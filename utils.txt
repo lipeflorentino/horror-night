@@ -1,0 +1,16 @@
+Tarefas 
+    Camera
+        - Leve Oscilação na camera (Respiração)
+        - Usar Cinemachine
+        - Adicionar vignette dinâmica URP
+        - Adicionar ruído leve na câmera
+        - Limite de visão com sombras na borda
+    Movement
+        - Criar passo lento com pausa
+
+Organização de Arquivos
+    - Art
+    - Scenes
+    - Scripts 
+    - Settings 
+    - Shaders
