@@ -1,16 +1,52 @@
-Tarefas 
+TASKS 
+
     Camera
         - Leve Oscilação na camera (Respiração)
-        - Usar Cinemachine
         - Adicionar vignette dinâmica URP
         - Adicionar ruído leve na câmera
         - Limite de visão com sombras na borda
     Movement
         - Criar passo lento com pausa
 
-Organização de Arquivos
+    Gameplay
+        - Turn Combat
+        - Combat Scene 
+        - SanitySystem (medo, ansiedade, ataques de panico)
+        - HUD system 
+        - InventorySystem 
+        - HideSystem (disparar eventos de se esconder de criatura)
+
+    Sistemas
+        - Sistema de Room Lock para combate
+        - Carregamento dinâmico de salas
+        - Grid automático de rooms
+        - Sistema de minimap integrado
+    
+    Progressão
+        - Story
+        - Character
+        - World
+        - Meta / Spirit 
+        - Collection
+
+    Rooms 
+        - Resource
+        - Enemy 
+        - Story 
+        - NPC 
+        - Boss 
+
+
+FILE ORGANIZATION
+
     - Art
     - Scenes
     - Scripts 
     - Settings 
     - Shaders
+
+
+GAME PATH 
+
+    - inicio -> consegue uma habilidade -> tutorial -> Evento da história -> Introdução a não linearidade -> boss
+

@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float walkSpeed = 5f;
+    private bool canMove = true;
 
     [Header("Step By Step Settings")]
     public float stepSpeed = 5f;
@@ -24,7 +25,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (!canMove) return;
+        
         moveInput = Input.GetAxisRaw("Horizontal");
+
+        HandleFlip();
 
         bool shiftPressed = Input.GetKey(KeyCode.LeftShift);
 
@@ -79,5 +84,24 @@ public class PlayerMovement : MonoBehaviour
             StopAllCoroutines();
             isStepWalking = false;
         }
+    }
+
+    private void HandleFlip()
+    {
+        if (moveInput > 0)
+            transform.localScale = new Vector3(1, 1, 1);
+        else if (moveInput < 0)
+            transform.localScale = new Vector3(-1, 1, 1);
+    }
+
+    public void LockMovement()
+    {
+        canMove = false;
+        rb.velocity = Vector2.zero;
+    }
+
+    public void UnlockMovement()
+    {
+        canMove = true;
     }
 }
