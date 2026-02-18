@@ -65,6 +65,28 @@ public class PlayerStatusManager : MonoBehaviour
         UpdateBar(sanityBar, currentSanity, maxSanity);
     }
 
+
+    public float GetCurrentStrength()
+    {
+        return currentStrength;
+    }
+
+    public bool CanSpendStrength(float amount)
+    {
+        return amount >= 0f && currentStrength >= amount;
+    }
+
+    public bool TrySpendStrength(float amount)
+    {
+        if (!CanSpendStrength(amount))
+        {
+            return false;
+        }
+
+        DecreaseStrength(amount);
+        return true;
+    }
+
     private void RefreshAllBars()
     {
         UpdateBar(lifeBar, currentLife, maxLife);
