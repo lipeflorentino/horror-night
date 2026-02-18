@@ -53,17 +53,6 @@ public class PlayerStatusManager : MonoBehaviour
         UpdateBar(strengthBar, currentStrength, maxStrength);
     }
 
-    // Alias methods in case "strenght" is used elsewhere.
-    public void IncreaseStrenght(float amount)
-    {
-        IncreaseStrength(amount);
-    }
-
-    public void DecreaseStrenght(float amount)
-    {
-        DecreaseStrength(amount);
-    }
-
     public void IncreaseSanity(float amount)
     {
         currentSanity = Mathf.Clamp(currentSanity + amount, 0f, maxSanity);

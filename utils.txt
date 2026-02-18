@@ -1,4 +1,8 @@
 TASKS 
+    Base 
+        - Fogueira (salvar, descansar) 
+        - Livro (Ler história, metaprogressão, etc)
+        - Baú (itens, reliquias, etc)
 
     Camera
         - Leve Oscilação na camera (Respiração)
@@ -31,6 +35,7 @@ TASKS
 
     Rooms 
         - Resource
+        - Debuff
         - Enemy 
         - Story 
         - NPC 
