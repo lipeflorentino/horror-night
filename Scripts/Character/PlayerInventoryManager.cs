@@ -54,28 +54,23 @@ public class PlayerInventoryManager : MonoBehaviour
             return false;
         }
 
-        int remaining = amount;
+        int existingSlotIndex = FindSlotIndex(itemName, statType);
 
-        for (int i = 0; i < slots.Count && remaining > 0; i++)
+        if (existingSlotIndex >= 0)
         {
-            InventorySlot slot = slots[i];
-            if (slot.IsEmpty || !CanStack(slot.item, itemName, statType))
+            InventorySlot existingSlot = slots[existingSlotIndex];
+            int freeSpace = maxItemsPerSlot - existingSlot.item.quantity;
+            if (freeSpace < amount)
             {
-                continue;
+                return false;
             }
 
-            int freeSpace = maxItemsPerSlot - slot.item.quantity;
-            if (freeSpace <= 0)
-            {
-                continue;
-            }
-
-            int toAdd = Mathf.Min(freeSpace, remaining);
-            slot.item.quantity += toAdd;
-            remaining -= toAdd;
+            existingSlot.item.quantity += amount;
+            OnInventoryChanged?.Invoke();
+            return true;
         }
 
-        for (int i = 0; i < slots.Count && remaining > 0; i++)
+        for (int i = 0; i < slots.Count; i++)
         {
             InventorySlot slot = slots[i];
             if (!slot.IsEmpty)
@@ -83,25 +78,24 @@ public class PlayerInventoryManager : MonoBehaviour
                 continue;
             }
 
-            int toAdd = Mathf.Min(maxItemsPerSlot, remaining);
+            if (amount > maxItemsPerSlot)
+            {
+                return false;
+            }
+
             slot.item = new InventoryItem
             {
                 itemName = itemName,
                 sprite = sprite,
                 statType = statType,
-                quantity = toAdd
+                quantity = amount
             };
 
-            remaining -= toAdd;
-        }
-
-        bool addedAny = remaining < amount;
-        if (addedAny)
-        {
             OnInventoryChanged?.Invoke();
+            return true;
         }
 
-        return remaining == 0;
+        return false;
     }
 
     public bool RemoveItem(string itemName, ItemStatType statType, int amount = 1)
@@ -202,5 +196,21 @@ public class PlayerInventoryManager : MonoBehaviour
         return item != null
             && string.Equals(item.itemName, itemName, StringComparison.OrdinalIgnoreCase)
             && item.statType == statType;
+    }
+
+    private int FindSlotIndex(string itemName, ItemStatType statType)
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            InventorySlot slot = slots[i];
+            if (slot.IsEmpty || !CanStack(slot.item, itemName, statType))
+            {
+                continue;
+            }
+
+            return i;
+        }
+
+        return -1;
     }
 }
