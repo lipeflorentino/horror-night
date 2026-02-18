@@ -19,13 +19,13 @@ public class UnlockableInteractable2D : MonoBehaviour, IInteractable
     [SerializeField] private UnityEvent onUnlockFailed;
 
     private PlayerStatusManager playerStatus;
-    private IInteractable targetInteractable;
+    private InteractableObject2D targetInteractable;
     private bool isUnlocked;
 
     private void Awake()
     {
         playerStatus = FindFirstObjectByType<PlayerStatusManager>();
-        targetInteractable = interactableTarget as IInteractable;
+        targetInteractable = interactableTarget as InteractableObject2D;
 
         if (interactableTarget != null && targetInteractable == null)
         {
@@ -33,6 +33,8 @@ public class UnlockableInteractable2D : MonoBehaviour, IInteractable
         }
 
         isUnlocked = !startsLocked;
+
+        if (!isUnlocked && interactableTarget != null) interactableTarget.enabled = false;
     }
 
     public void Interact()
@@ -82,6 +84,7 @@ public class UnlockableInteractable2D : MonoBehaviour, IInteractable
         }
 
         bool unlocked = playerStatus.TrySpendStrength(unlockStrengthCost);
+        Debug.Log($"unlocked: {unlocked}");
 
         if (!unlocked)
         {
@@ -90,6 +93,7 @@ public class UnlockableInteractable2D : MonoBehaviour, IInteractable
         }
 
         isUnlocked = true;
+        interactableTarget.enabled = true;
         onUnlockSuccess?.Invoke();
     }
 }

@@ -6,6 +6,11 @@ public class InteractionPromptUI : MonoBehaviour
     [SerializeField] private GameObject container;
     [SerializeField] private TMP_Text promptText;
 
+    void Start()
+    {
+        Hide();
+    }
+
     public void Show(string text)
     {
         if (promptText != null)
@@ -24,6 +29,14 @@ public class InteractionPromptUI : MonoBehaviour
         if (container != null)
         {
             container.SetActive(false);
+        }
+    }
+
+    public void Flicker()
+    {
+        if (promptText != null)
+        {
+            container.transform.GetComponent<PromptFeedbackEffect>().PlayDeniedEffect();
         }
     }
 }

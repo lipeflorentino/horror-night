@@ -38,12 +38,13 @@ public class PlayerInteractionController2D : MonoBehaviour
             : transform.position;
 
         Collider2D hit = Physics2D.OverlapCircle(center, interactionRadius, interactableLayer);
-        IInteractable foundInteractable = hit != null ? hit.GetComponent<IInteractable>() : null;
-
+        IInteractable foundInteractable = hit?.GetComponent<IInteractable>();
+        
         if (ReferenceEquals(foundInteractable, currentInteractable))
         {
             if (currentInteractable != null)
             {
+                interactionPromptUI = hit.GetComponent<InteractionPromptUI>();
                 ShowPromptForCurrentInteractable();
             }
 

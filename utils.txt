@@ -1,3 +1,10 @@
+TO DO !!!!
+    - Script para gerenciar Inventario
+        - Abrir tela
+        - Travar controles
+        - Destravar ao apertar novamente (Toggle)
+
+
 TASKS 
     Base 
         - Fogueira (salvar, descansar) 
@@ -9,6 +16,7 @@ TASKS
         - Adicionar vignette dinâmica URP
         - Adicionar ruído leve na câmera
         - Limite de visão com sombras na borda
+        
     Movement
         - Criar passo lento com pausa
 

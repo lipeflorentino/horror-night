@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class InteractableObject2D : MonoBehaviour, IInteractable
+public class InteractableObject2D : MonoBehaviour
 {
     [Header("Prompt")]
     [SerializeField] private string interactionText = "[E] Interagir";
