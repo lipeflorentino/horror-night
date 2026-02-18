@@ -1,16 +1,29 @@
+using TMPro;
 using UnityEngine;
 
 public class InteractionPromptUI : MonoBehaviour
 {
     [SerializeField] private GameObject container;
+    [SerializeField] private TMP_Text promptText;
 
-    public void Show()
+    public void Show(string text)
     {
-        container.SetActive(true);
+        if (promptText != null)
+        {
+            promptText.text = text;
+        }
+
+        if (container != null)
+        {
+            container.SetActive(true);
+        }
     }
 
     public void Hide()
     {
-        container.SetActive(false);
+        if (container != null)
+        {
+            container.SetActive(false);
+        }
     }
 }
