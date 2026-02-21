@@ -10,7 +10,6 @@ HISTÓRIAS
     8. Sistemas do personagem (hp, inventory, progressão, controles)
 
 Backlog 
-    - 
-
-Horror Night.slnx is unable to open. Please ensure that your .NET SDK version is 9.0.200 or higher to support .slnx files.
+    - ItemSpawnableSO
+        - 
 
