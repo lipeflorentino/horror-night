@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 71e615ef3688d604eb62c4a21b3ada44
+guid: 4780b4e85189b1648af8a92e09ef72e8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_0
+      name: objects_tileset_0
       rect:
         serializedVersion: 2
-        x: 59
-        y: 623
-        width: 444
-        height: 349
+        x: 154
+        y: 666
+        width: 313
+        height: 283
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ab8c9c40d9750b4eafc0cb2b446ed05
-      internalID: -974051958
+      spriteID: 4a6c677e1e3e3654ca533b2fb860876f
+      internalID: 1994089586
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_1
+      name: objects_tileset_1
       rect:
         serializedVersion: 2
-        x: 550
-        y: 571
-        width: 361
-        height: 412
+        x: 487
+        y: 659
+        width: 247
+        height: 295
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +145,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c6e48209c168cfd419a41735c5fd3eb7
-      internalID: -1732195487
+      spriteID: e3795640a4a7ad147a73735cf025ad88
+      internalID: 848058512
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_2
+      name: objects_tileset_2
       rect:
         serializedVersion: 2
-        x: 1015
-        y: 585
-        width: 494
-        height: 405
+        x: 822
+        y: 650
+        width: 227
+        height: 315
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7bed5452110bb804f9d332468cf30e4c
-      internalID: -1548928159
+      spriteID: b0b1b414f858e0c4a8c9ac786ae491e0
+      internalID: 1903587364
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_3
+      name: objects_tileset_3
       rect:
         serializedVersion: 2
-        x: 61
-        y: 283
-        width: 492
-        height: 277
+        x: 1113
+        y: 641
+        width: 271
+        height: 329
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,20 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7baf337a457a319448a219f8c6d7ae9c
-      internalID: -269053753
+      spriteID: af2a80f56b7b9a1478ff51db153fa1fb
+      internalID: 1683510214
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_4
+      name: objects_tileset_4
       rect:
         serializedVersion: 2
-        x: 521
-        y: 79
-        width: 487
-        height: 388
+        x: 170
+        y: 326
+        width: 283
+        height: 295
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -208,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a71dcb88a396f254ca7d03a162e07216
-      internalID: -601219630
+      spriteID: d8a454106a8c1b64a8c38957af7e6af3
+      internalID: 106501455
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_5
+      name: objects_tileset_5
       rect:
         serializedVersion: 2
-        x: 1056
-        y: 140
-        width: 419
-        height: 377
+        x: 471
+        y: 340
+        width: 281
+        height: 285
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,8 +229,71 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0d391a0aba7cfd3479ecc93d70240c1d
-      internalID: 1388472527
+      spriteID: e5d86d0005f1ae84a803158e374382c2
+      internalID: -1997279113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: objects_tileset_6
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 333
+        width: 270
+        height: 292
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88d9b58b7ea32744093477e1ec9c44c4
+      internalID: -447267847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: objects_tileset_7
+      rect:
+        serializedVersion: 2
+        x: 1094
+        y: 340
+        width: 309
+        height: 283
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6817888749e07b94f8b6f261e2a29ab0
+      internalID: -1218606889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: objects_tileset_8
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 36
+        width: 177
+        height: 286
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 007d5ca79a808f74981e8d44f76f2078
+      internalID: 489331603
       vertices: []
       indices: 
       edges: []
@@ -246,12 +309,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      creatures_unrevealed_tileset_0: -974051958
-      creatures_unrevealed_tileset_1: -1732195487
-      creatures_unrevealed_tileset_2: -1548928159
-      creatures_unrevealed_tileset_3: -269053753
-      creatures_unrevealed_tileset_4: -601219630
-      creatures_unrevealed_tileset_5: 1388472527
+      objects_tileset_0: 1994089586
+      objects_tileset_1: 848058512
+      objects_tileset_2: 1903587364
+      objects_tileset_3: 1683510214
+      objects_tileset_4: 106501455
+      objects_tileset_5: -1997279113
+      objects_tileset_6: -447267847
+      objects_tileset_7: -1218606889
+      objects_tileset_8: 489331603
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

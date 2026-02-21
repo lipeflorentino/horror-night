@@ -1,9 +1,38 @@
-TO DO !!!!
-    - Script para gerenciar Inventario
-        - Abrir tela
-        - Travar controles
-        - Destravar ao apertar novamente (Toggle)
+IDEIAS
+    - Elemento que pode ser combinado a um item para upgrade (magica, éter, lumus)
+    - Companions tem menor ativação de encounters
+    - Ruidos de passos aumentam chance de encouners
+    - Um ponto de exclamação aparece no mapa, na area onde o jogador deverá interagir para spawmar recompesas
+    - Loot é spawmado conforme jogador vasculha area
+    - Seguir na horizontal manter nivel de itens e inimigos, ir para vertical altera nivel
+    - Ao iniciar run, há 2 caminhos horizontais e 1 caminho vertical que pode estar bloqueado.
+        - os caminhos horizontais podem ser explorados indefinidamente, mas tem custo mental e incremento de tensao
+            - seguir para esquerda evolui o aspecto X do personagem e dá possibilidade de x recompensas (gerado aleatoriamente)
+            - seguir pela direita evolui o aspecto Y do personagem e dá possibilidade de y recompensas (gerado aleatoriamente)
+        - ir para o caminho vertical, causa avanço na historia, no nivel do jogador e na dificuldade global, mas alivia um pouco a tensao momentanea e recupera parte da sanidade
+            - contador mental aumenta em 1 (barra de progressão mental, sao os niveis do coma do personagem, no topo ele desperta)
+            - Aumenta dano inimigo
+            - Aumenta chance de eventos severos
+            - serão 3 níveis
 
+    - Contador de tensão: 
+        - Movimento + 1 de tensão
+        - Derrotar inimigos + 3
+
+    - Pontos de Tensão 
+        - 4 pontos: Encontro
+        - 5 pontos: Glitch (instabilidade)
+        - 8 pontos: Evento psicologico (Encontrar recurso com custo de sanidade, Ilusão que consome turno, perder vida ou perder item)
+
+    - Tensão influencia:
+        - Chance de combate
+        - Tipo de inimigo
+        - Distorções visuais
+        - Alteração de diálogos internos
+
+    - No topo escolher entre dois caminhos 
+        - Tentar salvar a menina e arriscar perder todos recursos que tem 
+        - Sair da floresta e guardar os recursos permanentemente
 
 TASKS 
     Base 

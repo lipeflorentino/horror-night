@@ -12,9 +12,10 @@ public class PlayerMovement : MonoBehaviour
     public float stepSpeed = 5f;
     public float stepDuration = 0.2f;
     public float pauseDuration = 0.2f;
-
     private Rigidbody2D rb;
-    private float moveInput;
+    private float horizontalInput;
+    private float verticalInput;
+
     private bool isStepWalking = false;
     private bool isStepping = false;
 
@@ -26,14 +27,16 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (!canMove) return;
-        
-        moveInput = Input.GetAxisRaw("Horizontal");
+
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput   = Input.GetAxisRaw("Vertical");
 
         HandleFlip();
 
         bool shiftPressed = Input.GetKey(KeyCode.LeftShift);
+        bool hasInput = horizontalInput != 0 || verticalInput != 0;
 
-        if (shiftPressed && moveInput != 0)
+        if (shiftPressed && hasInput)
         {
             if (!isStepWalking)
                 StartCoroutine(StepByStepWalk());
@@ -47,29 +50,38 @@ public class PlayerMovement : MonoBehaviour
 
     private void NormalWalk()
     {
-        rb.velocity = new Vector2(moveInput * walkSpeed, rb.velocity.y);
+        Vector2 direction = new Vector2(horizontalInput, verticalInput).normalized;
+        rb.velocity = direction * walkSpeed;
     }
 
     private IEnumerator StepByStepWalk()
     {
         isStepWalking = true;
 
-        while (Input.GetKey(KeyCode.LeftShift) && moveInput != 0)
+        while (Input.GetKey(KeyCode.LeftShift))
         {
+            horizontalInput = Input.GetAxisRaw("Horizontal");
+            verticalInput   = Input.GetAxisRaw("Vertical");
+
+            Vector2 direction = new Vector2(horizontalInput, verticalInput).normalized;
+
+            if (direction == Vector2.zero)
+                break;
+
             // STEP
             isStepping = true;
             float timer = 0f;
 
             while (timer < stepDuration)
             {
-                rb.velocity = new Vector2(moveInput * stepSpeed, rb.velocity.y);
+                rb.velocity = direction * stepSpeed;
                 timer += Time.deltaTime;
                 yield return null;
             }
 
             // PAUSE
             isStepping = false;
-            rb.velocity = new Vector2(0, rb.velocity.y);
+            rb.velocity = Vector2.zero;
 
             yield return new WaitForSeconds(pauseDuration);
         }
@@ -88,9 +100,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleFlip()
     {
-        if (moveInput > 0)
+        if (horizontalInput > 0)
             transform.localScale = new Vector3(1, 1, 1);
-        else if (moveInput < 0)
+        else if (horizontalInput < 0)
             transform.localScale = new Vector3(-1, 1, 1);
     }
 

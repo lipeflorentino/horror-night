@@ -31,12 +31,4 @@ public class InteractionPromptUI : MonoBehaviour
             container.SetActive(false);
         }
     }
-
-    public void Flicker()
-    {
-        if (promptText != null)
-        {
-            container.transform.GetComponent<PromptFeedbackEffect>().PlayDeniedEffect();
-        }
-    }
 }

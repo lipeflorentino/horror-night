@@ -1,7 +1,16 @@
-TO DO 
-    - InvetorySystem 
-    - CollectableObject 
-    - Level Sorting System 
+HISTÓRIAS 
+
+    1. Estrutura de Clareiras (prefabs + conexões)
+    2. Variável global de Tensão
+    3. Variável global de Corrupção
+    4. Tabela de eventos ponderados
+    5. Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
+    6. Sistema simples de perda parcial
+    7. Sistema de combate em turnos
+    8. Sistemas do personagem (hp, inventory, progressão, controles)
 
 Backlog 
     - 
+
+Horror Night.slnx is unable to open. Please ensure that your .NET SDK version is 9.0.200 or higher to support .slnx files.
+

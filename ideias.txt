@@ -1,0 +1,37 @@
+1) Ideia Central Da Run
+
+Quando a run inicia, é gerada uma "clareira", o player pode explorar a clareira em busca de recursos. 
+A cada movimento aumenta ponto de tensão, um certo numero gera encounter. Alem disso, estou pensando em implementar um sistema de escolha gerado a cada "clareira", como se fossem duas cartas. 
+O caminho da direita e caminho da esquerda. Cada caminho tem algumas recompensas especificas e inimigos especificos. 
+Ao selecionar o jogador é transportado para essa nova "clareira" e novamente é apresentado a duas escolhas geradas "aleatoriamente" dentro de uma tabela preexistente de recompensas (itens, habilidades, etc). 
+O player tbm tem a opção de "subir" que seria analogo a subir de level, aumentando dificuldade e aspectos do jogo avançam (nem sempre está liberado subir, o player pode ter que cumprir algum requisito, ter chave, derrotar algum chefe, etc). 
+
+
+2) Recompensas 
+
+Elas “Emergem” do Ambiente:
+Em vez de encontrar algo fisicamente, a recompensa pode emergir como fenômeno: 
+Pode aparecer um prompt de texto na tela.
+    Uma sombra se solidifica → escolha absorver ou expulsar
+    Um sussurro se intensifica → escolha escutar ou ignorar
+    Uma árvore “oferece” algo (apenas efeito visual simples) -> aceitar ou não
+
+Modelo de execução:
+Pontos de interação são gerados aleatoriamente pela clareira.
+Jogador se aproxima e surge um efeito visual de texto simples.
+Aparece escolha contextual minimalista (2 opções rápidas).
+A escolha pode envolver perdas -> trocar 5hp por item raro
+
+3) Fluxo de Gameplay 
+
+Começa na base, ajusta inventário, build e inicia run:
+Entra na clareira
+Sorteia estado dominante.
+Define tabela de recompensas possíveis.
+Define tipo de inimigo provável.
+
+Durante exploração:
+Movimento gera tensão.
+Interações ocorrem nos pontos de interação
+Encontros ocorrem.
+Após encontro, surge escolha de caminho.
