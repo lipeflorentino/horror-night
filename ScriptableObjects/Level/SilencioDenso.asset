@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee04029046aed8b4dab3d6b3ad4b5887, type: 3}
+  m_Name: SilencioDenso
+  m_EditorClassIdentifier: 
+  levelId: silencio_denso
+  size: 5
+  backgroundPrefab: {fileID: 4232275755201499981, guid: a3e1edef9244d704cbe32a5f2276a6ba, type: 3}
+  defaultNode: {fileID: 11400000, guid: 827898b8764ca4047b62dd71da14b3dc, type: 2}
+  leftPortalNode: {fileID: 11400000, guid: 0d81b37b9decd53479a12306d09f52d2, type: 2}
+  rightPortalNode: {fileID: 11400000, guid: 71d67bbbec1a6fd459f2de7ee4d4863a, type: 2}
+  tileSpacing: 3
+  Tier_Min: 1
+  Tier_Max: 3
+  Spawn_Weight: 10
+  Base_Difficulty: 1
+  Base_Tension_Modifier: 0.5
+  Presence_Growth_Modifier: 1
+  Encounter_Risk_Modifier: 0.8
+  Reward_Min_Value: 1
+  Reward_Max_Value: 3
+  Tags: mental,respiro,memoria
+  Special_Rule: "Tens\xE3o cresce 50% mais devagar"

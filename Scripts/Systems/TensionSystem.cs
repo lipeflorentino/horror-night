@@ -29,6 +29,6 @@ public class TensionSystem : MonoBehaviour
 
    int GetEncounterThreshold()
    {
-       return 5 + RunManager.Instance.CurrentTier;
+       return 5; // + LevelController.Instance.CurrentTier;
    }
 }

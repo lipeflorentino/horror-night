@@ -10,6 +10,5 @@ HISTÓRIAS
     8. Sistemas do personagem (hp, inventory, progressão, controles)
 
 Backlog 
-    - ItemSpawnableSO
-        - 
+    - 
 

@@ -1,9 +1,9 @@
 using UnityEngine;
 public class LevelInstance : MonoBehaviour
 {
-   public LevelDefinition Definition;
+   public LevelSO Definition;
 
-   public void Initialize(LevelDefinition def)
+   public void Initialize(LevelSO def)
    {
        Definition = def;
        ApplyDefinition();
