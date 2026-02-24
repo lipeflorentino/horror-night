@@ -1,0 +1,83 @@
+ÉPICOS SCRUM — HORROR NIGHT
+
+Este documento resume, em visão de produto (épicos), o que já foi entregue no projeto até o momento.
+
+ÉPICO 1 — FUNDAÇÃO TÉCNICA DO PROJETO (Unity + Organização)
+Status: Concluído (base inicial)
+Já foi feito:
+- Estrutura principal de pastas consolidada (Art, Scenes, Scripts, Prefabs, ScriptableObjects, Shaders, Settings).
+- Pipeline base de projeto Unity configurada com assets e cenas iniciais.
+- Definição de separação arquitetural em Model-View-Presenter no diretório Scripts.
+
+ÉPICO 2 — MODELAGEM DE DADOS DO MUNDO (LEVEL/NODE)
+Status: Concluído (primeira versão)
+Já foi feito:
+- Definição de enums e flags para tipagem de nós e comportamento.
+- Criação de estrutura de modificadores de status (StatModifier).
+- Implementação de SpawnEntry para tabela de conteúdo.
+- Implementação de LevelNodeSO com sorteio ponderado por peso.
+- Implementação de LevelSO com parâmetros de layout, tier, tensão, risco, recompensas e tags.
+- Implementação de LevelNode em runtime, com geração de conteúdo por regra.
+
+ÉPICO 3 — NAVEGAÇÃO DA CLAREIRA E FLUXO DE NÍVEL
+Status: Concluído (MVP funcional)
+Já foi feito:
+- Implementação de LevelController para criar nós, posicionar jogador e mover entre índices.
+- Conversão de índice lógico para posição no mundo (tile spacing).
+- Detecção de exploração de nó e geração de conteúdo no primeiro acesso.
+- Eventos de mudança de nó e conclusão de nível.
+- Implementação de RunController para iniciar run, carregar níveis e alternar para próximo nível.
+
+ÉPICO 4 — JOGADOR (MOVIMENTO E STATUS)
+Status: Concluído (primeira versão)
+Já foi feito:
+- Movimento em grade horizontal por input (setas/A-D), com interpolação suave.
+- Flip de sprite conforme direção.
+- Sistema de status do jogador com Vida, Força e Sanidade.
+- Métodos de aumento/redução de status e consumo controlado de força.
+- Atualização de barras de UI por fillAmount.
+
+ÉPICO 5 — SISTEMAS DE PRESSÃO E ENCONTRO
+Status: Concluído (primeira versão)
+Já foi feito:
+- TensionSystem: acúmulo por movimento + gatilho de encontro ao atingir limiar.
+- PresenceSystem: acúmulo temporal + encontro forçado ao atingir limite.
+- EncounterSystem: camada de orquestração para encontros normais e forçados.
+- CombatManager: ponto central para iniciar combate com modificador de dificuldade.
+
+ÉPICO 6 — INTEGRAÇÃO DE MODIFICADORES DE NÍVEL
+Status: Concluído (primeira versão)
+Já foi feito:
+- LevelInstance aplica parâmetros do LevelSO em sistemas globais:
+  - Modificador de tensão.
+  - Crescimento de presença.
+  - Risco de encounter.
+  - Tags visuais do ambiente.
+
+ÉPICO 7 — INTERFACE E FEEDBACK VISUAL
+Status: Concluído parcialmente
+Já foi feito:
+- UI de avanço de nível (LevelUpUI) com evento de continuidade.
+- Indicador de nível em janela visual de 5 slots (UILevelIndicator).
+- Sistema de fade in/out para transições.
+- VisualSystem com gatilhos por tags (mental/sombra) e stubs de efeito.
+
+Pendências percebidas neste épico:
+- Implementar efeitos reais em EnableFogEffect e DarkenEnvironment.
+- Refinar UX de portal/subida de nível e inputs relacionados.
+
+ÉPICO 8 — COMBATE E CONTEÚDO AVANÇADO
+Status: Em andamento (estrutura pronta, lógica detalhada pendente)
+Já foi feito:
+- Criação da porta de entrada do combate (CombatManager.StartCombat).
+- Encadeamento com os sistemas de encontro.
+
+Faltas para próximas sprints:
+- Definição de turnos, entidades inimigas e resolução de dano/efeitos.
+- Escalonamento real por tier, tags e dificuldade.
+- Recompensas pós-combate e integração com progressão.
+
+RESUMO EXECUTIVO
+- A base arquitetural e o loop estrutural da run estão estabelecidos.
+- O projeto já possui núcleo jogável para movimentação, geração de nós e gatilho de encontros.
+- Próximo grande passo de produto: aprofundar combate, progressão e polimento de feedback visual/UX.
