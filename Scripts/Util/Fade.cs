@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-public class FadeController : MonoBehaviour
+public class Fade : MonoBehaviour
 {
     public Image fadeImage;
     public float fadeSpeed = 2f;
