@@ -9,6 +9,11 @@ HISTÓRIAS
     7. Sistema de combate em turnos
     8. Sistemas do personagem (hp, inventory, progressão, controles)
 
-Backlog 
-    - 
+1. Épicos (Grandes entregas)
+Os Épicos são as grandes funcionalidades que definem o jogo. 
+Exemplos para seu RPG:
 
+    Épico 1: Core Gameplay (Movimentação e Combate)
+    Épico 2: Sistema de Progressão (XP, Level e Skills)
+    Épico 3: Mundo e Narrativa (Diálogos e Quests)
+    Épico 4: Polimento e UI (Menus e Efeitos Sonoros)
