@@ -207,7 +207,7 @@ MonoBehaviour:
   root: {fileID: 101273162}
   nameText: {fileID: 769891246}
   descriptionText: {fileID: 658290517}
-  iconImage: {fileID: 0}
+  iconImage: {fileID: 1371718885}
   pickButton: {fileID: 2081514659}
   leaveButton: {fileID: 537214806}
 --- !u!114 &137132716 stripped
@@ -1456,7 +1456,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -265717274, guid: 67536acf7631070409d5df40ba1665fd, type: 3}
+  m_Sprite: {fileID: 1430024435, guid: b2a6f1b0d4dac7e45969623c095061de, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
