@@ -35,3 +35,12 @@ Movimento gera tensão.
 Interações ocorrem nos pontos de interação
 Encontros ocorrem.
 Após encontro, surge escolha de caminho.
+
+
+4) PALETA DE CORES 
+
+    Cor principal: roxo profundo (#3b2f5c)
+    Destaque: magenta suave (#b36ad6)
+    Texto: #C6C6C6
+    Texto Sec. #B5ACAC
+    cor comum. #A55EAD 

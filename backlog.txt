@@ -17,3 +17,6 @@ Exemplos para seu RPG:
     Épico 2: Sistema de Progressão (XP, Level e Skills)
     Épico 3: Mundo e Narrativa (Diálogos e Quests)
     Épico 4: Polimento e UI (Menus e Efeitos Sonoros)
+
+
+    Criar um sistema completo de Loot com peso + raridade + seed procedural

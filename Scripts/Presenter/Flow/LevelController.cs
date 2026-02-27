@@ -33,8 +33,6 @@ public class LevelController : MonoBehaviour
 
         startIndex = level.size / 2;
         CurrentIndex = startIndex;
-        nodes[CurrentIndex].GenerateContent();
-
         OnNodeChanged?.Invoke(CurrentIndex);
     }
 
@@ -49,8 +47,8 @@ public class LevelController : MonoBehaviour
 
         if (!nodes[CurrentIndex].explored)
         {
-            nodes[CurrentIndex].GenerateContent();
             nodes[CurrentIndex].explored = true;
+            nodes[CurrentIndex].looted = true;
         }
 
         OnNodeChanged?.Invoke(CurrentIndex);

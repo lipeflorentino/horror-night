@@ -1982,6 +1982,7 @@ GameObject:
   - component: {fileID: 2987951144079921831}
   - component: {fileID: 1673056188402891766}
   - component: {fileID: 5342978682417247641}
+  - component: {fileID: 6486987500381942688}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2167,6 +2168,19 @@ MonoBehaviour:
   levelController: {fileID: 0}
   spriteRenderer: {fileID: 16397655899682528}
   moveDuration: 1
+--- !u!114 &6486987500381942688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4358587489585040219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa8af4916a555874ea996e28a492bd7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  items: []
 --- !u!1 &4532202215196471996
 GameObject:
   m_ObjectHideFlags: 0
