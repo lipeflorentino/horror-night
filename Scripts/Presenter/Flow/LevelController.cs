@@ -48,7 +48,6 @@ public class LevelController : MonoBehaviour
         if (!nodes[CurrentIndex].explored)
         {
             nodes[CurrentIndex].explored = true;
-            nodes[CurrentIndex].looted = true;
         }
 
         OnNodeChanged?.Invoke(CurrentIndex);

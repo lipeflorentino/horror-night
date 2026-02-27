@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -12,6 +13,8 @@ public class PlayerGridMovement : MonoBehaviour
     [SerializeField] private float moveDuration = 0.25f;
 
     private bool isMoving = false;
+
+    public event Action<int> OnMoveCompleted;
 
     private void Start()
     {
@@ -74,5 +77,7 @@ public class PlayerGridMovement : MonoBehaviour
 
         transform.position = targetPosition;
         isMoving = false;
+
+        OnMoveCompleted?.Invoke(levelController.CurrentIndex);
     }
 }
