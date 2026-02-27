@@ -7,6 +7,7 @@ public class LootSystem : MonoBehaviour
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private LevelController levelController;
     [SerializeField] private PlayerGridMovement playerMovement;
+    [SerializeField, Range(0f, 1f)] private float lootSpawnChance = 0.5f;
 
     private void Start()
     {
@@ -21,14 +22,25 @@ public class LootSystem : MonoBehaviour
         if (popup == null)
             popup = FindObjectOfType<UILootPopup>();
 
-        levelController.OnNodeChanged += HandleNodeChanged;
+        playerMovement.OnMoveCompleted += HandlePlayerArrivedAtNode;
     }
 
-    private void HandleNodeChanged(int index)
+    private void OnDestroy()
+    {
+        if (playerMovement != null)
+            playerMovement.OnMoveCompleted -= HandlePlayerArrivedAtNode;
+    }
+
+    private void HandlePlayerArrivedAtNode(int index)
     {
         LevelNode node = levelController.nodes[index];
 
         if (!node.definition.flags.HasFlag(NodeFlags.CanSpawnLoot) || node.looted)
+            return;
+
+        node.looted = true;
+
+        if (Random.value > lootSpawnChance)
             return;
 
         ItemSO item = database.GetRandomWeighted();
