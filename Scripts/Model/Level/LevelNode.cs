@@ -7,7 +7,7 @@ public class LevelNode
     public int index;
     public LevelNodeSO definition;
 
-    public bool explored, looted;
+    public bool explored, looted, activityResolved;
 
     public LevelNode(int index, LevelNodeSO definition)
     {
@@ -15,5 +15,6 @@ public class LevelNode
         this.definition = definition;
         explored = false;
         looted = false;
+        activityResolved = false;
     }
 }

@@ -1,5 +1,6 @@
 public enum NodeType { Default, Portal, Boss, Event, Story, Treasure }
 public enum Rarity { Common, Uncommon, Rare, Epic, Legendary }
+public enum NodeActivityType { Loot, Event, Encounter, Treasure, None }
 
 [System.Flags]
 public enum NodeFlags
