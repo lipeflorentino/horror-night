@@ -45,4 +45,35 @@ public class LevelSO : ScriptableObject
     [Header("Special Rule Description")]
     [TextArea]
     public string Special_Rule;
+
+    [Header("Node Activity - Base Weights")]
+    [Min(0f)] public float Loot_Weight = 1f;
+    [Min(0f)] public float Event_Weight = 1f;
+    [Min(0f)] public float Encounter_Weight = 1f;
+    [Min(0f)] public float Treasure_Weight = 0.5f;
+    [Min(0f)] public float None_Weight = 0.5f;
+
+    [Header("Node Activity - Runtime Modifiers")]
+    public float Loot_Weight_Modifier;
+    public float Event_Weight_Modifier;
+    public float Encounter_Weight_Modifier;
+    public float Treasure_Weight_Modifier;
+    public float None_Weight_Modifier;
+
+    public float GetEffectiveActivityWeight(NodeActivityType activityType)
+    {
+        switch (activityType)
+        {
+            case NodeActivityType.Loot:
+                return Mathf.Max(0f, Loot_Weight + Loot_Weight_Modifier);
+            case NodeActivityType.Event:
+                return Mathf.Max(0f, Event_Weight + Event_Weight_Modifier);
+            case NodeActivityType.Encounter:
+                return Mathf.Max(0f, Encounter_Weight + Encounter_Weight_Modifier);
+            case NodeActivityType.Treasure:
+                return Mathf.Max(0f, Treasure_Weight + Treasure_Weight_Modifier);
+            default:
+                return Mathf.Max(0f, None_Weight + None_Weight_Modifier);
+        }
+    }
 }
