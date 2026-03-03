@@ -1,8 +1,7 @@
 IDEIAS
     - Elemento que pode ser combinado a um item para upgrade (magica, éter, lumus)
     - Companions tem menor ativação de encounters
-    - Ruidos de passos aumentam chance de encouners
-    - Um ponto de exclamação aparece no mapa, na area onde o jogador deverá interagir para spawmar recompesas
+    - Ruidos de passos aumentam chance de encounetrs
     - Loot é spawmado conforme jogador vasculha area
     - Seguir na horizontal manter nivel de itens e inimigos, ir para vertical altera nivel
     - Ao iniciar run, há 2 caminhos horizontais e 1 caminho vertical que pode estar bloqueado.
@@ -78,17 +77,4 @@ TASKS
         - NPC 
         - Boss 
 
-
-FILE ORGANIZATION
-
-    - Art
-    - Scenes
-    - Scripts 
-    - Settings 
-    - Shaders
-
-
-GAME PATH 
-
-    - inicio -> consegue uma habilidade -> tutorial -> Evento da história -> Introdução a não linearidade -> boss
 

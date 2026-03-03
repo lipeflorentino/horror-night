@@ -51,25 +51,25 @@ public class NodeActivityController : MonoBehaviour
         if (node == null)
             return;
 
-        if (node.definition.flags.HasFlag(NodeFlags.OneTimeOnly) && node.activityResolved)
+        if (node.activityResolved)
             return;
 
         NodeActivityType result = RollActivity(node, levelController.currentLevel);
         DispatchActivity(result, node, levelController.currentLevel);
 
-        if (node.definition.flags.HasFlag(NodeFlags.OneTimeOnly))
-            node.activityResolved = true;
+        // if (node.definition.flags.HasFlag(NodeFlags.OneTimeOnly))
+        node.activityResolved = true;
     }
 
     private NodeActivityType RollActivity(LevelNode node, LevelSO level)
     {
         float lootWeight = IsLootAllowed(node) ? level.GetEffectiveActivityWeight(NodeActivityType.Loot) : 0f;
-        float eventWeight = IsEventAllowed(node) ? level.GetEffectiveActivityWeight(NodeActivityType.Occurrence) : 0f;
+        float occurrenceWeight = IsOccurrenceAllowed(node) ? level.GetEffectiveActivityWeight(NodeActivityType.Occurrence) : 0f;
         float encounterWeight = IsEncounterAllowed(node) ? level.GetEffectiveActivityWeight(NodeActivityType.Encounter) * Mathf.Max(0f, level.Encounter_Risk_Modifier) : 0f;
         float treasureWeight = IsTreasureAllowed(node) ? level.GetEffectiveActivityWeight(NodeActivityType.Treasure) : 0f;
         float noneWeight = level.GetEffectiveActivityWeight(NodeActivityType.None);
 
-        float total = lootWeight + eventWeight + encounterWeight + treasureWeight + noneWeight;
+        float total = lootWeight + occurrenceWeight + encounterWeight + treasureWeight + noneWeight;
 
         if (total <= 0f)
             return NodeActivityType.None;
@@ -79,8 +79,8 @@ public class NodeActivityController : MonoBehaviour
         if (roll < lootWeight) return NodeActivityType.Loot;
         roll -= lootWeight;
 
-        if (roll < eventWeight) return NodeActivityType.Occurrence;
-        roll -= eventWeight;
+        if (roll < occurrenceWeight) return NodeActivityType.Occurrence;
+        roll -= occurrenceWeight;
 
         if (roll < encounterWeight) return NodeActivityType.Encounter;
         roll -= encounterWeight;
@@ -98,7 +98,7 @@ public class NodeActivityController : MonoBehaviour
                 lootSystem.TriggerLoot(node);
                 break;
             case NodeActivityType.Occurrence:
-                occurrenceSystem.TriggerEvent(node, level);
+                occurrenceSystem.TriggerOccurrence(node, level);
                 break;
             case NodeActivityType.Encounter:
                 encounterSystem.TriggerEncounter();
@@ -116,7 +116,7 @@ public class NodeActivityController : MonoBehaviour
         return node.definition.flags.HasFlag(NodeFlags.CanSpawnLoot) && !node.looted;
     }
 
-    private static bool IsEventAllowed(LevelNode node)
+    private static bool IsOccurrenceAllowed(LevelNode node)
     {
         return node.definition.flags.HasFlag(NodeFlags.CanSpawnOccurrence);
     }

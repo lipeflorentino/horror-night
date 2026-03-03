@@ -19,4 +19,8 @@ Exemplos para seu RPG:
     Épico 4: Polimento e UI (Menus e Efeitos Sonoros)
 
 
-    Criar um sistema completo de Loot com peso + raridade + seed procedural
+    
+TO DO 
+    - Implementar sistemas que faltam
+        - Encounter, Presence, Tension, Treasure
+    - 
