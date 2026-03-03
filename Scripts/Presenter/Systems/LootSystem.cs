@@ -39,7 +39,7 @@ public class LootSystem : MonoBehaviour
 
         if (popup == null)
         {
-            inventory?.AddItem(item);
+            inventory.AddItem(item);
             if (playerMovement != null)
                 playerMovement.enabled = true;
             return;
@@ -48,7 +48,7 @@ public class LootSystem : MonoBehaviour
         popup.Show(item,
             onPick: () =>
             {
-                inventory?.AddItem(item);
+                inventory.AddItem(item);
                 if (playerMovement != null)
                     playerMovement.enabled = true;
             },

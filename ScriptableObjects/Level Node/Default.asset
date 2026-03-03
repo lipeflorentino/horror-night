@@ -13,21 +13,4 @@ MonoBehaviour:
   m_Name: Default
   m_EditorClassIdentifier: 
   nodeType: 0
-  flags: 1
-  spawnTable:
-  - itemName: Cookie
-    rarity: 0
-    weight: 1
-    effects:
-      life: 1
-      physical: -1
-      sanity: 0
-      power: 0
-  - itemName: Flor
-    rarity: 0
-    weight: 1
-    effects:
-      life: 0
-      physical: 0
-      sanity: 2
-      power: 0
+  flags: 15

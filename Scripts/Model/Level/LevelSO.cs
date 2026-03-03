@@ -5,6 +5,7 @@ public class LevelSO : ScriptableObject
 {
     [Header("Identity")]
     public string levelId;
+    public LevelType levelType;
     [Header("Structure")]
     [Min(3)]
     public int size = 5; 
@@ -13,14 +14,6 @@ public class LevelSO : ScriptableObject
     public LevelNodeSO defaultNode, leftPortalNode, rightPortalNode;
     [Header("Layout")]
     public float tileSpacing = 4f;
-
-    /* 
-    Regras:
-        Index 0 → leftPortalNode
-        Index size - 1 → rightPortalNode
-        Demais → defaultNode 
-    */
-
     [Header("Tier Range")]
     public int Tier_Min;
     public int Tier_Max;

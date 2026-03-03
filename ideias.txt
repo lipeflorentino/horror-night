@@ -44,3 +44,13 @@ Após encontro, surge escolha de caminho.
     Texto: #C6C6C6
     Texto Sec. #B5ACAC
     cor comum. #A55EAD 
+
+5) Dados para seleção de level
+- tags
+- nível de recompensa / inimigos
+- chance de cada atividade ocorrer
+- tamanho (slots)
+
+Criar script que irá escutar evento dispardo quando player chega ao node.
+- sortear atividade 
+- chamar o handler adequado

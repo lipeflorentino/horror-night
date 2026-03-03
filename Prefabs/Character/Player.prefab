@@ -2495,14 +2495,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelController: {fileID: 0}
   slots:
-  - {fileID: 3671931857142078730}
-  - {fileID: 5666895686600726654}
-  - {fileID: 4116566441292920662}
-  - {fileID: 6317581275743093129}
-  - {fileID: 2091473636907896630}
-  normalColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - row:
+    - {fileID: 3671931857142078730}
+    - {fileID: 6400634600379261901}
+  - row:
+    - {fileID: 5666895686600726654}
+    - {fileID: 6482343633482184471}
+  - row:
+    - {fileID: 4116566441292920662}
+    - {fileID: 1347866543804871479}
+  - row:
+    - {fileID: 6317581275743093129}
+    - {fileID: 1347866543804871479}
+  - row:
+    - {fileID: 2091473636907896630}
+    - {fileID: 2331813321710202830}
+  normalColor: {r: 0.2830189, g: 0.2763439, b: 0.2763439, a: 1}
   currentColor: {r: 1, g: 1, b: 1, a: 1}
-  portalColor: {r: 1, g: 0, b: 1, a: 1}
+  portalColor: {r: 0.6320754, g: 0.10435206, b: 0.6320754, a: 1}
 --- !u!1 &6039705412985285934
 GameObject:
   m_ObjectHideFlags: 0

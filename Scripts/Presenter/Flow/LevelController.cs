@@ -31,7 +31,7 @@ public class LevelController : MonoBehaviour
             nodes[i] = new LevelNode(i, nodeDef);
         }
 
-        startIndex = level.size / 2;
+        startIndex = 0;
         CurrentIndex = startIndex;
         OnNodeChanged?.Invoke(CurrentIndex);
     }

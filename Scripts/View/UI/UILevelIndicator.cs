@@ -1,12 +1,20 @@
+using System;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
+
+[Serializable]
+public class SlotRow
+{
+    public Image[] row;
+}
 
 public class UILevelIndicator : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LevelController levelController;
 
-    [SerializeField] private Image[] slots; // Deve ter 5 elementos
+    [SerializeField] private SlotRow[] slots; // Precisa de 5 imagens
 
     [Header("Visuals")]
     [SerializeField] private Color normalColor = Color.gray;
@@ -14,7 +22,7 @@ public class UILevelIndicator : MonoBehaviour
     [SerializeField] private Color portalColor = Color.magenta;
 
     private const int windowSize = 5;
-    private const int centerIndex = 2; // posição central da janela visual
+    private const int centerIndex = 0; // posição central da janela visual
 
     private void OnEnable()
     {
@@ -52,25 +60,29 @@ public class UILevelIndicator : MonoBehaviour
 
             if (realIndex < 0 || realIndex >= levelController.nodes.Length)
             {
-                slots[i].gameObject.SetActive(false);
+                slots[i].row[0].gameObject.SetActive(false);
+                slots[i].row[1].gameObject.SetActive(false);
                 continue;
             }
 
-            slots[i].gameObject.SetActive(true);
+            slots[i].row[0].gameObject.SetActive(true);
 
             LevelNode node = levelController.nodes[realIndex];
 
             if (realIndex == currentIndex)
             {
-                slots[i].color = currentColor;
+                slots[i].row[0].color = currentColor;
+                slots[i].row[1].gameObject.SetActive(true);
             }
             else if (node.definition.nodeType == NodeType.Portal)
             {
-                slots[i].color = portalColor;
+                slots[i].row[0].color = portalColor;
+                slots[i].row[1].gameObject.SetActive(false);
             }
             else
             {
-                slots[i].color = normalColor;
+                slots[i].row[0].color = normalColor;
+                slots[i].row[1].gameObject.SetActive(false);
             }
         }
     }

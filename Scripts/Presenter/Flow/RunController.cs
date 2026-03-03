@@ -78,6 +78,8 @@ public class RunController : MonoBehaviour
 
     private void HandlePortal()
     {
+        //TODO: Implementar sorteio de dois tipos de area do level. Cada area vai ter suas caracteristicas e recompensas.
+
         LevelSO nextLevel = GetNextLevel();
 
         if (nextLevel == null)

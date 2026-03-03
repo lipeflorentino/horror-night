@@ -1,4 +1,5 @@
-public enum NodeType { Default, Portal, Boss, Event, Story, Treasure }
+public enum NodeType { Default, Portal }
+public enum LevelType { Default, Boss, Story }
 public enum Rarity { Common, Uncommon, Rare, Epic, Legendary }
 public enum NodeActivityType { Loot, Event, Encounter, Treasure, None }
 
@@ -9,6 +10,7 @@ public enum NodeFlags
     CanSpawnLoot    = 1 << 0,
     CanSpawnEnemy   = 1 << 1,
     CanSpawnEvent   = 1 << 2,
-    OneTimeOnly     = 1 << 3,
-    Dangerous       = 1 << 4
+    canSpawnTreasure = 1 << 3,
+    OneTimeOnly     = 1 << 4,
+    Dangerous       = 1 << 5
 }

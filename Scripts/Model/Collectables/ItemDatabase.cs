@@ -16,8 +16,6 @@ public class ItemDatabase : MonoBehaviour
 
         allItems.Clear();
         allItems.AddRange(loaded);
-
-        Debug.Log($"Itens carregados: {allItems.Count}");
     }
 
     public ItemSO GetRandomWeighted()

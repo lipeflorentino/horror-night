@@ -95,16 +95,16 @@ public class NodeActivityController : MonoBehaviour
         switch (activity)
         {
             case NodeActivityType.Loot:
-                lootSystem?.TriggerLoot(node);
+                lootSystem.TriggerLoot(node);
                 break;
             case NodeActivityType.Event:
-                eventSystem?.TriggerEvent(node, level);
+                eventSystem.TriggerEvent(node, level);
                 break;
             case NodeActivityType.Encounter:
-                encounterSystem?.TriggerEncounter();
+                encounterSystem.TriggerEncounter();
                 break;
             case NodeActivityType.Treasure:
-                treasureSystem?.TriggerTreasure(node);
+                treasureSystem.TriggerTreasure(node);
                 break;
             default:
                 break;
