@@ -59,7 +59,7 @@ public class LevelSO : ScriptableObject
         {
             case NodeActivityType.Loot:
                 return Mathf.Max(0f, Loot_Weight + Loot_Weight_Modifier);
-            case NodeActivityType.Event:
+            case NodeActivityType.Occurrence:
                 return Mathf.Max(0f, Event_Weight + Event_Weight_Modifier);
             case NodeActivityType.Encounter:
                 return Mathf.Max(0f, Encounter_Weight + Encounter_Weight_Modifier);

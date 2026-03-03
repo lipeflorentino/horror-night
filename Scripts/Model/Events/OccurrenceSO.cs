@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Event Entry")]
-public class EventEntrySO : ScriptableObject
+[CreateAssetMenu(menuName = "Game/Occurrence")]
+public class OccurrenceSO : ScriptableObject
 {
     public int id;
     public string title;

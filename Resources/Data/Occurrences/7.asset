@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14f544afa97075f4c86565ddd90cb25d, type: 3}
+  m_Name: 7
+  m_EditorClassIdentifier: 
+  id: 7
+  title: Fruto Desconhecido
+  description: "Uma fruta vibrante cresce sozinha numa \xE1rvore morta."
+  successText: "Voc\xEA identifica que \xE9 nutritiva e recupera energia."
+  failText: A fruta era venenosa e queima sua garganta.
+  successStat: life
+  successValue: 1
+  failStat: life
+  failValue: -1
+  rollRange: 4

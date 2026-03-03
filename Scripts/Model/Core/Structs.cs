@@ -5,3 +5,12 @@ public struct StatModifier {
     public int sanity; 
     public int power; 
 }
+
+public struct OccurrenceResult
+{
+    public bool success;
+    public int occurrenceRoll;
+    public int playerRoll;
+    public string successText;
+    public string failText;
+}

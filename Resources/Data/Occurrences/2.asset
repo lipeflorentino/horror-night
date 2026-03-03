@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14f544afa97075f4c86565ddd90cb25d, type: 3}
+  m_Name: 2
+  m_EditorClassIdentifier: 
+  id: 2
+  title: "Sussurros na N\xE9voa"
+  description: "Vozes come\xE7am a chamar seu nome entre as \xE1rvores."
+  successText: "Voc\xEA reconhece que \xE9 ilus\xE3o da floresta e ignora os sussurros."
+  failText: "Voc\xEA segue as vozes e se perde por um tempo."
+  successStat: sanity
+  successValue: 1
+  failStat: sanity
+  failValue: -1
+  rollRange: 4

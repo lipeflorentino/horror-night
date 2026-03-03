@@ -1,17 +1,17 @@
 using UnityEngine;
 
-public class EventSystem : MonoBehaviour
+public class OccurrenceSystem : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private EventDatabase database;
-    [SerializeField] private UIEventPopup popup;
+    [SerializeField] private OccurrenceDatabase database;
+    [SerializeField] private UIOccurrencePopup popup;
     [SerializeField] private PlayerGridMovement playerMovement;
     [SerializeField] private PlayerStatusManager playerStatus;
 
     private void Awake()
     {
         if (popup == null)
-            popup = FindObjectOfType<UIEventPopup>();
+            popup = FindObjectOfType<UIOccurrencePopup>();
 
         if (playerMovement == null)
             playerMovement = FindObjectOfType<PlayerGridMovement>();
@@ -20,7 +20,7 @@ public class EventSystem : MonoBehaviour
             playerStatus = FindObjectOfType<PlayerStatusManager>();
 
         if (database == null)
-            database = Resources.Load<EventDatabase>("Data/EventDatabase");
+            database = FindObjectOfType<OccurrenceDatabase>();
     }
 
     public void TriggerEvent(LevelNode node, LevelSO level)
@@ -28,19 +28,19 @@ public class EventSystem : MonoBehaviour
         if (node == null || database == null)
             return;
 
-        EventEntrySO selectedEvent = database.GetRandom();
+        OccurrenceSO selectedEvent = database != null ? database.GetRandom() : null;
 
         if (selectedEvent == null)
             return;
 
-        int eventRoll = Random.Range(0, Mathf.Max(0, selectedEvent.rollRange) + 1);
+        int occurrenceRoll = Random.Range(0, Mathf.Max(0, selectedEvent.rollRange) + 1);
 
         if (playerMovement != null)
             playerMovement.enabled = false;
 
         if (popup == null)
         {
-            ResolveEvent(selectedEvent, eventRoll);
+            ResolveEvent(selectedEvent, occurrenceRoll);
             if (playerMovement != null)
                 playerMovement.enabled = true;
             return;
@@ -48,8 +48,8 @@ public class EventSystem : MonoBehaviour
 
         popup.Show(
             selectedEvent,
-            eventRoll,
-            onRoll: () => ResolveEvent(selectedEvent, eventRoll),
+            occurrenceRoll,
+            onRoll: () => ResolveEvent(selectedEvent, occurrenceRoll),
             onClose: () =>
             {
                 if (playerMovement != null)
@@ -57,11 +57,11 @@ public class EventSystem : MonoBehaviour
             });
     }
 
-    private EventResult ResolveEvent(EventEntrySO selectedEvent, int eventRoll)
+    private OccurrenceResult ResolveEvent(OccurrenceSO selectedEvent, int occurrenceRoll)
     {
         int playerStatValue = playerStatus != null ? playerStatus.GetStatValue(selectedEvent.successStat) : 0;
         int playerRoll = Random.Range(0, Mathf.Max(0, playerStatValue) + 1);
-        bool success = playerRoll > eventRoll;
+        bool success = playerRoll > occurrenceRoll;
 
         if (playerStatus != null)
         {
@@ -71,22 +71,13 @@ public class EventSystem : MonoBehaviour
                 playerStatus.ApplyStatDelta(selectedEvent.failStat, selectedEvent.failValue);
         }
 
-        return new EventResult
+        return new OccurrenceResult
         {
             success = success,
-            eventRoll = eventRoll,
+            occurrenceRoll = occurrenceRoll,
             playerRoll = playerRoll,
             successText = selectedEvent.successText,
             failText = selectedEvent.failText
         };
     }
-}
-
-public struct EventResult
-{
-    public bool success;
-    public int eventRoll;
-    public int playerRoll;
-    public string successText;
-    public string failText;
 }

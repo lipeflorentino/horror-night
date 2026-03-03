@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIEventPopup : MonoBehaviour
+public class UIOccurrencePopup : MonoBehaviour
 {
     [SerializeField] private GameObject root;
     [SerializeField] private TextMeshProUGUI titleText;
@@ -15,7 +15,7 @@ public class UIEventPopup : MonoBehaviour
     [SerializeField] private GameObject resultRoot;
     [SerializeField] private TextMeshProUGUI resultText;
 
-    public void Show(EventEntrySO entry, int eventRoll, Func<EventResult> onRoll, Action onClose)
+    public void Show(OccurrenceSO entry, int occurrenceRoll, Func<OccurrenceResult> onRoll, Action onClose)
     {
         if (root != null)
             root.SetActive(true);
@@ -38,7 +38,7 @@ public class UIEventPopup : MonoBehaviour
             rollButton.interactable = true;
             rollButton.onClick.AddListener(() =>
             {
-                EventResult result = onRoll != null ? onRoll.Invoke() : default;
+                OccurrenceResult result = onRoll != null ? onRoll.Invoke() : default;
 
                 if (resultRoot != null)
                     resultRoot.SetActive(true);
@@ -46,7 +46,7 @@ public class UIEventPopup : MonoBehaviour
                 if (resultText != null)
                 {
                     string message = result.success ? result.successText : result.failText;
-                    resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.eventRoll}";
+                    resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}";
                 }
 
                 rollButton.interactable = false;

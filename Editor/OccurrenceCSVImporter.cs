@@ -4,13 +4,12 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class EventCSVImporter
+public class OccurrenceCSVImporter
 {
-    private const string CsvPath = "Assets/Resources/Data/EventsTable.csv";
-    private const string OutputFolder = "Assets/Resources/Data/Events/";
-    private const string DatabasePath = "Assets/Resources/Data/EventDatabase.asset";
+    private const string CsvPath = "Assets/Resources/Data/OccurrenceTable.csv";
+    private const string OutputFolder = "Assets/Resources/Data/Occurrences/";
 
-    [MenuItem("Tools/Import Events CSV")]
+    [MenuItem("Tools/Import Occurrence CSV")]
     public static void ImportCSV()
     {
         if (!File.Exists(CsvPath))
@@ -23,7 +22,7 @@ public class EventCSVImporter
             Directory.CreateDirectory(OutputFolder);
 
         string[] lines = File.ReadAllLines(CsvPath);
-        List<EventEntrySO> importedEvents = new List<EventEntrySO>();
+        List<OccurrenceSO> importedEntries = new();
 
         bool skippedHeader = false;
 
@@ -51,44 +50,33 @@ public class EventCSVImporter
                 continue;
 
             string assetPath = OutputFolder + id + ".asset";
-            EventEntrySO eventEntry = AssetDatabase.LoadAssetAtPath<EventEntrySO>(assetPath);
+            OccurrenceSO occurrenceEntry = AssetDatabase.LoadAssetAtPath<OccurrenceSO>(assetPath);
 
-            if (eventEntry == null)
+            if (occurrenceEntry == null)
             {
-                eventEntry = ScriptableObject.CreateInstance<EventEntrySO>();
-                AssetDatabase.CreateAsset(eventEntry, assetPath);
+                occurrenceEntry = ScriptableObject.CreateInstance<OccurrenceSO>();
+                AssetDatabase.CreateAsset(occurrenceEntry, assetPath);
             }
 
-            eventEntry.id = id;
-            eventEntry.title = values[1];
-            eventEntry.description = values[2];
-            eventEntry.successText = values[3];
-            eventEntry.failText = values[4];
-            eventEntry.successStat = NormalizeStatName(values[5]);
-            eventEntry.successValue = ParseInt(values[6]);
-            eventEntry.failStat = NormalizeStatName(values[7]);
-            eventEntry.failValue = ParseInt(values[8]);
-            eventEntry.rollRange = Mathf.Max(0, ParseInt(values[9]));
+            occurrenceEntry.id = id;
+            occurrenceEntry.title = values[1];
+            occurrenceEntry.description = values[2];
+            occurrenceEntry.successText = values[3];
+            occurrenceEntry.failText = values[4];
+            occurrenceEntry.successStat = NormalizeStatName(values[5]);
+            occurrenceEntry.successValue = ParseInt(values[6]);
+            occurrenceEntry.failStat = NormalizeStatName(values[7]);
+            occurrenceEntry.failValue = ParseInt(values[8]);
+            occurrenceEntry.rollRange = Mathf.Max(0, ParseInt(values[9]));
 
-            EditorUtility.SetDirty(eventEntry);
-            importedEvents.Add(eventEntry);
+            EditorUtility.SetDirty(occurrenceEntry);
+            importedEntries.Add(occurrenceEntry);
         }
-
-        EventDatabase database = AssetDatabase.LoadAssetAtPath<EventDatabase>(DatabasePath);
-
-        if (database == null)
-        {
-            database = ScriptableObject.CreateInstance<EventDatabase>();
-            AssetDatabase.CreateAsset(database, DatabasePath);
-        }
-
-        database.allEvents = importedEvents;
-        EditorUtility.SetDirty(database);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log($"Importação de eventos concluída! Total: {importedEvents.Count}");
+        Debug.Log($"Importação de ocorrencias concluída!");
     }
 
     private static string[] SplitCsvLine(string line)
