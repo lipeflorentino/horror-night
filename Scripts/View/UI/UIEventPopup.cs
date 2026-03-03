@@ -1,38 +1,71 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using System;
 
 public class UIEventPopup : MonoBehaviour
 {
     [SerializeField] private GameObject root;
-    [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private Image iconImage;
-    [SerializeField] private Button pickButton;
-    [SerializeField] private Button leaveButton;
+    [SerializeField] private Button rollButton;
+    [SerializeField] private Button closeButton;
 
-    public void Show(ItemSO item, Action onPick, Action onLeave)
+    [Header("Result UI")]
+    [SerializeField] private GameObject resultRoot;
+    [SerializeField] private TextMeshProUGUI resultText;
+
+    public void Show(EventEntrySO entry, int eventRoll, Func<EventResult> onRoll, Action onClose)
     {
-        root.SetActive(true);
+        if (root != null)
+            root.SetActive(true);
 
-        nameText.text = item.itemName;
-        descriptionText.text = item.description;
-        iconImage.sprite = item.icon;
+        if (titleText != null)
+            titleText.text = entry.title;
 
-        pickButton.onClick.RemoveAllListeners();
-        leaveButton.onClick.RemoveAllListeners();
+        if (descriptionText != null)
+            descriptionText.text = entry.description;
 
-        pickButton.onClick.AddListener(() =>
+        if (resultRoot != null)
+            resultRoot.SetActive(false);
+
+        if (resultText != null)
+            resultText.text = string.Empty;
+
+        if (rollButton != null)
         {
-            onPick?.Invoke();
-            root.SetActive(false);
-        });
+            rollButton.onClick.RemoveAllListeners();
+            rollButton.interactable = true;
+            rollButton.onClick.AddListener(() =>
+            {
+                EventResult result = onRoll != null ? onRoll.Invoke() : default;
 
-        leaveButton.onClick.AddListener(() =>
+                if (resultRoot != null)
+                    resultRoot.SetActive(true);
+
+                if (resultText != null)
+                {
+                    string message = result.success ? result.successText : result.failText;
+                    resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.eventRoll}";
+                }
+
+                rollButton.interactable = false;
+
+                if (closeButton != null)
+                    closeButton.gameObject.SetActive(true);
+            });
+        }
+
+        if (closeButton != null)
         {
-            onLeave?.Invoke();
-            root.SetActive(false);
-        });
+            closeButton.onClick.RemoveAllListeners();
+            closeButton.gameObject.SetActive(false);
+            closeButton.onClick.AddListener(() =>
+            {
+                onClose?.Invoke();
+                if (root != null)
+                    root.SetActive(false);
+            });
+        }
     }
 }

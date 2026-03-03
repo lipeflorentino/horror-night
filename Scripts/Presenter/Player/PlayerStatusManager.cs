@@ -66,6 +66,65 @@ public class PlayerStatusManager : MonoBehaviour
     }
 
 
+
+    public float GetCurrentLife()
+    {
+        return currentLife;
+    }
+
+    public float GetCurrentSanity()
+    {
+        return currentSanity;
+    }
+
+    public int GetStatValue(string statName)
+    {
+        switch (statName)
+        {
+            case "life":
+                return Mathf.RoundToInt(currentLife);
+            case "physical":
+            case "power":
+                return Mathf.RoundToInt(currentStrength);
+            case "sanity":
+                return Mathf.RoundToInt(currentSanity);
+            default:
+                return 0;
+        }
+    }
+
+    public void ApplyStatDelta(string statName, int value)
+    {
+        if (value == 0)
+            return;
+
+        if (statName == "life")
+        {
+            if (value > 0)
+                IncreaseLife(value);
+            else
+                DecreaseLife(-value);
+            return;
+        }
+
+        if (statName == "physical" || statName == "power")
+        {
+            if (value > 0)
+                IncreaseStrength(value);
+            else
+                DecreaseStrength(-value);
+            return;
+        }
+
+        if (statName == "sanity")
+        {
+            if (value > 0)
+                IncreaseSanity(value);
+            else
+                DecreaseSanity(-value);
+        }
+    }
+
     public float GetCurrentStrength()
     {
         return currentStrength;
