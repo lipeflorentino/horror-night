@@ -1,4 +1,12 @@
 using UnityEngine;
+using UnityEngine.Serialization;
+
+public enum MapSize
+{
+    Small = 4,
+    Medium = 7,
+    Large = 12
+}
 
 [CreateAssetMenu(fileName = "LevelSO", menuName = "Game/Level Definition")]
 public class LevelSO : ScriptableObject
@@ -6,14 +14,22 @@ public class LevelSO : ScriptableObject
     [Header("Identity")]
     public string levelId;
     public LevelType levelType;
+
     [Header("Structure")]
-    [Min(3)]
-    public int size = 5; 
+    [FormerlySerializedAs("size")]
+    [Min(1)] public int nodesPerArea = 5;
+    public MapSize mapSize = MapSize.Small;
     public GameObject backgroundPrefab;
+
     [Header("Node Definitions")]
-    public LevelNodeSO defaultNode, leftPortalNode, rightPortalNode;
+    public LevelNodeSO defaultNode;
+    public LevelNodeSO leftPortalNode;
+    public LevelNodeSO rightPortalNode;
+    public LevelNodeSO finalObjectiveNode;
+
     [Header("Layout")]
     public float tileSpacing = 4f;
+
     [Header("Tier Range")]
     public int Tier_Min;
     public int Tier_Max;
@@ -52,6 +68,47 @@ public class LevelSO : ScriptableObject
     public float Encounter_Weight_Modifier;
     public float Treasure_Weight_Modifier;
     public float None_Weight_Modifier;
+
+    public int AreaCount => (int)mapSize;
+    public int TotalNodes => nodesPerArea * AreaCount;
+
+    public bool IsAreaStartIndex(int index)
+    {
+        return index > 0 && index % nodesPerArea == 0;
+    }
+
+    public bool IsAreaEndIndex(int index)
+    {
+        return (index + 1) % nodesPerArea == 0;
+    }
+
+    public bool IsFinalNodeIndex(int index)
+    {
+        return index == TotalNodes - 1;
+    }
+
+    public LevelNodeSO GetNodeDefinitionForIndex(int index)
+    {
+        if (index <= 0)
+            return leftPortalNode != null ? leftPortalNode : defaultNode;
+
+        if (IsFinalNodeIndex(index))
+            return finalObjectiveNode != null ? finalObjectiveNode : defaultNode;
+
+        if (IsAreaStartIndex(index))
+            return leftPortalNode != null ? leftPortalNode : defaultNode;
+
+        if (IsAreaEndIndex(index))
+            return rightPortalNode != null ? rightPortalNode : defaultNode;
+
+        return defaultNode;
+    }
+
+    private void OnValidate()
+    {
+        if (nodesPerArea < 1)
+            nodesPerArea = 1;
+    }
 
     public float GetEffectiveActivityWeight(NodeActivityType activityType)
     {
