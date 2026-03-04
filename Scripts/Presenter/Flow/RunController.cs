@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class RunController : MonoBehaviour
@@ -9,6 +10,7 @@ public class RunController : MonoBehaviour
     [SerializeField] private LevelController levelController;
     [SerializeField] private LevelUpUI levelUpUI;
     [SerializeField] private PlayerGridMovement playerMovement;
+    [SerializeField] private Fade fadeEffect;
 
     private LevelSO currentLevel;
     private bool waitingForLevelUpInput;
@@ -20,6 +22,8 @@ public class RunController : MonoBehaviour
 
         if (playerMovement == null)
             playerMovement = FindObjectOfType<PlayerGridMovement>();
+        if (fadeEffect == null)
+            fadeEffect = FindObjectOfType<Fade>();
     }
 
     private void Start()
@@ -108,12 +112,26 @@ public class RunController : MonoBehaviour
 
     private void HandleAreaChanged(int areaIndex)
     {
+        StartCoroutine(HandleAreaChangedRoutine(areaIndex));
+    }
+
+    private IEnumerator HandleAreaChangedRoutine(int areaIndex)
+    {
         Debug.Log($"[RunController] Área {areaIndex + 1}/{currentLevel.AreaCount} carregada. Reutilize o prefab da área e regenere dados locais.");
 
         if (playerMovement != null)
         {
+            playerMovement.enabled = false;
+
+            fadeEffect.InstantBlack();
+
             Vector3 areaStartPosition = levelController.GetWorldPositionFromIndex(levelController.CurrentIndex);
             playerMovement.transform.position = areaStartPosition;
+
+            yield return new WaitForSeconds(0.5f);
+            yield return StartCoroutine(fadeEffect.FadeIn());
+
+            playerMovement.enabled = true;
         }
     }
 }

@@ -13,8 +13,8 @@ public class UILevelIndicator : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LevelController levelController;
-
-    [SerializeField] private SlotRow[] slots; // Precisa de 5 imagens
+    [SerializeField] private GameObject[] slots;
+    [SerializeField] private SlotRow[] slotRows;
 
     [Header("Visuals")]
     [SerializeField] private Color normalColor = Color.gray;
@@ -22,12 +22,26 @@ public class UILevelIndicator : MonoBehaviour
     [SerializeField] private Color portalColor = Color.magenta;
 
     private const int windowSize = 5;
-    private const int centerIndex = 0; // posição central da janela visual
 
     private void OnEnable()
     {
         if (levelController == null)
             levelController = FindObjectOfType<LevelController>();
+
+        slotRows = new SlotRow[slots.Length];
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            GameObject slot = slots[i];
+
+            Image fill = slot.transform.Find("Fill").GetComponent<Image>();
+            Image highlight = slot.transform.Find("Highlight").GetComponent<Image>();
+
+            slotRows[i] = new SlotRow
+            {
+                row = new Image[] { fill, highlight }
+            };
+        }
 
         levelController.OnNodeChanged += Refresh;
         Refresh(levelController.CurrentIndex);
@@ -55,34 +69,33 @@ public class UILevelIndicator : MonoBehaviour
         
         for (int i = 0; i < windowSize; i++)
         {
-            int offset = i - centerIndex;
-            int realIndex = currentIndex + offset;
-
-            if (realIndex < 0 || realIndex >= levelController.nodes.Length)
+            int blockStart = currentIndex / windowSize * windowSize;
+            int realIndex = blockStart + i;
+            
+            if (realIndex >= levelController.nodes.Length)
             {
-                slots[i].row[0].gameObject.SetActive(false);
-                slots[i].row[1].gameObject.SetActive(false);
+                slotRows[i].row[0].gameObject.SetActive(false);
                 continue;
             }
 
-            slots[i].row[0].gameObject.SetActive(true);
+            slotRows[i].row[0].gameObject.SetActive(true);
 
             LevelNode node = levelController.nodes[realIndex];
 
             if (realIndex == currentIndex)
             {
-                slots[i].row[0].color = currentColor;
-                slots[i].row[1].gameObject.SetActive(true);
+                slotRows[i].row[0].color = currentColor;
+                slotRows[i].row[1].gameObject.SetActive(true);
             }
             else if (node.definition.nodeType == NodeType.Portal)
             {
-                slots[i].row[0].color = portalColor;
-                slots[i].row[1].gameObject.SetActive(false);
+                slotRows[i].row[0].color = portalColor;
+                slotRows[i].row[1].gameObject.SetActive(false);
             }
             else
             {
-                slots[i].row[0].color = normalColor;
-                slots[i].row[1].gameObject.SetActive(false);
+                slotRows[i].row[0].color = normalColor;
+                slotRows[i].row[1].gameObject.SetActive(false);
             }
         }
     }

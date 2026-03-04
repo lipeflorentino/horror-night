@@ -4,28 +4,41 @@ using System.Collections;
 
 public class Fade : MonoBehaviour
 {
-    public Image fadeImage;
-    public float fadeSpeed = 2f;
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeSpeed = 2f;
 
-    public IEnumerator FadeOut()
+    private void SetAlpha(float alpha)
     {
-        float t = 0;
-        while (t < 1)
-        {
-            t += Time.deltaTime * fadeSpeed;
-            fadeImage.color = new Color(0, 0, 0, t);
-            yield return null;
-        }
+        Color c = fadeImage.color;
+        c.a = alpha;
+        fadeImage.color = c;
+    }
+
+    public void InstantBlack()
+    {
+        SetAlpha(1f);
     }
 
     public IEnumerator FadeIn()
     {
-        float t = 1;
-        while (t > 0)
+        float t = 1f;
+
+        while (t > 0f)
         {
             t -= Time.deltaTime * fadeSpeed;
-            fadeImage.color = new Color(0, 0, 0, t);
+            SetAlpha(t);
             yield return null;
         }
+
+        SetAlpha(0f);
+    }
+
+    public IEnumerator BlackThenFadeIn(float holdDuration)
+    {
+        InstantBlack();
+
+        yield return new WaitForSeconds(holdDuration);
+
+        yield return StartCoroutine(FadeIn());
     }
 }
