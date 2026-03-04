@@ -4,15 +4,53 @@ public class RunController : MonoBehaviour
 {
     [Header("Level Flow")]
     [SerializeField] private LevelSO startingLevel;
-    [SerializeField] private LevelSO[] possibleLevels;
 
     [Header("References")]
     [SerializeField] private LevelController levelController;
     [SerializeField] private LevelUpUI levelUpUI;
+    [SerializeField] private PlayerGridMovement playerMovement;
+
     private LevelSO currentLevel;
     private bool waitingForLevelUpInput;
-    private bool waitingForPortalInput = false;
-    [SerializeField] private PlayerGridMovement playerMovement;
+
+    private void Awake()
+    {
+        if (levelController == null)
+            levelController = FindObjectOfType<LevelController>();
+
+        if (playerMovement == null)
+            playerMovement = FindObjectOfType<PlayerGridMovement>();
+    }
+
+    private void Start()
+    {
+        currentLevel = startingLevel;
+        StartRun();
+    }
+
+    private void OnEnable()
+    {
+        if (levelController != null)
+        {
+            levelController.OnLevelCompleted += HandleLevelCompleted;
+            levelController.OnAreaChanged += HandleAreaChanged;
+        }
+
+        if (levelUpUI != null)
+            levelUpUI.OnContinuePressed += HandleContinuePressed;
+    }
+
+    private void OnDisable()
+    {
+        if (levelController != null)
+        {
+            levelController.OnLevelCompleted -= HandleLevelCompleted;
+            levelController.OnAreaChanged -= HandleAreaChanged;
+        }
+
+        if (levelUpUI != null)
+            levelUpUI.OnContinuePressed -= HandleContinuePressed;
+    }
 
     private void Update()
     {
@@ -22,90 +60,60 @@ public class RunController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             waitingForLevelUpInput = false;
-            levelUpUI.Hide();
-            GoToNextLevel();
+
+            if (levelUpUI != null)
+                levelUpUI.Hide();
         }
-    }
-
-    private void Awake()
-    {
-        if (levelController == null)
-            levelController = FindObjectOfType<LevelController>();
-    }
-
-    private void Start()
-    {
-        currentLevel = startingLevel;
-        StartRun();
     }
 
     public void StartRun()
     {
+        if (startingLevel == null)
+            return;
+
         LoadLevel(startingLevel);
     }
 
     private void LoadLevel(LevelSO level)
     {
+        currentLevel = level;
         levelController.Initialize(level);
-        levelController.OnNodeChanged += HandleNodeChanged;
-        levelController.OnLevelCompleted += HandleLevelCompleted;
-        levelUpUI.OnContinuePressed += HandleContinuePressed;
+
+        if (playerMovement != null)
+        {
+            Vector3 startPos = levelController.GetWorldPositionFromIndex(levelController.CurrentIndex);
+            playerMovement.transform.position = startPos;
+            playerMovement.enabled = true;
+        }
     }
 
     private void HandleLevelCompleted()
     {
-        playerMovement.enabled = false;
+        if (playerMovement != null)
+            playerMovement.enabled = false;
+
         waitingForLevelUpInput = true;
-        levelUpUI.Show();
+
+        if (levelUpUI != null)
+            levelUpUI.Show();
     }
 
     private void HandleContinuePressed()
     {
-        levelUpUI.Hide();
-        playerMovement.enabled = true;
-        GoToNextLevel();
+        waitingForLevelUpInput = false;
+
+        if (levelUpUI != null)
+            levelUpUI.Hide();
     }
 
-    private void HandleNodeChanged(int index)
+    private void HandleAreaChanged(int areaIndex)
     {
-        LevelNode currentNode = levelController.GetCurrentNode();
+        Debug.Log($"[RunController] Área {areaIndex + 1}/{currentLevel.AreaCount} carregada. Reutilize o prefab da área e regenere dados locais.");
 
-        if (currentNode.definition.nodeType == NodeType.Portal)
+        if (playerMovement != null)
         {
-            if (waitingForPortalInput) HandlePortal();
+            Vector3 areaStartPosition = levelController.GetWorldPositionFromIndex(levelController.CurrentIndex);
+            playerMovement.transform.position = areaStartPosition;
         }
-    }
-
-    private void HandlePortal()
-    {
-        //TODO: Implementar sorteio de dois tipos de area do level. Cada area vai ter suas caracteristicas e recompensas.
-
-        LevelSO nextLevel = GetNextLevel();
-
-        if (nextLevel == null)
-            return;
-
-        levelController.OnNodeChanged -= HandleNodeChanged;
-        LoadLevel(nextLevel);
-    }
-
-    private void GoToNextLevel()
-    {
-        LevelSO next = GetNextLevel();
-
-        if (next == null)
-            return;
-
-        currentLevel = next;
-        levelController.Initialize(currentLevel);
-    }
-
-    private LevelSO GetNextLevel()
-    {
-        if (possibleLevels == null || possibleLevels.Length == 0)
-            return null;
-
-        int randomIndex = Random.Range(0, possibleLevels.Length);
-        return possibleLevels[randomIndex];
     }
 }
