@@ -1,70 +1,101 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 public class LevelController : MonoBehaviour
 {
     public LevelSO currentLevel;
     public LevelNode[] nodes;
     public int CurrentIndex { get; private set; }
+    public int CurrentAreaIndex { get; private set; }
+
     public event Action<int> OnNodeChanged;
+    public event Action<int> OnAreaChanged;
     public event Action OnLevelCompleted;
+
     private bool levelCompleted;
     private int startIndex;
 
     public void Initialize(LevelSO level)
     {
         currentLevel = level;
+        levelCompleted = false;
 
-        nodes = new LevelNode[level.size];
-
-        for (int i = 0; i < level.size; i++)
+        if (currentLevel == null)
         {
-            LevelNodeSO nodeDef;
+            nodes = Array.Empty<LevelNode>();
+            CurrentIndex = 0;
+            CurrentAreaIndex = 0;
+            return;
+        }
 
-            if (i == 0)
-                nodeDef = level.leftPortalNode;
-            else if (i == level.size - 1)
-                nodeDef = level.rightPortalNode;
-            else
-                nodeDef = level.defaultNode;
+        nodes = new LevelNode[currentLevel.TotalNodes];
 
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            LevelNodeSO nodeDef = currentLevel.GetNodeDefinitionForIndex(i);
             nodes[i] = new LevelNode(i, nodeDef);
         }
 
         startIndex = 0;
         CurrentIndex = startIndex;
+        CurrentAreaIndex = GetAreaIndex(CurrentIndex);
+        nodes[CurrentIndex].explored = true;
+
         OnNodeChanged?.Invoke(CurrentIndex);
+        OnAreaChanged?.Invoke(CurrentAreaIndex);
     }
 
     public bool TryMove(int direction)
     {
+        if (nodes == null || nodes.Length == 0)
+            return false;
+
         int targetIndex = CurrentIndex + direction;
 
         if (targetIndex < 0 || targetIndex >= nodes.Length)
             return false;
 
+        int previousAreaIndex = CurrentAreaIndex;
+
         CurrentIndex = targetIndex;
+        CurrentAreaIndex = GetAreaIndex(CurrentIndex);
 
         if (!nodes[CurrentIndex].explored)
-        {
             nodes[CurrentIndex].explored = true;
-        }
 
         OnNodeChanged?.Invoke(CurrentIndex);
+
+        if (CurrentAreaIndex != previousAreaIndex)
+            OnAreaChanged?.Invoke(CurrentAreaIndex);
+
+        if (currentLevel.IsFinalNodeIndex(CurrentIndex))
+            MarkLevelCompleted();
 
         return true;
     }
 
     public Vector3 GetWorldPositionFromIndex(int index)
     {
-        int offsetFromCenter = index - startIndex;
-        float x = offsetFromCenter * currentLevel.tileSpacing;
+        int localIndex = currentLevel == null ? index : index % currentLevel.nodesPerArea;
+        int offsetFromStart = localIndex - startIndex;
+        float x = offsetFromStart * currentLevel.tileSpacing;
         return new Vector3(x, 0f, 0f);
     }
 
     public LevelNode GetCurrentNode()
     {
+        if (nodes == null || nodes.Length == 0)
+            return null;
+
         return nodes[CurrentIndex];
+    }
+
+    public bool IsCurrentNodeAreaPortal()
+    {
+        if (currentLevel == null || nodes == null || nodes.Length == 0)
+            return false;
+
+        return currentLevel.IsAreaEndIndex(CurrentIndex) && !currentLevel.IsFinalNodeIndex(CurrentIndex);
     }
 
     public void MarkLevelCompleted()
@@ -76,8 +107,8 @@ public class LevelController : MonoBehaviour
         OnLevelCompleted?.Invoke();
     }
 
-    public void ResetCompletion()
+    private int GetAreaIndex(int nodeIndex)
     {
-        levelCompleted = false;
+        return nodeIndex / Mathf.Max(1, currentLevel.nodesPerArea);
     }
 }
