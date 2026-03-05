@@ -1,0 +1,4 @@
+ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,LifeMin,LifeMax,PhysicalMin,PhysicalMax,MentalMin,MentalMax,SpecialRule,ImagePath
+1,Sussurro Rastejante,Uma presença que se move nas sombras,Normal,10,0,2,Agressivo,Furtivo,Aberração,8,12,3,5,2,4,,Assets/Art/Sprites/Creatures/creatures_tileset.png
+2,Guardião do Breu,Predador que ronda clareiras sem lua,Special,6,1,4,Cauteloso,Brutal,Humanoide,14,20,6,10,4,7,Causa medo ao entrar em combate,Assets/Art/Sprites/Creatures/creatures_tileset.png
+3,Avatar da Noite,Entidade que marca o fim da trilha,Boss,2,3,10,Implacável,Ritualístico,Entidade,30,42,10,16,10,14,Ganha bônus quando encontro é forçado,Assets/Art/Sprites/Creatures/creatures_tileset.png
