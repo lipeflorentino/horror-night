@@ -1,20 +1,27 @@
 using UnityEngine;
+
 public class CombatManager : MonoBehaviour
 {
-   public static CombatManager Instance;
+    public static CombatManager Instance;
 
-   void Awake()
-   {
-       Instance = this;
-   }
+    private void Awake()
+    {
+        Instance = this;
+    }
 
-   public void StartCombat(float difficultyModifier)
-   {
-       Debug.Log("Combat started with modifier: " + difficultyModifier);
+    public void StartCombat(float difficultyModifier)
+    {
+        StartCombat(null, difficultyModifier);
+    }
 
-       // Aqui você carrega inimigos baseados em:
-       // - Tier
-       // - Tags da clareira
-       // - Difficulty modifier
-   }
+    public void StartCombat(EnemyInstance enemy, float difficultyModifier)
+    {
+        if (enemy == null)
+        {
+            Debug.Log("Combat started with no enemy selected. Modifier: " + difficultyModifier);
+            return;
+        }
+
+        Debug.Log($"Combat started vs {enemy.source.enemyName} ({enemy.source.archetype}) | Life: {enemy.life} Physical: {enemy.physical} Mental: {enemy.mental} | Modifier: {difficultyModifier}");
+    }
 }

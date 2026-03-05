@@ -2,6 +2,7 @@ public enum NodeType { Default, Portal }
 public enum LevelType { Default, Boss, Story }
 public enum Rarity { Common, Uncommon, Rare, Epic, Legendary }
 public enum NodeActivityType { Loot, Occurrence, Encounter, Treasure, None }
+public enum EnemyArchetype { Normal, Special, Boss }
 
 [System.Flags]
 public enum NodeFlags

@@ -1,26 +1,59 @@
 using UnityEngine;
+
 public class EncounterSystem : MonoBehaviour
 {
-   public static EncounterSystem Instance;
-   private float riskModifier = 1f;
+    public static EncounterSystem Instance;
 
-   void Awake()
-   {
-       Instance = this;
-   }
+    [SerializeField] private EnemyDatabase enemyDatabase;
+    [SerializeField] private LevelController levelController;
 
-   public void SetRiskModifier(float value)
-   {
-       riskModifier = value;
-   }
+    private float riskModifier = 1f;
 
-   public void TriggerEncounter()
-   {
-       CombatManager.Instance.StartCombat(riskModifier);
-   }
+    private void Awake()
+    {
+        Instance = this;
 
-   public void TriggerForcedEncounter()
-   {
-       CombatManager.Instance.StartCombat(riskModifier * 1.5f);
-   }
+        if (enemyDatabase == null)
+            enemyDatabase = FindObjectOfType<EnemyDatabase>();
+
+        if (levelController == null)
+            levelController = FindObjectOfType<LevelController>();
+    }
+
+    public void SetRiskModifier(float value)
+    {
+        riskModifier = value;
+    }
+
+    public void TriggerEncounter()
+    {
+        TriggerEncounterInternal(false);
+    }
+
+    public void TriggerForcedEncounter()
+    {
+        TriggerEncounterInternal(true);
+    }
+
+    private void TriggerEncounterInternal(bool isForced)
+    {
+        EnemyRunContext context = BuildContext(isForced);
+        EnemyInstance selectedEnemy = enemyDatabase != null ? enemyDatabase.RollRandomEnemy(context) : null;
+
+        float modifier = isForced ? riskModifier * 1.5f : riskModifier;
+        CombatManager.Instance.StartCombat(selectedEnemy, modifier);
+    }
+
+    private EnemyRunContext BuildContext(bool isForced)
+    {
+        LevelSO level = levelController != null ? levelController.currentLevel : null;
+
+        return new EnemyRunContext
+        {
+            tier = level != null ? Mathf.Max(0, level.Tier_Min) : 0,
+            levelTags = level != null ? level.Tags : string.Empty,
+            riskModifier = riskModifier,
+            forcedEncounter = isForced
+        };
+    }
 }
