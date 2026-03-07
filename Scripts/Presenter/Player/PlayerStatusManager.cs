@@ -3,6 +3,14 @@ using UnityEngine.UI;
 
 public class PlayerStatusManager : MonoBehaviour
 {
+    [System.Serializable]
+    public struct PlayerStatusSnapshot
+    {
+        public float life;
+        public float strength;
+        public float sanity;
+    }
+
     [Header("Status Bars (Image Fill Radial 360)")]
     [SerializeField] private Image lifeBar;
     [SerializeField] private Image strengthBar;
@@ -128,6 +136,24 @@ public class PlayerStatusManager : MonoBehaviour
     public float GetCurrentStrength()
     {
         return currentStrength;
+    }
+
+    public PlayerStatusSnapshot GetSnapshot()
+    {
+        return new PlayerStatusSnapshot
+        {
+            life = currentLife,
+            strength = currentStrength,
+            sanity = currentSanity
+        };
+    }
+
+    public void RestoreSnapshot(PlayerStatusSnapshot snapshot)
+    {
+        currentLife = Mathf.Clamp(snapshot.life, 0f, maxLife);
+        currentStrength = Mathf.Clamp(snapshot.strength, 0f, maxStrength);
+        currentSanity = Mathf.Clamp(snapshot.sanity, 0f, maxSanity);
+        RefreshAllBars();
     }
 
     public bool CanSpendStrength(float amount)
