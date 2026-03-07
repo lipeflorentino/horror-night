@@ -98,6 +98,41 @@ public class LevelController : MonoBehaviour
         return currentLevel.IsAreaEndIndex(CurrentIndex) && !currentLevel.IsFinalNodeIndex(CurrentIndex);
     }
 
+
+    public bool[] CaptureExploredSnapshot()
+    {
+        if (nodes == null)
+            return Array.Empty<bool>();
+
+        bool[] explored = new bool[nodes.Length];
+        for (int i = 0; i < nodes.Length; i++)
+            explored[i] = nodes[i] != null && nodes[i].explored;
+
+        return explored;
+    }
+
+    public void RestoreProgress(LevelSO level, int currentIndex, bool[] exploredSnapshot)
+    {
+        Initialize(level);
+
+        if (nodes == null || nodes.Length == 0)
+            return;
+
+        if (exploredSnapshot != null)
+        {
+            int count = Mathf.Min(exploredSnapshot.Length, nodes.Length);
+            for (int i = 0; i < count; i++)
+                nodes[i].explored = exploredSnapshot[i];
+        }
+
+        CurrentIndex = Mathf.Clamp(currentIndex, 0, nodes.Length - 1);
+        nodes[CurrentIndex].explored = true;
+        CurrentAreaIndex = GetAreaIndex(CurrentIndex);
+
+        OnNodeChanged?.Invoke(CurrentIndex);
+        OnAreaChanged?.Invoke(CurrentAreaIndex);
+    }
+
     public void MarkLevelCompleted()
     {
         if (levelCompleted)
