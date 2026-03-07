@@ -10,4 +10,14 @@ public class PlayerInventory : MonoBehaviour
         items.Add(item);
         Debug.Log("Item adicionado: " + item.itemName);
     }
+
+    public List<ItemSO> CreateSnapshot()
+    {
+        return new List<ItemSO>(items);
+    }
+
+    public void RestoreSnapshot(List<ItemSO> snapshot)
+    {
+        items = snapshot != null ? new List<ItemSO>(snapshot) : new List<ItemSO>();
+    }
 }
