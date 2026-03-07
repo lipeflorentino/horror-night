@@ -1,4 +1,9 @@
 ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,LifeMin,LifeMax,PhysicalMin,PhysicalMax,MentalMin,MentalMax,SpecialRule,ImagePath
-1,Sussurro Rastejante,Uma presença que se move nas sombras,Normal,10,0,2,Agressivo,Furtivo,Aberração,8,12,3,5,2,4,,Assets/Art/Sprites/Creatures/creatures_tileset.png
-2,Guardião do Breu,Predador que ronda clareiras sem lua,Special,6,1,4,Cauteloso,Brutal,Humanoide,14,20,6,10,4,7,Causa medo ao entrar em combate,Assets/Art/Sprites/Creatures/creatures_tileset.png
-3,Avatar da Noite,Entidade que marca o fim da trilha,Boss,2,3,10,Implacável,Ritualístico,Entidade,30,42,10,16,10,14,Ganha bônus quando encontro é forçado,Assets/Art/Sprites/Creatures/creatures_tileset.png
+1,Sussurro Rastejante,Uma presença que se move nas sombras,Normal,10,0,2,Agressivo,Furtivo,Aberração,8,12,3,5,2,4,,Assets/Art/Sprites/Creatures/1.png
+2,Guardião do Breu,Predador que ronda clareiras sem lua,Special,6,1,4,Cauteloso,Brutal,Humanoide,14,20,6,10,4,7,Causa medo ao entrar em combate,Assets/Art/Sprites/Creatures/2.png
+3,Avatar da Noite,Entidade que marca o fim da trilha,Boss,2,3,10,Implacável,Ritualístico,Entidade,30,42,10,16,10,14,Ganha bônus quando encontro é forçado,Assets/Art/Sprites/Creatures/3.png
+4,Rastejador da Folhagem,Criatura que se arrasta sob folhas mortas,Normal,9,0,2,Agressivo,Primitivo,Bestial,9,13,3,6,2,3,,Assets/Art/Sprites/Creatures/4.png
+5,Corvo Espectral,Ave de olhos vazios que observa em silêncio,Normal,8,0,2,Cauteloso,Furtivo,Espírito,7,10,2,4,3,5,,Assets/Art/Sprites/Creatures/5.png
+6,Lenhador Perdido,Alma condenada que vaga entre as árvores,Normal,7,0,2,Errático,Brutal,Humanoide,10,14,4,6,2,4,,Assets/Art/Sprites/Creatures/6.png
+7,Filhote do Breu,Pequena aberração que caça em grupos,Normal,10,0,1,Agressivo,Frenético,Aberração,6,9,2,4,1,3,,Assets/Art/Sprites/Creatures/7.png
+8,Vulto da Névoa,Forma indistinta que surge entre a neblina,Normal,9,1,2,Cauteloso,Furtivo,Entidade,8,11,3,4,3,6,,Assets/Art/Sprites/Creatures/8.png

@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelId: silencio_denso
   levelType: 0
-  size: 5
+  nodesPerArea: 5
+  mapSize: 4
   backgroundPrefab: {fileID: 4232275755201499981, guid: a3e1edef9244d704cbe32a5f2276a6ba, type: 3}
   defaultNode: {fileID: 11400000, guid: 827898b8764ca4047b62dd71da14b3dc, type: 2}
   leftPortalNode: {fileID: 11400000, guid: 0d81b37b9decd53479a12306d09f52d2, type: 2}
   rightPortalNode: {fileID: 11400000, guid: 71d67bbbec1a6fd459f2de7ee4d4863a, type: 2}
+  finalObjectiveNode: {fileID: 0}
   tileSpacing: 3
   Tier_Min: 1
   Tier_Max: 3
@@ -33,9 +35,9 @@ MonoBehaviour:
   Special_Rule: "Tens\xE3o cresce 50% mais devagar"
   Loot_Weight: 1
   Event_Weight: 3
-  Encounter_Weight: 0
+  Encounter_Weight: 4
   Treasure_Weight: 0
-  None_Weight: 0
+  None_Weight: 2
   Loot_Weight_Modifier: 0
   Event_Weight_Modifier: 0
   Encounter_Weight_Modifier: 0

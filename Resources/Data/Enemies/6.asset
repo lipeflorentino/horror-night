@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 6
+  m_EditorClassIdentifier: Assembly-CSharp::NormalEnemySO
+  id: 6
+  enemyName: Lenhador Perdido
+  description: "Alma condenada que vaga entre as \xE1rvores"
+  archetype: 0
+  weight: 7
+  tierMin: 0
+  tierMax: 2
+  image: {fileID: 1597767951, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  tags:
+    behavior: "Err\xE1tico"
+    style: Brutal
+    type: Humanoide
+  life:
+    min: 10
+    max: 14
+  physical:
+    min: 4
+    max: 6
+  mental:
+    min: 2
+    max: 4
+  specialRule: 

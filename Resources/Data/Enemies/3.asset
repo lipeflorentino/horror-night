@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 3
+  m_EditorClassIdentifier: Assembly-CSharp::BossEnemySO
+  id: 3
+  enemyName: Avatar da Noite
+  description: Entidade que marca o fim da trilha
+  archetype: 2
+  weight: 2
+  tierMin: 3
+  tierMax: 10
+  image: {fileID: 1001697032, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  tags:
+    behavior: "Implac\xE1vel"
+    style: "Ritual\xEDstico"
+    type: Entidade
+  life:
+    min: 30
+    max: 42
+  physical:
+    min: 10
+    max: 16
+  mental:
+    min: 10
+    max: 14
+  specialRule: "Ganha b\xF4nus quando encontro \xE9 for\xE7ado"

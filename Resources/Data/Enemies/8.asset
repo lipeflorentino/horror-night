@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 8
+  m_EditorClassIdentifier: Assembly-CSharp::NormalEnemySO
+  id: 8
+  enemyName: "Vulto da N\xE9voa"
+  description: Forma indistinta que surge entre a neblina
+  archetype: 0
+  weight: 9
+  tierMin: 1
+  tierMax: 2
+  image: {fileID: 1209198942, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  tags:
+    behavior: Cauteloso
+    style: Furtivo
+    type: Entidade
+  life:
+    min: 8
+    max: 11
+  physical:
+    min: 3
+    max: 4
+  mental:
+    min: 3
+    max: 6
+  specialRule: 
