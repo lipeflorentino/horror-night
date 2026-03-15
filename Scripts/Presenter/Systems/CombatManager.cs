@@ -5,6 +5,27 @@ using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
+    public enum PlayerActionType
+    {
+        AttackLife,
+        AttackPhysical,
+        AttackMental,
+        Defend,
+        Parry,
+        Flee,
+        InstantKill,
+        Learn,
+        Item
+    }
+
+    private enum EnemyActionType
+    {
+        AttackLife,
+        AttackPhysical,
+        AttackMental,
+        Defend
+    }
+
     [System.Serializable]
     private class RunStateSnapshot
     {
@@ -37,6 +58,16 @@ public class CombatManager : MonoBehaviour
     private int enemyLife;
     private int enemyPhysical;
     private int enemyMental;
+
+    private int basePlayerLife;
+    private int basePlayerPhysical;
+    private int basePlayerMental;
+
+    private int baseEnemyLife;
+    private int baseEnemyPhysical;
+    private int baseEnemyMental;
+
+    private PlayerActionType? pendingPlayerAction;
 
     private void Awake()
     {
@@ -146,8 +177,16 @@ public class CombatManager : MonoBehaviour
         enemyPhysical = Mathf.Max(1, currentEnemy.physical);
         enemyMental = Mathf.Max(1, currentEnemy.mental);
 
+        basePlayerLife = playerLife;
+        basePlayerPhysical = playerPhysical;
+        basePlayerMental = playerMental;
+
+        baseEnemyLife = enemyLife;
+        baseEnemyPhysical = enemyPhysical;
+        baseEnemyMental = enemyMental;
+
         SpawnBattlers(bindings);
-        StartCoroutine(RunBasicTurnCombat(bindings));
+        StartCoroutine(RunTurnCombat(bindings));
     }
 
     private void SpawnBattlers(CombatSceneBindings bindings)
@@ -169,49 +208,270 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private IEnumerator RunBasicTurnCombat(CombatSceneBindings bindings)
+    private IEnumerator RunTurnCombat(CombatSceneBindings bindings)
     {
         bool playerTurn = (playerLife + playerPhysical + playerMental) >= (enemyLife + enemyPhysical + enemyMental);
+        bindings.SetCombatLog("O combate começou.");
 
         while (playerLife > 0 && enemyLife > 0)
         {
+            UpdateCombatHud(bindings);
+
             if (playerTurn)
-            {
-                int damage = Mathf.Max(1, Mathf.RoundToInt(playerPhysical * 0.35f));
-                enemyLife = Mathf.Max(0, enemyLife - damage);
-                Debug.Log($"[Combat] Player attacks for {damage}. Enemy life: {enemyLife}");
-            }
+                yield return ExecutePlayerTurn(bindings);
             else
-            {
-                int lifeDamage = Mathf.Max(1, Mathf.RoundToInt(enemyPhysical * 0.3f));
-                int sanityDamage = Mathf.Max(1, Mathf.RoundToInt(enemyMental * 0.15f));
-
-                playerLife = Mathf.Max(0, playerLife - lifeDamage);
-                playerMental = Mathf.Max(0, playerMental - sanityDamage);
-
-                Debug.Log($"[Combat] Enemy attacks for {lifeDamage} life and {sanityDamage} sanity. Player life: {playerLife}");
-            }
+                yield return ExecuteEnemyTurn(bindings);
 
             if (enemyLife <= 0 || playerLife <= 0)
                 break;
 
             playerTurn = !playerTurn;
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(0.5f);
         }
+
+        UpdateCombatHud(bindings);
 
         if (enemyLife <= 0)
         {
-            Debug.Log("[Combat] Enemy defeated. Placeholder reward generated.");
+            bindings.SetTurnText("Vitória");
+            bindings.SetCombatLog("Inimigo derrotado. Placeholder de recompensa gerado.");
             ApplyCombatResultsToSnapshot();
+            yield return new WaitForSeconds(0.8f);
             EndCombatAndReturnToRun();
             yield break;
         }
 
+        bindings.SetTurnText("Derrota");
+        bindings.SetCombatLog("Você foi derrotado.");
         bindings.ShowGameOverUI(() =>
         {
             shouldRestoreSnapshotOnReturn = false;
             SceneManager.LoadScene(runSnapshot.sceneName);
         });
+    }
+
+    private IEnumerator ExecutePlayerTurn(CombatSceneBindings bindings)
+    {
+        pendingPlayerAction = null;
+        bindings.SetTurnText("Turno do Jogador");
+        bindings.SetCombatLog("Escolha uma ação.");
+        bindings.SetActionsVisible(true);
+        bindings.OnPlayerActionSelected += CachePlayerAction;
+
+        while (!pendingPlayerAction.HasValue)
+            yield return null;
+
+        bindings.OnPlayerActionSelected -= CachePlayerAction;
+        PlayerActionType action = pendingPlayerAction.Value;
+        int playerRoll = RollDice(bindings);
+        int enemyRoll = RollDice(bindings);
+
+        ResolveActions(action, ChooseEnemyAction(), playerRoll, enemyRoll, bindings);
+        yield return new WaitForSeconds(0.6f);
+    }
+
+    private IEnumerator ExecuteEnemyTurn(CombatSceneBindings bindings)
+    {
+        bindings.SetTurnText("Turno do Inimigo");
+        bindings.SetCombatLog("Inimigo está escolhendo uma ação...");
+
+        EnemyActionType enemyAction = ChooseEnemyAction();
+        PlayerActionType passivePlayerAction = ChooseAutoDefenseAction();
+
+        int enemyRoll = RollDice(bindings);
+        int playerRoll = RollDice(bindings);
+
+        ResolveActions(passivePlayerAction, enemyAction, playerRoll, enemyRoll, bindings);
+        yield return new WaitForSeconds(0.6f);
+    }
+
+    private void CachePlayerAction(PlayerActionType action)
+    {
+        pendingPlayerAction = action;
+    }
+
+    private int RollDice(CombatSceneBindings bindings)
+    {
+        int roll = Random.Range(1, 21);
+        bindings.SetDiceValue(roll);
+        return roll;
+    }
+
+    private void ResolveActions(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
+    {
+        string resultLog;
+
+        if (IsEnemyAttack(enemyAction) && (playerAction == PlayerActionType.Defend || playerAction == PlayerActionType.Parry))
+        {
+            resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll);
+            bindings.SetCombatLog(resultLog);
+            return;
+        }
+
+        if (IsPlayerAttack(playerAction))
+        {
+            int damage = Mathf.Max(1, playerRoll);
+            if (enemyAction == EnemyActionType.Defend)
+            {
+                damage = Mathf.Max(0, damage - enemyRoll);
+                resultLog = $"Você atacou ({playerAction}), mas o inimigo defendeu parte do dano. Dano final: {damage}.";
+            }
+            else
+            {
+                resultLog = $"Você atacou ({playerAction}) e causou {damage} de dano.";
+            }
+
+            ApplyDamageToEnemy(playerAction, damage);
+        }
+        else
+        {
+            resultLog = ResolvePlayerSpecialAction(playerAction, playerRoll);
+        }
+
+        if (enemyLife > 0 && playerLife > 0 && IsEnemyAttack(enemyAction))
+        {
+            ApplyDamageToPlayer(enemyAction, enemyRoll);
+            resultLog += $" Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.";
+        }
+
+        bindings.SetCombatLog(resultLog);
+    }
+
+    private string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll)
+    {
+        if (playerAction == PlayerActionType.Defend)
+        {
+            int finalDamage = Mathf.Max(0, enemyRoll - playerRoll);
+            ApplyDamageToPlayer(enemyAction, finalDamage);
+            return $"Você defendeu. Defesa: {playerRoll}. Dano recebido: {finalDamage}.";
+        }
+
+        bool parrySuccess = playerRoll >= enemyRoll;
+        if (parrySuccess)
+        {
+            ApplyDamageToEnemy(PlayerActionType.AttackLife, playerRoll);
+            return $"Parry perfeito! Você reverteu {playerRoll} de dano ao inimigo.";
+        }
+
+        ApplyDamageToPlayer(enemyAction, enemyRoll);
+        return $"Parry falhou. Você recebeu {enemyRoll} de dano.";
+    }
+
+    private string ResolvePlayerSpecialAction(PlayerActionType action, int roll)
+    {
+        switch (action)
+        {
+            case PlayerActionType.Flee:
+                if (roll >= 18)
+                {
+                    enemyLife = 0;
+                    return "Fuga bem sucedida! Combate encerrado.";
+                }
+
+                return "Tentativa de fuga falhou.";
+            case PlayerActionType.InstantKill:
+                if (roll >= 20)
+                {
+                    enemyLife = 0;
+                    return "Instant Kill ativado! Inimigo eliminado.";
+                }
+
+                return "Instant Kill falhou.";
+            case PlayerActionType.Learn:
+                if (roll >= 12)
+                    return "Learn bem sucedido: informações do inimigo coletadas (placeholder).";
+
+                return "Learn falhou: nenhuma informação nova.";
+            case PlayerActionType.Item:
+                return "Uso de item ainda é placeholder.";
+            default:
+                return $"Ação {action} é placeholder.";
+        }
+    }
+
+    private void ApplyDamageToEnemy(PlayerActionType attackType, int amount)
+    {
+        if (amount == 0)
+            return;
+
+        switch (attackType)
+        {
+            case PlayerActionType.AttackLife:
+                enemyLife = Mathf.Clamp(enemyLife - amount, 0, baseEnemyLife);
+                break;
+            case PlayerActionType.AttackPhysical:
+                enemyPhysical = Mathf.Clamp(enemyPhysical - amount, 0, baseEnemyPhysical);
+                break;
+            case PlayerActionType.AttackMental:
+                enemyMental = Mathf.Clamp(enemyMental - amount, 0, baseEnemyMental);
+                break;
+            default:
+                enemyLife = Mathf.Clamp(enemyLife - amount, 0, baseEnemyLife);
+                break;
+        }
+    }
+
+    private void ApplyDamageToPlayer(EnemyActionType attackType, int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        switch (attackType)
+        {
+            case EnemyActionType.AttackLife:
+                playerLife = Mathf.Max(0, playerLife - amount);
+                break;
+            case EnemyActionType.AttackPhysical:
+                playerPhysical = Mathf.Max(0, playerPhysical - amount);
+                break;
+            case EnemyActionType.AttackMental:
+                playerMental = Mathf.Max(0, playerMental - amount);
+                break;
+        }
+    }
+
+    private EnemyActionType ChooseEnemyAction()
+    {
+        int roll = Random.Range(0, 100);
+        if (roll < 30)
+            return EnemyActionType.AttackLife;
+        if (roll < 55)
+            return EnemyActionType.AttackPhysical;
+        if (roll < 80)
+            return EnemyActionType.AttackMental;
+        return EnemyActionType.Defend;
+    }
+
+    private PlayerActionType ChooseAutoDefenseAction()
+    {
+        return Random.value < 0.75f ? PlayerActionType.Defend : PlayerActionType.Parry;
+    }
+
+    private bool IsPlayerAttack(PlayerActionType action)
+    {
+        return action == PlayerActionType.AttackLife || action == PlayerActionType.AttackPhysical || action == PlayerActionType.AttackMental;
+    }
+
+    private bool IsEnemyAttack(EnemyActionType action)
+    {
+        return action == EnemyActionType.AttackLife || action == EnemyActionType.AttackPhysical || action == EnemyActionType.AttackMental;
+    }
+
+    private void UpdateCombatHud(CombatSceneBindings bindings)
+    {
+        bindings.UpdateHud(
+            playerLife,
+            basePlayerLife,
+            playerPhysical,
+            basePlayerPhysical,
+            playerMental,
+            basePlayerMental,
+            enemyLife,
+            baseEnemyLife,
+            enemyPhysical,
+            baseEnemyPhysical,
+            enemyMental,
+            baseEnemyMental);
     }
 
     private void ApplyCombatResultsToSnapshot()
