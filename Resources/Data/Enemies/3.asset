@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
   m_Name: 3
-  m_EditorClassIdentifier: Assembly-CSharp::BossEnemySO
+  m_EditorClassIdentifier: 
   id: 3
   enemyName: Avatar da Noite
   description: Entidade que marca o fim da trilha
@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 2
   tierMin: 3
   tierMax: 10
-  image: {fileID: 0}
+  image: {fileID: 712402801, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
   tags:
     behavior: "Implac\xE1vel"
     style: "Ritual\xEDstico"

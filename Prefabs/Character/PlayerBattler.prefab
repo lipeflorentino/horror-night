@@ -805,6 +805,7 @@ GameObject:
   - component: {fileID: 8691534267539769205}
   - component: {fileID: 1397178279328130541}
   - component: {fileID: 2264778139582696256}
+  - component: {fileID: 6959943355668713840}
   m_Layer: 0
   m_Name: PlayerBattler
   m_TagString: Player
@@ -862,6 +863,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   items: []
+--- !u!114 &6959943355668713840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4332124285523534979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 661952ebe5cb4d558892a3c3ce555a06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  life: 10
+  physical: 10
+  mental: 10
 --- !u!1 &4931424507839612175
 GameObject:
   m_ObjectHideFlags: 0

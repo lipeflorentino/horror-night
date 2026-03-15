@@ -10,7 +10,6 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private string combatSceneName = "Combat";
 
     [Header("Combat Prefabs")]
-    [SerializeField] private GameObject enemyCombatPrefab;
     [SerializeField] private GameObject playerBattlerPrefab;
 
     private EnemyInstance currentEnemy;
@@ -51,8 +50,8 @@ public class CombatManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this)
-            SceneManager.sceneLoaded -= HandleSceneLoaded;
+        // if (Instance == this)
+           // SceneManager.sceneLoaded -= HandleSceneLoaded;
     }
 
     public void StartCombat(float difficultyModifier)
@@ -113,6 +112,7 @@ public class CombatManager : MonoBehaviour
 
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log($"HandleSceneLoaded {scene} - {mode}");
         if (!combatActive)
             return;
 
@@ -129,8 +129,9 @@ public class CombatManager : MonoBehaviour
 
     private void SetupCombatScene()
     {
+        Debug.Log("Setup Combat!");
         CombatSceneBindings bindings = FindObjectOfType<CombatSceneBindings>();
-        
+
         if (bindings == null)
         {
             Debug.LogError("CombatSceneBindings missing in combat scene.");
@@ -159,6 +160,7 @@ public class CombatManager : MonoBehaviour
 
     private void SpawnBattlers(CombatSceneBindings bindings)
     {
+        Debug.Log("SpawnBattlers!");
         if (playerBattlerPrefab != null && bindings.playerSpawnPoint != null)
         {
             GameObject playerObj = Instantiate(playerBattlerPrefab, bindings.playerSpawnPoint.position, Quaternion.identity);
@@ -167,13 +169,24 @@ public class CombatManager : MonoBehaviour
                 battler.Setup(playerLife, playerPhysical, playerMental);
         }
 
-        if (enemyCombatPrefab != null && bindings.enemySpawnPoint != null)
-        {
-            GameObject enemyObj = Instantiate(enemyCombatPrefab, bindings.enemySpawnPoint.position, Quaternion.identity);
-            EnemyBattler battler = enemyObj.GetComponent<EnemyBattler>();
-            if (battler != null)
-                battler.Setup(currentEnemy);
-        }
+        if (bindings.enemySpawnPoint == null)
+            return;
+
+        EnemyBattler enemyBattler = CreateRuntimeEnemyBattler(bindings.enemySpawnPoint.position);
+
+        if (enemyBattler != null)
+            enemyBattler.Setup(currentEnemy);
+    }
+
+    private EnemyBattler CreateRuntimeEnemyBattler(Vector3 position)
+    {
+        GameObject enemyObj = new GameObject("EnemyBattler_Runtime");
+        enemyObj.transform.position = position;
+
+        EnemyBattler battler = enemyObj.AddComponent<EnemyBattler>();
+        enemyObj.AddComponent<SpriteRenderer>();
+
+        return battler;
     }
 
     private IEnumerator RunTurnCombat(CombatSceneBindings bindings)

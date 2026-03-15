@@ -50,6 +50,7 @@ public class EnemyCSVImporter
             string assetPath = OutputFolder + id + ".asset";
 
             EnemySO enemy = LoadOrCreateEnemy(assetPath, archetype);
+            
             if (enemy == null)
                 continue;
 
@@ -89,16 +90,10 @@ public class EnemyCSVImporter
         if (loaded != null)
             return loaded;
 
-        EnemySO enemy;
-
-        if (archetype == EnemyArchetype.Boss)
-            enemy = ScriptableObject.CreateInstance<BossEnemySO>();
-        else if (archetype == EnemyArchetype.Special)
-            enemy = ScriptableObject.CreateInstance<SpecialEnemySO>();
-        else
-            enemy = ScriptableObject.CreateInstance<NormalEnemySO>();
+        EnemySO enemy = ScriptableObject.CreateInstance<EnemySO>();
 
         AssetDatabase.CreateAsset(enemy, assetPath);
+
         return enemy;
     }
 

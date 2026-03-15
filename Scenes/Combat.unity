@@ -13158,7 +13158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   combatSceneName: Combat
-  enemyCombatPrefab: {fileID: 7052613227684567950, guid: 316b5dc114a1b7e48a315ec770c8d9ad, type: 3}
+  enemyCombatPrefab: {fileID: 0}
   playerBattlerPrefab: {fileID: 4332124285523534979, guid: 52e79c7c532b7194a9a75628d5be77bb, type: 3}
 --- !u!1 &1569988393
 GameObject:

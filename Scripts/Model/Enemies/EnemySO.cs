@@ -3,21 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct StatRange
-{
-    public int min;
-    public int max;
-
-    public int Roll(float modifier = 1f)
-    {
-        int clampedMin = Mathf.Max(0, min);
-        int clampedMax = Mathf.Max(clampedMin, max);
-        int value = UnityEngine.Random.Range(clampedMin, clampedMax + 1);
-        return Mathf.Max(0, Mathf.RoundToInt(value * Mathf.Max(0.1f, modifier)));
-    }
-}
-
-[Serializable]
 public class EnemyTagSet
 {
     public string behavior;
@@ -35,7 +20,7 @@ public class EnemyTagSet
     }
 }
 
-public abstract class EnemySO : ScriptableObject
+public class EnemySO : ScriptableObject
 {
     [Header("Identity")]
     public int id;
@@ -62,7 +47,7 @@ public abstract class EnemySO : ScriptableObject
     [Header("Optional")]
     [TextArea] public string specialRule;
 
-    public virtual bool MatchesContext(EnemyRunContext context)
+    public bool MatchesContext(EnemyRunContext context)
     {
         if (context == null)
             return true;

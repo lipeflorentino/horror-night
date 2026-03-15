@@ -40,12 +40,3 @@ public class EnemyInstance
     public int mental;
     public int runTier;
 }
-
-[CreateAssetMenu(menuName = "Game/Enemy/Normal")]
-public class NormalEnemySO : EnemySO { }
-
-[CreateAssetMenu(menuName = "Game/Enemy/Special")]
-public class SpecialEnemySO : EnemySO { }
-
-[CreateAssetMenu(menuName = "Game/Enemy/Boss")]
-public class BossEnemySO : EnemySO { }
