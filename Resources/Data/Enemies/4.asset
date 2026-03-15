@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 9
   tierMin: 0
   tierMax: 2
-  image: {fileID: 848058512, guid: 4780b4e85189b1648af8a92e09ef72e8, type: 3}
+  image: {fileID: 0}
   tags:
     behavior: Agressivo
     style: Primitivo

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 [System.Serializable]
 public struct StatModifier { 
     public int life; 
@@ -13,4 +15,15 @@ public struct OccurrenceResult
     public int playerRoll;
     public string successText;
     public string failText;
+}
+
+[System.Serializable]
+public class RunStateSnapshot
+{
+    public string sceneName;
+    public LevelSO level;
+    public int levelIndex;
+    public bool[] exploredNodes;
+    public PlayerStatusManager.PlayerStatusSnapshot playerStatus;
+    public List<ItemSO> inventoryItems;
 }

@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 10
   tierMin: 0
   tierMax: 1
-  image: {fileID: -354716006, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  image: {fileID: 0}
   tags:
     behavior: Agressivo
     style: "Fren\xE9tico"

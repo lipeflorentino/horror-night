@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 9
   tierMin: 1
   tierMax: 2
-  image: {fileID: 1209198942, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  image: {fileID: 0}
   tags:
     behavior: Cauteloso
     style: Furtivo

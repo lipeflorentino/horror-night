@@ -74,24 +74,24 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private Button restartButton;
 
-    public event Action<CombatManager.PlayerActionType> OnPlayerActionSelected;
+    public event Action<PlayerActionType> OnPlayerActionSelected;
 
     private void Awake()
     {
         RegisterButton(attackButton, () => OpenActionMenu(initialActionsUI, attackActionsUI));
         RegisterButton(defenseButton, () => OpenActionMenu(initialActionsUI, defenseActionsUI));
         RegisterButton(specialButton, () => OpenActionMenu(initialActionsUI, specialActionsUI));
-        RegisterButton(itemButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.Item));
+        RegisterButton(itemButton, () => TriggerPlayerAction(PlayerActionType.Item));
 
-        RegisterButton(attackLifeButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.AttackLife));
-        RegisterButton(attackPhysicalButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.AttackPhysical));
-        RegisterButton(attackMentalButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.AttackMental));
+        RegisterButton(attackLifeButton, () => TriggerPlayerAction(PlayerActionType.AttackLife));
+        RegisterButton(attackPhysicalButton, () => TriggerPlayerAction(PlayerActionType.AttackPhysical));
+        RegisterButton(attackMentalButton, () => TriggerPlayerAction(PlayerActionType.AttackMental));
 
-        RegisterButton(defendButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.Defend));
-        RegisterButton(parryButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.Parry));
-        RegisterButton(fleeButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.Flee));
-        RegisterButton(instantKillButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.InstantKill));
-        RegisterButton(learnButton, () => TriggerPlayerAction(CombatManager.PlayerActionType.Learn));
+        RegisterButton(defendButton, () => TriggerPlayerAction(PlayerActionType.Defend));
+        RegisterButton(parryButton, () => TriggerPlayerAction(PlayerActionType.Parry));
+        RegisterButton(fleeButton, () => TriggerPlayerAction(PlayerActionType.Flee));
+        RegisterButton(instantKillButton, () => TriggerPlayerAction(PlayerActionType.InstantKill));
+        RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
 
         SetActionsVisible(false);
     }
@@ -186,7 +186,7 @@ public class CombatSceneBindings : MonoBehaviour
             nextMenu.SetActive(true);
     }
 
-    private void TriggerPlayerAction(CombatManager.PlayerActionType action)
+    private void TriggerPlayerAction(PlayerActionType action)
     {
         SetActionsVisible(false);
         OnPlayerActionSelected?.Invoke(action);

@@ -1,42 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
-    public enum PlayerActionType
-    {
-        AttackLife,
-        AttackPhysical,
-        AttackMental,
-        Defend,
-        Parry,
-        Flee,
-        InstantKill,
-        Learn,
-        Item
-    }
-
-    private enum EnemyActionType
-    {
-        AttackLife,
-        AttackPhysical,
-        AttackMental,
-        Defend
-    }
-
-    [System.Serializable]
-    private class RunStateSnapshot
-    {
-        public string sceneName;
-        public LevelSO level;
-        public int levelIndex;
-        public bool[] exploredNodes;
-        public PlayerStatusManager.PlayerStatusSnapshot playerStatus;
-        public List<ItemSO> inventoryItems;
-    }
-
     public static CombatManager Instance;
 
     [Header("Scene")]
@@ -163,6 +130,7 @@ public class CombatManager : MonoBehaviour
     private void SetupCombatScene()
     {
         CombatSceneBindings bindings = FindObjectOfType<CombatSceneBindings>();
+        
         if (bindings == null)
         {
             Debug.LogError("CombatSceneBindings missing in combat scene.");
