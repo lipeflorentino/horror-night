@@ -78,3 +78,34 @@ TASKS
         - Boss 
 
 
+PROMPT Para Tileset
+
+A dark horror RPG UI asset sheet on transparent background.
+
+Include separate elements arranged in a clean grid:
+
+1. Stone gothic button frame for action buttons
+2. Five action icons:
+   - rusted sword
+   - brain
+   - living heart
+   - running shadow silhouette
+   - leather pouch
+3. A parchment square frame for dice rolling
+4. A 20-sided die (D20) with the front face blank (no number)
+5. Three gothic health bar fills: red HP, purple mental, yellow physical
+6. Small enemy tag icons: chaotic, aggressive, mental
+
+Art style:
+dark fantasy, hand drawn, thick ink outlines, similar to Fear & Hunger and Omori.
+
+clean sprites
+transparent background
+video game UI asset sheet
+
+
+🎮 montar o prefab da UI (Unity / Godot)
+
+🎲 fazer animação do D20 rolando
+
+🧠 criar sistema de combate baseado em sanidade
