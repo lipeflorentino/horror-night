@@ -41,7 +41,7 @@ public class EncounterSystem : MonoBehaviour
         EnemyInstance selectedEnemy = enemyDatabase != null ? enemyDatabase.RollRandomEnemy(context) : null;
 
         float modifier = isForced ? riskModifier * 1.5f : riskModifier;
-        CombatManager.Instance.StartCombat(selectedEnemy, modifier);
+        CombatManager.EnsureInstance().StartCombat(selectedEnemy, modifier);
     }
 
     private EnemyRunContext BuildContext(bool isForced)
