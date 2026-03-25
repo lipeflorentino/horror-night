@@ -47,7 +47,7 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private DiceRollUI diceRollUI;
 
     [Header("Combat Feedback")]
-    [SerializeField] private SpriteRenderer playerSpriteRenderer;
+    [SerializeField] private GameObject playerHitUI;
     [SerializeField] private SpriteRenderer enemySpriteRenderer;
     [SerializeField] private TMP_Text playerFeedbackText;
     [SerializeField] private TMP_Text enemyFeedbackText;
@@ -199,7 +199,7 @@ public class CombatSceneBindings : MonoBehaviour
         if (amount <= 0)
             return;
 
-        FlashSprite(playerSpriteRenderer);
+        StartCoroutine(FlashPlayerUIRoutine(playerHitUI));
         string damageText = critical ? $"CRITICAL HIT! -{amount}" : $"-{amount}";
         ShowFeedbackText(true, damageText, critical ? criticalFeedbackColor : damageFlashColor);
     }
@@ -248,8 +248,15 @@ public class CombatSceneBindings : MonoBehaviour
     {
         if (spriteRenderer == null)
             return;
-
+        
         StartCoroutine(FlashSpriteRoutine(spriteRenderer));
+    }
+
+    private IEnumerator FlashPlayerUIRoutine(GameObject hitPlayerUI)
+    {
+        hitPlayerUI.SetActive(true);
+        yield return new WaitForSeconds(damageFlashDuration);
+        hitPlayerUI.SetActive(false);
     }
 
     private IEnumerator FlashSpriteRoutine(SpriteRenderer spriteRenderer)
@@ -316,13 +323,6 @@ public class CombatSceneBindings : MonoBehaviour
 
     private void ResolveCombatVisualReferences()
     {
-        if (playerSpriteRenderer == null)
-        {
-            PlayerBattler playerBattler = FindObjectOfType<PlayerBattler>();
-            if (playerBattler != null)
-                playerSpriteRenderer = playerBattler.GetComponentInChildren<SpriteRenderer>();
-        }
-
         if (enemySpriteRenderer == null)
         {
             EnemyBattler enemyBattler = FindObjectOfType<EnemyBattler>();

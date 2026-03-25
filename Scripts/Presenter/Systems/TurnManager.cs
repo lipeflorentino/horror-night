@@ -104,10 +104,12 @@ public class TurnManager
 
         int playerRoll = 0;
         int enemyRoll = 0;
+        bool isPlayerTurn = true;
+
         yield return RollDice(bindings, v => playerRoll = v);
         yield return RollDice(bindings, v => enemyRoll = v);
 
-        ResolveActions(action, ChooseEnemyAction(), playerRoll, enemyRoll, bindings);
+        ResolveActions(action, ChooseEnemyAction(isPlayerTurn), playerRoll, enemyRoll, bindings);
         yield return new WaitForSeconds(0.6f);
     }
 
@@ -116,7 +118,7 @@ public class TurnManager
         bindings.SetTurnText("Turno do Inimigo");
         bindings.SetCombatLog("Inimigo está escolhendo uma ação...", CombatLogCategory.Action);
 
-        EnemyActionType enemyAction = ChooseEnemyAction();
+        EnemyActionType enemyAction = ChooseEnemyAction(false);
         PlayerActionType passivePlayerAction = ChooseAutoDefenseAction();
         bindings.NotifyEnemyAction($"Ação: {FormatEnemyAction(enemyAction)}");
 
@@ -182,7 +184,7 @@ public class TurnManager
             ApplyDamageToPlayer(enemyAction, enemyRoll);
             bindings.NotifyPlayerDamage(enemyRoll, enemyRoll >= 20);
             resultLog += $" Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.";
-            bindings.SetCombatLog($"Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.", CombatLogCategory.Damage);
+            bindings.SetCombatLog(resultLog, CombatLogCategory.Damage);
         }
     }
 
@@ -279,9 +281,12 @@ public class TurnManager
         }
     }
 
-    private EnemyActionType ChooseEnemyAction()
+    private EnemyActionType ChooseEnemyAction(bool isPlayerTurn)
     {
+        if (isPlayerTurn) return EnemyActionType.Defend;
+
         int roll = Random.Range(0, 100);
+
         if (roll < 30)
             return EnemyActionType.AttackLife;
         if (roll < 55)

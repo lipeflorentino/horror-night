@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9191812809160255124}
+  - component: {fileID: 5615925752399337872}
   m_Layer: 0
   m_Name: Dice
   m_TagString: Untagged
@@ -38,6 +39,23 @@ RectTransform:
   m_AnchoredPosition: {x: 890, y: -451}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &5615925752399337872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4923039375038587686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a05af57dc58ec84a893aafbc9ccd5a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  diceImage: {fileID: 2583571745162478997}
+  diceValueText: {fileID: 2333620945070018509}
+  rollDuration: 0.65
+  spinSpeed: 900
+  updateInterval: 0.06
 --- !u!1 &6114375653774256184
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,7 +184,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 66.51245, y: -6.7476196, z: 73.26013, w: -19.278961}
+  m_margin: {x: 39.819046, y: -9.351885, z: 47.21734, w: -21.883224}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
