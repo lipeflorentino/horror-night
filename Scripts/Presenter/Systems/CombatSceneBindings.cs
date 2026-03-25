@@ -105,7 +105,7 @@ public class CombatSceneBindings : MonoBehaviour
     public void SetCombatLog(string value)
     {
         if (combatLogText != null)
-            combatLogText.text = value;
+            combatLogText.text += "\n" + value;
     }
 
     public void SetDiceValue(int value)
@@ -170,9 +170,11 @@ public class CombatSceneBindings : MonoBehaviour
 
     private void RegisterButton(Button button, Action callback)
     {
+        Debug.Log($"RegisterButton {button} - {callback}");
         if (button == null)
             return;
 
+        Debug.Log("Button register onClick");
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => callback?.Invoke());
     }

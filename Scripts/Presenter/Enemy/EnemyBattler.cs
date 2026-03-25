@@ -14,7 +14,6 @@ public class EnemyBattler : MonoBehaviour
 
     public void Setup(EnemyInstance enemy)
     {
-        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName}");
         enemyData = enemy;
         if (enemyData == null || enemyData.source == null)
             return;
@@ -23,5 +22,7 @@ public class EnemyBattler : MonoBehaviour
 
         if (enemySpriteRenderer != null && enemyData.source.image != null)
             enemySpriteRenderer.sprite = enemyData.source.image;
+
+        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName}");
     }
 }

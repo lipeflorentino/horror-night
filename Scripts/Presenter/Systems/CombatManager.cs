@@ -9,11 +9,10 @@ public class CombatManager : MonoBehaviour
     [Header("Scene")]
     [SerializeField] private string combatSceneName = "Combat";
 
-    [Header("Combat Prefabs")]
-    [SerializeField] private GameObject playerBattlerPrefab;
-
     private CombatStateController stateController;
     private TurnManager turnManager;
+    private PlayerBattler playerBattler;
+    private EnemyBattler enemyBattler;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap()
@@ -49,8 +48,8 @@ public class CombatManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         stateController = GetComponent<CombatStateController>();
+
         if (stateController == null)
             stateController = gameObject.AddComponent<CombatStateController>();
 
@@ -144,31 +143,17 @@ public class CombatManager : MonoBehaviour
 
     private void SpawnBattlers(CombatSceneBindings bindings)
     {
-        if (playerBattlerPrefab != null && bindings.playerSpawnPoint != null)
+        playerBattler = FindObjectOfType<PlayerBattler>();
+        enemyBattler = FindObjectOfType<EnemyBattler>();
+
+        if (playerBattler != null && bindings.playerSpawnPoint != null)
         {
-            GameObject playerObj = Instantiate(playerBattlerPrefab, bindings.playerSpawnPoint.position, Quaternion.identity);
-            PlayerBattler battler = playerObj.GetComponent<PlayerBattler>();
-            if (battler != null)
-                battler.Setup(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental);
+            if (playerBattler != null)
+                playerBattler.Setup(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental);
         }
 
-        if (bindings.enemySpawnPoint == null)
-            return;
-
-        EnemyBattler enemyBattler = CreateRuntimeEnemyBattler(bindings.enemySpawnPoint.position);
-        if (enemyBattler != null)
+        if (enemyBattler != null && bindings.enemySpawnPoint != null)
             enemyBattler.Setup(stateController.CurrentEnemy);
-    }
-
-    private EnemyBattler CreateRuntimeEnemyBattler(Vector3 position)
-    {
-        GameObject enemyObj = new GameObject("EnemyBattler_Runtime");
-        enemyObj.transform.position = position;
-
-        EnemyBattler battler = enemyObj.AddComponent<EnemyBattler>();
-        enemyObj.AddComponent<SpriteRenderer>();
-
-        return battler;
     }
 
     private void EndCombatAndReturnToRun()

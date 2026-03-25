@@ -91,7 +91,7 @@ public class TurnManager
     {
         pendingPlayerAction = null;
         bindings.SetTurnText("Turno do Jogador");
-        bindings.SetCombatLog("Escolha uma ação.");
+        bindings.SetCombatLog("Aguardando ação do jogador...");
         bindings.SetActionsVisible(true);
         bindings.OnPlayerActionSelected += CachePlayerAction;
 
