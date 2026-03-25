@@ -14,6 +14,7 @@ public class UIOccurrencePopup : MonoBehaviour
     [Header("Result UI")]
     [SerializeField] private GameObject resultRoot;
     [SerializeField] private TextMeshProUGUI resultText;
+    [SerializeField] private DiceRollUI diceRollUI;
 
     public void Show(OccurrenceSO entry, int occurrenceRoll, Func<OccurrenceResult> onRoll, Action onClose)
     {
@@ -38,21 +39,7 @@ public class UIOccurrencePopup : MonoBehaviour
             rollButton.interactable = true;
             rollButton.onClick.AddListener(() =>
             {
-                OccurrenceResult result = onRoll != null ? onRoll.Invoke() : default;
-
-                if (resultRoot != null)
-                    resultRoot.SetActive(true);
-
-                if (resultText != null)
-                {
-                    string message = result.success ? result.successText : result.failText;
-                    resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}";
-                }
-
-                rollButton.interactable = false;
-
-                if (closeButton != null)
-                    closeButton.gameObject.SetActive(true);
+                StartCoroutine(HandleRoll(onRoll));
             });
         }
 
@@ -67,5 +54,28 @@ public class UIOccurrencePopup : MonoBehaviour
                     root.SetActive(false);
             });
         }
+    }
+
+    private System.Collections.IEnumerator HandleRoll(Func<OccurrenceResult> onRoll)
+    {
+        OccurrenceResult result = onRoll != null ? onRoll.Invoke() : default;
+
+        if (diceRollUI != null)
+            yield return StartCoroutine(diceRollUI.PlayRollAnimation(result.playerRoll));
+
+        if (resultRoot != null)
+            resultRoot.SetActive(true);
+
+        if (resultText != null)
+        {
+            string message = result.success ? result.successText : result.failText;
+            resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}";
+        }
+
+        if (rollButton != null)
+            rollButton.interactable = false;
+
+        if (closeButton != null)
+            closeButton.gameObject.SetActive(true);
     }
 }

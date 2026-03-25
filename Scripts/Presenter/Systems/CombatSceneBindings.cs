@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -42,8 +44,17 @@ public class CombatSceneBindings : MonoBehaviour
     [Header("Turn + Combat Feedback")]
     [SerializeField] private TMP_Text turnText;
     [SerializeField] private TMP_Text combatLogText;
-    [SerializeField] private Image diceImage;
-    [SerializeField] private TMP_Text diceValueText;
+    [SerializeField] private DiceRollUI diceRollUI;
+
+    [Header("Combat Feedback")]
+    [SerializeField] private SpriteRenderer playerSpriteRenderer;
+    [SerializeField] private SpriteRenderer enemySpriteRenderer;
+    [SerializeField] private TMP_Text playerFeedbackText;
+    [SerializeField] private TMP_Text enemyFeedbackText;
+    [SerializeField] private float damageFlashDuration = 0.15f;
+    [SerializeField] private Color damageFlashColor = Color.red;
+    [SerializeField] private Color actionFeedbackColor = new(1f, 0.9f, 0.3f);
+    [SerializeField] private Color criticalFeedbackColor = new(1f, 0.35f, 0.35f);
 
     [Header("Actions UI")]
     [SerializeField] private GameObject initialActionsUI;
@@ -75,6 +86,10 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private Button restartButton;
 
     public event Action<PlayerActionType> OnPlayerActionSelected;
+    private readonly Queue<string> combatLogEntries = new();
+    private const int MaxLogEntries = 5;
+    private Coroutine playerFeedbackRoutine;
+    private Coroutine enemyFeedbackRoutine;
 
     private void Awake()
     {
@@ -94,6 +109,7 @@ public class CombatSceneBindings : MonoBehaviour
         RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
 
         SetActionsVisible(false);
+        ResolveCombatVisualReferences();
     }
 
     public void SetTurnText(string value)
@@ -102,19 +118,24 @@ public class CombatSceneBindings : MonoBehaviour
             turnText.text = value;
     }
 
-    public void SetCombatLog(string value)
+    public void SetCombatLog(string value, CombatLogCategory category = CombatLogCategory.Default)
     {
-        if (combatLogText != null)
-            combatLogText.text += "\n" + value;
+        if (combatLogText == null || string.IsNullOrWhiteSpace(value))
+            return;
+
+        combatLogEntries.Enqueue(FormatLog(value, category));
+        while (combatLogEntries.Count > MaxLogEntries)
+            combatLogEntries.Dequeue();
+
+        combatLogText.text = string.Join("\n", combatLogEntries);
     }
 
-    public void SetDiceValue(int value)
+    public IEnumerator PlayDiceRoll(int value)
     {
-        if (diceValueText != null)
-            diceValueText.text = value.ToString();
+        if (diceRollUI == null)
+            yield break;
 
-        if (diceImage != null)
-            diceImage.enabled = true;
+        yield return StartCoroutine(diceRollUI.PlayRollAnimation(value));
     }
 
     public void SetActionsVisible(bool visible)
@@ -168,6 +189,105 @@ public class CombatSceneBindings : MonoBehaviour
         });
     }
 
+    public void RefreshCombatVisualReferences()
+    {
+        ResolveCombatVisualReferences();
+    }
+
+    public void NotifyPlayerDamage(int amount, bool critical = false)
+    {
+        if (amount <= 0)
+            return;
+
+        FlashSprite(playerSpriteRenderer);
+        string damageText = critical ? $"CRITICAL HIT! -{amount}" : $"-{amount}";
+        ShowFeedbackText(true, damageText, critical ? criticalFeedbackColor : damageFlashColor);
+    }
+
+    public void NotifyEnemyDamage(int amount, bool critical = false)
+    {
+        if (amount <= 0)
+            return;
+
+        FlashSprite(enemySpriteRenderer);
+        string damageText = critical ? $"CRITICAL HIT! -{amount}" : $"-{amount}";
+        ShowFeedbackText(false, damageText, critical ? criticalFeedbackColor : damageFlashColor);
+    }
+
+    public void NotifyPlayerAction(string actionText)
+    {
+        if (string.IsNullOrWhiteSpace(actionText))
+            return;
+
+        ShowFeedbackText(true, actionText, actionFeedbackColor);
+    }
+
+    public void NotifyEnemyAction(string actionText)
+    {
+        if (string.IsNullOrWhiteSpace(actionText))
+            return;
+
+        ShowFeedbackText(false, actionText, actionFeedbackColor);
+    }
+
+    private string FormatLog(string value, CombatLogCategory category)
+    {
+        string colorHex = category switch
+        {
+            CombatLogCategory.Damage => "#FF5F5F",
+            CombatLogCategory.Action => "#FFD35A",
+            CombatLogCategory.Victory => "#6CFF83",
+            CombatLogCategory.Defeat => "#FF4040",
+            _ => "#B3B3B3"
+        };
+
+        return $"<color={colorHex}>{value}</color>";
+    }
+
+    private void FlashSprite(SpriteRenderer spriteRenderer)
+    {
+        if (spriteRenderer == null)
+            return;
+
+        StartCoroutine(FlashSpriteRoutine(spriteRenderer));
+    }
+
+    private IEnumerator FlashSpriteRoutine(SpriteRenderer spriteRenderer)
+    {
+        Color original = spriteRenderer.color;
+        spriteRenderer.color = damageFlashColor;
+        yield return new WaitForSeconds(damageFlashDuration);
+        spriteRenderer.color = original;
+    }
+
+    private void ShowFeedbackText(bool isPlayer, string value, Color color)
+    {
+        TMP_Text feedbackText = isPlayer ? playerFeedbackText : enemyFeedbackText;
+        if (feedbackText == null)
+            return;
+
+        if (isPlayer && playerFeedbackRoutine != null)
+            StopCoroutine(playerFeedbackRoutine);
+
+        if (!isPlayer && enemyFeedbackRoutine != null)
+            StopCoroutine(enemyFeedbackRoutine);
+
+        Coroutine newRoutine = StartCoroutine(ShowFeedbackTextRoutine(feedbackText, value, color));
+        if (isPlayer)
+            playerFeedbackRoutine = newRoutine;
+        else
+            enemyFeedbackRoutine = newRoutine;
+    }
+
+    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, string value, Color color)
+    {
+        feedbackText.gameObject.SetActive(true);
+        feedbackText.color = color;
+        feedbackText.text = value;
+        yield return new WaitForSeconds(0.85f);
+        feedbackText.gameObject.SetActive(false);
+    }
+
     private void RegisterButton(Button button, Action callback)
     {
         Debug.Log($"RegisterButton {button} - {callback}");
@@ -193,4 +313,36 @@ public class CombatSceneBindings : MonoBehaviour
         SetActionsVisible(false);
         OnPlayerActionSelected?.Invoke(action);
     }
+
+    private void ResolveCombatVisualReferences()
+    {
+        if (playerSpriteRenderer == null)
+        {
+            PlayerBattler playerBattler = FindObjectOfType<PlayerBattler>();
+            if (playerBattler != null)
+                playerSpriteRenderer = playerBattler.GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (enemySpriteRenderer == null)
+        {
+            EnemyBattler enemyBattler = FindObjectOfType<EnemyBattler>();
+            if (enemyBattler != null)
+                enemySpriteRenderer = enemyBattler.GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (playerFeedbackText != null)
+            playerFeedbackText.gameObject.SetActive(false);
+
+        if (enemyFeedbackText != null)
+            enemyFeedbackText.gameObject.SetActive(false);
+    }
+}
+
+public enum CombatLogCategory
+{
+    Default,
+    Action,
+    Damage,
+    Victory,
+    Defeat
 }

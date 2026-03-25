@@ -154,6 +154,8 @@ public class CombatManager : MonoBehaviour
 
         if (enemyBattler != null && bindings.enemySpawnPoint != null)
             enemyBattler.Setup(stateController.CurrentEnemy);
+
+        bindings.RefreshCombatVisualReferences();
     }
 
     private void EndCombatAndReturnToRun()
