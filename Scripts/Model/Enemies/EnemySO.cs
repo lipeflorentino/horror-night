@@ -44,6 +44,15 @@ public class EnemySO : ScriptableObject
     public StatRange physical;
     public StatRange mental;
 
+    [Header("Combat - Advanced Stats")]
+    public StatRange attack;
+    public StatRange defense;
+    public StatRange criticalHitChance;
+    public StatRange parryChance;
+    public StatRange fleeChance;
+    public StatRange instantKillChance;
+    public StatRange learnChance;
+
     [Header("Optional")]
     [TextArea] public string specialRule;
 
@@ -63,13 +72,36 @@ public class EnemySO : ScriptableObject
     {
         float difficulty = context != null ? context.DifficultyModifier : 1f;
 
+        int rolledLife = life.Roll(difficulty);
+        int rolledPhysical = physical.Roll(difficulty);
+        int rolledMental = mental.Roll(difficulty);
+
+        int rolledAttack = attack.Roll(difficulty);
+        int rolledDefense = defense.Roll(difficulty);
+        int rolledCritChance = criticalHitChance.Roll(1f);
+        int rolledParryChance = parryChance.Roll(1f);
+        int rolledFleeChance = fleeChance.Roll(1f);
+        int rolledInstantKillChance = instantKillChance.Roll(1f);
+        int rolledLearnChance = learnChance.Roll(1f);
+
+        TurnManagerStats stats = TurnManagerStats.BuildDefault(rolledLife, rolledPhysical, rolledMental);
+        stats.attack = rolledAttack > 0 ? rolledAttack : stats.attack;
+        stats.defense = rolledDefense > 0 ? rolledDefense : stats.defense;
+        stats.criticalHitChance = rolledCritChance > 0 ? rolledCritChance : stats.criticalHitChance;
+        stats.parryChance = rolledParryChance > 0 ? rolledParryChance : stats.parryChance;
+        stats.fleeChance = rolledFleeChance > 0 ? rolledFleeChance : stats.fleeChance;
+        stats.instantKillChance = rolledInstantKillChance > 0 ? rolledInstantKillChance : stats.instantKillChance;
+        stats.learnChance = rolledLearnChance > 0 ? rolledLearnChance : stats.learnChance;
+        stats.Normalize();
+
         return new EnemyInstance
         {
             source = this,
-            life = life.Roll(difficulty),
-            physical = physical.Roll(difficulty),
-            mental = mental.Roll(difficulty),
-            runTier = context != null ? context.tier : 0
+            life = rolledLife,
+            physical = rolledPhysical,
+            mental = rolledMental,
+            runTier = context != null ? context.tier : 0,
+            combatStats = stats
         };
     }
 }

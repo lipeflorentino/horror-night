@@ -28,7 +28,12 @@ public class TurnManager
     public int BaseEnemyPhysical { get; private set; }
     public int BaseEnemyMental { get; private set; }
 
+    private TurnManagerStats playerStats;
+    private TurnManagerStats enemyStats;
+
     private PlayerActionType? pendingPlayerAction;
+    private readonly PlayerTurnActions playerTurnActions = new();
+    private readonly EnemyTurnActions enemyTurnActions = new();
 
     public void Initialize(RunStateSnapshot snapshot, EnemyInstance enemy)
     {
@@ -47,6 +52,16 @@ public class TurnManager
         BaseEnemyLife = EnemyLife;
         BaseEnemyPhysical = EnemyPhysical;
         BaseEnemyMental = EnemyMental;
+
+        playerStats = snapshot.playerStatus.combatStats;
+        if (playerStats.attack <= 0)
+            playerStats = TurnManagerStats.BuildDefault(PlayerLife, PlayerPhysical, PlayerMental);
+        playerStats.Normalize();
+
+        enemyStats = enemy.combatStats;
+        if (enemyStats.attack <= 0)
+            enemyStats = TurnManagerStats.BuildDefault(EnemyLife, EnemyPhysical, EnemyMental);
+        enemyStats.Normalize();
 
         Outcome = CombatOutcome.Ongoing;
     }
@@ -99,17 +114,19 @@ public class TurnManager
             yield return null;
 
         bindings.OnPlayerActionSelected -= CachePlayerAction;
+
         PlayerActionType action = pendingPlayerAction.Value;
-        bindings.NotifyPlayerAction($"Ação: {FormatPlayerAction(action)}");
+        EnemyActionType enemyAction = enemyTurnActions.ChooseEnemyAction(true);
+
+        bindings.NotifyPlayerAction($"Ação: {playerTurnActions.Format(action)}");
 
         int playerRoll = 0;
         int enemyRoll = 0;
-        bool isPlayerTurn = true;
 
-        yield return RollDice(bindings, v => playerRoll = v);
-        yield return RollDice(bindings, v => enemyRoll = v);
+        yield return RollForAction(bindings, playerTurnActions.GetRollType(action), true, v => playerRoll = v);
+        yield return RollForAction(bindings, enemyTurnActions.GetRollType(enemyAction), false, v => enemyRoll = v);
 
-        ResolveActions(action, ChooseEnemyAction(isPlayerTurn), playerRoll, enemyRoll, bindings);
+        ResolveActions(action, enemyAction, playerRoll, enemyRoll, bindings);
         yield return new WaitForSeconds(0.6f);
     }
 
@@ -118,14 +135,16 @@ public class TurnManager
         bindings.SetTurnText("Turno do Inimigo");
         bindings.SetCombatLog("Inimigo está escolhendo uma ação...", CombatLogCategory.Action);
 
-        EnemyActionType enemyAction = ChooseEnemyAction(false);
-        PlayerActionType passivePlayerAction = ChooseAutoDefenseAction();
-        bindings.NotifyEnemyAction($"Ação: {FormatEnemyAction(enemyAction)}");
+        EnemyActionType enemyAction = enemyTurnActions.ChooseEnemyAction(false);
+        PlayerActionType passivePlayerAction = enemyTurnActions.ChooseAutoDefenseAction();
+
+        bindings.NotifyEnemyAction($"Ação: {enemyTurnActions.Format(enemyAction)}");
 
         int enemyRoll = 0;
         int playerRoll = 0;
-        yield return RollDice(bindings, v => enemyRoll = v);
-        yield return RollDice(bindings, v => playerRoll = v);
+
+        yield return RollForAction(bindings, enemyTurnActions.GetRollType(enemyAction), false, v => enemyRoll = v);
+        yield return RollForAction(bindings, playerTurnActions.GetRollType(passivePlayerAction), true, v => playerRoll = v);
 
         ResolveActions(passivePlayerAction, enemyAction, playerRoll, enemyRoll, bindings);
         yield return new WaitForSeconds(0.6f);
@@ -136,103 +155,145 @@ public class TurnManager
         pendingPlayerAction = action;
     }
 
-    private IEnumerator RollDice(CombatSceneBindings bindings, System.Action<int> onFinished)
+    private IEnumerator RollForAction(CombatSceneBindings bindings, RollType rollType, bool isPlayer, System.Action<int> onFinished)
     {
-        int roll = Random.Range(1, 21);
+        int statValue = GetStatByRollType(rollType, isPlayer);
+        int roll = Random.Range(0, statValue + 1);
+
         if (bindings != null)
             yield return bindings.PlayDiceRoll(roll);
+
         onFinished?.Invoke(roll);
+    }
+
+    private int RollPercent(CombatSceneBindings bindings)
+    {
+        int roll = Random.Range(0, 100);
+        if (bindings != null)
+            bindings.StartCoroutine(bindings.PlayDiceRoll(roll));
+        return roll;
     }
 
     private void ResolveActions(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
         string resultLog;
 
-        if (IsEnemyAttack(enemyAction) && (playerAction == PlayerActionType.Defend || playerAction == PlayerActionType.Parry))
+        if (enemyTurnActions.IsAttack(enemyAction) && (playerAction == PlayerActionType.Defend || playerAction == PlayerActionType.Parry))
         {
-            resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll);
+            resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll, bindings);
             bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
             return;
         }
 
-        if (IsPlayerAttack(playerAction))
+        if (playerTurnActions.IsAttack(playerAction))
         {
-            int damage = Mathf.Max(1, playerRoll);
-            bool criticalHit = playerRoll >= 20;
-            if (enemyAction == EnemyActionType.Defend)
+            bool attackSuccess = playerRoll > enemyRoll;
+            if (!attackSuccess)
             {
-                damage = Mathf.Max(0, damage - enemyRoll);
-                resultLog = $"Você atacou ({playerAction}), mas o inimigo defendeu parte do dano. Dano final: {damage}.";
+                resultLog = $"Seu ataque ({playerAction}) falhou: {playerRoll} <= defesa inimiga {enemyRoll}.";
+                bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
             }
             else
             {
-                resultLog = $"Você atacou ({playerAction}) e causou {damage} de dano.";
-            }
+                int damage = Mathf.Max(1, playerStats.attack - enemyStats.defense);
+                bool criticalHit = RollPercent(bindings) < playerStats.criticalHitChance;
+                if (criticalHit)
+                    damage *= 2;
 
-            ApplyDamageToEnemy(playerAction, damage);
-            bindings.NotifyEnemyDamage(damage, criticalHit);
-            bindings.SetCombatLog(resultLog, CombatLogCategory.Damage);
+                ApplyDamageToEnemy(playerAction, damage);
+                bindings.NotifyEnemyDamage(damage, criticalHit);
+                resultLog = criticalHit
+                    ? $"Ataque crítico ({playerAction})! Dano causado: {damage}."
+                    : $"Você atacou ({playerAction}) e causou {damage} de dano.";
+                bindings.SetCombatLog(resultLog, CombatLogCategory.Damage);
+            }
         }
         else
         {
-            resultLog = ResolvePlayerSpecialAction(playerAction, playerRoll);
+            resultLog = ResolvePlayerSpecialAction(playerAction, bindings);
             bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
         }
 
-        if (EnemyLife > 0 && PlayerLife > 0 && IsEnemyAttack(enemyAction))
+        if (EnemyLife > 0 && PlayerLife > 0 && enemyTurnActions.IsAttack(enemyAction))
         {
-            ApplyDamageToPlayer(enemyAction, enemyRoll);
-            bindings.NotifyPlayerDamage(enemyRoll, enemyRoll >= 20);
-            resultLog += $" Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.";
-            bindings.SetCombatLog(resultLog, CombatLogCategory.Damage);
+            bool enemyAttackSuccess = enemyRoll > playerRoll;
+            if (!enemyAttackSuccess)
+            {
+                bindings.SetCombatLog($"Ataque inimigo falhou: {enemyRoll} <= sua defesa {playerRoll}.", CombatLogCategory.Action);
+                return;
+            }
+
+            int enemyDamage = Mathf.Max(1, enemyStats.attack - playerStats.defense);
+            bool enemyCrit = RollPercent(bindings) < enemyStats.criticalHitChance;
+            if (enemyCrit)
+                enemyDamage *= 2;
+
+            ApplyDamageToPlayer(enemyAction, enemyDamage);
+            bindings.NotifyPlayerDamage(enemyDamage, enemyCrit);
+            bindings.SetCombatLog($"Inimigo atacou ({enemyAction}) e causou {enemyDamage} de dano.", CombatLogCategory.Damage);
         }
     }
 
-    private string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll)
+    private string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
+        bool defenseSuccess = playerRoll >= enemyRoll;
+
         if (playerAction == PlayerActionType.Defend)
         {
-            int finalDamage = Mathf.Max(0, enemyRoll - playerRoll);
-            ApplyDamageToPlayer(enemyAction, finalDamage);
-            return $"Você defendeu. Defesa: {playerRoll}. Dano recebido: {finalDamage}.";
+            if (defenseSuccess)
+                return $"Defesa bem sucedida: {playerRoll} >= ataque inimigo {enemyRoll}. Nenhum dano recebido.";
+
+            int damage = Mathf.Max(1, enemyStats.attack - playerStats.defense);
+            ApplyDamageToPlayer(enemyAction, damage);
+            bindings.NotifyPlayerDamage(damage);
+            return $"Defesa falhou ({playerRoll} < {enemyRoll}). Você recebeu {damage} de dano.";
         }
 
-        bool parrySuccess = playerRoll >= enemyRoll;
-        if (parrySuccess)
+        int parryRoll = RollPercent(bindings);
+        bool parryChanceSuccess = parryRoll < playerStats.parryChance;
+
+        if (defenseSuccess && parryChanceSuccess)
         {
-            ApplyDamageToEnemy(PlayerActionType.AttackLife, playerRoll);
-            return $"Parry perfeito! Você reverteu {playerRoll} de dano ao inimigo.";
+            int reflectedDamage = Mathf.Max(1, playerStats.attack - enemyStats.defense);
+            ApplyDamageToEnemy(PlayerActionType.AttackLife, reflectedDamage);
+            bindings.NotifyEnemyDamage(reflectedDamage);
+            return $"Parry perfeito! Você refletiu {reflectedDamage} de dano ao inimigo.";
         }
 
-        ApplyDamageToPlayer(enemyAction, enemyRoll);
-        return $"Parry falhou. Você recebeu {enemyRoll} de dano.";
+        int parryFailDamage = Mathf.Max(1, enemyStats.attack - playerStats.defense);
+        ApplyDamageToPlayer(enemyAction, parryFailDamage);
+        bindings.NotifyPlayerDamage(parryFailDamage);
+        return $"Parry falhou. Você recebeu {parryFailDamage} de dano.";
     }
 
-    private string ResolvePlayerSpecialAction(PlayerActionType action, int roll)
+    private string ResolvePlayerSpecialAction(PlayerActionType action, CombatSceneBindings bindings)
     {
+        int chance = playerTurnActions.GetSpecialChance(action, playerStats);
+        int roll = RollPercent(bindings);
+
         switch (action)
         {
             case PlayerActionType.Flee:
-                if (roll >= 18)
+                if (roll < chance)
                 {
                     EnemyLife = 0;
-                    return "Fuga bem sucedida! Combate encerrado.";
+                    return $"Fuga bem sucedida! Chance {chance}% (rolagem {roll}).";
                 }
 
-                return "Tentativa de fuga falhou.";
+                return $"Tentativa de fuga falhou. Chance {chance}% (rolagem {roll}).";
             case PlayerActionType.InstantKill:
-                if (roll >= 20)
+                if (roll < chance)
                 {
                     EnemyLife = 0;
-                    return "Instant Kill ativado! Inimigo eliminado.";
+                    return $"Instant Kill ativado! Chance {chance}% (rolagem {roll}).";
                 }
 
-                return "Instant Kill falhou.";
+                return $"Instant Kill falhou. Chance {chance}% (rolagem {roll}).";
             case PlayerActionType.Learn:
-                if (roll >= 12)
-                    return "Learn bem sucedido: informações do inimigo coletadas (placeholder).";
+                if (roll < chance)
+                    return $"Learn bem sucedido! Chance {chance}% (rolagem {roll}).";
 
-                return "Learn falhou: nenhuma informação nova.";
+                return $"Learn falhou. Chance {chance}% (rolagem {roll}).";
             case PlayerActionType.Item:
                 return "Uso de item ainda é placeholder.";
             default:
@@ -242,7 +303,7 @@ public class TurnManager
 
     private void ApplyDamageToEnemy(PlayerActionType attackType, int amount)
     {
-        if (amount == 0)
+        if (amount <= 0)
             return;
 
         switch (attackType)
@@ -281,62 +342,14 @@ public class TurnManager
         }
     }
 
-    private EnemyActionType ChooseEnemyAction(bool isPlayerTurn)
+    private int GetStatByRollType(RollType rollType, bool isPlayer)
     {
-        if (isPlayerTurn) return EnemyActionType.Defend;
-
-        int roll = Random.Range(0, 100);
-
-        if (roll < 30)
-            return EnemyActionType.AttackLife;
-        if (roll < 55)
-            return EnemyActionType.AttackPhysical;
-        if (roll < 80)
-            return EnemyActionType.AttackMental;
-        return EnemyActionType.Defend;
-    }
-
-    private PlayerActionType ChooseAutoDefenseAction()
-    {
-        return Random.value < 0.75f ? PlayerActionType.Defend : PlayerActionType.Parry;
-    }
-
-    private bool IsPlayerAttack(PlayerActionType action)
-    {
-        return action == PlayerActionType.AttackLife || action == PlayerActionType.AttackPhysical || action == PlayerActionType.AttackMental;
-    }
-
-    private bool IsEnemyAttack(EnemyActionType action)
-    {
-        return action == EnemyActionType.AttackLife || action == EnemyActionType.AttackPhysical || action == EnemyActionType.AttackMental;
-    }
-
-    private string FormatPlayerAction(PlayerActionType action)
-    {
-        return action switch
+        return rollType switch
         {
-            PlayerActionType.AttackLife => "Ataque de Vida",
-            PlayerActionType.AttackPhysical => "Ataque Físico",
-            PlayerActionType.AttackMental => "Ataque Mental",
-            PlayerActionType.Defend => "Defesa",
-            PlayerActionType.Parry => "Parry",
-            PlayerActionType.Flee => "Fuga",
-            PlayerActionType.InstantKill => "Instant Kill",
-            PlayerActionType.Learn => "Learn",
-            PlayerActionType.Item => "Item",
-            _ => action.ToString()
-        };
-    }
-
-    private string FormatEnemyAction(EnemyActionType action)
-    {
-        return action switch
-        {
-            EnemyActionType.AttackLife => "Ataque de Vida",
-            EnemyActionType.AttackPhysical => "Ataque Físico",
-            EnemyActionType.AttackMental => "Ataque Mental",
-            EnemyActionType.Defend => "Defesa",
-            _ => action.ToString()
+            RollType.Life => isPlayer ? PlayerLife : EnemyLife,
+            RollType.Physical => isPlayer ? PlayerPhysical : EnemyPhysical,
+            RollType.Mental => isPlayer ? PlayerMental : EnemyMental,
+            _ => 0
         };
     }
 

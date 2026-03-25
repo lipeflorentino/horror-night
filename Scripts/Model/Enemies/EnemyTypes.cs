@@ -39,4 +39,5 @@ public class EnemyInstance
     public int physical;
     public int mental;
     public int runTier;
+    public TurnManagerStats combatStats;
 }

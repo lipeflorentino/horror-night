@@ -9,12 +9,23 @@ public class PlayerStatusManager : MonoBehaviour
         public float life;
         public float strength;
         public float sanity;
+        public TurnManagerStats combatStats;
     }
 
     [Header("Status Bars (Image Fill Radial 360)")]
     [SerializeField] private Image lifeBar;
     [SerializeField] private Image strengthBar;
     [SerializeField] private Image sanityBar;
+
+
+    [Header("Combat - Advanced Stats")]
+    [SerializeField] private int attack = 10;
+    [SerializeField] private int defense = 5;
+    [Range(0, 100)] [SerializeField] private int criticalHitChance = 10;
+    [Range(0, 100)] [SerializeField] private int parryChance = 25;
+    [Range(0, 100)] [SerializeField] private int fleeChance = 35;
+    [Range(0, 100)] [SerializeField] private int instantKillChance = 5;
+    [Range(0, 100)] [SerializeField] private int learnChance = 55;
 
     [Header("Life")]
     [SerializeField] private float maxLife = 100f;
@@ -140,11 +151,24 @@ public class PlayerStatusManager : MonoBehaviour
 
     public PlayerStatusSnapshot GetSnapshot()
     {
+        TurnManagerStats stats = new TurnManagerStats
+        {
+            attack = attack,
+            defense = defense,
+            criticalHitChance = criticalHitChance,
+            parryChance = parryChance,
+            fleeChance = fleeChance,
+            instantKillChance = instantKillChance,
+            learnChance = learnChance
+        };
+        stats.Normalize();
+
         return new PlayerStatusSnapshot
         {
             life = currentLife,
             strength = currentStrength,
-            sanity = currentSanity
+            sanity = currentSanity,
+            combatStats = stats
         };
     }
 
@@ -153,6 +177,18 @@ public class PlayerStatusManager : MonoBehaviour
         currentLife = Mathf.Clamp(snapshot.life, 0f, maxLife);
         currentStrength = Mathf.Clamp(snapshot.strength, 0f, maxStrength);
         currentSanity = Mathf.Clamp(snapshot.sanity, 0f, maxSanity);
+
+        TurnManagerStats restoredStats = snapshot.combatStats;
+        restoredStats.Normalize();
+
+        attack = restoredStats.attack;
+        defense = restoredStats.defense;
+        criticalHitChance = restoredStats.criticalHitChance;
+        parryChance = restoredStats.parryChance;
+        fleeChance = restoredStats.fleeChance;
+        instantKillChance = restoredStats.instantKillChance;
+        learnChance = restoredStats.learnChance;
+
         RefreshAllBars();
     }
 
