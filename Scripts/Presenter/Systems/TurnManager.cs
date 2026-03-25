@@ -54,7 +54,7 @@ public class TurnManager
     public IEnumerator RunTurnCombat(CombatSceneBindings bindings)
     {
         bool playerTurn = (PlayerLife + PlayerPhysical + PlayerMental) >= (EnemyLife + EnemyPhysical + EnemyMental);
-        bindings.SetCombatLog("O combate começou.");
+        bindings.SetCombatLog("O combate começou.", CombatLogCategory.Action);
 
         while (PlayerLife > 0 && EnemyLife > 0)
         {
@@ -77,13 +77,13 @@ public class TurnManager
         if (EnemyLife <= 0)
         {
             bindings.SetTurnText("Vitória");
-            bindings.SetCombatLog("Inimigo derrotado. Placeholder de recompensa gerado.");
+            bindings.SetCombatLog("Inimigo derrotado. Placeholder de recompensa gerado.", CombatLogCategory.Victory);
             Outcome = CombatOutcome.Victory;
             yield break;
         }
 
         bindings.SetTurnText("Derrota");
-        bindings.SetCombatLog("Você foi derrotado.");
+        bindings.SetCombatLog("Você foi derrotado.", CombatLogCategory.Defeat);
         Outcome = CombatOutcome.Defeat;
     }
 
@@ -91,7 +91,7 @@ public class TurnManager
     {
         pendingPlayerAction = null;
         bindings.SetTurnText("Turno do Jogador");
-        bindings.SetCombatLog("Aguardando ação do jogador...");
+        bindings.SetCombatLog("Aguardando ação do jogador...", CombatLogCategory.Action);
         bindings.SetActionsVisible(true);
         bindings.OnPlayerActionSelected += CachePlayerAction;
 
@@ -100,9 +100,12 @@ public class TurnManager
 
         bindings.OnPlayerActionSelected -= CachePlayerAction;
         PlayerActionType action = pendingPlayerAction.Value;
+        bindings.NotifyPlayerAction($"Ação: {FormatPlayerAction(action)}");
 
-        int playerRoll = RollDice(bindings);
-        int enemyRoll = RollDice(bindings);
+        int playerRoll = 0;
+        int enemyRoll = 0;
+        yield return RollDice(bindings, v => playerRoll = v);
+        yield return RollDice(bindings, v => enemyRoll = v);
 
         ResolveActions(action, ChooseEnemyAction(), playerRoll, enemyRoll, bindings);
         yield return new WaitForSeconds(0.6f);
@@ -111,13 +114,16 @@ public class TurnManager
     private IEnumerator ExecuteEnemyTurn(CombatSceneBindings bindings)
     {
         bindings.SetTurnText("Turno do Inimigo");
-        bindings.SetCombatLog("Inimigo está escolhendo uma ação...");
+        bindings.SetCombatLog("Inimigo está escolhendo uma ação...", CombatLogCategory.Action);
 
         EnemyActionType enemyAction = ChooseEnemyAction();
         PlayerActionType passivePlayerAction = ChooseAutoDefenseAction();
+        bindings.NotifyEnemyAction($"Ação: {FormatEnemyAction(enemyAction)}");
 
-        int enemyRoll = RollDice(bindings);
-        int playerRoll = RollDice(bindings);
+        int enemyRoll = 0;
+        int playerRoll = 0;
+        yield return RollDice(bindings, v => enemyRoll = v);
+        yield return RollDice(bindings, v => playerRoll = v);
 
         ResolveActions(passivePlayerAction, enemyAction, playerRoll, enemyRoll, bindings);
         yield return new WaitForSeconds(0.6f);
@@ -128,11 +134,12 @@ public class TurnManager
         pendingPlayerAction = action;
     }
 
-    private int RollDice(CombatSceneBindings bindings)
+    private IEnumerator RollDice(CombatSceneBindings bindings, System.Action<int> onFinished)
     {
         int roll = Random.Range(1, 21);
-        bindings.SetDiceValue(roll);
-        return roll;
+        if (bindings != null)
+            yield return bindings.PlayDiceRoll(roll);
+        onFinished?.Invoke(roll);
     }
 
     private void ResolveActions(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
@@ -142,13 +149,14 @@ public class TurnManager
         if (IsEnemyAttack(enemyAction) && (playerAction == PlayerActionType.Defend || playerAction == PlayerActionType.Parry))
         {
             resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll);
-            bindings.SetCombatLog(resultLog);
+            bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
             return;
         }
 
         if (IsPlayerAttack(playerAction))
         {
             int damage = Mathf.Max(1, playerRoll);
+            bool criticalHit = playerRoll >= 20;
             if (enemyAction == EnemyActionType.Defend)
             {
                 damage = Mathf.Max(0, damage - enemyRoll);
@@ -160,19 +168,22 @@ public class TurnManager
             }
 
             ApplyDamageToEnemy(playerAction, damage);
+            bindings.NotifyEnemyDamage(damage, criticalHit);
+            bindings.SetCombatLog(resultLog, CombatLogCategory.Damage);
         }
         else
         {
             resultLog = ResolvePlayerSpecialAction(playerAction, playerRoll);
+            bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
         }
 
         if (EnemyLife > 0 && PlayerLife > 0 && IsEnemyAttack(enemyAction))
         {
             ApplyDamageToPlayer(enemyAction, enemyRoll);
+            bindings.NotifyPlayerDamage(enemyRoll, enemyRoll >= 20);
             resultLog += $" Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.";
+            bindings.SetCombatLog($"Inimigo atacou ({enemyAction}) e causou {enemyRoll} de dano.", CombatLogCategory.Damage);
         }
-
-        bindings.SetCombatLog(resultLog);
     }
 
     private string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll)
@@ -293,6 +304,35 @@ public class TurnManager
     private bool IsEnemyAttack(EnemyActionType action)
     {
         return action == EnemyActionType.AttackLife || action == EnemyActionType.AttackPhysical || action == EnemyActionType.AttackMental;
+    }
+
+    private string FormatPlayerAction(PlayerActionType action)
+    {
+        return action switch
+        {
+            PlayerActionType.AttackLife => "Ataque de Vida",
+            PlayerActionType.AttackPhysical => "Ataque Físico",
+            PlayerActionType.AttackMental => "Ataque Mental",
+            PlayerActionType.Defend => "Defesa",
+            PlayerActionType.Parry => "Parry",
+            PlayerActionType.Flee => "Fuga",
+            PlayerActionType.InstantKill => "Instant Kill",
+            PlayerActionType.Learn => "Learn",
+            PlayerActionType.Item => "Item",
+            _ => action.ToString()
+        };
+    }
+
+    private string FormatEnemyAction(EnemyActionType action)
+    {
+        return action switch
+        {
+            EnemyActionType.AttackLife => "Ataque de Vida",
+            EnemyActionType.AttackPhysical => "Ataque Físico",
+            EnemyActionType.AttackMental => "Ataque Mental",
+            EnemyActionType.Defend => "Defesa",
+            _ => action.ToString()
+        };
     }
 
     private void UpdateCombatHud(CombatSceneBindings bindings)
