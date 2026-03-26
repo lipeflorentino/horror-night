@@ -33,4 +33,25 @@ MonoBehaviour:
   mental:
     min: 2
     max: 4
+  attack:
+    min: 1
+    max: 3
+  defense:
+    min: 2
+    max: 4
+  criticalHitChance:
+    min: 1
+    max: 4
+  parryChance:
+    min: 2
+    max: 5
+  fleeChance:
+    min: 0
+    max: 0
+  instantKillChance:
+    min: 0
+    max: 0
+  learnChance:
+    min: 0
+    max: 0
   specialRule: 

@@ -49,6 +49,7 @@ public class CombatSceneBindings : MonoBehaviour
     [Header("Combat Feedback")]
     [SerializeField] private GameObject playerHitUI;
     [SerializeField] private SpriteRenderer enemySpriteRenderer;
+    [SerializeField] private GameObject playerFeedbackPanel;
     [SerializeField] private TMP_Text playerFeedbackText;
     [SerializeField] private TMP_Text enemyFeedbackText;
     [SerializeField] private float damageFlashDuration = 0.15f;
@@ -110,6 +111,7 @@ public class CombatSceneBindings : MonoBehaviour
 
         SetActionsVisible(false);
         ResolveCombatVisualReferences();
+        playerFeedbackPanel.SetActive(true);
     }
 
     public void SetTurnText(string value)

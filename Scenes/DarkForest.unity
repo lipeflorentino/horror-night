@@ -4326,26 +4326,18 @@ PrefabInstance:
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
-    - target: {fileID: 1673056188402891766, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_Enabled
-      value: 1
+    - target: {fileID: 2612833570966783259, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4358587489585040219, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 4358587489585040219, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5342978682417247641, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
-    - target: {fileID: 7659556622220371361, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7760248086195083446, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

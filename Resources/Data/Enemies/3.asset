@@ -33,4 +33,25 @@ MonoBehaviour:
   mental:
     min: 10
     max: 14
+  attack:
+    min: 3
+    max: 6
+  defense:
+    min: 1
+    max: 2
+  criticalHitChance:
+    min: 0
+    max: 0
+  parryChance:
+    min: 0
+    max: 0
+  fleeChance:
+    min: 0
+    max: 0
+  instantKillChance:
+    min: 0
+    max: 0
+  learnChance:
+    min: 0
+    max: 0
   specialRule: "Ganha b\xF4nus quando encontro \xE9 for\xE7ado"

@@ -84,7 +84,7 @@ public class TurnManager
                 break;
 
             playerTurn = !playerTurn;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(2f);
         }
 
         UpdateCombatHud(bindings);
@@ -118,7 +118,7 @@ public class TurnManager
         PlayerActionType action = pendingPlayerAction.Value;
         EnemyActionType enemyAction = enemyTurnActions.ChooseEnemyAction(true);
 
-        bindings.NotifyPlayerAction($"Ação: {playerTurnActions.Format(action)}");
+        bindings.NotifyPlayerAction($"{playerTurnActions.Format(action)}");
 
         int playerRoll = 0;
         int enemyRoll = 0;
@@ -138,7 +138,7 @@ public class TurnManager
         EnemyActionType enemyAction = enemyTurnActions.ChooseEnemyAction(false);
         PlayerActionType passivePlayerAction = enemyTurnActions.ChooseAutoDefenseAction();
 
-        bindings.NotifyEnemyAction($"Ação: {enemyTurnActions.Format(enemyAction)}");
+        // bindings.NotifyEnemyAction($"Ação: {enemyTurnActions.Format(enemyAction)}");
 
         int enemyRoll = 0;
         int playerRoll = 0;
@@ -160,17 +160,15 @@ public class TurnManager
         int statValue = GetStatByRollType(rollType, isPlayer);
         int roll = Random.Range(0, statValue + 1);
 
-        if (bindings != null)
+        if (bindings != null && isPlayer)
             yield return bindings.PlayDiceRoll(roll);
 
         onFinished?.Invoke(roll);
     }
 
-    private int RollPercent(CombatSceneBindings bindings)
+    private int RollPercent()
     {
         int roll = Random.Range(0, 100);
-        if (bindings != null)
-            bindings.StartCoroutine(bindings.PlayDiceRoll(roll));
         return roll;
     }
 
@@ -192,11 +190,12 @@ public class TurnManager
             {
                 resultLog = $"Seu ataque ({playerAction}) falhou: {playerRoll} <= defesa inimiga {enemyRoll}.";
                 bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
+                bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyAction)}");
             }
             else
             {
                 int damage = Mathf.Max(1, playerStats.attack - enemyStats.defense);
-                bool criticalHit = RollPercent(bindings) < playerStats.criticalHitChance;
+                bool criticalHit = RollPercent() < playerStats.criticalHitChance;
                 if (criticalHit)
                     damage *= 2;
 
@@ -212,6 +211,7 @@ public class TurnManager
         {
             resultLog = ResolvePlayerSpecialAction(playerAction, bindings);
             bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
+            bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerAction)}");
         }
 
         if (EnemyLife > 0 && PlayerLife > 0 && enemyTurnActions.IsAttack(enemyAction))
@@ -224,7 +224,7 @@ public class TurnManager
             }
 
             int enemyDamage = Mathf.Max(1, enemyStats.attack - playerStats.defense);
-            bool enemyCrit = RollPercent(bindings) < enemyStats.criticalHitChance;
+            bool enemyCrit = RollPercent() < enemyStats.criticalHitChance;
             if (enemyCrit)
                 enemyDamage *= 2;
 
@@ -241,7 +241,11 @@ public class TurnManager
         if (playerAction == PlayerActionType.Defend)
         {
             if (defenseSuccess)
+            {
+                bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerAction)}");
                 return $"Defesa bem sucedida: {playerRoll} >= ataque inimigo {enemyRoll}. Nenhum dano recebido.";
+            }
+                
 
             int damage = Mathf.Max(1, enemyStats.attack - playerStats.defense);
             ApplyDamageToPlayer(enemyAction, damage);
@@ -249,11 +253,12 @@ public class TurnManager
             return $"Defesa falhou ({playerRoll} < {enemyRoll}). Você recebeu {damage} de dano.";
         }
 
-        int parryRoll = RollPercent(bindings);
+        int parryRoll = RollPercent();
         bool parryChanceSuccess = parryRoll < playerStats.parryChance;
 
         if (defenseSuccess && parryChanceSuccess)
         {
+            bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerAction)}");
             int reflectedDamage = Mathf.Max(1, playerStats.attack - enemyStats.defense);
             ApplyDamageToEnemy(PlayerActionType.AttackLife, reflectedDamage);
             bindings.NotifyEnemyDamage(reflectedDamage);
@@ -269,7 +274,7 @@ public class TurnManager
     private string ResolvePlayerSpecialAction(PlayerActionType action, CombatSceneBindings bindings)
     {
         int chance = playerTurnActions.GetSpecialChance(action, playerStats);
-        int roll = RollPercent(bindings);
+        int roll = RollPercent();
 
         switch (action)
         {
@@ -325,6 +330,7 @@ public class TurnManager
 
     private void ApplyDamageToPlayer(EnemyActionType attackType, int amount)
     {
+        Debug.Log($"ApplyDamageToPlayer attack {attackType} - amount {amount}");
         if (amount <= 0)
             return;
 

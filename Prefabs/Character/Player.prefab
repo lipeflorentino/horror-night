@@ -2096,6 +2096,13 @@ MonoBehaviour:
   lifeBar: {fileID: 5932917369431078764}
   strengthBar: {fileID: 6434464738999983492}
   sanityBar: {fileID: 847645643205960929}
+  attack: 3
+  defense: 2
+  criticalHitChance: 10
+  parryChance: 25
+  fleeChance: 35
+  instantKillChance: 5
+  learnChance: 55
   maxLife: 10
   currentLife: 10
   maxStrength: 10
