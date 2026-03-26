@@ -28,9 +28,9 @@ public class CombatStateController : MonoBehaviour
         if (RunSnapshot == null)
             return;
 
-        RunSnapshot.playerStatus.life = life;
-        RunSnapshot.playerStatus.strength = physical;
-        RunSnapshot.playerStatus.sanity = mental;
+        RunSnapshot.playerStatus.heart = life;
+        RunSnapshot.playerStatus.physical = physical;
+        RunSnapshot.playerStatus.mind = mental;
 
         combatStats.Normalize();
         RunSnapshot.playerStatus.combatStats = combatStats;

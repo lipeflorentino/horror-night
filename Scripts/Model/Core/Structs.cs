@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
-public struct StatModifier { 
-    public int life; 
-    public int physical; 
-    public int sanity; 
-    public int power; 
+public struct StatModifier
+{
+    [FormerlySerializedAs("life")] public int heart;
+    public int physical;
+    [FormerlySerializedAs("sanity")] public int mind;
+    [FormerlySerializedAs("power")] public int physicalBonus;
 }
 
 public struct OccurrenceResult

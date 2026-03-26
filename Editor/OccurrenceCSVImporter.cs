@@ -125,7 +125,7 @@ public class OccurrenceCSVImporter
         {
             case "vida":
             case "life":
-                return "life";
+                return "heart";
             case "físico":
             case "fisico":
             case "força":
@@ -136,12 +136,12 @@ public class OccurrenceCSVImporter
             case "mental":
             case "sanidade":
             case "sanity":
-                return "sanity";
+                return "mind";
             case "poder":
             case "power":
                 return "power";
             default:
-                return "life";
+                return "heart";
         }
     }
 }
