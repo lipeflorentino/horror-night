@@ -34,9 +34,9 @@ public class TurnActions
 
     public void Initialize(RunStateSnapshot snapshot, EnemyInstance enemy)
     {
-        PlayerLife = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.life));
-        PlayerPhysical = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.strength));
-        PlayerMental = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.sanity));
+        PlayerLife = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.heart));
+        PlayerPhysical = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.physical));
+        PlayerMental = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.mind));
 
         EnemyLife = Mathf.Max(0, enemy.life);
         EnemyPhysical = Mathf.Max(0, enemy.physical);

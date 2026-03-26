@@ -1,22 +1,39 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class PlayerStatusManager : MonoBehaviour
 {
     [System.Serializable]
+    public class StatHudBinding
+    {
+        public Image fillImage;
+        public TMP_Text valueText;
+
+        public void SetValue(float current, float max)
+        {
+            if (fillImage != null)
+                fillImage.fillAmount = max <= 0f ? 0f : Mathf.Clamp01(current / max);
+
+            if (valueText != null)
+                valueText.text = Mathf.RoundToInt(current).ToString();
+        }
+    }
+
+    [System.Serializable]
     public struct PlayerStatusSnapshot
     {
-        public float life;
-        public float strength;
-        public float sanity;
+        [FormerlySerializedAs("life")] public float heart;
+        [FormerlySerializedAs("strength")] public float physical;
+        [FormerlySerializedAs("sanity")] public float mind;
         public TurnManagerStats combatStats;
     }
 
-    [Header("Status Bars (Image Fill Radial 360)")]
-    [SerializeField] private Image lifeBar;
-    [SerializeField] private Image strengthBar;
-    [SerializeField] private Image sanityBar;
-
+    [Header("Status HUD (Horizontal Bar + Text)")]
+    [SerializeField] private StatHudBinding heartHud;
+    [SerializeField] private StatHudBinding physicalHud;
+    [SerializeField] private StatHudBinding mindHud;
 
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
@@ -27,86 +44,82 @@ public class PlayerStatusManager : MonoBehaviour
     [Range(0, 100)] [SerializeField] private int instantKillChance = 5;
     [Range(0, 100)] [SerializeField] private int learnChance = 55;
 
-    [Header("Life")]
-    [SerializeField] private float maxLife = 100f;
-    [SerializeField] private float currentLife = 100f;
+    [Header("Heart")]
+    [FormerlySerializedAs("maxLife")] [SerializeField] private float maxHeart = 100f;
+    [FormerlySerializedAs("currentLife")] [SerializeField] private float currentHeart = 100f;
 
-    [Header("Strength")]
-    [SerializeField] private float maxStrength = 100f;
-    [SerializeField] private float currentStrength = 100f;
+    [Header("Physical")]
+    [FormerlySerializedAs("maxStrength")] [SerializeField] private float maxPhysical = 100f;
+    [FormerlySerializedAs("currentStrength")] [SerializeField] private float currentPhysical = 100f;
 
-    [Header("Sanity")]
-    [SerializeField] private float maxSanity = 100f;
-    [SerializeField] private float currentSanity = 100f;
+    [Header("Mind")]
+    [FormerlySerializedAs("maxSanity")] [SerializeField] private float maxMind = 100f;
+    [FormerlySerializedAs("currentSanity")] [SerializeField] private float currentMind = 100f;
 
     private void Awake()
     {
-        currentLife = Mathf.Clamp(currentLife, 0f, maxLife);
-        currentStrength = Mathf.Clamp(currentStrength, 0f, maxStrength);
-        currentSanity = Mathf.Clamp(currentSanity, 0f, maxSanity);
+        currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
+        currentPhysical = Mathf.Clamp(currentPhysical, 0f, maxPhysical);
+        currentMind = Mathf.Clamp(currentMind, 0f, maxMind);
 
         RefreshAllBars();
     }
 
-    public void IncreaseLife(float amount)
+    public void IncreaseHeart(float amount)
     {
-        currentLife = Mathf.Clamp(currentLife + amount, 0f, maxLife);
-        UpdateBar(lifeBar, currentLife, maxLife);
+        currentHeart = Mathf.Clamp(currentHeart + amount, 0f, maxHeart);
+        heartHud?.SetValue(currentHeart, maxHeart);
     }
 
-    public void DecreaseLife(float amount)
+    public void DecreaseHeart(float amount)
     {
-        currentLife = Mathf.Clamp(currentLife - amount, 0f, maxLife);
-        UpdateBar(lifeBar, currentLife, maxLife);
+        currentHeart = Mathf.Clamp(currentHeart - amount, 0f, maxHeart);
+        heartHud?.SetValue(currentHeart, maxHeart);
     }
 
-    public void IncreaseStrength(float amount)
+    public void IncreasePhysical(float amount)
     {
-        currentStrength = Mathf.Clamp(currentStrength + amount, 0f, maxStrength);
-        UpdateBar(strengthBar, currentStrength, maxStrength);
+        currentPhysical = Mathf.Clamp(currentPhysical + amount, 0f, maxPhysical);
+        physicalHud?.SetValue(currentPhysical, maxPhysical);
     }
 
-    public void DecreaseStrength(float amount)
+    public void DecreasePhysical(float amount)
     {
-        currentStrength = Mathf.Clamp(currentStrength - amount, 0f, maxStrength);
-        UpdateBar(strengthBar, currentStrength, maxStrength);
+        currentPhysical = Mathf.Clamp(currentPhysical - amount, 0f, maxPhysical);
+        physicalHud?.SetValue(currentPhysical, maxPhysical);
     }
 
-    public void IncreaseSanity(float amount)
+    public void IncreaseMind(float amount)
     {
-        currentSanity = Mathf.Clamp(currentSanity + amount, 0f, maxSanity);
-        UpdateBar(sanityBar, currentSanity, maxSanity);
+        currentMind = Mathf.Clamp(currentMind + amount, 0f, maxMind);
+        mindHud?.SetValue(currentMind, maxMind);
     }
 
-    public void DecreaseSanity(float amount)
+    public void DecreaseMind(float amount)
     {
-        currentSanity = Mathf.Clamp(currentSanity - amount, 0f, maxSanity);
-        UpdateBar(sanityBar, currentSanity, maxSanity);
+        currentMind = Mathf.Clamp(currentMind - amount, 0f, maxMind);
+        mindHud?.SetValue(currentMind, maxMind);
     }
 
+    public float GetCurrentHeart() => currentHeart;
+    public float GetCurrentMind() => currentMind;
+    public float GetCurrentPhysical() => currentPhysical;
 
-
-    public float GetCurrentLife()
-    {
-        return currentLife;
-    }
-
-    public float GetCurrentSanity()
-    {
-        return currentSanity;
-    }
+    // Backward-compatible helpers.
+    public float GetCurrentLife() => GetCurrentHeart();
+    public float GetCurrentSanity() => GetCurrentMind();
+    public float GetCurrentStrength() => GetCurrentPhysical();
 
     public int GetStatValue(string statName)
     {
-        switch (statName)
+        switch (NormalizeStatName(statName))
         {
-            case "life":
-                return Mathf.RoundToInt(currentLife);
+            case "heart":
+                return Mathf.RoundToInt(currentHeart);
             case "physical":
-            case "power":
-                return Mathf.RoundToInt(currentStrength);
-            case "sanity":
-                return Mathf.RoundToInt(currentSanity);
+                return Mathf.RoundToInt(currentPhysical);
+            case "mind":
+                return Mathf.RoundToInt(currentMind);
             default:
                 return 0;
         }
@@ -117,36 +130,21 @@ public class PlayerStatusManager : MonoBehaviour
         if (value == 0)
             return;
 
-        if (statName == "life")
+        switch (NormalizeStatName(statName))
         {
-            if (value > 0)
-                IncreaseLife(value);
-            else
-                DecreaseLife(-value);
-            return;
+            case "heart":
+                if (value > 0) IncreaseHeart(value);
+                else DecreaseHeart(-value);
+                return;
+            case "physical":
+                if (value > 0) IncreasePhysical(value);
+                else DecreasePhysical(-value);
+                return;
+            case "mind":
+                if (value > 0) IncreaseMind(value);
+                else DecreaseMind(-value);
+                return;
         }
-
-        if (statName == "physical" || statName == "power")
-        {
-            if (value > 0)
-                IncreaseStrength(value);
-            else
-                DecreaseStrength(-value);
-            return;
-        }
-
-        if (statName == "sanity")
-        {
-            if (value > 0)
-                IncreaseSanity(value);
-            else
-                DecreaseSanity(-value);
-        }
-    }
-
-    public float GetCurrentStrength()
-    {
-        return currentStrength;
     }
 
     public PlayerStatusSnapshot GetSnapshot()
@@ -165,18 +163,18 @@ public class PlayerStatusManager : MonoBehaviour
 
         return new PlayerStatusSnapshot
         {
-            life = currentLife,
-            strength = currentStrength,
-            sanity = currentSanity,
+            heart = currentHeart,
+            physical = currentPhysical,
+            mind = currentMind,
             combatStats = stats
         };
     }
 
     public void RestoreSnapshot(PlayerStatusSnapshot snapshot)
     {
-        currentLife = Mathf.Clamp(snapshot.life, 0f, maxLife);
-        currentStrength = Mathf.Clamp(snapshot.strength, 0f, maxStrength);
-        currentSanity = Mathf.Clamp(snapshot.sanity, 0f, maxSanity);
+        currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
+        currentPhysical = Mathf.Clamp(snapshot.physical, 0f, maxPhysical);
+        currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
 
         TurnManagerStats restoredStats = snapshot.combatStats;
         restoredStats.Normalize();
@@ -192,34 +190,62 @@ public class PlayerStatusManager : MonoBehaviour
         RefreshAllBars();
     }
 
-    public bool CanSpendStrength(float amount)
+    public bool CanSpendPhysical(float amount)
     {
-        return amount >= 0f && currentStrength >= amount;
+        return amount >= 0f && currentPhysical >= amount;
     }
 
-    public bool TrySpendStrength(float amount)
+    public bool TrySpendPhysical(float amount)
     {
-        if (!CanSpendStrength(amount))
-        {
+        if (!CanSpendPhysical(amount))
             return false;
-        }
 
-        DecreaseStrength(amount);
+        DecreasePhysical(amount);
         return true;
     }
 
+    // Backward-compatible helpers.
+    public void IncreaseLife(float amount) => IncreaseHeart(amount);
+    public void DecreaseLife(float amount) => DecreaseHeart(amount);
+    public void IncreaseStrength(float amount) => IncreasePhysical(amount);
+    public void DecreaseStrength(float amount) => DecreasePhysical(amount);
+    public void IncreaseSanity(float amount) => IncreaseMind(amount);
+    public void DecreaseSanity(float amount) => DecreaseMind(amount);
+    public bool CanSpendStrength(float amount) => CanSpendPhysical(amount);
+    public bool TrySpendStrength(float amount) => TrySpendPhysical(amount);
+
     private void RefreshAllBars()
     {
-        UpdateBar(lifeBar, currentLife, maxLife);
-        UpdateBar(strengthBar, currentStrength, maxStrength);
-        UpdateBar(sanityBar, currentSanity, maxSanity);
+        heartHud?.SetValue(currentHeart, maxHeart);
+        physicalHud?.SetValue(currentPhysical, maxPhysical);
+        mindHud?.SetValue(currentMind, maxMind);
     }
 
-    private void UpdateBar(Image bar, float currentValue, float maxValue)
+    private static string NormalizeStatName(string statName)
     {
-        if (bar == null || maxValue <= 0f)
-            return;
+        string normalized = string.IsNullOrWhiteSpace(statName)
+            ? string.Empty
+            : statName.Trim().ToLowerInvariant();
 
-        bar.fillAmount = currentValue / maxValue;
+        switch (normalized)
+        {
+            case "heart":
+            case "life":
+            case "vida":
+                return "heart";
+            case "physical":
+            case "strength":
+            case "força":
+            case "forca":
+            case "power":
+                return "physical";
+            case "mind":
+            case "mental":
+            case "sanity":
+            case "sanidade":
+                return "mind";
+            default:
+                return normalized;
+        }
     }
 }
