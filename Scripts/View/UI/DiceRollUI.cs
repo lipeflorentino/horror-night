@@ -11,6 +11,12 @@ public class DiceRollUI : MonoBehaviour
     [SerializeField] private float spinSpeed = 900f;
     [SerializeField] private float updateInterval = 0.06f;
 
+    public void ClearValue()
+    {
+        if (diceValueText != null)
+            diceValueText.text = "0";
+    }
+
     public IEnumerator PlayRollAnimation(int finalValue)
     {
         if (diceImage == null && diceValueText == null)

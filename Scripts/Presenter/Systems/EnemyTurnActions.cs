@@ -1,29 +1,56 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyTurnActions
 {
-    public EnemyActionType ChooseEnemyAction(bool isPlayerTurn)
+    public EnemyActionType ChooseEnemyDefenseAction()
     {
-        if (isPlayerTurn)
-            return EnemyActionType.Defend;
-
-        int roll = Random.Range(0, 100);
-
-        if (roll < 30)
-            return EnemyActionType.AttackLife;
-
-        if (roll < 55)
-            return EnemyActionType.AttackPhysical;
-
-        if (roll < 80)
-            return EnemyActionType.AttackMental;
-
         return EnemyActionType.Defend;
     }
 
-    public PlayerActionType ChooseAutoDefenseAction()
+    public EnemyActionType ChooseEnemyAction(
+        int playerLife,
+        int playerPhysical,
+        int playerMental,
+        int enemyLife,
+        int enemyPhysical,
+        int enemyMental)
     {
-        return Random.value < 0.75f ? PlayerActionType.Defend : PlayerActionType.Parry;
+        List<(EnemyActionType action, float weight)> weightedActions = new()
+        {
+            (EnemyActionType.AttackLife, BuildWeight(playerLife, enemyLife)),
+            (EnemyActionType.AttackPhysical, BuildWeight(playerPhysical, enemyPhysical)),
+            (EnemyActionType.AttackMental, BuildWeight(playerMental, enemyMental))
+        };
+
+        float totalWeight = 0f;
+        for (int i = 0; i < weightedActions.Count; i++)
+            totalWeight += weightedActions[i].weight;
+
+        if (totalWeight <= 0f)
+            return EnemyActionType.AttackLife;
+
+        float roll = Random.value * totalWeight;
+        float cumulative = 0f;
+
+        for (int i = 0; i < weightedActions.Count; i++)
+        {
+            cumulative += weightedActions[i].weight;
+            if (roll <= cumulative)
+                return weightedActions[i].action;
+        }
+
+        return EnemyActionType.AttackLife;
+    }
+
+    private float BuildWeight(int playerStat, int enemyStat)
+    {
+        if (playerStat <= 0)
+            return 0f;
+
+        float vulnerableWeight = 1f / (playerStat + 1f);
+        float enemyStrengthWeight = Mathf.Max(0f, enemyStat) / 10f;
+        return 0.25f + vulnerableWeight * 6f + enemyStrengthWeight;
     }
 
     public bool IsAttack(EnemyActionType action)

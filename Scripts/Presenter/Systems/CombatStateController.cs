@@ -23,7 +23,7 @@ public class CombatStateController : MonoBehaviour
         return true;
     }
 
-    public void ApplyCombatResults(int life, int physical, int mental)
+    public void ApplyCombatResults(int life, int physical, int mental, TurnManagerStats combatStats)
     {
         if (RunSnapshot == null)
             return;
@@ -31,6 +31,9 @@ public class CombatStateController : MonoBehaviour
         RunSnapshot.playerStatus.life = life;
         RunSnapshot.playerStatus.strength = physical;
         RunSnapshot.playerStatus.sanity = mental;
+
+        combatStats.Normalize();
+        RunSnapshot.playerStatus.combatStats = combatStats;
     }
 
     public void MarkSkipRestoreOnReturn()

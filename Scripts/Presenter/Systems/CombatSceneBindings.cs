@@ -153,6 +153,42 @@ public class CombatSceneBindings : MonoBehaviour
             specialActionsUI.SetActive(false);
     }
 
+    public void ShowAttackMenu()
+    {
+        SetActionsVisible(true);
+        if (initialActionsUI != null)
+            initialActionsUI.SetActive(false);
+        if (attackActionsUI != null)
+            attackActionsUI.SetActive(true);
+    }
+
+    public void ShowDefenseMenu()
+    {
+        SetActionsVisible(true);
+        if (initialActionsUI != null)
+            initialActionsUI.SetActive(false);
+        if (defenseActionsUI != null)
+            defenseActionsUI.SetActive(true);
+    }
+
+    public void UpdateAttackButtonAvailability(bool lifeEnabled, bool physicalEnabled, bool mentalEnabled)
+    {
+        if (attackLifeButton != null)
+            attackLifeButton.interactable = lifeEnabled;
+
+        if (attackPhysicalButton != null)
+            attackPhysicalButton.interactable = physicalEnabled;
+
+        if (attackMentalButton != null)
+            attackMentalButton.interactable = mentalEnabled;
+    }
+
+    public void ResetDiceValue()
+    {
+        if (diceRollUI != null)
+            diceRollUI.ClearValue();
+    }
+
     public void UpdateHud(
         int playerLife,
         int playerLifeMax,

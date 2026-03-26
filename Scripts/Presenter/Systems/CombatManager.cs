@@ -128,7 +128,7 @@ public class CombatManager : MonoBehaviour
 
         if (turnManager.Outcome == CombatOutcome.Victory)
         {
-            stateController.ApplyCombatResults(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental);
+            stateController.ApplyCombatResults(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental, turnManager.PlayerCombatStats);
             yield return new WaitForSeconds(0.8f);
             EndCombatAndReturnToRun();
             yield break;
@@ -149,7 +149,7 @@ public class CombatManager : MonoBehaviour
         if (playerBattler != null && bindings.playerSpawnPoint != null)
         {
             if (playerBattler != null)
-                playerBattler.Setup(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental);
+                playerBattler.Setup(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental, turnManager.PlayerCombatStats);
         }
 
         if (enemyBattler != null && bindings.enemySpawnPoint != null)
