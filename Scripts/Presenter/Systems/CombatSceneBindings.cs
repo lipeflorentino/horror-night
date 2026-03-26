@@ -64,7 +64,6 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private GameObject specialActionsUI;
 
     [SerializeField] private Button attackButton;
-    [SerializeField] private Button defenseButton;
     [SerializeField] private Button itemButton;
     [SerializeField] private Button specialButton;
 
@@ -95,7 +94,6 @@ public class CombatSceneBindings : MonoBehaviour
     private void Awake()
     {
         RegisterButton(attackButton, () => OpenActionMenu(initialActionsUI, attackActionsUI));
-        RegisterButton(defenseButton, () => OpenActionMenu(initialActionsUI, defenseActionsUI));
         RegisterButton(specialButton, () => OpenActionMenu(initialActionsUI, specialActionsUI));
         RegisterButton(itemButton, () => TriggerPlayerAction(PlayerActionType.Item));
 
@@ -105,6 +103,7 @@ public class CombatSceneBindings : MonoBehaviour
 
         RegisterButton(defendButton, () => TriggerPlayerAction(PlayerActionType.Defend));
         RegisterButton(parryButton, () => TriggerPlayerAction(PlayerActionType.Parry));
+        
         RegisterButton(fleeButton, () => TriggerPlayerAction(PlayerActionType.Flee));
         RegisterButton(instantKillButton, () => TriggerPlayerAction(PlayerActionType.InstantKill));
         RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
@@ -153,6 +152,42 @@ public class CombatSceneBindings : MonoBehaviour
 
         if (specialActionsUI != null)
             specialActionsUI.SetActive(false);
+    }
+
+    public void ShowAttackMenu()
+    {
+        SetActionsVisible(true);
+        if (initialActionsUI != null)
+            initialActionsUI.SetActive(false);
+        if (attackActionsUI != null)
+            attackActionsUI.SetActive(true);
+    }
+
+    public void ShowDefenseMenu()
+    {
+        SetActionsVisible(true);
+        if (initialActionsUI != null)
+            initialActionsUI.SetActive(false);
+        if (defenseActionsUI != null)
+            defenseActionsUI.SetActive(true);
+    }
+
+    public void UpdateAttackButtonAvailability(bool lifeEnabled, bool physicalEnabled, bool mentalEnabled)
+    {
+        if (attackLifeButton != null)
+            attackLifeButton.interactable = lifeEnabled;
+
+        if (attackPhysicalButton != null)
+            attackPhysicalButton.interactable = physicalEnabled;
+
+        if (attackMentalButton != null)
+            attackMentalButton.interactable = mentalEnabled;
+    }
+
+    public void ResetDiceValue()
+    {
+        if (diceRollUI != null)
+            diceRollUI.ClearValue();
     }
 
     public void UpdateHud(

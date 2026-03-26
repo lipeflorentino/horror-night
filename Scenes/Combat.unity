@@ -751,7 +751,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Defesa
+  m_text: Skills
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8819,7 +8819,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1306185196, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
+  m_Sprite: {fileID: 1840181746, guid: 1ac2741ed224a1c4788572be0179e647, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13567,6 +13567,7 @@ MonoBehaviour:
   diceRollUI: {fileID: 635962041281327812}
   playerHitUI: {fileID: 1621853458}
   enemySpriteRenderer: {fileID: 0}
+  playerFeedbackPanel: {fileID: 0}
   playerFeedbackText: {fileID: 1225301836}
   enemyFeedbackText: {fileID: 932496531}
   damageFlashDuration: 0.5
@@ -13578,9 +13579,8 @@ MonoBehaviour:
   defenseActionsUI: {fileID: 748467719}
   specialActionsUI: {fileID: 2093194152}
   attackButton: {fileID: 1439960008}
-  defenseButton: {fileID: 917017146}
   itemButton: {fileID: 1980628640}
-  specialButton: {fileID: 0}
+  specialButton: {fileID: 917017146}
   attackLifeButton: {fileID: 1325929522}
   attackPhysicalButton: {fileID: 828000445}
   attackMentalButton: {fileID: 811468642}
@@ -16168,7 +16168,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1907872877}
   m_Layer: 0
-  m_Name: Def
+  m_Name: Esp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23945,6 +23945,13 @@ MonoBehaviour:
   life: 0
   physical: 0
   mental: 0
+  attack: 0
+  defense: 0
+  criticalHitChance: 0
+  parryChance: 0
+  fleeChance: 0
+  instantKillChance: 0
+  learnChance: 0
 --- !u!4 &7029179520040926187
 Transform:
   m_ObjectHideFlags: 0
@@ -24576,6 +24583,13 @@ MonoBehaviour:
       fleeChance: 0
       instantKillChance: 0
       learnChance: 0
+  life: 0
+  physical: 0
+  mental: 0
+  attack: 0
+  defense: 0
+  criticalHitChance: 0
+  parryChance: 0
 --- !u!1 &8830677275170457572
 GameObject:
   m_ObjectHideFlags: 0
