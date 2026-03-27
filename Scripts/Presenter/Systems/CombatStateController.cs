@@ -23,13 +23,13 @@ public class CombatStateController : MonoBehaviour
         return true;
     }
 
-    public void ApplyCombatResults(int life, int physical, int mental, TurnManagerStats combatStats)
+    public void ApplyCombatResults(int life, int body, int mental, TurnManagerStats combatStats)
     {
         if (RunSnapshot == null)
             return;
 
         RunSnapshot.playerStatus.heart = life;
-        RunSnapshot.playerStatus.physical = physical;
+        RunSnapshot.playerStatus.body = body;
         RunSnapshot.playerStatus.mind = mental;
 
         combatStats.Normalize();

@@ -4,22 +4,22 @@ public class PlayerTurnActions
 {
     public bool IsAttack(PlayerActionType action)
     {
-        return action == PlayerActionType.AttackLife || action == PlayerActionType.AttackPhysical || action == PlayerActionType.AttackMental;
+        return action == PlayerActionType.AttackHeart || action == PlayerActionType.AttackBody || action == PlayerActionType.AttackMind;
     }
 
     public RollType GetRollType(PlayerActionType action)
     {
         return action switch
         {
-            PlayerActionType.AttackLife => RollType.Life,
-            PlayerActionType.AttackPhysical => RollType.Physical,
-            PlayerActionType.AttackMental => RollType.Mental,
-            PlayerActionType.Defend => RollType.Physical,
-            PlayerActionType.Parry => RollType.Physical,
-            PlayerActionType.Flee => RollType.Physical,
-            PlayerActionType.InstantKill => RollType.Mental,
-            PlayerActionType.Learn => RollType.Mental,
-            _ => RollType.Physical
+            PlayerActionType.AttackHeart => RollType.Heart,
+            PlayerActionType.AttackBody => RollType.Body,
+            PlayerActionType.AttackMind => RollType.Mind,
+            PlayerActionType.Defend => RollType.Body,
+            PlayerActionType.Parry => RollType.Body,
+            PlayerActionType.Flee => RollType.Body,
+            PlayerActionType.InstantKill => RollType.Mind,
+            PlayerActionType.Learn => RollType.Mind,
+            _ => RollType.Body
         };
     }
 
@@ -38,9 +38,9 @@ public class PlayerTurnActions
     {
         return action switch
         {
-            PlayerActionType.AttackLife => "Ataque de Vida",
-            PlayerActionType.AttackPhysical => "Ataque Físico",
-            PlayerActionType.AttackMental => "Ataque Mental",
+            PlayerActionType.AttackHeart => "Ataque de Vida",
+            PlayerActionType.AttackBody => "Ataque Físico",
+            PlayerActionType.AttackMind => "Ataque Mind",
             PlayerActionType.Defend => "Defesa",
             PlayerActionType.Parry => "Parry",
             PlayerActionType.Flee => "Fuga",

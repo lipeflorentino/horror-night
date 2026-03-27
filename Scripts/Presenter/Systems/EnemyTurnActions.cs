@@ -9,18 +9,18 @@ public class EnemyTurnActions
     }
 
     public EnemyActionType ChooseEnemyAction(
-        int playerLife,
-        int playerPhysical,
-        int playerMental,
-        int enemyLife,
-        int enemyPhysical,
-        int enemyMental)
+        int playerHeart,
+        int playerBody,
+        int playerMind,
+        int enemyHeart,
+        int enemyBody,
+        int enemyMind)
     {
         List<(EnemyActionType action, float weight)> weightedActions = new()
         {
-            (EnemyActionType.AttackLife, BuildWeight(playerLife, enemyLife)),
-            (EnemyActionType.AttackPhysical, BuildWeight(playerPhysical, enemyPhysical)),
-            (EnemyActionType.AttackMental, BuildWeight(playerMental, enemyMental))
+            (EnemyActionType.AttackHeart, BuildWeight(playerHeart, enemyHeart)),
+            (EnemyActionType.AttackBody, BuildWeight(playerBody, enemyBody)),
+            (EnemyActionType.AttackMind, BuildWeight(playerMind, enemyMind))
         };
 
         float totalWeight = 0f;
@@ -28,7 +28,7 @@ public class EnemyTurnActions
             totalWeight += weightedActions[i].weight;
 
         if (totalWeight <= 0f)
-            return EnemyActionType.AttackLife;
+            return EnemyActionType.AttackHeart;
 
         float roll = Random.value * totalWeight;
         float cumulative = 0f;
@@ -40,7 +40,7 @@ public class EnemyTurnActions
                 return weightedActions[i].action;
         }
 
-        return EnemyActionType.AttackLife;
+        return EnemyActionType.AttackHeart;
     }
 
     private float BuildWeight(int playerStat, int enemyStat)
@@ -55,18 +55,18 @@ public class EnemyTurnActions
 
     public bool IsAttack(EnemyActionType action)
     {
-        return action == EnemyActionType.AttackLife || action == EnemyActionType.AttackPhysical || action == EnemyActionType.AttackMental;
+        return action == EnemyActionType.AttackHeart || action == EnemyActionType.AttackBody || action == EnemyActionType.AttackMind;
     }
 
     public RollType GetRollType(EnemyActionType action)
     {
         return action switch
         {
-            EnemyActionType.AttackLife => RollType.Life,
-            EnemyActionType.AttackPhysical => RollType.Physical,
-            EnemyActionType.AttackMental => RollType.Mental,
-            EnemyActionType.Defend => RollType.Physical,
-            _ => RollType.Physical
+            EnemyActionType.AttackHeart => RollType.Heart,
+            EnemyActionType.AttackBody => RollType.Body,
+            EnemyActionType.AttackMind => RollType.Mind,
+            EnemyActionType.Defend => RollType.Body,
+            _ => RollType.Body
         };
     }
 
@@ -74,9 +74,9 @@ public class EnemyTurnActions
     {
         return action switch
         {
-            EnemyActionType.AttackLife => "Ataque de Vida",
-            EnemyActionType.AttackPhysical => "Ataque Físico",
-            EnemyActionType.AttackMental => "Ataque Mental",
+            EnemyActionType.AttackHeart => "Ataque de Vida",
+            EnemyActionType.AttackBody => "Ataque Físico",
+            EnemyActionType.AttackMind => "Ataque Mental",
             EnemyActionType.Defend => "Defesa",
             _ => action.ToString()
         };

@@ -3852,7 +3852,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &365357097
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3965,7 +3965,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &381447306
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5876,7 +5876,7 @@ GameObject:
   m_Component:
   - component: {fileID: 587047666}
   m_Layer: 5
-  m_Name: HP
+  m_Name: Heart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13581,32 +13581,32 @@ MonoBehaviour:
   attackButton: {fileID: 1439960008}
   itemButton: {fileID: 1980628640}
   specialButton: {fileID: 917017146}
-  attackLifeButton: {fileID: 1325929522}
-  attackPhysicalButton: {fileID: 828000445}
-  attackMentalButton: {fileID: 811468642}
+  attackHeartButton: {fileID: 1325929522}
+  attackBodyButton: {fileID: 828000445}
+  attackMindButton: {fileID: 811468642}
   defendButton: {fileID: 1002463122}
   parryButton: {fileID: 136238664}
   fleeButton: {fileID: 885056946}
   instantKillButton: {fileID: 893901380}
   learnButton: {fileID: 686107678}
   playerHud:
-    life:
+    heart:
       fillImage: {fileID: 7670206369859284924}
       valueText: {fileID: 7670206369859284923}
-    physical:
+    body:
       fillImage: {fileID: 7670206369859284922}
       valueText: {fileID: 7670206369859284921}
-    mental:
+    mind:
       fillImage: {fileID: 7670206369859284926}
       valueText: {fileID: 7670206369859284925}
   enemyHud:
-    life:
+    heart:
       fillImage: {fileID: 454048712}
       valueText: {fileID: 1090789125}
-    physical:
+    body:
       fillImage: {fileID: 861068776}
       valueText: {fileID: 13349622}
-    mental:
+    mind:
       fillImage: {fileID: 2034193685}
       valueText: {fileID: 1979483478}
   gameOverPanel: {fileID: 1098654962}
@@ -15513,7 +15513,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1843214772}
   m_Layer: 5
-  m_Name: FIS
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17264,7 +17264,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2044275510}
   m_Layer: 5
-  m_Name: MEN
+  m_Name: Mind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18267,22 +18267,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2952395f7c26bdb469d3fcd938d935d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifeBar: {fileID: 0}
-  strengthBar: {fileID: 0}
-  sanityBar: {fileID: 0}
-  attack: 10
-  defense: 5
+  heartHud:
+    fillImage: {fileID: 0}
+    valueText: {fileID: 0}
+  bodyHud:
+    fillImage: {fileID: 0}
+    valueText: {fileID: 0}
+  mindHud:
+    fillImage: {fileID: 0}
+    valueText: {fileID: 0}
+  attack: 3
+  defense: 2
   criticalHitChance: 10
   parryChance: 25
   fleeChance: 35
   instantKillChance: 5
   learnChance: 55
-  maxLife: 10
-  currentLife: 10
-  maxStrength: 10
-  currentStrength: 10
-  maxSanity: 10
-  currentSanity: 10
+  maxHeart: 10
+  currentHeart: 10
+  maxBody: 10
+  currentBody: 10
+  maxMind: 10
+  currentMind: 10
 --- !u!4 &1413464973838994096
 Transform:
   m_ObjectHideFlags: 0
@@ -23942,9 +23948,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 661952ebe5cb4d558892a3c3ce555a06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  life: 0
-  physical: 0
-  mental: 0
+  heart: 0
+  body: 0
+  mind: 0
   attack: 0
   defense: 0
   criticalHitChance: 0
@@ -24571,9 +24577,9 @@ MonoBehaviour:
   enemySpriteRenderer: {fileID: 7193410123719029634}
   enemyData:
     source: {fileID: 0}
-    life: 0
-    physical: 0
-    mental: 0
+    heart: 0
+    body: 0
+    mind: 0
     runTier: 0
     combatStats:
       attack: 0
@@ -24583,9 +24589,9 @@ MonoBehaviour:
       fleeChance: 0
       instantKillChance: 0
       learnChance: 0
-  life: 0
-  physical: 0
-  mental: 0
+  heart: 0
+  body: 0
+  mind: 0
   attack: 0
   defense: 0
   criticalHitChance: 0

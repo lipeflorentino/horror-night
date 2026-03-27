@@ -1,8 +1,8 @@
 public enum PlayerActionType
 {
-    AttackLife,
-    AttackPhysical,
-    AttackMental,
+    AttackHeart,
+    AttackBody,
+    AttackMind,
     Defend,
     Parry,
     Flee,
@@ -13,8 +13,8 @@ public enum PlayerActionType
 
 public enum EnemyActionType
 {
-    AttackLife,
-    AttackPhysical,
-    AttackMental,
+    AttackHeart,
+    AttackBody,
+    AttackMind,
     Defend
 }

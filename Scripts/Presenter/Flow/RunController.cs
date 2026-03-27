@@ -117,8 +117,6 @@ public class RunController : MonoBehaviour
 
     private IEnumerator HandleAreaChangedRoutine(int areaIndex)
     {
-        Debug.Log($"[RunController] Área {areaIndex + 1}/{currentLevel.AreaCount} carregada. Reutilize o prefab da área e regenere dados locais.");
-
         if (playerMovement != null)
         {
             playerMovement.enabled = false;

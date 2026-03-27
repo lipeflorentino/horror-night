@@ -88,7 +88,7 @@ public class CombatManager : MonoBehaviour
         if (!stateController.TryBeginCombat(enemy))
             return;
 
-        Debug.Log($"Combat started vs {enemy.source.enemyName} ({enemy.source.archetype}) | Life: {enemy.life} Physical: {enemy.physical} Mental: {enemy.mental} | Modifier: {difficultyModifier}");
+        Debug.Log($"Combat started vs {enemy.source.enemyName} ({enemy.source.archetype}) | Heart: {enemy.heart} Body: {enemy.body} Mind: {enemy.mind} | Modifier: {difficultyModifier}");
         SceneManager.LoadScene(combatSceneName);
     }
 
@@ -128,7 +128,7 @@ public class CombatManager : MonoBehaviour
 
         if (turnManager.Outcome == CombatOutcome.Victory)
         {
-            stateController.ApplyCombatResults(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental, turnManager.PlayerCombatStats);
+            stateController.ApplyCombatResults(turnManager.PlayerHeart, turnManager.PlayerBody, turnManager.PlayerMind, turnManager.PlayerCombatStats);
             yield return new WaitForSeconds(0.8f);
             EndCombatAndReturnToRun();
             yield break;
@@ -149,7 +149,7 @@ public class CombatManager : MonoBehaviour
         if (playerBattler != null && bindings.playerSpawnPoint != null)
         {
             if (playerBattler != null)
-                playerBattler.Setup(turnManager.PlayerLife, turnManager.PlayerPhysical, turnManager.PlayerMental, turnManager.PlayerCombatStats);
+                playerBattler.Setup(turnManager.PlayerHeart, turnManager.PlayerBody, turnManager.PlayerMind, turnManager.PlayerCombatStats);
         }
 
         if (enemyBattler != null && bindings.enemySpawnPoint != null)

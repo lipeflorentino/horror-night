@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class TurnActions
 {
-    public int PlayerLife { get; private set; }
-    public int PlayerPhysical { get; private set; }
-    public int PlayerMental { get; private set; }
+    public int PlayerHeart { get; private set; }
+    public int PlayerBody { get; private set; }
+    public int PlayerMind { get; private set; }
 
-    public int EnemyLife { get; private set; }
-    public int EnemyPhysical { get; private set; }
-    public int EnemyMental { get; private set; }
+    public int EnemyHeart { get; private set; }
+    public int EnemyBody { get; private set; }
+    public int EnemyMind { get; private set; }
 
-    public int BasePlayerLife { get; private set; }
-    public int BasePlayerPhysical { get; private set; }
-    public int BasePlayerMental { get; private set; }
+    public int BasePlayerHeart { get; private set; }
+    public int BasePlayerBody { get; private set; }
+    public int BasePlayerMind { get; private set; }
 
-    public int BaseEnemyLife { get; private set; }
-    public int BaseEnemyPhysical { get; private set; }
-    public int BaseEnemyMental { get; private set; }
+    public int BaseEnemyHeart { get; private set; }
+    public int BaseEnemyBody { get; private set; }
+    public int BaseEnemyMind { get; private set; }
 
     public TurnManagerStats PlayerStats { get; private set; }
     public TurnManagerStats EnemyStats { get; private set; }
@@ -34,30 +34,30 @@ public class TurnActions
 
     public void Initialize(RunStateSnapshot snapshot, EnemyInstance enemy)
     {
-        PlayerLife = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.heart));
-        PlayerPhysical = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.physical));
-        PlayerMental = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.mind));
+        PlayerHeart = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.heart));
+        PlayerBody = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.body));
+        PlayerMind = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.mind));
 
-        EnemyLife = Mathf.Max(0, enemy.life);
-        EnemyPhysical = Mathf.Max(0, enemy.physical);
-        EnemyMental = Mathf.Max(0, enemy.mental);
+        EnemyHeart = Mathf.Max(0, enemy.heart);
+        EnemyBody = Mathf.Max(0, enemy.body);
+        EnemyMind = Mathf.Max(0, enemy.mind);
 
-        BasePlayerLife = Mathf.Max(1, PlayerLife);
-        BasePlayerPhysical = Mathf.Max(1, PlayerPhysical);
-        BasePlayerMental = Mathf.Max(1, PlayerMental);
+        BasePlayerHeart = Mathf.Max(1, PlayerHeart);
+        BasePlayerBody = Mathf.Max(1, PlayerBody);
+        BasePlayerMind = Mathf.Max(1, PlayerMind);
 
-        BaseEnemyLife = Mathf.Max(1, EnemyLife);
-        BaseEnemyPhysical = Mathf.Max(1, EnemyPhysical);
-        BaseEnemyMental = Mathf.Max(1, EnemyMental);
+        BaseEnemyHeart = Mathf.Max(1, EnemyHeart);
+        BaseEnemyBody = Mathf.Max(1, EnemyBody);
+        BaseEnemyMind = Mathf.Max(1, EnemyMind);
 
         PlayerStats = snapshot.playerStatus.combatStats;
         if (PlayerStats.attack <= 0)
-            PlayerStats = TurnManagerStats.BuildDefault(PlayerLife, PlayerPhysical, PlayerMental);
+            PlayerStats = TurnManagerStats.BuildDefault(PlayerHeart, PlayerBody, PlayerMind);
         PlayerStats.Normalize();
 
         EnemyStats = enemy.combatStats;
         if (EnemyStats.attack <= 0)
-            EnemyStats = TurnManagerStats.BuildDefault(EnemyLife, EnemyPhysical, EnemyMental);
+            EnemyStats = TurnManagerStats.BuildDefault(EnemyHeart, EnemyBody, EnemyMind);
         EnemyStats.Normalize();
     }
 
@@ -143,7 +143,7 @@ public class TurnActions
         if (defenseSuccess && parryChanceSuccess)
         {
             int reflectedDamage = Mathf.Max(1, PlayerStats.attack - EnemyStats.defense);
-            ApplyDamageToEnemy(PlayerActionType.AttackLife, reflectedDamage, bindings);
+            ApplyDamageToEnemy(PlayerActionType.AttackHeart, reflectedDamage, bindings);
             bindings.NotifyEnemyDamage(reflectedDamage);
             return $"Parry perfeito! Você refletiu {reflectedDamage} de dano ao inimigo.";
         }
@@ -164,9 +164,9 @@ public class TurnActions
             case PlayerActionType.Flee:
                 if (roll < chance)
                 {
-                    EnemyLife = 0;
-                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyLife(), CanAttackEnemyPhysical(), CanAttackEnemyMental());
-                    bindings.UpdateHud(PlayerLife, BasePlayerLife, PlayerPhysical, BasePlayerPhysical, PlayerMental, BasePlayerMental, EnemyLife, BaseEnemyLife, EnemyPhysical, BaseEnemyPhysical, EnemyMental, BaseEnemyMental);
+                    EnemyHeart = 0;
+                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
+                    bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
                     return $"Fuga bem sucedida! Chance {chance}% (rolagem {roll}).";
                 }
 
@@ -174,9 +174,9 @@ public class TurnActions
             case PlayerActionType.InstantKill:
                 if (roll < chance)
                 {
-                    EnemyLife = 0;
-                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyLife(), CanAttackEnemyPhysical(), CanAttackEnemyMental());
-                    bindings.UpdateHud(PlayerLife, BasePlayerLife, PlayerPhysical, BasePlayerPhysical, PlayerMental, BasePlayerMental, EnemyLife, BaseEnemyLife, EnemyPhysical, BaseEnemyPhysical, EnemyMental, BaseEnemyMental);
+                    EnemyHeart = 0;
+                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
+                    bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
                     return $"Instant Kill ativado! Chance {chance}% (rolagem {roll}).";
                 }
 
@@ -199,22 +199,22 @@ public class TurnActions
 
         switch (attackType)
         {
-            case PlayerActionType.AttackLife:
-                EnemyLife = Mathf.Clamp(EnemyLife - amount, 0, BaseEnemyLife);
+            case PlayerActionType.AttackHeart:
+                EnemyHeart = Mathf.Clamp(EnemyHeart - amount, 0, BaseEnemyHeart);
                 break;
-            case PlayerActionType.AttackPhysical:
-                EnemyPhysical = Mathf.Clamp(EnemyPhysical - amount, 0, BaseEnemyPhysical);
+            case PlayerActionType.AttackBody:
+                EnemyBody = Mathf.Clamp(EnemyBody - amount, 0, BaseEnemyBody);
                 break;
-            case PlayerActionType.AttackMental:
-                EnemyMental = Mathf.Clamp(EnemyMental - amount, 0, BaseEnemyMental);
+            case PlayerActionType.AttackMind:
+                EnemyMind = Mathf.Clamp(EnemyMind - amount, 0, BaseEnemyMind);
                 break;
             default:
-                EnemyLife = Mathf.Clamp(EnemyLife - amount, 0, BaseEnemyLife);
+                EnemyHeart = Mathf.Clamp(EnemyHeart - amount, 0, BaseEnemyHeart);
                 break;
         }
 
-        bindings.UpdateAttackButtonAvailability(CanAttackEnemyLife(), CanAttackEnemyPhysical(), CanAttackEnemyMental());
-        bindings.UpdateHud(PlayerLife, BasePlayerLife, PlayerPhysical, BasePlayerPhysical, PlayerMental, BasePlayerMental, EnemyLife, BaseEnemyLife, EnemyPhysical, BaseEnemyPhysical, EnemyMental, BaseEnemyMental);
+        bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
+        bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
     }
 
     public void ApplyDamageToPlayer(EnemyActionType attackType, int amount, CombatSceneBindings bindings)
@@ -224,18 +224,18 @@ public class TurnActions
 
         switch (attackType)
         {
-            case EnemyActionType.AttackLife:
-                PlayerLife = Mathf.Max(0, PlayerLife - amount);
+            case EnemyActionType.AttackHeart:
+                PlayerHeart = Mathf.Max(0, PlayerHeart - amount);
                 break;
-            case EnemyActionType.AttackPhysical:
-                PlayerPhysical = Mathf.Max(0, PlayerPhysical - amount);
+            case EnemyActionType.AttackBody:
+                PlayerBody = Mathf.Max(0, PlayerBody - amount);
                 break;
-            case EnemyActionType.AttackMental:
-                PlayerMental = Mathf.Max(0, PlayerMental - amount);
+            case EnemyActionType.AttackMind:
+                PlayerMind = Mathf.Max(0, PlayerMind - amount);
                 break;
         }
 
-        bindings.UpdateHud(PlayerLife, BasePlayerLife, PlayerPhysical, BasePlayerPhysical, PlayerMental, BasePlayerMental, EnemyLife, BaseEnemyLife, EnemyPhysical, BaseEnemyPhysical, EnemyMental, BaseEnemyMental);
+        bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
     }
 
     private int RollPercent()
@@ -247,14 +247,14 @@ public class TurnActions
     {
         return rollType switch
         {
-            RollType.Life => isPlayer ? PlayerLife : EnemyLife,
-            RollType.Physical => isPlayer ? PlayerPhysical : EnemyPhysical,
-            RollType.Mental => isPlayer ? PlayerMental : EnemyMental,
+            RollType.Heart => isPlayer ? PlayerHeart : EnemyHeart,
+            RollType.Body => isPlayer ? PlayerBody : EnemyBody,
+            RollType.Mind => isPlayer ? PlayerMind : EnemyMind,
             _ => 0
         };
     }
 
-    public bool CanAttackEnemyLife() => EnemyLife > 0;
-    public bool CanAttackEnemyPhysical() => EnemyPhysical > 0;
-    public bool CanAttackEnemyMental() => EnemyMental > 0;
+    public bool CanAttackEnemyHeart() => EnemyHeart > 0;
+    public bool CanAttackEnemyBody() => EnemyBody > 0;
+    public bool CanAttackEnemyMind() => EnemyMind > 0;
 }

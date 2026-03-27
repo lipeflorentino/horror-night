@@ -197,7 +197,7 @@ GameObject:
   m_Component:
   - component: {fileID: 812737746906366595}
   m_Layer: 5
-  m_Name: MEN
+  m_Name: Mind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -560,7 +560,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6056191686740305804}
   m_Layer: 5
-  m_Name: FIS
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1018,7 +1018,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2042358124029651866}
   m_Layer: 5
-  m_Name: HP
+  m_Name: Heart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

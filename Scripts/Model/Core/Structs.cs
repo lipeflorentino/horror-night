@@ -5,10 +5,9 @@ using UnityEngine.Serialization;
 [System.Serializable]
 public struct StatModifier
 {
-    [FormerlySerializedAs("life")] public int heart;
-    public int physical;
-    [FormerlySerializedAs("sanity")] public int mind;
-    [FormerlySerializedAs("power")] public int physicalBonus;
+    [SerializeField] public int mind;
+    [SerializeField] public int heart;
+    [SerializeField] public int body;
 }
 
 public struct OccurrenceResult

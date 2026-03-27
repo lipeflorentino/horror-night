@@ -6,9 +6,9 @@ public class EnemyBattler : MonoBehaviour
     [SerializeField] private SpriteRenderer enemySpriteRenderer;
     public EnemyInstance enemyData;
 
-    public int life;
-    public int physical;
-    public int mental;
+    public int heart;
+    public int body;
+    public int mind;
     public int attack;
     public int defense;
     public int criticalHitChance;
@@ -31,14 +31,14 @@ public class EnemyBattler : MonoBehaviour
         if (enemySpriteRenderer != null && enemyData.source.image != null)
             enemySpriteRenderer.sprite = enemyData.source.image;
 
-        life = enemyData.life;
-        physical = enemyData.physical;
-        mental = enemyData.mental;
+        heart = enemyData.heart;
+        body = enemyData.body;
+        mind = enemyData.mind;
         attack = enemyData.combatStats.attack;
         defense = enemyData.combatStats.defense;
         criticalHitChance = enemyData.combatStats.criticalHitChance;
         parryChance = enemyData.combatStats.parryChance;
 
-        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName} | life: {life}, physical: {physical}, mental: {mental}, atk: {attack}, def: {defense}");
+        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName} | heart: {heart}, body: {body}, mind: {mind}, atk: {attack}, def: {defense}");
     }
 }

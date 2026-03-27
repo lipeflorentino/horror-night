@@ -64,9 +64,9 @@ public class EnemyCSVImporter
             enemy.tags.behavior = values[7];
             enemy.tags.style = values[8];
             enemy.tags.type = values[9];
-            enemy.life = BuildRange(values[10], values[11]);
-            enemy.physical = BuildRange(values[12], values[13]);
-            enemy.mental = BuildRange(values[14], values.Length > 15 ? values[15] : values[14]);
+            enemy.heart = BuildRange(values[10], values[11]);
+            enemy.body = BuildRange(values[12], values[13]);
+            enemy.mind = BuildRange(values[14], values.Length > 15 ? values[15] : values[14]);
             enemy.specialRule = values.Length > 16 ? values[16] : string.Empty;
 
             if (values.Length > 17)

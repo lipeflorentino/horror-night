@@ -2,9 +2,9 @@ using UnityEngine;
 
 public enum RollType
 {
-    Life,
-    Physical,
-    Mental
+    Heart,
+    Body,
+    Mind
 }
 
 [System.Serializable]
@@ -18,20 +18,20 @@ public struct TurnManagerStats
     public int instantKillChance;
     public int learnChance;
 
-    public static TurnManagerStats BuildDefault(int life, int physical, int mental)
+    public static TurnManagerStats BuildDefault(int heart, int body, int mind)
     {
-        int scaledPhysicalChance = Mathf.Clamp((Mathf.Max(0, physical) - 1) * 10, 0, 95);
-        int scaledMentalChance = Mathf.Clamp((Mathf.Max(0, mental) - 1) * 10, 0, 95);
+        int scaledBodyChance = Mathf.Clamp((Mathf.Max(0, body) - 1) * 10, 0, 95);
+        int scaledMindChance = Mathf.Clamp((Mathf.Max(0, mind) - 1) * 10, 0, 95);
 
         return new TurnManagerStats
         {
-            attack = Mathf.Max(1, physical),
-            defense = Mathf.Max(0, Mathf.RoundToInt((life + physical) * 0.25f)),
-            criticalHitChance = Mathf.Clamp(Mathf.RoundToInt(mental * 0.8f), 0, 60),
-            parryChance = Mathf.Clamp(scaledPhysicalChance, 0, 90),
-            fleeChance = Mathf.Clamp(scaledPhysicalChance, 0, 95),
-            instantKillChance = Mathf.Clamp(Mathf.RoundToInt(scaledMentalChance * 0.25f), 1, 35),
-            learnChance = Mathf.Clamp(Mathf.RoundToInt(scaledMentalChance * 0.75f), 5, 95)
+            attack = Mathf.Max(1, body),
+            defense = Mathf.Max(0, Mathf.RoundToInt((heart + body) * 0.25f)),
+            criticalHitChance = Mathf.Clamp(Mathf.RoundToInt(mind * 0.8f), 0, 60),
+            parryChance = Mathf.Clamp(scaledBodyChance, 0, 90),
+            fleeChance = Mathf.Clamp(scaledBodyChance, 0, 95),
+            instantKillChance = Mathf.Clamp(Mathf.RoundToInt(scaledMindChance * 0.25f), 1, 35),
+            learnChance = Mathf.Clamp(Mathf.RoundToInt(scaledMindChance * 0.75f), 5, 95)
         };
     }
 

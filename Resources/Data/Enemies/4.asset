@@ -24,15 +24,15 @@ MonoBehaviour:
     behavior: Agressivo
     style: Primitivo
     type: Bestial
-  life:
-    min: 9
-    max: 13
-  physical:
+  heart:
+    min: 3
+    max: 7
+  body:
+    min: 4
+    max: 8
+  mind:
     min: 3
     max: 6
-  mental:
-    min: 2
-    max: 3
   attack:
     min: 4
     max: 7

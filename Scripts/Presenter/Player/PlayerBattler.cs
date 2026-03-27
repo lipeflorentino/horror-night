@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerBattler : MonoBehaviour
 {
-    public int life;
-    public int physical;
-    public int mental;
+    public int heart;
+    public int body;
+    public int mind;
 
     public int attack;
     public int defense;
@@ -14,11 +14,11 @@ public class PlayerBattler : MonoBehaviour
     public int instantKillChance;
     public int learnChance;
 
-    public void Setup(int baseLife, int basePhysical, int baseMental, TurnManagerStats combatStats)
+    public void Setup(int baseHeart, int baseBody, int baseMind, TurnManagerStats combatStats)
     {
-        life = baseLife;
-        physical = basePhysical;
-        mental = baseMental;
+        heart = baseHeart;
+        body = baseBody;
+        mind = baseMind;
 
         attack = combatStats.attack;
         defense = combatStats.defense;
@@ -28,6 +28,6 @@ public class PlayerBattler : MonoBehaviour
         instantKillChance = combatStats.instantKillChance;
         learnChance = combatStats.learnChance;
 
-        Debug.Log($"Setup Player! life: {life}, physical: {physical}, mental: {mental}, atk: {attack}, def: {defense}, crit: {criticalHitChance}");
+        Debug.Log($"Setup Player! heart: {heart}, body: {body}, mind: {mind}, atk: {attack}, def: {defense}, crit: {criticalHitChance}");
     }
 }

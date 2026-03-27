@@ -24,15 +24,15 @@ MonoBehaviour:
     behavior: Cauteloso
     style: Furtivo
     type: "Esp\xEDrito"
-  life:
-    min: 7
-    max: 10
-  physical:
-    min: 2
-    max: 4
-  mental:
+  heart:
     min: 3
-    max: 5
+    max: 7
+  body:
+    min: 4
+    max: 8
+  mind:
+    min: 3
+    max: 6
   attack:
     min: 4
     max: 8

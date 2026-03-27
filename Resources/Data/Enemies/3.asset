@@ -24,15 +24,15 @@ MonoBehaviour:
     behavior: "Implac\xE1vel"
     style: "Ritual\xEDstico"
     type: Entidade
-  life:
-    min: 30
-    max: 42
-  physical:
-    min: 10
-    max: 16
-  mental:
-    min: 10
-    max: 14
+  heart:
+    min: 3
+    max: 6
+  body:
+    min: 4
+    max: 8
+  mind:
+    min: 4
+    max: 8
   attack:
     min: 3
     max: 6

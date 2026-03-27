@@ -24,13 +24,13 @@ MonoBehaviour:
     behavior: Cauteloso
     style: Furtivo
     type: Entidade
-  life:
-    min: 8
-    max: 11
-  physical:
+  heart:
     min: 3
-    max: 4
-  mental:
+    max: 7
+  body:
+    min: 4
+    max: 8
+  mind:
     min: 3
     max: 6
   attack:

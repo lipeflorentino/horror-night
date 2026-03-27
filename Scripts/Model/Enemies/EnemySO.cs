@@ -40,9 +40,9 @@ public class EnemySO : ScriptableObject
     public EnemyTagSet tags = new EnemyTagSet();
 
     [Header("Stats Range")]
-    public StatRange life;
-    public StatRange physical;
-    public StatRange mental;
+    public StatRange heart;
+    public StatRange body;
+    public StatRange mind;
 
     [Header("Combat - Advanced Stats")]
     public StatRange attack;
@@ -72,9 +72,9 @@ public class EnemySO : ScriptableObject
     {
         float difficulty = context != null ? context.DifficultyModifier : 1f;
 
-        int rolledLife = life.Roll(difficulty);
-        int rolledPhysical = physical.Roll(difficulty);
-        int rolledMental = mental.Roll(difficulty);
+        int rolledHeart = heart.Roll(difficulty);
+        int rolledBody = body.Roll(difficulty);
+        int rolledMind = mind.Roll(difficulty);
 
         int rolledAttack = attack.Roll(difficulty);
         int rolledDefense = defense.Roll(difficulty);
@@ -84,7 +84,8 @@ public class EnemySO : ScriptableObject
         int rolledInstantKillChance = instantKillChance.Roll(1f);
         int rolledLearnChance = learnChance.Roll(1f);
 
-        TurnManagerStats stats = TurnManagerStats.BuildDefault(rolledLife, rolledPhysical, rolledMental);
+        TurnManagerStats stats = TurnManagerStats.BuildDefault(rolledHeart, rolledBody, rolledMind);
+        
         stats.attack = rolledAttack > 0 ? rolledAttack : stats.attack;
         stats.defense = rolledDefense > 0 ? rolledDefense : stats.defense;
         stats.criticalHitChance = rolledCritChance > 0 ? rolledCritChance : stats.criticalHitChance;
@@ -97,9 +98,9 @@ public class EnemySO : ScriptableObject
         return new EnemyInstance
         {
             source = this,
-            life = rolledLife,
-            physical = rolledPhysical,
-            mental = rolledMental,
+            heart = rolledHeart,
+            body = rolledBody,
+            mind = rolledMind,
             runTier = context != null ? context.tier : 0,
             combatStats = stats
         };

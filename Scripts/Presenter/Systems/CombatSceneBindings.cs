@@ -26,15 +26,15 @@ public class CombatSceneBindings : MonoBehaviour
     [Serializable]
     public class CombatHudBinding
     {
-        public StatBarBinding life;
-        public StatBarBinding physical;
-        public StatBarBinding mental;
+        public StatBarBinding heart;
+        public StatBarBinding body;
+        public StatBarBinding mind;
 
-        public void SetValues(int lifeValue, int lifeMax, int physicalValue, int physicalMax, int mentalValue, int mentalMax)
+        public void SetValues(int heartValue, int heartMax, int bodyValue, int bodyMax, int mindValue, int mindMax)
         {
-            life?.SetValue(lifeValue, lifeMax);
-            physical?.SetValue(physicalValue, physicalMax);
-            mental?.SetValue(mentalValue, mentalMax);
+            heart?.SetValue(heartValue, heartMax);
+            body?.SetValue(bodyValue, bodyMax);
+            mind?.SetValue(mindValue, mindMax);
         }
     }
 
@@ -67,9 +67,9 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private Button itemButton;
     [SerializeField] private Button specialButton;
 
-    [SerializeField] private Button attackLifeButton;
-    [SerializeField] private Button attackPhysicalButton;
-    [SerializeField] private Button attackMentalButton;
+    [SerializeField] private Button attackHeartButton;
+    [SerializeField] private Button attackBodyButton;
+    [SerializeField] private Button attackMindButton;
 
     [SerializeField] private Button defendButton;
     [SerializeField] private Button parryButton;
@@ -97,9 +97,9 @@ public class CombatSceneBindings : MonoBehaviour
         RegisterButton(specialButton, () => OpenActionMenu(initialActionsUI, specialActionsUI));
         RegisterButton(itemButton, () => TriggerPlayerAction(PlayerActionType.Item));
 
-        RegisterButton(attackLifeButton, () => TriggerPlayerAction(PlayerActionType.AttackLife));
-        RegisterButton(attackPhysicalButton, () => TriggerPlayerAction(PlayerActionType.AttackPhysical));
-        RegisterButton(attackMentalButton, () => TriggerPlayerAction(PlayerActionType.AttackMental));
+        RegisterButton(attackHeartButton, () => TriggerPlayerAction(PlayerActionType.AttackHeart));
+        RegisterButton(attackBodyButton, () => TriggerPlayerAction(PlayerActionType.AttackBody));
+        RegisterButton(attackMindButton, () => TriggerPlayerAction(PlayerActionType.AttackMind));
 
         RegisterButton(defendButton, () => TriggerPlayerAction(PlayerActionType.Defend));
         RegisterButton(parryButton, () => TriggerPlayerAction(PlayerActionType.Parry));
@@ -110,7 +110,7 @@ public class CombatSceneBindings : MonoBehaviour
 
         SetActionsVisible(false);
         ResolveCombatVisualReferences();
-        playerFeedbackPanel.SetActive(true);
+        // playerFeedbackPanel.SetActive(true);
     }
 
     public void SetTurnText(string value)
@@ -172,16 +172,16 @@ public class CombatSceneBindings : MonoBehaviour
             defenseActionsUI.SetActive(true);
     }
 
-    public void UpdateAttackButtonAvailability(bool lifeEnabled, bool physicalEnabled, bool mentalEnabled)
+    public void UpdateAttackButtonAvailability(bool heartEnabled, bool bodyEnabled, bool mindEnabled)
     {
-        if (attackLifeButton != null)
-            attackLifeButton.interactable = lifeEnabled;
+        if (attackHeartButton != null)
+            attackHeartButton.interactable = heartEnabled;
 
-        if (attackPhysicalButton != null)
-            attackPhysicalButton.interactable = physicalEnabled;
+        if (attackBodyButton != null)
+            attackBodyButton.interactable = bodyEnabled;
 
-        if (attackMentalButton != null)
-            attackMentalButton.interactable = mentalEnabled;
+        if (attackMindButton != null)
+            attackMindButton.interactable = mindEnabled;
     }
 
     public void ResetDiceValue()
@@ -191,21 +191,21 @@ public class CombatSceneBindings : MonoBehaviour
     }
 
     public void UpdateHud(
-        int playerLife,
-        int playerLifeMax,
-        int playerPhysical,
-        int playerPhysicalMax,
-        int playerMental,
-        int playerMentalMax,
-        int enemyLife,
-        int enemyLifeMax,
-        int enemyPhysical,
-        int enemyPhysicalMax,
-        int enemyMental,
-        int enemyMentalMax)
+        int playerheart,
+        int playerheartMax,
+        int playerbody,
+        int playerbodyMax,
+        int playermind,
+        int playermindMax,
+        int enemyheart,
+        int enemyheartMax,
+        int enemybody,
+        int enemybodyMax,
+        int enemymind,
+        int enemymindMax)
     {
-        playerHud?.SetValues(playerLife, playerLifeMax, playerPhysical, playerPhysicalMax, playerMental, playerMentalMax);
-        enemyHud?.SetValues(enemyLife, enemyLifeMax, enemyPhysical, enemyPhysicalMax, enemyMental, enemyMentalMax);
+        playerHud?.SetValues(playerheart, playerheartMax, playerbody, playerbodyMax, playermind, playermindMax);
+        enemyHud?.SetValues(enemyheart, enemyheartMax, enemybody, enemybodyMax, enemymind, enemymindMax);
     }
 
     public void ShowGameOverUI(Action onRestart)
@@ -334,11 +334,9 @@ public class CombatSceneBindings : MonoBehaviour
 
     private void RegisterButton(Button button, Action callback)
     {
-        Debug.Log($"RegisterButton {button} - {callback}");
         if (button == null)
             return;
-
-        Debug.Log("Button register onClick");
+            
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => callback?.Invoke());
     }

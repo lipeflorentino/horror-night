@@ -35,9 +35,9 @@ public class EnemyRunContext
 public class EnemyInstance
 {
     public EnemySO source;
-    public int life;
-    public int physical;
-    public int mental;
+    public int heart;
+    public int body;
+    public int mind;
     public int runTier;
     public TurnManagerStats combatStats;
 }

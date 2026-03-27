@@ -12,13 +12,13 @@ public class TurnManager
 {
     public CombatOutcome Outcome { get; private set; } = CombatOutcome.Ongoing;
 
-    public int PlayerLife => turnActions.PlayerLife;
-    public int PlayerPhysical => turnActions.PlayerPhysical;
-    public int PlayerMental => turnActions.PlayerMental;
+    public int PlayerHeart => turnActions.PlayerHeart;
+    public int PlayerBody => turnActions.PlayerBody;
+    public int PlayerMind => turnActions.PlayerMind;
 
-    public int EnemyLife => turnActions.EnemyLife;
-    public int EnemyPhysical => turnActions.EnemyPhysical;
-    public int EnemyMental => turnActions.EnemyMental;
+    public int EnemyHeart => turnActions.EnemyHeart;
+    public int EnemyBody => turnActions.EnemyBody;
+    public int EnemyMind => turnActions.EnemyMind;
 
     public TurnManagerStats PlayerCombatStats => turnActions.PlayerStats;
 
@@ -36,26 +36,26 @@ public class TurnManager
 
     public IEnumerator RunTurnCombat(CombatSceneBindings bindings)
     {
-        bool playerAttacking = (PlayerLife + PlayerPhysical + PlayerMental) >= (EnemyLife + EnemyPhysical + EnemyMental);
+        bool playerAttacking = (PlayerHeart + PlayerBody + PlayerMind) >= (EnemyHeart + EnemyBody + EnemyMind);
         bindings.SetCombatLog("O combate começou.", CombatLogCategory.Action);
 
-        while (PlayerLife > 0 && EnemyLife > 0)
+        while (PlayerHeart > 0 && EnemyHeart > 0)
         {
-            bindings.UpdateAttackButtonAvailability(turnActions.CanAttackEnemyLife(), turnActions.CanAttackEnemyPhysical(), turnActions.CanAttackEnemyMental());
+            bindings.UpdateAttackButtonAvailability(turnActions.CanAttackEnemyHeart(), turnActions.CanAttackEnemyBody(), turnActions.CanAttackEnemyMind());
 
             if (playerAttacking)
                 yield return ExecutePlayerAttackTurn(bindings);
             else
                 yield return ExecuteEnemyAttackTurn(bindings);
 
-            if (EnemyLife <= 0 || PlayerLife <= 0)
+            if (EnemyHeart <= 0 || PlayerHeart <= 0)
                 break;
 
             playerAttacking = !playerAttacking;
             yield return new WaitForSeconds(0.35f);
         }
 
-        if (EnemyLife <= 0)
+        if (EnemyHeart <= 0)
         {
             bindings.SetTurnText("Vitória");
             bindings.SetCombatLog("Inimigo derrotado. Placeholder de recompensa gerado.", CombatLogCategory.Victory);
@@ -102,12 +102,12 @@ public class TurnManager
         bindings.SetTurnText("Turno inimigo: Defesa");
 
         EnemyActionType enemyAttack = enemyTurnActions.ChooseEnemyAction(
-            PlayerLife,
-            PlayerPhysical,
-            PlayerMental,
-            EnemyLife,
-            EnemyPhysical,
-            EnemyMental);
+            PlayerHeart,
+            PlayerBody,
+            PlayerMind,
+            EnemyHeart,
+            EnemyBody,
+            EnemyMind);
 
         bindings.SetCombatLog("Inimigo vai atacar. Escolha sua defesa.", CombatLogCategory.Action);
         bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyAttack)}");
