@@ -13,10 +13,14 @@ public struct StatModifier
 public struct OccurrenceResult
 {
     public bool success;
+    public bool requiresRoll;
+    public int selectedOption;
     public int occurrenceRoll;
     public int playerRoll;
-    public string successText;
-    public string failText;
+    public int rollRange;
+    public int delta;
+    public string optionText;
+    public string primaryStat;
 }
 
 [System.Serializable]

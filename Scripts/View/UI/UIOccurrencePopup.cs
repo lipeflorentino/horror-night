@@ -8,15 +8,23 @@ public class UIOccurrencePopup : MonoBehaviour
     [SerializeField] private GameObject root;
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private Button rollButton;
+    [SerializeField] private Button optionButton1;
+    [SerializeField] private Button optionButton2;
+    [SerializeField] private Button neutralOptionButton;
+    [SerializeField] private TextMeshProUGUI optionButton1Text;
+    [SerializeField] private TextMeshProUGUI optionButton2Text;
+    [SerializeField] private TextMeshProUGUI neutralOptionButtonText;
     [SerializeField] private Button closeButton;
+
+    [Header("Legacy")]
+    [SerializeField] private Button rollButton;
 
     [Header("Result UI")]
     [SerializeField] private GameObject resultRoot;
     [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private DiceRollUI diceRollUI;
 
-    public void Show(OccurrenceSO entry, int occurrenceRoll, Func<OccurrenceResult> onRoll, Action onClose)
+    public void Show(OccurrenceSO entry, Func<int, OccurrenceResult> onOptionSelected, Action onClose)
     {
         if (root != null)
             root.SetActive(true);
@@ -27,21 +35,18 @@ public class UIOccurrencePopup : MonoBehaviour
         if (descriptionText != null)
             descriptionText.text = entry.description;
 
+        if (rollButton != null)
+            rollButton.gameObject.SetActive(false);
+
         if (resultRoot != null)
             resultRoot.SetActive(false);
 
         if (resultText != null)
             resultText.text = string.Empty;
 
-        if (rollButton != null)
-        {
-            rollButton.onClick.RemoveAllListeners();
-            rollButton.interactable = true;
-            rollButton.onClick.AddListener(() =>
-            {
-                StartCoroutine(HandleRoll(onRoll));
-            });
-        }
+        SetupChoiceButton(optionButton1, optionButton1Text, entry.profileOption1, 0, onOptionSelected);
+        SetupChoiceButton(optionButton2, optionButton2Text, entry.profileOption2, 1, onOptionSelected);
+        SetupChoiceButton(neutralOptionButton, neutralOptionButtonText, entry.neutralOption, 2, onOptionSelected);
 
         if (closeButton != null)
         {
@@ -56,11 +61,30 @@ public class UIOccurrencePopup : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator HandleRoll(Func<OccurrenceResult> onRoll)
+    private void SetupChoiceButton(Button button, TextMeshProUGUI buttonText, string label, int index, Func<int, OccurrenceResult> callback)
     {
-        OccurrenceResult result = onRoll != null ? onRoll.Invoke() : default;
+        if (buttonText != null)
+            buttonText.text = label;
 
-        if (diceRollUI != null)
+        if (button == null)
+            return;
+
+        button.gameObject.SetActive(true);
+        button.interactable = true;
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() =>
+        {
+            StartCoroutine(HandleOptionSelection(index, callback));
+        });
+    }
+
+    private System.Collections.IEnumerator HandleOptionSelection(int selectedIndex, Func<int, OccurrenceResult> callback)
+    {
+        ToggleOptionButtons(false);
+
+        OccurrenceResult result = callback != null ? callback.Invoke(selectedIndex) : default;
+
+        if (result.requiresRoll && diceRollUI != null)
             yield return StartCoroutine(diceRollUI.PlayRollAnimation(result.playerRoll));
 
         if (resultRoot != null)
@@ -68,14 +92,34 @@ public class UIOccurrencePopup : MonoBehaviour
 
         if (resultText != null)
         {
-            string message = result.success ? result.successText : result.failText;
-            resultText.text = $"{message}\n\nRolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}";
+            if (result.requiresRoll)
+            {
+                string outcome = result.success ? "Sucesso" : "Falha";
+                string deltaText = result.delta >= 0 ? $"+{result.delta}" : result.delta.ToString();
+                resultText.text =
+                    $"Opção: {result.optionText}\n" +
+                    $"{outcome} | Rolagem: {result.playerRoll} x Meta: {result.occurrenceRoll} (faixa 1-{result.rollRange})\n" +
+                    $"Impacto em {result.primaryStat}: {deltaText}";
+            }
+            else
+            {
+                resultText.text = $"Opção escolhida: {result.optionText}\nSem rolagem para esta ocorrência.";
+            }
         }
-
-        if (rollButton != null)
-            rollButton.interactable = false;
 
         if (closeButton != null)
             closeButton.gameObject.SetActive(true);
+    }
+
+    private void ToggleOptionButtons(bool interactable)
+    {
+        if (optionButton1 != null)
+            optionButton1.interactable = interactable;
+
+        if (optionButton2 != null)
+            optionButton2.interactable = interactable;
+
+        if (neutralOptionButton != null)
+            neutralOptionButton.interactable = interactable;
     }
 }
