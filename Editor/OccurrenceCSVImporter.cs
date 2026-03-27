@@ -6,22 +6,24 @@ using UnityEngine;
 
 public class OccurrenceCSVImporter
 {
-    private const string CsvPath = "Assets/Resources/Data/OccurrenceTable.csv";
-    private const string OutputFolder = "Assets/Resources/Data/Occurrences/";
+    private const string CsvPathV2 = "Resources/Data/OccurrenceTable_v2.csv";
+    private const string CsvPathLegacy = "Resources/Data/OccurrenceTable.csv";
+    private const string OutputFolder = "Resources/Data/Occurrences/";
 
     [MenuItem("Tools/Import Occurrence CSV")]
     public static void ImportCSV()
     {
-        if (!File.Exists(CsvPath))
+        string csvPath = ResolveCsvPath();
+        if (string.IsNullOrEmpty(csvPath))
         {
-            Debug.LogError("CSV não encontrado em: " + CsvPath);
+            Debug.LogError($"CSV não encontrado em: {CsvPathV2} ou {CsvPathLegacy}");
             return;
         }
 
         if (!Directory.Exists(OutputFolder))
             Directory.CreateDirectory(OutputFolder);
 
-        string[] lines = File.ReadAllLines(CsvPath);
+        string[] lines = File.ReadAllLines(csvPath);
         List<OccurrenceSO> importedEntries = new();
 
         bool skippedHeader = false;
@@ -36,13 +38,13 @@ public class OccurrenceCSVImporter
             if (!skippedHeader)
             {
                 skippedHeader = true;
-                if (line.StartsWith("ID", StringComparison.OrdinalIgnoreCase))
+                if (line.StartsWith("id", StringComparison.OrdinalIgnoreCase))
                     continue;
             }
 
             string[] values = SplitCsvLine(line);
 
-            if (values.Length < 10)
+            if (values.Length < 12)
                 continue;
 
             int id = ParseInt(values[0]);
@@ -61,13 +63,14 @@ public class OccurrenceCSVImporter
             occurrenceEntry.id = id;
             occurrenceEntry.title = values[1];
             occurrenceEntry.description = values[2];
-            occurrenceEntry.successText = values[3];
-            occurrenceEntry.failText = values[4];
-            occurrenceEntry.successStat = NormalizeStatName(values[5]);
-            occurrenceEntry.successValue = ParseInt(values[6]);
-            occurrenceEntry.failStat = NormalizeStatName(values[7]);
-            occurrenceEntry.failValue = ParseInt(values[8]);
-            occurrenceEntry.rollRange = Mathf.Max(0, ParseInt(values[9]));
+            occurrenceEntry.profileOption1 = values[3];
+            occurrenceEntry.profileOption2 = values[4];
+            occurrenceEntry.neutralOption = values[5];
+            occurrenceEntry.profile1Type = ParseArchetype(values[6]);
+            occurrenceEntry.profile2Type = ParseArchetype(values[7]);
+            occurrenceEntry.primaryStat = NormalizeStatName(values[8]);
+            occurrenceEntry.requiresRoll = ParseBool(values[9]);
+            occurrenceEntry.tier = Mathf.Max(0, ParseInt(values[10]));
 
             EditorUtility.SetDirty(occurrenceEntry);
             importedEntries.Add(occurrenceEntry);
@@ -76,7 +79,18 @@ public class OccurrenceCSVImporter
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log($"Importação de ocorrencias concluída!");
+        Debug.Log($"Importação de ocorrencias concluída! Itens: {importedEntries.Count}");
+    }
+
+    private static string ResolveCsvPath()
+    {
+        if (File.Exists(CsvPathV2))
+            return CsvPathV2;
+
+        if (File.Exists(CsvPathLegacy))
+            return CsvPathLegacy;
+
+        return null;
     }
 
     private static string[] SplitCsvLine(string line)
@@ -117,6 +131,28 @@ public class OccurrenceCSVImporter
         return parsed;
     }
 
+    private static bool ParseBool(string value)
+    {
+        if (bool.TryParse(value.Trim(), out bool parsed))
+            return parsed;
+
+        string normalized = value.Trim().ToLowerInvariant();
+        return normalized == "1" || normalized == "sim" || normalized == "yes";
+    }
+
+    private static PlayerArchetype ParseArchetype(string archetype)
+    {
+        string normalized = archetype.Trim().ToUpperInvariant();
+
+        return normalized switch
+        {
+            "NF" => PlayerArchetype.NF,
+            "SJ" => PlayerArchetype.SJ,
+            "SP" => PlayerArchetype.SP,
+            _ => PlayerArchetype.NT
+        };
+    }
+
     private static string NormalizeStatName(string stat)
     {
         string normalized = stat.Trim().ToLowerInvariant();
@@ -124,7 +160,9 @@ public class OccurrenceCSVImporter
         switch (normalized)
         {
             case "vida":
-            case "life":
+            case "heart":
+            case "coracao":
+            case "coração":
                 return "heart";
             case "físico":
             case "fisico":
@@ -132,14 +170,15 @@ public class OccurrenceCSVImporter
             case "forca":
             case "strength":
             case "physical":
-                return "physical";
+            case "corpo":
+            case "body":
+                return "body";
             case "mental":
             case "sanidade":
             case "sanity":
+            case "mente":
+            case "mind":
                 return "mind";
-            case "poder":
-            case "power":
-                return "power";
             default:
                 return "heart";
         }

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class OccurrenceSystem : MonoBehaviour
 {
+    private const int MinRollRange = 1;
+
     [Header("References")]
     [SerializeField] private OccurrenceDatabase database;
     [SerializeField] private UIOccurrencePopup popup;
@@ -28,19 +30,17 @@ public class OccurrenceSystem : MonoBehaviour
         if (node == null || database == null)
             return;
 
-        OccurrenceSO selectedOccurrence = database != null ? database.GetRandom() : null;
+        OccurrenceSO selectedOccurrence = database.GetRandom();
 
         if (selectedOccurrence == null)
             return;
-
-        int occurrenceRoll = Random.Range(0, Mathf.Max(0, selectedOccurrence.rollRange) + 1);
 
         if (playerMovement != null)
             playerMovement.enabled = false;
 
         if (popup == null)
         {
-            ResolveOccurrence(selectedOccurrence, occurrenceRoll);
+            ResolveOccurrence(selectedOccurrence, 2);
             if (playerMovement != null)
                 playerMovement.enabled = true;
             return;
@@ -48,8 +48,7 @@ public class OccurrenceSystem : MonoBehaviour
 
         popup.Show(
             selectedOccurrence,
-            occurrenceRoll,
-            onRoll: () => ResolveOccurrence(selectedOccurrence, occurrenceRoll),
+            onOptionSelected: selectedOption => ResolveOccurrence(selectedOccurrence, selectedOption),
             onClose: () =>
             {
                 if (playerMovement != null)
@@ -57,27 +56,59 @@ public class OccurrenceSystem : MonoBehaviour
             });
     }
 
-    private OccurrenceResult ResolveOccurrence(OccurrenceSO selectedOccurrence, int occurrenceRoll)
+    private OccurrenceResult ResolveOccurrence(OccurrenceSO selectedOccurrence, int selectedOption)
     {
-        int playerStatValue = playerStatus != null ? playerStatus.GetStatValue(selectedOccurrence.successStat) : 0;
-        int playerRoll = Random.Range(0, Mathf.Max(0, playerStatValue) + 1);
-        bool success = playerRoll > occurrenceRoll;
-
-        if (playerStatus != null)
+        OccurrenceResult result = new OccurrenceResult
         {
-            if (success)
-                playerStatus.ApplyStatDelta(selectedOccurrence.successStat, selectedOccurrence.successValue);
-            else
-                playerStatus.ApplyStatDelta(selectedOccurrence.failStat, selectedOccurrence.failValue);
+            selectedOption = selectedOption,
+            requiresRoll = selectedOccurrence.requiresRoll,
+            optionText = GetOptionText(selectedOccurrence, selectedOption),
+            primaryStat = selectedOccurrence.primaryStat
+        };
+
+        if (playerStatus == null)
+            return result;
+
+        if (selectedOption == 0)
+            playerStatus.AddArchetypePoint(selectedOccurrence.profile1Type);
+        else if (selectedOption == 1)
+            playerStatus.AddArchetypePoint(selectedOccurrence.profile2Type);
+
+        if (!selectedOccurrence.requiresRoll)
+        {
+            result.success = true;
+            return result;
         }
 
-        return new OccurrenceResult
+        int playerStatValue = playerStatus.GetStatValue(selectedOccurrence.primaryStat);
+        int rollRange = Mathf.Max(MinRollRange, playerStatValue);
+
+        int targetRoll = Random.Range(1, rollRange + 1);
+        int playerRoll = Random.Range(1, rollRange + 1);
+        bool success = playerRoll >= targetRoll;
+
+        int delta = Mathf.Max(1, selectedOccurrence.tier);
+        if (!success)
+            delta = -delta;
+
+        playerStatus.ApplyStatDelta(selectedOccurrence.primaryStat, delta);
+
+        result.success = success;
+        result.occurrenceRoll = targetRoll;
+        result.playerRoll = playerRoll;
+        result.delta = delta;
+        result.rollRange = rollRange;
+
+        return result;
+    }
+
+    private static string GetOptionText(OccurrenceSO occurrence, int selectedOption)
+    {
+        return selectedOption switch
         {
-            success = success,
-            occurrenceRoll = occurrenceRoll,
-            playerRoll = playerRoll,
-            successText = selectedOccurrence.successText,
-            failText = selectedOccurrence.failText
+            0 => occurrence.profileOption1,
+            1 => occurrence.profileOption2,
+            _ => occurrence.neutralOption
         };
     }
 }

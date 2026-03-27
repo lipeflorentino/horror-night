@@ -22,13 +22,59 @@ public class PlayerStatusManager : MonoBehaviour
     }
 
     [System.Serializable]
+    public struct ArchetypePoints
+    {
+        [SerializeField] public int nt;
+        [SerializeField] public int nf;
+        [SerializeField] public int sj;
+        [SerializeField] public int sp;
+
+        public int Get(PlayerArchetype archetype)
+        {
+            return archetype switch
+            {
+                PlayerArchetype.NF => nf,
+                PlayerArchetype.SJ => sj,
+                PlayerArchetype.SP => sp,
+                _ => nt
+            };
+        }
+
+        public void Add(PlayerArchetype archetype, int amount)
+        {
+            switch (archetype)
+            {
+                case PlayerArchetype.NF:
+                    nf += amount;
+                    break;
+                case PlayerArchetype.SJ:
+                    sj += amount;
+                    break;
+                case PlayerArchetype.SP:
+                    sp += amount;
+                    break;
+                default:
+                    nt += amount;
+                    break;
+            }
+        }
+    }
+
+    [System.Serializable]
     public struct PlayerStatusSnapshot
     {
         [SerializeField] public float heart;
         [SerializeField] public float body;
         [SerializeField] public float mind;
+        [SerializeField] public PlayerArchetype currentArchetype;
+        [SerializeField] public ArchetypePoints archetypePoints;
         public TurnManagerStats combatStats;
     }
+
+    [Header("Archetype")]
+    [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.NT;
+    [SerializeField] private PlayerArchetype currentArchetype = PlayerArchetype.NT;
+    [SerializeField] private ArchetypePoints archetypePoints;
 
     [Header("Status HUD (Horizontal Bar + Text)")]
     [SerializeField] private StatHudBinding heartHud;
@@ -58,11 +104,33 @@ public class PlayerStatusManager : MonoBehaviour
 
     private void Awake()
     {
+        currentArchetype = initialArchetype;
+
         currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
         currentBody = Mathf.Clamp(currentBody, 0f, maxBody);
         currentMind = Mathf.Clamp(currentMind, 0f, maxMind);
 
         RefreshAllBars();
+    }
+
+    public PlayerArchetype GetCurrentArchetype() => currentArchetype;
+
+    public void SetCurrentArchetype(PlayerArchetype archetype)
+    {
+        currentArchetype = archetype;
+    }
+
+    public int GetArchetypePoints(PlayerArchetype archetype)
+    {
+        return archetypePoints.Get(archetype);
+    }
+
+    public void AddArchetypePoint(PlayerArchetype archetype, int amount = 1)
+    {
+        if (amount <= 0)
+            return;
+
+        archetypePoints.Add(archetype, amount);
     }
 
     public void IncreaseHeart(float amount)
@@ -161,6 +229,8 @@ public class PlayerStatusManager : MonoBehaviour
             heart = currentHeart,
             body = currentBody,
             mind = currentMind,
+            currentArchetype = currentArchetype,
+            archetypePoints = archetypePoints,
             combatStats = stats
         };
     }
@@ -170,6 +240,8 @@ public class PlayerStatusManager : MonoBehaviour
         currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
         currentBody = Mathf.Clamp(snapshot.body, 0f, maxBody);
         currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
+        currentArchetype = snapshot.currentArchetype;
+        archetypePoints = snapshot.archetypePoints;
 
         TurnManagerStats restoredStats = snapshot.combatStats;
         restoredStats.Normalize();
@@ -217,17 +289,21 @@ public class PlayerStatusManager : MonoBehaviour
             case "heart":
             case "life":
             case "vida":
+            case "coracao":
+            case "coração":
                 return "heart";
             case "body":
             case "strength":
             case "força":
             case "forca":
             case "power":
+            case "corpo":
                 return "body";
             case "mind":
             case "mental":
             case "sanity":
             case "sanidade":
+            case "mente":
                 return "mind";
             default:
                 return normalized;
