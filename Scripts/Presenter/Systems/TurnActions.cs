@@ -32,7 +32,7 @@ public class TurnActions
         this.enemyTurnActions = enemyTurnActions;
     }
 
-    public void Initialize(RunStateSnapshot snapshot, EnemyInstance enemy)
+    public void Initialize(CombatSceneBindings bindings, RunStateSnapshot snapshot, EnemyInstance enemy)
     {
         PlayerHeart = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.heart));
         PlayerBody = Mathf.Max(0, Mathf.RoundToInt(snapshot.playerStatus.body));
@@ -59,6 +59,8 @@ public class TurnActions
         if (EnemyStats.attack <= 0)
             EnemyStats = TurnManagerStats.BuildDefault(EnemyHeart, EnemyBody, EnemyMind);
         EnemyStats.Normalize();
+
+        bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
     }
 
     public IEnumerator RollForAction(CombatSceneBindings bindings, RollType rollType, bool isPlayer, Action<int> onFinished)

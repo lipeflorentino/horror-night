@@ -117,7 +117,7 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        turnManager.Initialize(stateController.RunSnapshot, stateController.CurrentEnemy);
+        turnManager.Initialize(bindings, stateController.RunSnapshot, stateController.CurrentEnemy);
         SpawnBattlers(bindings);
         StartCoroutine(RunCombatFlow(bindings));
     }

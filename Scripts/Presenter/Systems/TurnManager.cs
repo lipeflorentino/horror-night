@@ -27,10 +27,10 @@ public class TurnManager
     private readonly EnemyTurnActions enemyTurnActions = new();
     private TurnActions turnActions;
 
-    public void Initialize(RunStateSnapshot snapshot, EnemyInstance enemy)
+    public void Initialize(CombatSceneBindings bindings, RunStateSnapshot snapshot, EnemyInstance enemy)
     {
         turnActions = new TurnActions(playerTurnActions, enemyTurnActions);
-        turnActions.Initialize(snapshot, enemy);
+        turnActions.Initialize(bindings, snapshot, enemy);
         Outcome = CombatOutcome.Ongoing;
     }
 

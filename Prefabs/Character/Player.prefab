@@ -3249,6 +3249,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mind
       objectReference: {fileID: 0}
+    - target: {fileID: 1591142386812483217, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.8807926
+      objectReference: {fileID: 0}
+    - target: {fileID: 1591142386812483217, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.8807926
+      objectReference: {fileID: 0}
+    - target: {fileID: 1591142386812483217, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.8807926
+      objectReference: {fileID: 0}
+    - target: {fileID: 1591142386812483217, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -158
+      objectReference: {fileID: 0}
+    - target: {fileID: 1591142386812483217, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 124.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1712052225735460930, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3340,6 +3360,26 @@ PrefabInstance:
     - target: {fileID: 4057193825966890410, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
       propertyPath: m_Name
       value: PlayerBattleUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927903388406932126, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1430024435, guid: b2a6f1b0d4dac7e45969623c095061de, type: 3}
+    - target: {fileID: 6794488730725809939, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 82.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6794488730725809939, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 21.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376037705123816801, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -159.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376037705123816801, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 133.3
       objectReference: {fileID: 0}
     - target: {fileID: 8899277468278504228, guid: 6b07a40a8522d424abb6be7276830df4, type: 3}
       propertyPath: m_text

@@ -4330,10 +4330,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4487196636439806813, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -175.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5342978682417247641, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
+    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7589186
+      objectReference: {fileID: 0}
+    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7589186
+      objectReference: {fileID: 0}
+    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7589186
+      objectReference: {fileID: 0}
+    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -177.09999
+      objectReference: {fileID: 0}
     - target: {fileID: 7760248086195083446, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
