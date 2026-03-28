@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 7
   m_EditorClassIdentifier: 
   id: 7
-  title: Fruto Desconhecido
-  description: "Uma fruta vibrante cresce sozinha numa \xE1rvore morta."
-  successText: "Voc\xEA identifica que \xE9 nutritiva e recupera energia."
-  failText: A fruta era venenosa e queima sua garganta.
-  successStat: life
-  successValue: 1
-  failStat: life
-  failValue: -1
-  rollRange: 4
+  title: Sombra em Movimento
+  description: "Sua pr\xF3pria sombra parece se mover diferente."
+  profileOption1: "Analisar a distor\xE7\xE3o visual"
+  profileOption2: Reagir instintivamente
+  neutralOption: "Parar e n\xE3o se mover"
+  profile1Type: 0
+  profile2Type: 3
+  primaryStat: mind
+  requiresRoll: 1
+  tier: 2

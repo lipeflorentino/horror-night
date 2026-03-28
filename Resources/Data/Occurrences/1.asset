@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: 
   id: 1
-  title: "Raiz Trai\xE7oeira"
-  description: "Uma raiz grossa se move levemente sob seu p\xE9."
-  successText: "Voc\xEA mant\xE9m o equil\xEDbrio com agilidade impressionante."
-  failText: "Voc\xEA trope\xE7a e bate o joelho numa pedra oculta."
-  successStat: physical
-  successValue: 1
-  failStat: life
-  failValue: -1
-  rollRange: 3
+  title: "Sussurro entre \xC1rvores"
+  description: Um sussurro parece chamar seu nome repetidamente.
+  profileOption1: Analisar a origem do som
+  profileOption2: Tentar responder ao sussurro
+  neutralOption: Ignorar e seguir em frente
+  profile1Type: 0
+  profile2Type: 1
+  primaryStat: mind
+  requiresRoll: 1
+  tier: 1

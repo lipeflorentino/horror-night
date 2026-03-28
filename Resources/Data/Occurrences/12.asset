@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 12
   m_EditorClassIdentifier: 
   id: 12
-  title: "Clar\xE3o Verde"
-  description: "Um raio verde cruza o c\xE9u e atinge uma \xE1rvore pr\xF3xima."
-  successText: "Voc\xEA aproveita a energia residual e se sente revigorado."
-  failText: "Fragmentos incandescentes atingem voc\xEA."
-  successStat: life
-  successValue: 1
-  failStat: life
-  failValue: -1
-  rollRange: 14
+  title: Vulto Familiar
+  description: "Algo que lembra algu\xE9m conhecido surge entre as \xE1rvores."
+  profileOption1: "Questionar a veracidade da vis\xE3o"
+  profileOption2: "Aproximar-se pela conex\xE3o emocional"
+  neutralOption: Ignorar completamente
+  profile1Type: 0
+  profile2Type: 1
+  primaryStat: heart
+  requiresRoll: 1
+  tier: 4

@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 5
   m_EditorClassIdentifier: 
   id: 5
-  title: Lago de Reflexo Negro
-  description: "Seu reflexo se move diferente de voc\xEA."
-  successText: "Voc\xEA encara seu duplo e afirma sua pr\xF3pria identidade."
-  failText: "Seu reflexo sorri e voc\xEA sente parte da sua energia esvair."
-  successStat: sanity
-  successValue: 1
-  failStat: sanity
-  failValue: -1
-  rollRange: 7
+  title: Objeto Enterrado
+  description: "Algo parcialmente coberto chama aten\xE7\xE3o no solo."
+  profileOption1: Avaliar antes de tocar
+  profileOption2: Desenterrar imediatamente
+  neutralOption: "Deixar como est\xE1"
+  profile1Type: 2
+  profile2Type: 3
+  primaryStat: body
+  requiresRoll: 1
+  tier: 2

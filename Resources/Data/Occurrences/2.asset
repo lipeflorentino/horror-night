@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   id: 2
-  title: "Sussurros na N\xE9voa"
-  description: "Vozes come\xE7am a chamar seu nome entre as \xE1rvores."
-  successText: "Voc\xEA reconhece que \xE9 ilus\xE3o da floresta e ignora os sussurros."
-  failText: "Voc\xEA segue as vozes e se perde por um tempo."
-  successStat: sanity
-  successValue: 1
-  failStat: sanity
-  failValue: -1
-  rollRange: 4
+  title: Rastro Recente
+  description: "Marcas frescas no ch\xE3o indicam que algo passou por ali."
+  profileOption1: "Examinar o padr\xE3o das pegadas"
+  profileOption2: Seguir o rastro rapidamente
+  neutralOption: "Contornar a \xE1rea"
+  profile1Type: 2
+  profile2Type: 3
+  primaryStat: mind
+  requiresRoll: 1
+  tier: 1

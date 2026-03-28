@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 11
   m_EditorClassIdentifier: 
   id: 11
-  title: Corvo Falante
-  description: "Um corvo pousa pr\xF3ximo e diz: 'N\xE3o confie na lua.'"
-  successText: "Voc\xEA presta aten\xE7\xE3o e sente que evitou um perigo futuro."
-  failText: "Voc\xEA ignora e sente um arrepio constante te perturbando."
-  successStat: sanity
-  successValue: 1
-  failStat: sanity
-  failValue: -1
-  rollRange: 9
+  title: Som de Passos
+  description: "Passos acompanham voc\xEA no ritmo exato."
+  profileOption1: "Parar e analisar o padr\xE3o"
+  profileOption2: Acelerar e fugir do som
+  neutralOption: Continuar andando
+  profile1Type: 2
+  profile2Type: 3
+  primaryStat: body
+  requiresRoll: 0
+  tier: 3

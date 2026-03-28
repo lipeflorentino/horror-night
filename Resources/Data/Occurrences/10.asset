@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 10
   m_EditorClassIdentifier: 
   id: 10
-  title: "Armadilha de Ca\xE7ador"
-  description: "Um estalo ecoa sob seu p\xE9."
-  successText: "Voc\xEA salta no \xFAltimo segundo antes da armadilha fechar."
-  failText: A armadilha prende sua perna dolorosamente.
-  successStat: physical
-  successValue: 1
-  failStat: life
-  failValue: -2
-  rollRange: 11
+  title: "Reflexo na \xC1gua"
+  description: "Seu reflexo n\xE3o replica seus movimentos."
+  profileOption1: Testar logicamente o reflexo
+  profileOption2: "Interagir diretamente com a \xE1gua"
+  neutralOption: Desviar o olhar
+  profile1Type: 0
+  profile2Type: 3
+  primaryStat: mind
+  requiresRoll: 1
+  tier: 3

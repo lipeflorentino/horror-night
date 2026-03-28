@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   id: 3
-  title: Esporos Luminescentes
-  description: "Um cogumelo explode liberando p\xF3 brilhante."
-  successText: "Voc\xEA prende a respira\xE7\xE3o e sai da nuvem t\xF3xica."
-  failText: "Voc\xEA inala os esporos e sente tontura imediata."
-  successStat: sanity
-  successValue: 1
-  failStat: life
-  failValue: -1
-  rollRange: 2
+  title: Figura ao Longe
+  description: "Uma silhueta im\xF3vel observa entre as \xE1rvores."
+  profileOption1: Estudar o comportamento da figura
+  profileOption2: Aproximar-se sem hesitar
+  neutralOption: Esconder-se e esperar
+  profile1Type: 2
+  profile2Type: 3
+  primaryStat: body
+  requiresRoll: 1
+  tier: 1

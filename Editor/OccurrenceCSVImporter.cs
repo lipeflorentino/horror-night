@@ -6,17 +6,17 @@ using UnityEngine;
 
 public class OccurrenceCSVImporter
 {
-    private const string CsvPathV2 = "Resources/Data/OccurrenceTable_v2.csv";
-    private const string CsvPathLegacy = "Resources/Data/OccurrenceTable.csv";
-    private const string OutputFolder = "Resources/Data/Occurrences/";
+    private const string CsvPath = "Assets/Resources/Data/OccurrenceTable.csv";
+    private const string OutputFolder = "Assets/Resources/Data/Occurrences/";
 
     [MenuItem("Tools/Import Occurrence CSV")]
     public static void ImportCSV()
     {
         string csvPath = ResolveCsvPath();
+
         if (string.IsNullOrEmpty(csvPath))
         {
-            Debug.LogError($"CSV não encontrado em: {CsvPathV2} ou {CsvPathLegacy}");
+            Debug.LogError($"CSV não encontrado em: {CsvPath}");
             return;
         }
 
@@ -44,10 +44,11 @@ public class OccurrenceCSVImporter
 
             string[] values = SplitCsvLine(line);
 
-            if (values.Length < 12)
+            if (values.Length < 10)
                 continue;
 
             int id = ParseInt(values[0]);
+            
             if (id <= 0)
                 continue;
 
@@ -84,11 +85,8 @@ public class OccurrenceCSVImporter
 
     private static string ResolveCsvPath()
     {
-        if (File.Exists(CsvPathV2))
-            return CsvPathV2;
-
-        if (File.Exists(CsvPathLegacy))
-            return CsvPathLegacy;
+        if (File.Exists(CsvPath))
+            return CsvPath;
 
         return null;
     }

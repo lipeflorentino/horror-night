@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 8
   m_EditorClassIdentifier: 
   id: 8
-  title: Ritual Esquecido
-  description: "Voc\xEA encontra um c\xEDrculo de pedras com s\xEDmbolos antigos."
-  successText: "Voc\xEA entende parte do s\xEDmbolo e absorve conhecimento ancestral."
-  failText: "Voc\xEA ativa algo sem querer e sofre uma descarga arcana."
-  successStat: sanity
-  successValue: 2
-  failStat: life
-  failValue: -1
-  rollRange: 12
+  title: "\xC1rvore Retorcida"
+  description: "Uma \xE1rvore parece ter crescido de forma antinatural."
+  profileOption1: "Observar padr\xF5es no crescimento"
+  profileOption2: Tocar a casca lentamente
+  neutralOption: Seguir sem interagir
+  profile1Type: 0
+  profile2Type: 1
+  primaryStat: heart
+  requiresRoll: 0
+  tier: 2

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIOccurrencePopup : MonoBehaviour
 {
     [SerializeField] private GameObject root;
+    [SerializeField] private GameObject choicesUIPanel;
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Button optionButton1;
@@ -15,9 +16,6 @@ public class UIOccurrencePopup : MonoBehaviour
     [SerializeField] private TextMeshProUGUI optionButton2Text;
     [SerializeField] private TextMeshProUGUI neutralOptionButtonText;
     [SerializeField] private Button closeButton;
-
-    [Header("Legacy")]
-    [SerializeField] private Button rollButton;
 
     [Header("Result UI")]
     [SerializeField] private GameObject resultRoot;
@@ -34,9 +32,6 @@ public class UIOccurrencePopup : MonoBehaviour
 
         if (descriptionText != null)
             descriptionText.text = entry.description;
-
-        if (rollButton != null)
-            rollButton.gameObject.SetActive(false);
 
         if (resultRoot != null)
             resultRoot.SetActive(false);
@@ -96,14 +91,15 @@ public class UIOccurrencePopup : MonoBehaviour
             {
                 string outcome = result.success ? "Sucesso" : "Falha";
                 string deltaText = result.delta >= 0 ? $"+{result.delta}" : result.delta.ToString();
+
                 resultText.text =
-                    $"Opção: {result.optionText}\n" +
-                    $"{outcome} | Rolagem: {result.playerRoll} x Meta: {result.occurrenceRoll} (faixa 1-{result.rollRange})\n" +
-                    $"Impacto em {result.primaryStat}: {deltaText}";
+                    $"{result.optionText}" +
+                    $"{outcome} | Rolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}" +
+                    $"Afetou {result.primaryStat}: {deltaText}";
             }
             else
             {
-                resultText.text = $"Opção escolhida: {result.optionText}\nSem rolagem para esta ocorrência.";
+                resultText.text = $"{result.optionText}.";
             }
         }
 
@@ -121,5 +117,7 @@ public class UIOccurrencePopup : MonoBehaviour
 
         if (neutralOptionButton != null)
             neutralOptionButton.interactable = interactable;
+
+        choicesUIPanel.SetActive(interactable);
     }
 }

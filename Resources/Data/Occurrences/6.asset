@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 6
   m_EditorClassIdentifier: 
   id: 6
-  title: "Galho Quebradi\xE7o"
-  description: "Voc\xEA precisa atravessar um tronco sobre um desfiladeiro."
-  successText: "Voc\xEA atravessa com equil\xEDbrio e firmeza."
-  failText: "O galho cede parcialmente e voc\xEA se machuca na queda curta."
-  successStat: physical
-  successValue: 1
-  failStat: physical
-  failValue: -1
-  rollRange: 9
+  title: Riso Distante
+  description: Um riso infantil ecoa pela floresta.
+  profileOption1: Buscar racionalmente origem do som
+  profileOption2: Tentar encontrar a origem emocional
+  neutralOption: Ignorar voz
+  profile1Type: 2
+  profile2Type: 1
+  primaryStat: mind
+  requiresRoll: 0
+  tier: 2

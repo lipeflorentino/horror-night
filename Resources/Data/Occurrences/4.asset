@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 4
   m_EditorClassIdentifier: 
   id: 4
-  title: "Olhos na Escurid\xE3o"
-  description: Dois olhos vermelhos te observam do mato.
-  successText: "Voc\xEA encara de volta e a criatura recua."
-  failText: "Voc\xEA hesita e algo arranha seu bra\xE7o antes de fugir."
-  successStat: physical
-  successValue: 1
-  failStat: life
-  failValue: -1
-  rollRange: 5
+  title: Luz Tremulante
+  description: Uma luz fraca pisca entre os galhos.
+  profileOption1: "Investigar com cautela l\xF3gica"
+  profileOption2: "Confiar na intui\xE7\xE3o e se aproximar"
+  neutralOption: Evitar completamente
+  profile1Type: 0
+  profile2Type: 1
+  primaryStat: mind
+  requiresRoll: 0
+  tier: 2

@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: 9
   m_EditorClassIdentifier: 
   id: 9
-  title: Chuva Repentina
-  description: Uma tempestade fria cai sem aviso.
-  successText: "Voc\xEA encontra abrigo rapidamente."
-  failText: "Voc\xEA permanece exposto e seu corpo fica exausto."
-  successStat: sanity
-  successValue: 1
-  failStat: physical
-  failValue: -1
-  rollRange: 6
+  title: "Cheiro Met\xE1lico"
+  description: O ar tem um cheiro forte de ferro.
+  profileOption1: "Investigar a fonte com m\xE9todo"
+  profileOption2: Seguir o cheiro sem pensar
+  neutralOption: Evitar respirar fundo
+  profile1Type: 2
+  profile2Type: 3
+  primaryStat: body
+  requiresRoll: 1
+  tier: 3
