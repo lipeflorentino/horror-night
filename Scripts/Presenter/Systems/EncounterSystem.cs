@@ -27,16 +27,24 @@ public class EncounterSystem : MonoBehaviour
 
     public void TriggerEncounter()
     {
-        TriggerEncounterInternal(false);
+        TriggerEncounterInternal(false, true);
+    }
+
+    public void TriggerEncounterFromTension()
+    {
+        TriggerEncounterInternal(false, false);
     }
 
     public void TriggerForcedEncounter()
     {
-        TriggerEncounterInternal(true);
+        TriggerEncounterInternal(true, true);
     }
 
-    private void TriggerEncounterInternal(bool isForced)
+    private void TriggerEncounterInternal(bool isForced, bool increaseTension)
     {
+        if (increaseTension && TensionSystem.Instance != null)
+            TensionSystem.Instance.AddTension(isForced ? 2 : 1);
+
         EnemyRunContext context = BuildContext(isForced);
         EnemyInstance selectedEnemy = enemyDatabase != null ? enemyDatabase.RollRandomEnemy(context) : null;
 

@@ -40,6 +40,9 @@ public class NodeActivityController : MonoBehaviour
 
     private void HandleMoveCompleted(int index)
     {
+        if (TensionSystem.Instance != null)
+            TensionSystem.Instance.OnPlayerMove();
+
         if (levelController == null || levelController.currentLevel == null || levelController.nodes == null)
             return;
 

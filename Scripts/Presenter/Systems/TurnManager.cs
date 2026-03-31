@@ -5,7 +5,8 @@ public enum CombatOutcome
 {
     Ongoing,
     Victory,
-    Defeat
+    Defeat,
+    Fled
 }
 
 public class TurnManager
@@ -19,6 +20,8 @@ public class TurnManager
     public int EnemyHeart => turnActions.EnemyHeart;
     public int EnemyBody => turnActions.EnemyBody;
     public int EnemyMind => turnActions.EnemyMind;
+
+    public int EnemyRevealLevel => turnActions.EnemyRevealLevel;
 
     public TurnManagerStats PlayerCombatStats => turnActions.PlayerStats;
 
@@ -39,20 +42,32 @@ public class TurnManager
         bool playerAttacking = (PlayerHeart + PlayerBody + PlayerMind) >= (EnemyHeart + EnemyBody + EnemyMind);
         bindings.SetCombatLog("O combate começou.", CombatLogCategory.Action);
 
-        while (PlayerHeart > 0 && EnemyHeart > 0)
+        while (PlayerHeart > 0 && EnemyHeart > 0 && Outcome == CombatOutcome.Ongoing)
         {
             bindings.UpdateAttackButtonAvailability(turnActions.CanAttackEnemyHeart(), turnActions.CanAttackEnemyBody(), turnActions.CanAttackEnemyMind());
+            bindings.UpdateSpecialActionAvailability(turnActions.CanUseInstantKill(), turnActions.CanUseLearn());
+            bindings.SetEnemyLearnState(turnActions.EnemyRevealLevel, CombatManager.Instance.CurrentEnemySource, EnemyHeart, EnemyBody, EnemyMind, turnActions.EnemyStats);
 
             if (playerAttacking)
                 yield return ExecutePlayerAttackTurn(bindings);
             else
                 yield return ExecuteEnemyAttackTurn(bindings);
 
+            if (Outcome != CombatOutcome.Ongoing)
+                break;
+
             if (EnemyHeart <= 0 || PlayerHeart <= 0)
                 break;
 
             playerAttacking = !playerAttacking;
             yield return new WaitForSeconds(0.35f);
+        }
+
+        if (Outcome == CombatOutcome.Fled)
+        {
+            bindings.SetTurnText("Fuga");
+            bindings.SetCombatLog("Você escapou do combate.", CombatLogCategory.Action);
+            yield break;
         }
 
         if (EnemyHeart <= 0)
@@ -72,28 +87,47 @@ public class TurnManager
     {
         pendingPlayerAction = null;
         bindings.SetTurnText("Seu turno: Ataque");
-        bindings.SetCombatLog("Escolha seu ataque.", CombatLogCategory.Action);
+        bindings.SetCombatLog("Escolha seu ataque ou ação especial.", CombatLogCategory.Action);
         bindings.SetActionsVisible(true);
-        bindings.OnPlayerActionSelected += CacheAttackAction;
+        bindings.OnPlayerActionSelected += CachePlayerTurnAction;
 
         while (!pendingPlayerAction.HasValue)
             yield return null;
 
-        bindings.OnPlayerActionSelected -= CacheAttackAction;
+        bindings.OnPlayerActionSelected -= CachePlayerTurnAction;
 
-        PlayerActionType playerAttack = pendingPlayerAction.Value;
-        EnemyActionType enemyDefense = enemyTurnActions.ChooseEnemyDefenseAction();
+        PlayerActionType selectedAction = pendingPlayerAction.Value;
+        bindings.NotifyPlayerAction($"{playerTurnActions.Format(selectedAction)}");
 
-        bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerAttack)}");
-        bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
+        if (playerTurnActions.IsAttack(selectedAction))
+        {
+            EnemyActionType enemyDefense = enemyTurnActions.ChooseEnemyDefenseAction();
+            bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
 
-        int playerRoll = 0;
-        int enemyRoll = 0;
+            int playerRoll = 0;
+            int enemyRoll = 0;
 
-        yield return turnActions.RollForAction(bindings, playerTurnActions.GetRollType(playerAttack), true, v => playerRoll = v);
-        yield return turnActions.RollForAction(bindings, enemyTurnActions.GetRollType(enemyDefense), false, v => enemyRoll = v);
+            yield return turnActions.RollForAction(bindings, playerTurnActions.GetRollType(selectedAction), true, v => playerRoll = v);
+            yield return turnActions.RollForAction(bindings, enemyTurnActions.GetRollType(enemyDefense), false, v => enemyRoll = v);
 
-        yield return turnActions.ResolveActions(true, playerAttack, enemyDefense, playerRoll, enemyRoll, bindings);
+            yield return turnActions.ResolveActions(true, selectedAction, enemyDefense, playerRoll, enemyRoll, bindings);
+            yield break;
+        }
+
+        TurnActions.SpecialActionResolution specialResult = turnActions.ResolvePlayerSpecialAction(selectedAction, bindings);
+        bindings.NotifyPlayerAction(specialResult.feedback);
+        bindings.SetCombatLog(specialResult.log, CombatLogCategory.Action);
+
+        if (selectedAction == PlayerActionType.Learn)
+            bindings.SetEnemyLearnState(turnActions.EnemyRevealLevel, CombatManager.Instance.CurrentEnemySource, EnemyHeart, EnemyBody, EnemyMind, turnActions.EnemyStats);
+
+        if (specialResult.endCombat)
+        {
+            if (specialResult.postDelay > 0f)
+                yield return new WaitForSeconds(specialResult.postDelay);
+
+            Outcome = specialResult.forcedOutcome;
+        }
     }
 
     private IEnumerator ExecuteEnemyAttackTurn(CombatSceneBindings bindings)
@@ -132,9 +166,9 @@ public class TurnManager
         yield return turnActions.ResolveActions(false, playerDefense, enemyAttack, playerRoll, enemyRoll, bindings);
     }
 
-    private void CacheAttackAction(PlayerActionType action)
+    private void CachePlayerTurnAction(PlayerActionType action)
     {
-        if (playerTurnActions.IsAttack(action))
+        if (playerTurnActions.IsAttack(action) || action == PlayerActionType.Flee || action == PlayerActionType.InstantKill || action == PlayerActionType.Learn)
             pendingPlayerAction = action;
     }
 

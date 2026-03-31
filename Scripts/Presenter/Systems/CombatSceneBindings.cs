@@ -77,6 +77,11 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private Button instantKillButton;
     [SerializeField] private Button learnButton;
 
+    [Header("Learn UI")]
+    [SerializeField] private Button learnInfoIconButton;
+    [SerializeField] private GameObject learnInfoPanel;
+    [SerializeField] private TMP_Text learnInfoText;
+
     [Header("HUD")]
     [SerializeField] private CombatHudBinding playerHud;
     [SerializeField] private CombatHudBinding enemyHud;
@@ -107,8 +112,13 @@ public class CombatSceneBindings : MonoBehaviour
         RegisterButton(fleeButton, () => TriggerPlayerAction(PlayerActionType.Flee));
         RegisterButton(instantKillButton, () => TriggerPlayerAction(PlayerActionType.InstantKill));
         RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
+        RegisterButton(learnInfoIconButton, ToggleLearnInfoPanel);
 
         SetActionsVisible(false);
+        if (learnInfoIconButton != null)
+            learnInfoIconButton.gameObject.SetActive(false);
+        if (learnInfoPanel != null)
+            learnInfoPanel.SetActive(false);
         ResolveCombatVisualReferences();
         // playerFeedbackPanel.SetActive(true);
     }
@@ -182,6 +192,44 @@ public class CombatSceneBindings : MonoBehaviour
 
         if (attackMindButton != null)
             attackMindButton.interactable = mindEnabled;
+    }
+
+
+    public void UpdateSpecialActionAvailability(bool instantKillEnabled, bool learnEnabled)
+    {
+        if (instantKillButton != null)
+            instantKillButton.interactable = instantKillEnabled;
+
+        if (learnButton != null)
+            learnButton.interactable = learnEnabled;
+    }
+
+    public void SetEnemyLearnState(int revealLevel, EnemySO enemy, int currentHeart, int currentBody, int currentMind, TurnManagerStats enemyStats)
+    {
+        bool hasInfo = revealLevel > 0;
+
+        if (learnInfoIconButton != null)
+            learnInfoIconButton.gameObject.SetActive(hasInfo);
+
+        if (!hasInfo)
+        {
+            if (learnInfoPanel != null)
+                learnInfoPanel.SetActive(false);
+            return;
+        }
+
+        if (learnInfoText == null || enemy == null)
+            return;
+
+        string basicInfo = $"{enemy.enemyName}\nArquetipo: {enemy.archetype}\nHeart: {currentHeart} | Body: {currentBody} | Mind: {currentMind}";
+        if (revealLevel == 1)
+        {
+            learnInfoText.text = basicInfo;
+            return;
+        }
+
+        string advancedInfo = $"ATK: {enemyStats.attack} | DEF: {enemyStats.defense}\nCrit: {enemyStats.criticalHitChance}% | Parry: {enemyStats.parryChance}%\nRegra: {enemy.specialRule}";
+        learnInfoText.text = $"{basicInfo}\n\n{advancedInfo}";
     }
 
     public void ResetDiceValue()
@@ -339,6 +387,14 @@ public class CombatSceneBindings : MonoBehaviour
             
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => callback?.Invoke());
+    }
+
+    private void ToggleLearnInfoPanel()
+    {
+        if (learnInfoPanel == null)
+            return;
+
+        learnInfoPanel.SetActive(!learnInfoPanel.activeSelf);
     }
 
     private void OpenActionMenu(GameObject previousMenu, GameObject nextMenu)
