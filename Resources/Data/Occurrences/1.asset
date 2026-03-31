@@ -23,3 +23,5 @@ MonoBehaviour:
   primaryStat: mind
   requiresRoll: 1
   tier: 1
+  successText: "Voc\xEA mant\xE9m a lucidez e ignora a influ\xEAncia."
+  failText: O sussurro invade sua mente e te desorienta.

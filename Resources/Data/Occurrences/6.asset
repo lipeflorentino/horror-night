@@ -15,11 +15,13 @@ MonoBehaviour:
   id: 6
   title: Riso Distante
   description: Um riso infantil ecoa pela floresta.
-  profileOption1: Buscar racionalmente origem do som
+  profileOption1: Ignorar racionalmente o som
   profileOption2: Tentar encontrar a origem emocional
-  neutralOption: Ignorar voz
+  neutralOption: Continuar caminhando
   profile1Type: 2
   profile2Type: 1
   primaryStat: mind
   requiresRoll: 0
-  tier: 2
+  tier: 1
+  successText: "Voc\xEA mant\xE9m o foco e segue ileso."
+  failText: O som permanece perturbando sua mente.

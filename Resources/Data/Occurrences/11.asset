@@ -22,4 +22,6 @@ MonoBehaviour:
   profile2Type: 3
   primaryStat: body
   requiresRoll: 0
-  tier: 3
+  tier: 2
+  successText: "Voc\xEA mant\xE9m o controle da situa\xE7\xE3o."
+  failText: Os passos continuam te seguindo.

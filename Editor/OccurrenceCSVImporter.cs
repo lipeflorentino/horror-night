@@ -44,7 +44,7 @@ public class OccurrenceCSVImporter
 
             string[] values = SplitCsvLine(line);
 
-            if (values.Length < 10)
+            if (values.Length < 12)
                 continue;
 
             int id = ParseInt(values[0]);
@@ -72,6 +72,8 @@ public class OccurrenceCSVImporter
             occurrenceEntry.primaryStat = NormalizeStatName(values[8]);
             occurrenceEntry.requiresRoll = ParseBool(values[9]);
             occurrenceEntry.tier = Mathf.Max(0, ParseInt(values[10]));
+            occurrenceEntry.successText = values[11];
+            occurrenceEntry.failText = values[12];
 
             EditorUtility.SetDirty(occurrenceEntry);
             importedEntries.Add(occurrenceEntry);

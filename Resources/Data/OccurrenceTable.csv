@@ -1,13 +1,13 @@
-id,title,description,profile_option_1,profile_option_2,neutral_option,profile_1_type,profile_2_type,primary_stat,requires_roll,tier
-1,Sussurro entre Árvores,Um sussurro parece chamar seu nome repetidamente.,Analisar a origem do som,Tentar responder ao sussurro,Ignorar e seguir em frente,NT,NF,mente,true,1
-2,Rastro Recente,Marcas frescas no chão indicam que algo passou por ali.,Examinar o padrão das pegadas,Seguir o rastro rapidamente,Contornar a área,SJ,SP,mente,true,1
-3,Figura ao Longe,Uma silhueta imóvel observa entre as árvores.,Estudar o comportamento da figura,Aproximar-se sem hesitar,Esconder-se e esperar,SJ,SP,corpo,true,1
-4,Luz Tremulante,Uma luz fraca pisca entre os galhos.,Investigar com cautela lógica,Confiar na intuição e se aproximar,Evitar completamente,NT,NF,mente,false,2
-5,Objeto Enterrado,Algo parcialmente coberto chama atenção no solo.,Avaliar antes de tocar,Desenterrar imediatamente,Deixar como está,SJ,SP,corpo,true,2
-6,Riso Distante,Um riso infantil ecoa pela floresta.,Buscar racionalmente origem do som,Tentar encontrar a origem emocional,Ignorar voz,SJ,NF,mente,false,2
-7,Sombra em Movimento,Sua própria sombra parece se mover diferente.,Analisar a distorção visual,Reagir instintivamente,Parar e não se mover,NT,SP,mente,true,2
-8,Árvore Retorcida,Uma árvore parece ter crescido de forma antinatural.,Observar padrões no crescimento,Tocar a casca lentamente,Seguir sem interagir,NT,NF,coracao,false,2
-9,Cheiro Metálico,O ar tem um cheiro forte de ferro.,Investigar a fonte com método,Seguir o cheiro sem pensar,Evitar respirar fundo,SJ,SP,corpo,true,3
-10,Reflexo na Água,Seu reflexo não replica seus movimentos.,Testar logicamente o reflexo,Interagir diretamente com a água,Desviar o olhar,NT,SP,mente,true,3
-11,Som de Passos,Passos acompanham você no ritmo exato.,Parar e analisar o padrão,Acelerar e fugir do som,Continuar andando,SJ,SP,corpo,false,3
-12,Vulto Familiar,Algo que lembra alguém conhecido surge entre as árvores.,Questionar a veracidade da visão,Aproximar-se pela conexão emocional,Ignorar completamente,NT,NF,coracao,true,4
+id,title,description,profile_option_1,profile_option_2,neutral_option,profile_1_type,profile_2_type,primary_stat,requires_roll,tier,success_text,fail_text
+1,Sussurro entre Árvores,Um sussurro parece chamar seu nome repetidamente.,Analisar a origem do som,Tentar responder ao sussurro,Ignorar e seguir em frente,NT,NF,mente,true,1,Você mantém a lucidez e ignora a influência.,O sussurro invade sua mente e te desorienta.
+2,Rastro Recente,Marcas frescas no chão indicam algo passou por ali.,Examinar o padrão das pegadas,Seguir o rastro rapidamente,Contornar a área,SJ,SP,mente,true,1,Você identifica o perigo e evita uma emboscada.,Você segue o rastro e cai numa armadilha.
+3,Figura ao Longe,Uma silhueta imóvel observa entre as árvores.,Estudar o comportamento da figura,Aproximar-se sem hesitar,Esconder-se e esperar,SJ,SP,corpo,true,1,Você se move com precisão e evita ser notado.,A criatura percebe você e avança.
+4,Luz Tremulante,Uma luz fraca pisca entre os galhos.,Investigar com cautela lógica,Confiar na intuição e se aproximar,Evitar completamente,NT,NF,mente,false,1,Você encontra algo útil sem riscos.,A luz desaparece e nada acontece.
+5,Objeto Enterrado,Algo parcialmente coberto chama atenção no solo.,Avaliar antes de tocar,Desenterrar imediatamente,Deixar como está,SJ,SP,corpo,true,1,Você encontra um item escondido com segurança.,O objeto ativa algo perigoso ao ser removido.
+6,Riso Distante,Um riso infantil ecoa pela floresta.,Ignorar racionalmente o som,Tentar encontrar a origem emocional,Continuar caminhando,SJ,NF,mente,false,1,Você mantém o foco e segue ileso.,O som permanece perturbando sua mente.
+7,Sombra em Movimento,Sua própria sombra parece se mover diferente.,Analisar a distorção visual,Reagir instintivamente,Parar e não se mover,NT,SP,mente,true,1,Você percebe a ilusão e retoma o controle.,Sua sombra se distorce e te afeta.
+8,Árvore Retorcida,Uma árvore parece ter crescido de forma antinatural.,Observar padrões no crescimento,Tocar a casca lentamente,Seguir sem interagir,NT,NF,coracao,false,2,Você sente uma energia estranha mas controlável.,Algo na árvore responde à sua presença.
+9,Cheiro Metálico,O ar tem um cheiro forte de ferro.,Investigar a fonte com método,Seguir o cheiro sem pensar,Evitar respirar fundo,SJ,SP,corpo,true,2,Você localiza a origem sem se expor.,Você encontra algo hostil inesperadamente.
+10,Reflexo na Água,Seu reflexo não replica seus movimentos.,Testar logicamente o reflexo,Interagir diretamente com a água,Desviar o olhar,NT,SP,mente,true,2,Você resiste à distorção do reflexo.,Seu reflexo reage por conta própria.
+11,Som de Passos,Passos acompanham você no ritmo exato.,Parar e analisar o padrão,Acelerar e fugir do som,Continuar andando,SJ,SP,corpo,false,2,Você mantém o controle da situação.,Os passos continuam te seguindo.
+12,Vulto Familiar,Algo que lembra alguém conhecido surge entre as árvores.,Questionar a veracidade da visão,Aproximar-se pela conexão emocional,Ignorar completamente,NT,NF,coracao,true,2,Você percebe a ilusão antes que seja tarde.,A figura te engana e te afeta emocionalmente.

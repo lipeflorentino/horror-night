@@ -22,4 +22,6 @@ MonoBehaviour:
   profile2Type: 3
   primaryStat: body
   requiresRoll: 1
-  tier: 2
+  tier: 1
+  successText: "Voc\xEA encontra um item escondido com seguran\xE7a."
+  failText: O objeto ativa algo perigoso ao ser removido.

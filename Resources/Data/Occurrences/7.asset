@@ -22,4 +22,6 @@ MonoBehaviour:
   profile2Type: 3
   primaryStat: mind
   requiresRoll: 1
-  tier: 2
+  tier: 1
+  successText: "Voc\xEA percebe a ilus\xE3o e retoma o controle."
+  failText: Sua sombra se distorce e te afeta.

@@ -26,4 +26,6 @@ public class OccurrenceSO : ScriptableObject
     public string primaryStat;
     public bool requiresRoll;
     [Min(0)] public int tier = 1;
+    public string successText;
+    public string failText;
 }

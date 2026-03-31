@@ -23,3 +23,5 @@ MonoBehaviour:
   primaryStat: body
   requiresRoll: 1
   tier: 1
+  successText: "Voc\xEA se move com precis\xE3o e evita ser notado."
+  failText: "A criatura percebe voc\xEA e avan\xE7a."

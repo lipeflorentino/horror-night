@@ -23,3 +23,5 @@ MonoBehaviour:
   primaryStat: heart
   requiresRoll: 0
   tier: 2
+  successText: "Voc\xEA sente uma energia estranha mas control\xE1vel."
+  failText: "Algo na \xE1rvore responde \xE0 sua presen\xE7a."

@@ -63,7 +63,9 @@ public class OccurrenceSystem : MonoBehaviour
             selectedOption = selectedOption,
             requiresRoll = selectedOccurrence.requiresRoll,
             optionText = GetOptionText(selectedOccurrence, selectedOption),
-            primaryStat = selectedOccurrence.primaryStat
+            primaryStat = selectedOccurrence.primaryStat,
+            successText = selectedOccurrence.successText,
+            failText = selectedOccurrence.failText
         };
 
         if (playerStatus == null)

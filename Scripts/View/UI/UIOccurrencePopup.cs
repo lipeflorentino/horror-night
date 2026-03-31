@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ public class UIOccurrencePopup : MonoBehaviour
 
     [Header("Result UI")]
     [SerializeField] private GameObject resultRoot;
-    [SerializeField] private TextMeshProUGUI resultText;
+    [SerializeField] private TextMeshProUGUI resultText, resultStatusText, metaText, rollText, affectedStatText;
     [SerializeField] private DiceRollUI diceRollUI;
 
     public void Show(OccurrenceSO entry, Func<int, OccurrenceResult> onOptionSelected, Action onClose)
@@ -38,6 +39,15 @@ public class UIOccurrencePopup : MonoBehaviour
 
         if (resultText != null)
             resultText.text = string.Empty;
+        
+        if (resultStatusText != null)
+            resultStatusText.text = string.Empty;
+
+        if (affectedStatText != null)
+            affectedStatText.text = string.Empty;
+
+        if (choicesUIPanel != null)
+            choicesUIPanel.SetActive(true);
 
         SetupChoiceButton(optionButton1, optionButton1Text, entry.profileOption1, 0, onOptionSelected);
         SetupChoiceButton(optionButton2, optionButton2Text, entry.profileOption2, 1, onOptionSelected);
@@ -73,7 +83,7 @@ public class UIOccurrencePopup : MonoBehaviour
         });
     }
 
-    private System.Collections.IEnumerator HandleOptionSelection(int selectedIndex, Func<int, OccurrenceResult> callback)
+    private IEnumerator HandleOptionSelection(int selectedIndex, Func<int, OccurrenceResult> callback)
     {
         ToggleOptionButtons(false);
 
@@ -89,17 +99,17 @@ public class UIOccurrencePopup : MonoBehaviour
         {
             if (result.requiresRoll)
             {
-                string outcome = result.success ? "Sucesso" : "Falha";
                 string deltaText = result.delta >= 0 ? $"+{result.delta}" : result.delta.ToString();
 
-                resultText.text =
-                    $"{result.optionText}" +
-                    $"{outcome} | Rolagem: {result.playerRoll} x Meta: {result.occurrenceRoll}" +
-                    $"Afetou {result.primaryStat}: {deltaText}";
+                resultText.text = result.success ? result.successText : result.failText;
+                metaText.text = $"{result.occurrenceRoll}";
+                rollText.text = $"{result.playerRoll}";
+                resultStatusText.text = result.success ? "Sucesso" : "Falha";
+                affectedStatText.text = $"Afetou {result.primaryStat}: {deltaText}";
             }
             else
             {
-                resultText.text = $"{result.optionText}.";
+                resultText.text = $"{result.successText}.";
             }
         }
 

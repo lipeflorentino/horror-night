@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 2
   title: Rastro Recente
-  description: "Marcas frescas no ch\xE3o indicam que algo passou por ali."
+  description: "Marcas frescas no ch\xE3o indicam algo passou por ali."
   profileOption1: "Examinar o padr\xE3o das pegadas"
   profileOption2: Seguir o rastro rapidamente
   neutralOption: "Contornar a \xE1rea"
@@ -23,3 +23,5 @@ MonoBehaviour:
   primaryStat: mind
   requiresRoll: 1
   tier: 1
+  successText: "Voc\xEA identifica o perigo e evita uma emboscada."
+  failText: "Voc\xEA segue o rastro e cai numa armadilha."

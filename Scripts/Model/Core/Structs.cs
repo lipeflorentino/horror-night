@@ -21,6 +21,8 @@ public struct OccurrenceResult
     public int delta;
     public string optionText;
     public string primaryStat;
+    public string successText;
+    public string failText;
 }
 
 [System.Serializable]

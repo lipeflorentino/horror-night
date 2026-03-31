@@ -22,4 +22,6 @@ MonoBehaviour:
   profile2Type: 3
   primaryStat: mind
   requiresRoll: 1
-  tier: 3
+  tier: 2
+  successText: "Voc\xEA resiste \xE0 distor\xE7\xE3o do reflexo."
+  failText: "Seu reflexo reage por conta pr\xF3pria."

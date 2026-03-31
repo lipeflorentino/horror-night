@@ -22,4 +22,6 @@ MonoBehaviour:
   profile2Type: 1
   primaryStat: mind
   requiresRoll: 0
-  tier: 2
+  tier: 1
+  successText: "Voc\xEA encontra algo \xFAtil sem riscos."
+  failText: A luz desaparece e nada acontece.
