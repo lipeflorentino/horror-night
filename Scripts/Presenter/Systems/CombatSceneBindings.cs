@@ -115,10 +115,13 @@ public class CombatSceneBindings : MonoBehaviour
         RegisterButton(learnInfoIconButton, ToggleLearnInfoPanel);
 
         SetActionsVisible(false);
+
         if (learnInfoIconButton != null)
             learnInfoIconButton.gameObject.SetActive(false);
+
         if (learnInfoPanel != null)
             learnInfoPanel.SetActive(false);
+
         ResolveCombatVisualReferences();
         // playerFeedbackPanel.SetActive(true);
     }
@@ -365,6 +368,7 @@ public class CombatSceneBindings : MonoBehaviour
             StopCoroutine(enemyFeedbackRoutine);
 
         Coroutine newRoutine = StartCoroutine(ShowFeedbackTextRoutine(feedbackText, value, color));
+        
         if (isPlayer)
             playerFeedbackRoutine = newRoutine;
         else

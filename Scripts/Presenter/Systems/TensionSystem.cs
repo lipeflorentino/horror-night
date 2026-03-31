@@ -10,6 +10,7 @@ public class TensionSystem : MonoBehaviour
     [SerializeField] private float baseModifier = 1f;
     [SerializeField] private int encounterThreshold = 5;
     [SerializeField] private int currentTension;
+    [SerializeField] private int tensionThreshold = 100;
 
     [Header("Passive Tension")]
     [SerializeField, Range(0f, 1f)] private float lowStatThreshold = 0.5f;
@@ -17,8 +18,7 @@ public class TensionSystem : MonoBehaviour
     [SerializeField] private int lowStatTensionGain = 1;
 
     [Header("UI")]
-    [SerializeField] private Image tensionFill;
-    [SerializeField] private TMP_Text tensionValueText;
+    [SerializeField] private TensionUI tensionUI;
 
     private float lowStatTickTimer;
     private PlayerStatusManager cachedStatus;
@@ -111,12 +111,9 @@ public class TensionSystem : MonoBehaviour
 
     private void RefreshUI()
     {
-        int threshold = GetEncounterThreshold();
-
-        if (tensionFill != null)
-            tensionFill.fillAmount = Mathf.Clamp01(currentTension / (float)threshold);
-
-        if (tensionValueText != null)
-            tensionValueText.text = $"{currentTension}/{threshold}";
+        if (tensionUI != null)
+        {
+            tensionUI.RefreshUI(currentTension, tensionThreshold);
+        }
     }
 }
