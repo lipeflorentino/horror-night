@@ -36,6 +36,12 @@ public class TensionSystem : MonoBehaviour
         TickLowStatsTension();
     }
 
+    public void SetCurrentTension(int value)
+    {
+        currentTension = Mathf.Clamp(value, 0, Mathf.Max(1, tensionThreshold));
+        RefreshUI();
+    }
+
     public void SetBaseModifier(float value)
     {
         baseModifier = Mathf.Max(0f, value);

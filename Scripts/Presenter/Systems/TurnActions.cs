@@ -54,9 +54,9 @@ public class TurnActions
         EnemyBody = Mathf.Max(0, enemy.body);
         EnemyMind = Mathf.Max(0, enemy.mind);
 
-        BasePlayerHeart = Mathf.Max(1, PlayerHeart);
-        BasePlayerBody = Mathf.Max(1, PlayerBody);
-        BasePlayerMind = Mathf.Max(1, PlayerMind);
+        BasePlayerHeart = Mathf.Max(1, Mathf.RoundToInt(snapshot.playerStatus.maxHeart > 0f ? snapshot.playerStatus.maxHeart : PlayerHeart));
+        BasePlayerBody = Mathf.Max(1, Mathf.RoundToInt(snapshot.playerStatus.maxBody > 0f ? snapshot.playerStatus.maxBody : PlayerBody));
+        BasePlayerMind = Mathf.Max(1, Mathf.RoundToInt(snapshot.playerStatus.maxMind > 0f ? snapshot.playerStatus.maxMind : PlayerMind));
 
         BaseEnemyHeart = Mathf.Max(1, EnemyHeart);
         BaseEnemyBody = Mathf.Max(1, EnemyBody);

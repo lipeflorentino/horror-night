@@ -132,13 +132,10 @@ public class CombatManager : MonoBehaviour
         {
             stateController.ApplyCombatResults(turnManager.PlayerHeart, turnManager.PlayerBody, turnManager.PlayerMind, turnManager.PlayerCombatStats);
 
-            if (TensionSystem.Instance != null)
-            {
-                if (turnManager.Outcome == CombatOutcome.Victory)
-                    TensionSystem.Instance.ReduceTension(2);
-                else
-                    TensionSystem.Instance.AddTension(2);
-            }
+            if (turnManager.Outcome == CombatOutcome.Victory)
+                stateController.ApplyTensionDelta(-2);
+            else
+                stateController.ApplyTensionDelta(2);
 
             yield return new WaitForSeconds(0.8f);
             EndCombatAndReturnToRun();

@@ -36,6 +36,14 @@ public class CombatStateController : MonoBehaviour
         RunSnapshot.playerStatus.combatStats = combatStats;
     }
 
+    public void ApplyTensionDelta(int amount)
+    {
+        if (RunSnapshot == null || amount == 0)
+            return;
+
+        RunSnapshot.currentTension = Mathf.Max(0, RunSnapshot.currentTension + amount);
+    }
+
     public void MarkSkipRestoreOnReturn()
     {
         ShouldRestoreSnapshotOnReturn = false;
@@ -63,6 +71,9 @@ public class CombatStateController : MonoBehaviour
 
         if (inventory != null)
             inventory.RestoreSnapshot(RunSnapshot.inventoryItems);
+
+        if (TensionSystem.Instance != null)
+            TensionSystem.Instance.SetCurrentTension(RunSnapshot.currentTension);
 
         PlayerGridMovement movement = FindObjectOfType<PlayerGridMovement>();
         if (movement != null && levelController != null)
@@ -101,7 +112,8 @@ public class CombatStateController : MonoBehaviour
             levelIndex = levelController.CurrentIndex,
             exploredNodes = levelController.CaptureExploredSnapshot(),
             playerStatus = statusManager.GetSnapshot(),
-            inventoryItems = inventory.CreateSnapshot()
+            inventoryItems = inventory.CreateSnapshot(),
+            currentTension = TensionSystem.Instance != null ? TensionSystem.Instance.CurrentTension : 0
         };
 
         return true;
