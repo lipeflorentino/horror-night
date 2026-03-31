@@ -33,11 +33,11 @@ MonoBehaviour:
   Reward_Max_Value: 3
   Tags: mental,respiro,memoria
   Special_Rule: "Tens\xE3o cresce 50% mais devagar"
-  Loot_Weight: 1
-  Event_Weight: 4
-  Encounter_Weight: 0
+  Loot_Weight: 2
+  Event_Weight: 2
+  Encounter_Weight: 3
   Treasure_Weight: 0
-  None_Weight: 0
+  None_Weight: 3
   Loot_Weight_Modifier: 0
   Event_Weight_Modifier: 0
   Encounter_Weight_Modifier: 0

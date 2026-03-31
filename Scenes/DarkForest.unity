@@ -6060,6 +6060,10 @@ PrefabInstance:
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
+    - target: {fileID: 2080139850321150137, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4358587489585040219, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_Name
       value: Player
@@ -6067,6 +6071,10 @@ PrefabInstance:
     - target: {fileID: 4487196636439806813, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -175.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5058512529695600778, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5342978682417247641, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: levelController
