@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class TurnActions
 {
+    public struct SpecialActionResolution
+    {
+        public bool success;
+        public bool endCombat;
+        public CombatOutcome forcedOutcome;
+        public string log;
+        public string feedback;
+        public float postDelay;
+    }
+
     public int PlayerHeart { get; private set; }
     public int PlayerBody { get; private set; }
     public int PlayerMind { get; private set; }
@@ -19,6 +29,8 @@ public class TurnActions
     public int BaseEnemyHeart { get; private set; }
     public int BaseEnemyBody { get; private set; }
     public int BaseEnemyMind { get; private set; }
+
+    public int EnemyRevealLevel { get; private set; }
 
     public TurnManagerStats PlayerStats { get; private set; }
     public TurnManagerStats EnemyStats { get; private set; }
@@ -50,6 +62,8 @@ public class TurnActions
         BaseEnemyBody = Mathf.Max(1, EnemyBody);
         BaseEnemyMind = Mathf.Max(1, EnemyMind);
 
+        EnemyRevealLevel = 0;
+
         PlayerStats = snapshot.playerStatus.combatStats;
         if (PlayerStats.attack <= 0)
             PlayerStats = TurnManagerStats.BuildDefault(PlayerHeart, PlayerBody, PlayerMind);
@@ -61,6 +75,8 @@ public class TurnActions
         EnemyStats.Normalize();
 
         bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
+        bindings.UpdateSpecialActionAvailability(CanUseInstantKill(), CanUseLearn());
+        bindings.SetEnemyLearnState(EnemyRevealLevel, enemy.source, EnemyHeart, EnemyBody, EnemyMind, EnemyStats);
     }
 
     public IEnumerator RollForAction(CombatSceneBindings bindings, RollType rollType, bool isPlayer, Action<int> onFinished)
@@ -74,13 +90,7 @@ public class TurnActions
         onFinished?.Invoke(roll);
     }
 
-    public IEnumerator ResolveActions(
-        bool attackerIsPlayer,
-        PlayerActionType playerAction,
-        EnemyActionType enemyAction,
-        int playerRoll,
-        int enemyRoll,
-        CombatSceneBindings bindings)
+    public IEnumerator ResolveActions(bool attackerIsPlayer, PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
         yield return new WaitForSeconds(1f);
 
@@ -112,8 +122,6 @@ public class TurnActions
                 yield break;
             }
 
-            string specialLog = ResolvePlayerSpecialAction(playerAction, bindings);
-            bindings.SetCombatLog(specialLog, CombatLogCategory.Action);
             bindings.ResetDiceValue();
             yield break;
         }
@@ -121,6 +129,103 @@ public class TurnActions
         string resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll, bindings);
         bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
         bindings.ResetDiceValue();
+    }
+
+    public SpecialActionResolution ResolvePlayerSpecialAction(PlayerActionType action, CombatSceneBindings bindings)
+    {
+        int chance = playerTurnActions.GetSpecialChance(action, PlayerStats);
+        int roll = RollPercent();
+        bool success = roll < chance;
+
+        SpecialActionResolution result = new SpecialActionResolution
+        {
+            success = success,
+            endCombat = false,
+            forcedOutcome = CombatOutcome.Ongoing,
+            postDelay = 0f
+        };
+
+        switch (action)
+        {
+            case PlayerActionType.Flee:
+                if (success)
+                {
+                    result.endCombat = true;
+                    result.forcedOutcome = CombatOutcome.Fled;
+                    result.log = $"Fuga bem sucedida! Chance {chance}% (rolagem {roll}).";
+                    result.feedback = "Você escapou, mas ficou mais tenso.";
+                }
+                else
+                {
+                    result.log = $"Tentativa de fuga falhou. Chance {chance}% (rolagem {roll}).";
+                    result.feedback = "A fuga falhou.";
+                }
+
+                return result;
+
+            case PlayerActionType.InstantKill:
+                if (!CanUseInstantKill())
+                {
+                    result.success = false;
+                    result.log = "Instant Kill indisponível: reduza Coração, Corpo ou Mente do inimigo a 0.";
+                    result.feedback = "Instant Kill bloqueado.";
+                    return result;
+                }
+
+                if (success)
+                {
+                    EnemyHeart = 0;
+                    result.endCombat = true;
+                    result.forcedOutcome = CombatOutcome.Victory;
+                    result.log = $"Instant Kill ativado! Chance {chance}% (rolagem {roll}).";
+                    result.feedback = "Golpe fatal!";
+                    result.postDelay = 0.8f;
+                }
+                else
+                {
+                    result.log = $"Instant Kill falhou. Chance {chance}% (rolagem {roll}).";
+                    result.feedback = "O golpe fatal falhou.";
+                }
+
+                bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
+                bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
+                bindings.UpdateSpecialActionAvailability(CanUseInstantKill(), CanUseLearn());
+                return result;
+
+            case PlayerActionType.Learn:
+                if (!CanUseLearn())
+                {
+                    result.success = false;
+                    result.log = "Learn indisponível: inimigo já totalmente revelado.";
+                    result.feedback = "Learn bloqueado.";
+                    return result;
+                }
+
+                if (success)
+                {
+                    EnemyRevealLevel = Mathf.Clamp(EnemyRevealLevel + 1, 0, 2);
+                    result.log = $"Learn bem sucedido! Chance {chance}% (rolagem {roll}).";
+                    result.feedback = EnemyRevealLevel == 1
+                        ? "Informações básicas reveladas."
+                        : "Informações avançadas reveladas.";
+                }
+                else
+                {
+                    result.log = $"Learn falhou. Chance {chance}% (rolagem {roll}).";
+                    result.feedback = "Não conseguiu aprender nada novo.";
+                }
+
+                bindings.UpdateSpecialActionAvailability(CanUseInstantKill(), CanUseLearn());
+                return result;
+            case PlayerActionType.Item:
+                result.log = "Uso de item ainda é placeholder.";
+                result.feedback = "Item ainda não implementado.";
+                return result;
+            default:
+                result.log = $"Ação {action} é placeholder.";
+                result.feedback = "Ação especial inválida.";
+                return result;
+        }
     }
 
     public string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
@@ -156,44 +261,6 @@ public class TurnActions
         return $"Parry falhou. Você recebeu {parryFailDamage} de dano.";
     }
 
-    public string ResolvePlayerSpecialAction(PlayerActionType action, CombatSceneBindings bindings)
-    {
-        int chance = playerTurnActions.GetSpecialChance(action, PlayerStats);
-        int roll = RollPercent();
-
-        switch (action)
-        {
-            case PlayerActionType.Flee:
-                if (roll < chance)
-                {
-                    EnemyHeart = 0;
-                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
-                    bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
-                    return $"Fuga bem sucedida! Chance {chance}% (rolagem {roll}).";
-                }
-
-                return $"Tentativa de fuga falhou. Chance {chance}% (rolagem {roll}).";
-            case PlayerActionType.InstantKill:
-                if (roll < chance)
-                {
-                    EnemyHeart = 0;
-                    bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
-                    bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
-                    return $"Instant Kill ativado! Chance {chance}% (rolagem {roll}).";
-                }
-
-                return $"Instant Kill falhou. Chance {chance}% (rolagem {roll}).";
-            case PlayerActionType.Learn:
-                return roll < chance
-                    ? $"Learn bem sucedido! Chance {chance}% (rolagem {roll})."
-                    : $"Learn falhou. Chance {chance}% (rolagem {roll}).";
-            case PlayerActionType.Item:
-                return "Uso de item ainda é placeholder.";
-            default:
-                return $"Ação {action} é placeholder.";
-        }
-    }
-
     public void ApplyDamageToEnemy(PlayerActionType attackType, int amount, CombatSceneBindings bindings)
     {
         if (amount <= 0)
@@ -216,6 +283,7 @@ public class TurnActions
         }
 
         bindings.UpdateAttackButtonAvailability(CanAttackEnemyHeart(), CanAttackEnemyBody(), CanAttackEnemyMind());
+        bindings.UpdateSpecialActionAvailability(CanUseInstantKill(), CanUseLearn());
         bindings.UpdateHud(PlayerHeart, BasePlayerHeart, PlayerBody, BasePlayerBody, PlayerMind, BasePlayerMind, EnemyHeart, BaseEnemyHeart, EnemyBody, BaseEnemyBody, EnemyMind, BaseEnemyMind);
     }
 
@@ -259,4 +327,6 @@ public class TurnActions
     public bool CanAttackEnemyHeart() => EnemyHeart > 0;
     public bool CanAttackEnemyBody() => EnemyBody > 0;
     public bool CanAttackEnemyMind() => EnemyMind > 0;
+    public bool CanUseInstantKill() => EnemyHeart <= 0 || EnemyBody <= 0 || EnemyMind <= 0;
+    public bool CanUseLearn() => EnemyRevealLevel < 2;
 }

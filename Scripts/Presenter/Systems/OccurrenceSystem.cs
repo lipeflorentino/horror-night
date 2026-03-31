@@ -101,6 +101,14 @@ public class OccurrenceSystem : MonoBehaviour
         result.delta = delta;
         result.rollRange = rollRange;
 
+        if (TensionSystem.Instance != null)
+        {
+            if (success)
+                TensionSystem.Instance.ReduceTension(1);
+            else
+                TensionSystem.Instance.AddTension(2);
+        }
+
         return result;
     }
 

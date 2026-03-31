@@ -6,6 +6,8 @@ public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance;
 
+    public EnemySO CurrentEnemySource => stateController != null && stateController.CurrentEnemy != null ? stateController.CurrentEnemy.source : null;
+
     [Header("Scene")]
     [SerializeField] private string combatSceneName = "Combat";
 
@@ -126,9 +128,18 @@ public class CombatManager : MonoBehaviour
     {
         yield return StartCoroutine(turnManager.RunTurnCombat(bindings));
 
-        if (turnManager.Outcome == CombatOutcome.Victory)
+        if (turnManager.Outcome == CombatOutcome.Victory || turnManager.Outcome == CombatOutcome.Fled)
         {
             stateController.ApplyCombatResults(turnManager.PlayerHeart, turnManager.PlayerBody, turnManager.PlayerMind, turnManager.PlayerCombatStats);
+
+            if (TensionSystem.Instance != null)
+            {
+                if (turnManager.Outcome == CombatOutcome.Victory)
+                    TensionSystem.Instance.ReduceTension(2);
+                else
+                    TensionSystem.Instance.AddTension(2);
+            }
+
             yield return new WaitForSeconds(0.8f);
             EndCombatAndReturnToRun();
             yield break;

@@ -173,6 +173,10 @@ public class PlayerStatusManager : MonoBehaviour
     public float GetCurrentMind() => currentMind;
     public float GetCurrentBody() => currentBody;
 
+    public float GetHeartRatio() => maxHeart <= 0f ? 0f : currentHeart / maxHeart;
+    public float GetBodyRatio() => maxBody <= 0f ? 0f : currentBody / maxBody;
+    public float GetMindRatio() => maxMind <= 0f ? 0f : currentMind / maxMind;
+
     public int GetStatValue(string statName)
     {
         switch (NormalizeStatName(statName))
