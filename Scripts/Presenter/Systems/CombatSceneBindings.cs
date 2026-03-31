@@ -1,43 +1,11 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CombatSceneBindings : MonoBehaviour
 {
-    [Serializable]
-    public class StatBarBinding
-    {
-        public Image fillImage;
-        public TMP_Text valueText;
-
-        public void SetValue(int current, int max)
-        {
-            if (fillImage != null)
-                fillImage.fillAmount = max <= 0 ? 0f : Mathf.Clamp01(current / (float)max);
-
-            if (valueText != null)
-                valueText.text = current.ToString();
-        }
-    }
-
-    [Serializable]
-    public class CombatHudBinding
-    {
-        public StatBarBinding heart;
-        public StatBarBinding body;
-        public StatBarBinding mind;
-
-        public void SetValues(int heartValue, int heartMax, int bodyValue, int bodyMax, int mindValue, int mindMax)
-        {
-            heart?.SetValue(heartValue, heartMax);
-            body?.SetValue(bodyValue, bodyMax);
-            mind?.SetValue(mindValue, mindMax);
-        }
-    }
-
     public Transform playerSpawnPoint;
     public Transform enemySpawnPoint;
 
@@ -49,7 +17,6 @@ public class CombatSceneBindings : MonoBehaviour
     [Header("Combat Feedback")]
     [SerializeField] private GameObject playerHitUI;
     [SerializeField] private SpriteRenderer enemySpriteRenderer;
-    [SerializeField] private GameObject playerFeedbackPanel;
     [SerializeField] private TMP_Text playerFeedbackText;
     [SerializeField] private TMP_Text enemyFeedbackText;
     [SerializeField] private float damageFlashDuration = 0.15f;
@@ -83,354 +50,95 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private TMP_Text learnInfoText;
 
     [Header("HUD")]
-    [SerializeField] private CombatHudBinding playerHud;
-    [SerializeField] private CombatHudBinding enemyHud;
+    [SerializeField] private CombatUI.CombatHudBinding playerHud;
+    [SerializeField] private CombatUI.CombatHudBinding enemyHud;
 
     [Header("Game Over UI")]
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private Button restartButton;
 
-    public event Action<PlayerActionType> OnPlayerActionSelected;
-    private readonly Queue<string> combatLogEntries = new();
-    private const int MaxLogEntries = 5;
-    private Coroutine playerFeedbackRoutine;
-    private Coroutine enemyFeedbackRoutine;
+    private CombatPresenter presenter;
+
+    public event Action<PlayerActionType> OnPlayerActionSelected
+    {
+        add
+        {
+            if (presenter != null)
+                presenter.OnPlayerActionSelected += value;
+        }
+        remove
+        {
+            if (presenter != null)
+                presenter.OnPlayerActionSelected -= value;
+        }
+    }
 
     private void Awake()
     {
-        RegisterButton(attackButton, () => OpenActionMenu(initialActionsUI, attackActionsUI));
-        RegisterButton(specialButton, () => OpenActionMenu(initialActionsUI, specialActionsUI));
-        RegisterButton(itemButton, () => TriggerPlayerAction(PlayerActionType.Item));
+        CombatUI combatUI = new(
+            this,
+            turnText,
+            combatLogText,
+            diceRollUI,
+            playerHitUI,
+            enemySpriteRenderer,
+            playerFeedbackText,
+            enemyFeedbackText,
+            damageFlashDuration,
+            damageFlashColor,
+            actionFeedbackColor,
+            criticalFeedbackColor,
+            initialActionsUI,
+            attackActionsUI,
+            defenseActionsUI,
+            specialActionsUI,
+            attackHeartButton,
+            attackBodyButton,
+            attackMindButton,
+            instantKillButton,
+            learnButton,
+            learnInfoIconButton,
+            learnInfoPanel,
+            learnInfoText,
+            playerHud,
+            enemyHud,
+            gameOverPanel,
+            restartButton);
 
-        RegisterButton(attackHeartButton, () => TriggerPlayerAction(PlayerActionType.AttackHeart));
-        RegisterButton(attackBodyButton, () => TriggerPlayerAction(PlayerActionType.AttackBody));
-        RegisterButton(attackMindButton, () => TriggerPlayerAction(PlayerActionType.AttackMind));
+        CombatInputController inputController = new(
+            attackButton,
+            itemButton,
+            specialButton,
+            attackHeartButton,
+            attackBodyButton,
+            attackMindButton,
+            defendButton,
+            parryButton,
+            fleeButton,
+            instantKillButton,
+            learnButton,
+            learnInfoIconButton);
 
-        RegisterButton(defendButton, () => TriggerPlayerAction(PlayerActionType.Defend));
-        RegisterButton(parryButton, () => TriggerPlayerAction(PlayerActionType.Parry));
-        
-        RegisterButton(fleeButton, () => TriggerPlayerAction(PlayerActionType.Flee));
-        RegisterButton(instantKillButton, () => TriggerPlayerAction(PlayerActionType.InstantKill));
-        RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
-        RegisterButton(learnInfoIconButton, ToggleLearnInfoPanel);
-
-        SetActionsVisible(false);
-
-        if (learnInfoIconButton != null)
-            learnInfoIconButton.gameObject.SetActive(false);
-
-        if (learnInfoPanel != null)
-            learnInfoPanel.SetActive(false);
-
-        ResolveCombatVisualReferences();
-        // playerFeedbackPanel.SetActive(true);
+        presenter = new CombatPresenter(combatUI, inputController);
     }
 
-    public void SetTurnText(string value)
-    {
-        if (turnText != null)
-            turnText.text = value;
-    }
-
-    public void SetCombatLog(string value, CombatLogCategory category = CombatLogCategory.Default)
-    {
-        if (combatLogText == null || string.IsNullOrWhiteSpace(value))
-            return;
-
-        combatLogEntries.Enqueue(FormatLog(value, category));
-        while (combatLogEntries.Count > MaxLogEntries)
-            combatLogEntries.Dequeue();
-
-        combatLogText.text = string.Join("\n", combatLogEntries);
-    }
-
-    public IEnumerator PlayDiceRoll(int value)
-    {
-        if (diceRollUI == null)
-            yield break;
-
-        yield return StartCoroutine(diceRollUI.PlayRollAnimation(value));
-    }
-
-    public void SetActionsVisible(bool visible)
-    {
-        if (initialActionsUI != null)
-            initialActionsUI.SetActive(visible);
-
-        if (attackActionsUI != null)
-            attackActionsUI.SetActive(false);
-
-        if (defenseActionsUI != null)
-            defenseActionsUI.SetActive(false);
-
-        if (specialActionsUI != null)
-            specialActionsUI.SetActive(false);
-    }
-
-    public void ShowAttackMenu()
-    {
-        SetActionsVisible(true);
-        if (initialActionsUI != null)
-            initialActionsUI.SetActive(false);
-        if (attackActionsUI != null)
-            attackActionsUI.SetActive(true);
-    }
-
-    public void ShowDefenseMenu()
-    {
-        SetActionsVisible(true);
-        if (initialActionsUI != null)
-            initialActionsUI.SetActive(false);
-        if (defenseActionsUI != null)
-            defenseActionsUI.SetActive(true);
-    }
-
-    public void UpdateAttackButtonAvailability(bool heartEnabled, bool bodyEnabled, bool mindEnabled)
-    {
-        if (attackHeartButton != null)
-            attackHeartButton.interactable = heartEnabled;
-
-        if (attackBodyButton != null)
-            attackBodyButton.interactable = bodyEnabled;
-
-        if (attackMindButton != null)
-            attackMindButton.interactable = mindEnabled;
-    }
-
-
-    public void UpdateSpecialActionAvailability(bool instantKillEnabled, bool learnEnabled)
-    {
-        if (instantKillButton != null)
-            instantKillButton.interactable = instantKillEnabled;
-
-        if (learnButton != null)
-            learnButton.interactable = learnEnabled;
-    }
-
-    public void SetEnemyLearnState(int revealLevel, EnemySO enemy, int currentHeart, int currentBody, int currentMind, TurnManagerStats enemyStats)
-    {
-        bool hasInfo = revealLevel > 0;
-
-        if (learnInfoIconButton != null)
-            learnInfoIconButton.gameObject.SetActive(hasInfo);
-
-        if (!hasInfo)
-        {
-            if (learnInfoPanel != null)
-                learnInfoPanel.SetActive(false);
-            return;
-        }
-
-        if (learnInfoText == null || enemy == null)
-            return;
-
-        string basicInfo = $"{enemy.enemyName}\nArquetipo: {enemy.archetype}\nHeart: {currentHeart} | Body: {currentBody} | Mind: {currentMind}";
-        if (revealLevel == 1)
-        {
-            learnInfoText.text = basicInfo;
-            return;
-        }
-
-        string advancedInfo = $"ATK: {enemyStats.attack} | DEF: {enemyStats.defense}\nCrit: {enemyStats.criticalHitChance}% | Parry: {enemyStats.parryChance}%\nRegra: {enemy.specialRule}";
-        learnInfoText.text = $"{basicInfo}\n\n{advancedInfo}";
-    }
-
-    public void ResetDiceValue()
-    {
-        if (diceRollUI != null)
-            diceRollUI.ClearValue();
-    }
-
-    public void UpdateHud(
-        int playerheart,
-        int playerheartMax,
-        int playerbody,
-        int playerbodyMax,
-        int playermind,
-        int playermindMax,
-        int enemyheart,
-        int enemyheartMax,
-        int enemybody,
-        int enemybodyMax,
-        int enemymind,
-        int enemymindMax)
-    {
-        playerHud?.SetValues(playerheart, playerheartMax, playerbody, playerbodyMax, playermind, playermindMax);
-        enemyHud?.SetValues(enemyheart, enemyheartMax, enemybody, enemybodyMax, enemymind, enemymindMax);
-    }
-
-    public void ShowGameOverUI(Action onRestart)
-    {
-        Time.timeScale = 0f;
-
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
-
-        if (restartButton == null)
-            return;
-
-        restartButton.onClick.RemoveAllListeners();
-        restartButton.onClick.AddListener(() =>
-        {
-            Time.timeScale = 1f;
-            onRestart?.Invoke();
-        });
-    }
-
-    public void RefreshCombatVisualReferences()
-    {
-        ResolveCombatVisualReferences();
-    }
-
-    public void NotifyPlayerDamage(int amount, bool critical = false)
-    {
-        if (amount <= 0)
-            return;
-
-        StartCoroutine(FlashPlayerUIRoutine(playerHitUI));
-        string damageText = critical ? $"CRITICAL HIT! -{amount}" : $"-{amount}";
-        ShowFeedbackText(true, damageText, critical ? criticalFeedbackColor : damageFlashColor);
-    }
-
-    public void NotifyEnemyDamage(int amount, bool critical = false)
-    {
-        if (amount <= 0)
-            return;
-
-        FlashSprite(enemySpriteRenderer);
-        string damageText = critical ? $"CRITICAL HIT! -{amount}" : $"-{amount}";
-        ShowFeedbackText(false, damageText, critical ? criticalFeedbackColor : damageFlashColor);
-    }
-
-    public void NotifyPlayerAction(string actionText)
-    {
-        if (string.IsNullOrWhiteSpace(actionText))
-            return;
-
-        ShowFeedbackText(true, actionText, actionFeedbackColor);
-    }
-
-    public void NotifyEnemyAction(string actionText)
-    {
-        if (string.IsNullOrWhiteSpace(actionText))
-            return;
-
-        ShowFeedbackText(false, actionText, actionFeedbackColor);
-    }
-
-    private string FormatLog(string value, CombatLogCategory category)
-    {
-        string colorHex = category switch
-        {
-            CombatLogCategory.Damage => "#FF5F5F",
-            CombatLogCategory.Action => "#FFD35A",
-            CombatLogCategory.Victory => "#6CFF83",
-            CombatLogCategory.Defeat => "#FF4040",
-            _ => "#B3B3B3"
-        };
-
-        return $"<color={colorHex}>{value}</color>";
-    }
-
-    private void FlashSprite(SpriteRenderer spriteRenderer)
-    {
-        if (spriteRenderer == null)
-            return;
-        
-        StartCoroutine(FlashSpriteRoutine(spriteRenderer));
-    }
-
-    private IEnumerator FlashPlayerUIRoutine(GameObject hitPlayerUI)
-    {
-        hitPlayerUI.SetActive(true);
-        yield return new WaitForSeconds(damageFlashDuration);
-        hitPlayerUI.SetActive(false);
-    }
-
-    private IEnumerator FlashSpriteRoutine(SpriteRenderer spriteRenderer)
-    {
-        Color original = spriteRenderer.color;
-        spriteRenderer.color = damageFlashColor;
-        yield return new WaitForSeconds(damageFlashDuration);
-        spriteRenderer.color = original;
-    }
-
-    private void ShowFeedbackText(bool isPlayer, string value, Color color)
-    {
-        TMP_Text feedbackText = isPlayer ? playerFeedbackText : enemyFeedbackText;
-        if (feedbackText == null)
-            return;
-
-        if (isPlayer && playerFeedbackRoutine != null)
-            StopCoroutine(playerFeedbackRoutine);
-
-        if (!isPlayer && enemyFeedbackRoutine != null)
-            StopCoroutine(enemyFeedbackRoutine);
-
-        Coroutine newRoutine = StartCoroutine(ShowFeedbackTextRoutine(feedbackText, value, color));
-        
-        if (isPlayer)
-            playerFeedbackRoutine = newRoutine;
-        else
-            enemyFeedbackRoutine = newRoutine;
-    }
-
-    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, string value, Color color)
-    {
-        feedbackText.gameObject.SetActive(true);
-        feedbackText.color = color;
-        feedbackText.text = value;
-        yield return new WaitForSeconds(0.85f);
-        feedbackText.gameObject.SetActive(false);
-    }
-
-    private void RegisterButton(Button button, Action callback)
-    {
-        if (button == null)
-            return;
-            
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(() => callback?.Invoke());
-    }
-
-    private void ToggleLearnInfoPanel()
-    {
-        if (learnInfoPanel == null)
-            return;
-
-        learnInfoPanel.SetActive(!learnInfoPanel.activeSelf);
-    }
-
-    private void OpenActionMenu(GameObject previousMenu, GameObject nextMenu)
-    {
-        if (previousMenu != null)
-            previousMenu.SetActive(false);
-
-        if (nextMenu != null)
-            nextMenu.SetActive(true);
-    }
-
-    private void TriggerPlayerAction(PlayerActionType action)
-    {
-        SetActionsVisible(false);
-        OnPlayerActionSelected?.Invoke(action);
-    }
-
-    private void ResolveCombatVisualReferences()
-    {
-        if (enemySpriteRenderer == null)
-        {
-            EnemyBattler enemyBattler = FindObjectOfType<EnemyBattler>();
-            if (enemyBattler != null)
-                enemySpriteRenderer = enemyBattler.GetComponentInChildren<SpriteRenderer>();
-        }
-
-        if (playerFeedbackText != null)
-            playerFeedbackText.gameObject.SetActive(false);
-
-        if (enemyFeedbackText != null)
-            enemyFeedbackText.gameObject.SetActive(false);
-    }
+    public void SetTurnText(string value) => presenter.SetTurnText(value);
+    public void SetCombatLog(string value, CombatLogCategory category = CombatLogCategory.Default) => presenter.SetCombatLog(value, category);
+    public IEnumerator PlayDiceRoll(int value) => presenter.PlayDiceRoll(value);
+    public void SetActionsVisible(bool visible) => presenter.SetActionsVisible(visible);
+    public void ShowAttackMenu() => presenter.ShowAttackMenu();
+    public void ShowDefenseMenu() => presenter.ShowDefenseMenu();
+    public void UpdateAttackButtonAvailability(bool heartEnabled, bool bodyEnabled, bool mindEnabled) => presenter.UpdateAttackButtonAvailability(heartEnabled, bodyEnabled, mindEnabled);
+    public void UpdateSpecialActionAvailability(bool instantKillEnabled, bool learnEnabled) => presenter.UpdateSpecialActionAvailability(instantKillEnabled, learnEnabled);
+    public void SetEnemyLearnState(int revealLevel, EnemySO enemy, int currentHeart, int currentBody, int currentMind, TurnManagerStats enemyStats) => presenter.SetEnemyLearnState(revealLevel, enemy, currentHeart, currentBody, currentMind, enemyStats);
+    public void ResetDiceValue() => presenter.ResetDiceValue();
+    public void UpdateHud(int playerheart, int playerheartMax, int playerbody, int playerbodyMax, int playermind, int playermindMax, int enemyheart, int enemyheartMax, int enemybody, int enemybodyMax, int enemymind, int enemymindMax) => presenter.UpdateHud(playerheart, playerheartMax, playerbody, playerbodyMax, playermind, playermindMax, enemyheart, enemyheartMax, enemybody, enemybodyMax, enemymind, enemymindMax);
+    public void ShowGameOverUI(Action onRestart) => presenter.ShowGameOverUI(onRestart);
+    public void RefreshCombatVisualReferences() => presenter.RefreshCombatVisualReferences();
+    public void NotifyPlayerDamage(int amount, bool critical = false) => presenter.NotifyPlayerDamage(amount, critical);
+    public void NotifyEnemyDamage(int amount, bool critical = false) => presenter.NotifyEnemyDamage(amount, critical);
+    public void NotifyPlayerAction(string actionText) => presenter.NotifyPlayerAction(actionText);
+    public void NotifyEnemyAction(string actionText) => presenter.NotifyEnemyAction(actionText);
 }
 
 public enum CombatLogCategory

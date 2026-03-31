@@ -34,6 +34,7 @@ public class RunStateSnapshot
     public bool[] exploredNodes;
     public PlayerStatusManager.PlayerStatusSnapshot playerStatus;
     public List<ItemSO> inventoryItems;
+    public int currentTension;
 }
 
 [System.Serializable]

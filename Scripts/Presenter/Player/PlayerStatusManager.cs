@@ -66,6 +66,9 @@ public class PlayerStatusManager : MonoBehaviour
         [SerializeField] public float heart;
         [SerializeField] public float body;
         [SerializeField] public float mind;
+        [SerializeField] public float maxHeart;
+        [SerializeField] public float maxBody;
+        [SerializeField] public float maxMind;
         [SerializeField] public PlayerArchetype currentArchetype;
         [SerializeField] public ArchetypePoints archetypePoints;
         public TurnManagerStats combatStats;
@@ -172,6 +175,9 @@ public class PlayerStatusManager : MonoBehaviour
     public float GetCurrentHeart() => currentHeart;
     public float GetCurrentMind() => currentMind;
     public float GetCurrentBody() => currentBody;
+    public float GetMaxHeart() => maxHeart;
+    public float GetMaxBody() => maxBody;
+    public float GetMaxMind() => maxMind;
 
     public float GetHeartRatio() => maxHeart <= 0f ? 0f : currentHeart / maxHeart;
     public float GetBodyRatio() => maxBody <= 0f ? 0f : currentBody / maxBody;
@@ -233,6 +239,9 @@ public class PlayerStatusManager : MonoBehaviour
             heart = currentHeart,
             body = currentBody,
             mind = currentMind,
+            maxHeart = maxHeart,
+            maxBody = maxBody,
+            maxMind = maxMind,
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints,
             combatStats = stats
@@ -241,6 +250,10 @@ public class PlayerStatusManager : MonoBehaviour
 
     public void RestoreSnapshot(PlayerStatusSnapshot snapshot)
     {
+        maxHeart = Mathf.Max(1f, snapshot.maxHeart > 0f ? snapshot.maxHeart : maxHeart);
+        maxBody = Mathf.Max(1f, snapshot.maxBody > 0f ? snapshot.maxBody : maxBody);
+        maxMind = Mathf.Max(1f, snapshot.maxMind > 0f ? snapshot.maxMind : maxMind);
+
         currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
         currentBody = Mathf.Clamp(snapshot.body, 0f, maxBody);
         currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
