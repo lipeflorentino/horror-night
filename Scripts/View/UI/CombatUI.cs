@@ -38,6 +38,20 @@ public class CombatUI
         }
     }
 
+    [Serializable]
+    public class PlayerActionIconBinding
+    {
+        public PlayerActionType action;
+        public Sprite icon;
+    }
+
+    [Serializable]
+    public class EnemyActionIconBinding
+    {
+        public EnemyActionType action;
+        public Sprite icon;
+    }
+
     private readonly MonoBehaviour coroutineRunner;
     private readonly TMP_Text turnText;
     private readonly TMP_Text combatLogText;
@@ -49,6 +63,8 @@ public class CombatUI
     private readonly TMP_Text enemyFeedbackText;
     private readonly Image playerActionIcon;
     private readonly Image enemyActionIcon;
+    private readonly Dictionary<PlayerActionType, Sprite> playerActionIcons;
+    private readonly Dictionary<EnemyActionType, Sprite> enemyActionIcons;
     private readonly float damageFlashDuration;
     private readonly Color damageFlashColor;
     private readonly Color actionFeedbackColor;
@@ -79,6 +95,10 @@ public class CombatUI
     private const int MaxLogEntries = 5;
     private Coroutine playerFeedbackRoutine;
     private Coroutine enemyFeedbackRoutine;
+    private Vector3 playerFeedbackBaseScale = Vector3.one;
+    private Vector3 enemyFeedbackBaseScale = Vector3.one;
+    private bool hasPlayerFeedbackBaseScale;
+    private bool hasEnemyFeedbackBaseScale;
 
     public CombatUI(
         MonoBehaviour coroutineRunner,
@@ -91,6 +111,8 @@ public class CombatUI
         TMP_Text enemyFeedbackText,
         Image playerActionIcon,
         Image enemyActionIcon,
+        PlayerActionIconBinding[] playerActionIconMappings,
+        EnemyActionIconBinding[] enemyActionIconMappings,
         float damageFlashDuration,
         Color damageFlashColor,
         Color actionFeedbackColor,
@@ -125,6 +147,8 @@ public class CombatUI
         this.enemyFeedbackText = enemyFeedbackText;
         this.playerActionIcon = playerActionIcon;
         this.enemyActionIcon = enemyActionIcon;
+        playerActionIcons = BuildPlayerActionIconMap(playerActionIconMappings);
+        enemyActionIcons = BuildEnemyActionIconMap(enemyActionIconMappings);
         this.damageFlashDuration = damageFlashDuration;
         this.damageFlashColor = damageFlashColor;
         this.actionFeedbackColor = actionFeedbackColor;
@@ -334,20 +358,22 @@ public class CombatUI
         ShowFeedbackText(false, damageText, critical ? criticalFeedbackColor : damageFlashColor);
     }
 
-    public void NotifyPlayerAction(string actionText)
+    public void NotifyPlayerAction(string actionText, PlayerActionType? actionType = null)
     {
         if (string.IsNullOrWhiteSpace(actionText))
             return;
 
-        ShowFeedbackText(true, actionText, actionFeedbackColor, true);
+        Sprite actionIcon = actionType.HasValue ? GetPlayerActionIcon(actionType.Value) : null;
+        ShowFeedbackText(true, actionText, actionFeedbackColor, true, actionIcon);
     }
 
-    public void NotifyEnemyAction(string actionText)
+    public void NotifyEnemyAction(string actionText, EnemyActionType? actionType = null)
     {
         if (string.IsNullOrWhiteSpace(actionText))
             return;
 
-        ShowFeedbackText(false, actionText, actionFeedbackColor, true);
+        Sprite actionIcon = actionType.HasValue ? GetEnemyActionIcon(actionType.Value) : null;
+        ShowFeedbackText(false, actionText, actionFeedbackColor, true, actionIcon);
     }
 
     public void ToggleLearnInfoPanel()
@@ -398,7 +424,7 @@ public class CombatUI
         spriteRenderer.color = original;
     }
 
-    private void ShowFeedbackText(bool isPlayer, string value, Color color, bool isAction = false)
+    private void ShowFeedbackText(bool isPlayer, string value, Color color, bool isAction = false, Sprite actionIcon = null)
     {
         TMP_Text feedbackText = isPlayer ? playerFeedbackText : enemyFeedbackText;
         Image feedbackIcon = isPlayer ? playerActionIcon : enemyActionIcon;
@@ -412,7 +438,10 @@ public class CombatUI
         if (!isPlayer && enemyFeedbackRoutine != null)
             coroutineRunner.StopCoroutine(enemyFeedbackRoutine);
 
-        Coroutine newRoutine = coroutineRunner.StartCoroutine(ShowFeedbackTextRoutine(feedbackText, feedbackIcon, value, color, isAction));
+        Vector3 baseScale = GetFeedbackBaseScale(isPlayer, feedbackText);
+        feedbackText.transform.localScale = baseScale;
+
+        Coroutine newRoutine = coroutineRunner.StartCoroutine(ShowFeedbackTextRoutine(feedbackText, feedbackIcon, value, color, isAction, actionIcon, baseScale));
 
         if (isPlayer)
             playerFeedbackRoutine = newRoutine;
@@ -420,18 +449,21 @@ public class CombatUI
             enemyFeedbackRoutine = newRoutine;
     }
 
-    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, Image feedbackIcon, string value, Color color, bool isAction)
+    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, Image feedbackIcon, string value, Color color, bool isAction, Sprite actionIcon, Vector3 baseScale)
     {
         feedbackText.gameObject.SetActive(true);
         feedbackText.color = color;
         feedbackText.text = value;
         if (feedbackIcon != null)
-            feedbackIcon.gameObject.SetActive(isAction);
+        {
+            bool hasActionIcon = isAction && actionIcon != null;
+            feedbackIcon.sprite = actionIcon;
+            feedbackIcon.gameObject.SetActive(hasActionIcon);
+        }
 
         if (isAction)
         {
             Transform target = feedbackText.transform;
-            Vector3 baseScale = target.localScale;
             target.localScale = baseScale * 0.85f;
             yield return new WaitForSeconds(0.08f);
             target.localScale = baseScale * 1.1f;
@@ -455,9 +487,96 @@ public class CombatUI
         }
 
         if (playerFeedbackText != null)
+        {
+            playerFeedbackBaseScale = playerFeedbackText.transform.localScale;
+            hasPlayerFeedbackBaseScale = true;
+        }
+
+        if (enemyFeedbackText != null)
+        {
+            enemyFeedbackBaseScale = enemyFeedbackText.transform.localScale;
+            hasEnemyFeedbackBaseScale = true;
+        }
+
+        if (playerFeedbackText != null)
             playerFeedbackText.gameObject.SetActive(false);
 
         if (enemyFeedbackText != null)
             enemyFeedbackText.gameObject.SetActive(false);
+    }
+
+    private Vector3 GetFeedbackBaseScale(bool isPlayer, TMP_Text feedbackText)
+    {
+        if (feedbackText == null)
+            return Vector3.one;
+
+        if (isPlayer)
+        {
+            if (!hasPlayerFeedbackBaseScale)
+            {
+                playerFeedbackBaseScale = feedbackText.transform.localScale;
+                hasPlayerFeedbackBaseScale = true;
+            }
+
+            return playerFeedbackBaseScale;
+        }
+
+        if (!hasEnemyFeedbackBaseScale)
+        {
+            enemyFeedbackBaseScale = feedbackText.transform.localScale;
+            hasEnemyFeedbackBaseScale = true;
+        }
+
+        return enemyFeedbackBaseScale;
+    }
+
+    private Sprite GetPlayerActionIcon(PlayerActionType action)
+    {
+        if (playerActionIcons.TryGetValue(action, out Sprite icon))
+            return icon;
+
+        return null;
+    }
+
+    private Sprite GetEnemyActionIcon(EnemyActionType action)
+    {
+        if (enemyActionIcons.TryGetValue(action, out Sprite icon))
+            return icon;
+
+        return null;
+    }
+
+    private static Dictionary<PlayerActionType, Sprite> BuildPlayerActionIconMap(PlayerActionIconBinding[] mappings)
+    {
+        Dictionary<PlayerActionType, Sprite> map = new();
+        if (mappings == null)
+            return map;
+
+        foreach (PlayerActionIconBinding binding in mappings)
+        {
+            if (binding == null || binding.icon == null)
+                continue;
+
+            map[binding.action] = binding.icon;
+        }
+
+        return map;
+    }
+
+    private static Dictionary<EnemyActionType, Sprite> BuildEnemyActionIconMap(EnemyActionIconBinding[] mappings)
+    {
+        Dictionary<EnemyActionType, Sprite> map = new();
+        if (mappings == null)
+            return map;
+
+        foreach (EnemyActionIconBinding binding in mappings)
+        {
+            if (binding == null || binding.icon == null)
+                continue;
+
+            map[binding.action] = binding.icon;
+        }
+
+        return map;
     }
 }

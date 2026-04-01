@@ -97,7 +97,7 @@ public class TurnManager
         bindings.OnPlayerActionSelected -= CachePlayerTurnAction;
 
         PlayerActionType selectedAction = pendingPlayerAction.Value;
-        bindings.NotifyPlayerAction($"{playerTurnActions.Format(selectedAction)}");
+        bindings.NotifyPlayerAction(playerTurnActions.Format(selectedAction), selectedAction);
 
         if (playerTurnActions.IsAttack(selectedAction))
         {
@@ -116,7 +116,7 @@ public class TurnManager
         yield return turnActions.ResolveActions(true, selectedAction, enemyDefense, playerRoll, enemyRoll, bindings);
             
             // NOTIFICAÇÂO DE DEFESA DO INIMIGO
-            bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
+            bindings.NotifyEnemyAction(enemyTurnActions.Format(enemyDefense), enemyDefense);
             bindings.ResetDiceValue();
             yield break;
         }
@@ -157,8 +157,9 @@ public class TurnManager
 
         yield return new WaitForSeconds(1f);
 
-        bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyAttack)}");
+        bindings.NotifyEnemyAction(enemyTurnActions.Format(enemyAttack), enemyAttack);
 
+        bindings.BeginDefenseSelection();
         bindings.ShowDefenseMenu();
         bindings.SetCombatLog("Escolha sua defesa.", CombatLogCategory.Action);
         bindings.OnPlayerActionSelected += CacheDefenseAction;
@@ -167,6 +168,7 @@ public class TurnManager
             yield return null;
 
         bindings.OnPlayerActionSelected -= CacheDefenseAction;
+        bindings.EndDefenseSelection();
 
         PlayerActionType playerDefense = pendingPlayerAction.Value;
 
@@ -185,7 +187,7 @@ public class TurnManager
         yield return turnActions.ResolveActions(false, playerDefense, enemyAttack, playerRoll, enemyRoll, bindings);
 
         // NOTIFICAÇÂO DE DEFESA DO PLAYER
-        bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerDefense)}");
+        bindings.NotifyPlayerAction(playerTurnActions.Format(playerDefense), playerDefense);
         bindings.ResetDiceValue();
         yield return new WaitForSeconds(0.5f);
     }
