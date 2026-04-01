@@ -87,6 +87,7 @@ public class PlayerStatusManager : MonoBehaviour
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
+    [SerializeField] private int initiative = 10;
     [Range(0, 100)] [SerializeField] private int criticalHitChance = 10;
     [Range(0, 100)] [SerializeField] private int parryChance = 25;
     [Range(0, 100)] [SerializeField] private int fleeChance = 35;
@@ -193,6 +194,9 @@ public class PlayerStatusManager : MonoBehaviour
                 return Mathf.RoundToInt(currentBody);
             case "mind":
                 return Mathf.RoundToInt(currentMind);
+            case "initiative":
+            case "iniciativa":
+                return initiative;
             default:
                 return 0;
         }
@@ -217,6 +221,10 @@ public class PlayerStatusManager : MonoBehaviour
                 if (value > 0) IncreaseMind(value);
                 else DecreaseMind(-value);
                 return;
+            case "initiative":
+            case "iniciativa":
+                initiative = Mathf.Max(0, initiative + value);
+                return;
         }
     }
 
@@ -226,6 +234,7 @@ public class PlayerStatusManager : MonoBehaviour
         {
             attack = attack,
             defense = defense,
+            initiative = initiative,
             criticalHitChance = criticalHitChance,
             parryChance = parryChance,
             fleeChance = fleeChance,
@@ -265,6 +274,7 @@ public class PlayerStatusManager : MonoBehaviour
 
         attack = restoredStats.attack;
         defense = restoredStats.defense;
+        initiative = restoredStats.initiative;
         criticalHitChance = restoredStats.criticalHitChance;
         parryChance = restoredStats.parryChance;
         fleeChance = restoredStats.fleeChance;
@@ -322,6 +332,11 @@ public class PlayerStatusManager : MonoBehaviour
             case "sanidade":
             case "mente":
                 return "mind";
+            case "initiative":
+            case "iniciativa":
+            case "speed":
+            case "agility":
+                return "initiative";
             default:
                 return normalized;
         }

@@ -70,6 +70,17 @@ public class EnemyTurnActions
         };
     }
 
+    public RollType GetDefenseRollTypeByIncomingAttack(PlayerActionType playerAttack)
+    {
+        return playerAttack switch
+        {
+            PlayerActionType.AttackHeart => RollType.Heart,
+            PlayerActionType.AttackBody => RollType.Body,
+            PlayerActionType.AttackMind => RollType.Mind,
+            _ => RollType.Body
+        };
+    }
+
     public string Format(EnemyActionType action)
     {
         return action switch

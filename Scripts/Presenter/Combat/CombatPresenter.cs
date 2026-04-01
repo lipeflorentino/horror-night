@@ -15,6 +15,7 @@ public class CombatPresenter
 
         this.inputController.OnAttackMenuRequested += HandleAttackMenuRequested;
         this.inputController.OnSpecialMenuRequested += HandleSpecialMenuRequested;
+        this.inputController.OnBackRequested += HandleBackRequested;
         this.inputController.OnLearnInfoToggleRequested += HandleLearnInfoToggleRequested;
         this.inputController.OnPlayerActionSelected += HandlePlayerActionSelected;
     }
@@ -24,6 +25,7 @@ public class CombatPresenter
     public IEnumerator PlayDiceRoll(int value) => combatUI.PlayDiceRoll(value);
     public void SetActionsVisible(bool visible) => combatUI.SetActionsVisible(visible);
     public void ShowAttackMenu() => combatUI.ShowAttackMenu();
+    public void ShowInitialMenu() => combatUI.ShowInitialMenu();
     public void ShowDefenseMenu() => combatUI.ShowDefenseMenu();
     public void UpdateAttackButtonAvailability(bool heartEnabled, bool bodyEnabled, bool mindEnabled) => combatUI.UpdateAttackButtonAvailability(heartEnabled, bodyEnabled, mindEnabled);
     public void UpdateSpecialActionAvailability(bool instantKillEnabled, bool learnEnabled) => combatUI.UpdateSpecialActionAvailability(instantKillEnabled, learnEnabled);
@@ -50,6 +52,11 @@ public class CombatPresenter
     private void HandleLearnInfoToggleRequested()
     {
         combatUI.ToggleLearnInfoPanel();
+    }
+
+    private void HandleBackRequested()
+    {
+        combatUI.ShowInitialMenu();
     }
 
     private void HandlePlayerActionSelected(PlayerActionType action)

@@ -47,6 +47,8 @@ public class CombatUI
     private SpriteRenderer enemySpriteRenderer;
     private readonly TMP_Text playerFeedbackText;
     private readonly TMP_Text enemyFeedbackText;
+    private readonly Image playerActionIcon;
+    private readonly Image enemyActionIcon;
     private readonly float damageFlashDuration;
     private readonly Color damageFlashColor;
     private readonly Color actionFeedbackColor;
@@ -87,6 +89,8 @@ public class CombatUI
         SpriteRenderer enemySpriteRenderer,
         TMP_Text playerFeedbackText,
         TMP_Text enemyFeedbackText,
+        Image playerActionIcon,
+        Image enemyActionIcon,
         float damageFlashDuration,
         Color damageFlashColor,
         Color actionFeedbackColor,
@@ -100,6 +104,9 @@ public class CombatUI
         Button attackMindButton,
         Button instantKillButton,
         Button learnButton,
+        Button attackBackButton,
+        Button defenseBackButton,
+        Button specialBackButton,
         Button learnInfoIconButton,
         GameObject learnInfoPanel,
         TMP_Text learnInfoText,
@@ -116,6 +123,8 @@ public class CombatUI
         this.enemySpriteRenderer = enemySpriteRenderer;
         this.playerFeedbackText = playerFeedbackText;
         this.enemyFeedbackText = enemyFeedbackText;
+        this.playerActionIcon = playerActionIcon;
+        this.enemyActionIcon = enemyActionIcon;
         this.damageFlashDuration = damageFlashDuration;
         this.damageFlashColor = damageFlashColor;
         this.actionFeedbackColor = actionFeedbackColor;
@@ -196,6 +205,11 @@ public class CombatUI
             initialActionsUI.SetActive(false);
         if (attackActionsUI != null)
             attackActionsUI.SetActive(true);
+    }
+
+    public void ShowInitialMenu()
+    {
+        SetActionsVisible(true);
     }
 
     public void ShowDefenseMenu()
@@ -325,7 +339,7 @@ public class CombatUI
         if (string.IsNullOrWhiteSpace(actionText))
             return;
 
-        ShowFeedbackText(true, actionText, actionFeedbackColor);
+        ShowFeedbackText(true, actionText, actionFeedbackColor, true);
     }
 
     public void NotifyEnemyAction(string actionText)
@@ -333,7 +347,7 @@ public class CombatUI
         if (string.IsNullOrWhiteSpace(actionText))
             return;
 
-        ShowFeedbackText(false, actionText, actionFeedbackColor);
+        ShowFeedbackText(false, actionText, actionFeedbackColor, true);
     }
 
     public void ToggleLearnInfoPanel()
@@ -384,9 +398,10 @@ public class CombatUI
         spriteRenderer.color = original;
     }
 
-    private void ShowFeedbackText(bool isPlayer, string value, Color color)
+    private void ShowFeedbackText(bool isPlayer, string value, Color color, bool isAction = false)
     {
         TMP_Text feedbackText = isPlayer ? playerFeedbackText : enemyFeedbackText;
+        Image feedbackIcon = isPlayer ? playerActionIcon : enemyActionIcon;
         
         if (feedbackText == null)
             return;
@@ -397,7 +412,7 @@ public class CombatUI
         if (!isPlayer && enemyFeedbackRoutine != null)
             coroutineRunner.StopCoroutine(enemyFeedbackRoutine);
 
-        Coroutine newRoutine = coroutineRunner.StartCoroutine(ShowFeedbackTextRoutine(feedbackText, value, color));
+        Coroutine newRoutine = coroutineRunner.StartCoroutine(ShowFeedbackTextRoutine(feedbackText, feedbackIcon, value, color, isAction));
 
         if (isPlayer)
             playerFeedbackRoutine = newRoutine;
@@ -405,13 +420,29 @@ public class CombatUI
             enemyFeedbackRoutine = newRoutine;
     }
 
-    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, string value, Color color)
+    private IEnumerator ShowFeedbackTextRoutine(TMP_Text feedbackText, Image feedbackIcon, string value, Color color, bool isAction)
     {
         feedbackText.gameObject.SetActive(true);
         feedbackText.color = color;
         feedbackText.text = value;
-        yield return new WaitForSeconds(0.85f);
+        if (feedbackIcon != null)
+            feedbackIcon.gameObject.SetActive(isAction);
+
+        if (isAction)
+        {
+            Transform target = feedbackText.transform;
+            Vector3 baseScale = target.localScale;
+            target.localScale = baseScale * 0.85f;
+            yield return new WaitForSeconds(0.08f);
+            target.localScale = baseScale * 1.1f;
+            yield return new WaitForSeconds(0.08f);
+            target.localScale = baseScale;
+        }
+
+        yield return new WaitForSeconds(0.7f);
         feedbackText.gameObject.SetActive(false);
+        if (feedbackIcon != null)
+            feedbackIcon.gameObject.SetActive(false);
     }
 
     private void ResolveCombatVisualReferences()

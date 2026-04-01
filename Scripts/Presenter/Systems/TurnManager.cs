@@ -39,7 +39,7 @@ public class TurnManager
 
     public IEnumerator RunTurnCombat(CombatSceneBindings bindings)
     {
-        bool playerAttacking = (PlayerHeart + PlayerBody + PlayerMind) >= (EnemyHeart + EnemyBody + EnemyMind);
+        bool playerAttacking = turnActions.PlayerStats.initiative >= turnActions.EnemyStats.initiative;
         bindings.SetCombatLog("O combate começou.", CombatLogCategory.Action);
 
         while (IsPlayerAlive() && IsEnemyAlive() && Outcome == CombatOutcome.Ongoing)
@@ -107,12 +107,17 @@ public class TurnManager
             int enemyRoll = 0;
 
             yield return turnActions.RollForAction(bindings, playerTurnActions.GetRollType(selectedAction), true, v => playerRoll = v);
-            yield return turnActions.RollForAction(bindings, enemyTurnActions.GetRollType(enemyDefense), false, v => enemyRoll = v);
+            RollType defenseRollType = enemyTurnActions.GetDefenseRollTypeByIncomingAttack(selectedAction);
+            if (turnActions.CanRollForAction(defenseRollType, false))
+                yield return turnActions.RollForAction(bindings, defenseRollType, false, v => enemyRoll = v);
+            else
+                enemyRoll = -1;
 
-            yield return turnActions.ResolveActions(true, selectedAction, enemyDefense, playerRoll, enemyRoll, bindings);
+        yield return turnActions.ResolveActions(true, selectedAction, enemyDefense, playerRoll, enemyRoll, bindings);
             
             // NOTIFICAÇÂO DE DEFESA DO INIMIGO
             bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
+            bindings.ResetDiceValue();
             yield break;
         }
 
@@ -131,6 +136,7 @@ public class TurnManager
             Outcome = specialResult.forcedOutcome;
         }
 
+        bindings.ResetDiceValue();
         yield return new WaitForSeconds(0.5f);
     }
 
@@ -167,13 +173,20 @@ public class TurnManager
         int enemyRoll = 0;
         int playerRoll = 0;
 
-        yield return turnActions.RollForAction(bindings, enemyTurnActions.GetRollType(enemyAttack), false, v => enemyRoll = v);
-        yield return turnActions.RollForAction(bindings, playerTurnActions.GetRollType(playerDefense), true, v => playerRoll = v);
+        RollType enemyAttackRollType = enemyTurnActions.GetRollType(enemyAttack);
+        yield return turnActions.RollForAction(bindings, enemyAttackRollType, false, v => enemyRoll = v);
+
+        RollType defenseRollType = playerTurnActions.GetDefenseRollTypeByIncomingAttack(enemyAttack);
+        if (turnActions.CanRollForAction(defenseRollType, true))
+            yield return turnActions.RollForAction(bindings, defenseRollType, true, v => playerRoll = v);
+        else
+            playerRoll = -1;
 
         yield return turnActions.ResolveActions(false, playerDefense, enemyAttack, playerRoll, enemyRoll, bindings);
 
         // NOTIFICAÇÂO DE DEFESA DO PLAYER
         bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerDefense)}");
+        bindings.ResetDiceValue();
         yield return new WaitForSeconds(0.5f);
     }
 

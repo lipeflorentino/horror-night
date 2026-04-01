@@ -12,6 +12,7 @@ public struct TurnManagerStats
 {
     public int attack;
     public int defense;
+    public int initiative;
     public int criticalHitChance;
     public int parryChance;
     public int fleeChance;
@@ -27,6 +28,7 @@ public struct TurnManagerStats
         {
             attack = Mathf.Max(1, body),
             defense = Mathf.Max(0, Mathf.RoundToInt((heart + body) * 0.25f)),
+            initiative = Mathf.Max(0, Mathf.RoundToInt((body + mind) * 0.5f)),
             criticalHitChance = Mathf.Clamp(Mathf.RoundToInt(mind * 0.8f), 0, 60),
             parryChance = Mathf.Clamp(scaledBodyChance, 0, 90),
             fleeChance = Mathf.Clamp(scaledBodyChance, 0, 95),
@@ -39,6 +41,7 @@ public struct TurnManagerStats
     {
         attack = Mathf.Max(1, attack);
         defense = Mathf.Max(0, defense);
+        initiative = Mathf.Max(0, initiative);
         criticalHitChance = Mathf.Clamp(criticalHitChance, 0, 100);
         parryChance = Mathf.Clamp(parryChance, 0, 100);
         fleeChance = Mathf.Clamp(fleeChance, 0, 100);
