@@ -39,6 +39,9 @@ MonoBehaviour:
   defense:
     min: 1
     max: 2
+  initiative:
+    min: 3
+    max: 5
   criticalHitChance:
     min: 0
     max: 0

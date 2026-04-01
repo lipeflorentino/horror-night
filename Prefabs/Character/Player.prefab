@@ -2111,6 +2111,7 @@ MonoBehaviour:
     valueText: {fileID: 7590370054607366670}
   attack: 3
   defense: 2
+  initiative: 3
   criticalHitChance: 10
   parryChance: 25
   fleeChance: 35

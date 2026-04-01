@@ -47,6 +47,7 @@ public class EnemySO : ScriptableObject
     [Header("Combat - Advanced Stats")]
     public StatRange attack;
     public StatRange defense;
+    public StatRange initiative;
     public StatRange criticalHitChance;
     public StatRange parryChance;
     public StatRange fleeChance;
@@ -78,6 +79,7 @@ public class EnemySO : ScriptableObject
 
         int rolledAttack = attack.Roll(difficulty);
         int rolledDefense = defense.Roll(difficulty);
+        int rolledInitiative = initiative.Roll(difficulty);
         int rolledCritChance = criticalHitChance.Roll(1f);
         int rolledParryChance = parryChance.Roll(1f);
         int rolledFleeChance = fleeChance.Roll(1f);
@@ -88,6 +90,7 @@ public class EnemySO : ScriptableObject
         
         stats.attack = rolledAttack > 0 ? rolledAttack : stats.attack;
         stats.defense = rolledDefense > 0 ? rolledDefense : stats.defense;
+        stats.initiative = rolledInitiative > 0 ? rolledInitiative : stats.initiative;
         stats.criticalHitChance = rolledCritChance > 0 ? rolledCritChance : stats.criticalHitChance;
         stats.parryChance = rolledParryChance > 0 ? rolledParryChance : stats.parryChance;
         stats.fleeChance = rolledFleeChance > 0 ? rolledFleeChance : stats.fleeChance;
