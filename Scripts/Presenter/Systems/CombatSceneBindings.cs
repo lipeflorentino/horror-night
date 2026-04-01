@@ -21,6 +21,8 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private TMP_Text enemyFeedbackText;
     [SerializeField] private Image playerActionIcon;
     [SerializeField] private Image enemyActionIcon;
+    [SerializeField] private CombatUI.PlayerActionIconBinding[] playerActionIconMappings;
+    [SerializeField] private CombatUI.EnemyActionIconBinding[] enemyActionIconMappings;
     [SerializeField] private float damageFlashDuration = 0.15f;
     [SerializeField] private Color damageFlashColor = Color.red;
     [SerializeField] private Color actionFeedbackColor = new(1f, 0.9f, 0.3f);
@@ -91,6 +93,8 @@ public class CombatSceneBindings : MonoBehaviour
             enemyFeedbackText,
             playerActionIcon,
             enemyActionIcon,
+            playerActionIconMappings,
+            enemyActionIconMappings,
             damageFlashDuration,
             damageFlashColor,
             actionFeedbackColor,
@@ -151,6 +155,8 @@ public class CombatSceneBindings : MonoBehaviour
     public void RefreshCombatVisualReferences() => presenter.RefreshCombatVisualReferences();
     public void NotifyPlayerDamage(int amount, bool critical = false) => presenter.NotifyPlayerDamage(amount, critical);
     public void NotifyEnemyDamage(int amount, bool critical = false) => presenter.NotifyEnemyDamage(amount, critical);
-    public void NotifyPlayerAction(string actionText) => presenter.NotifyPlayerAction(actionText);
-    public void NotifyEnemyAction(string actionText) => presenter.NotifyEnemyAction(actionText);
+    public void NotifyPlayerAction(string actionText, PlayerActionType? actionType = null) => presenter.NotifyPlayerAction(actionText, actionType);
+    public void NotifyEnemyAction(string actionText, EnemyActionType? actionType = null) => presenter.NotifyEnemyAction(actionText, actionType);
+    public void BeginDefenseSelection() => presenter.BeginDefenseSelection();
+    public void EndDefenseSelection() => presenter.EndDefenseSelection();
 }

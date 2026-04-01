@@ -8,6 +8,7 @@ public class CombatInputController
     public event Action OnAttackMenuRequested;
     public event Action OnSpecialMenuRequested;
     public event Action OnBackRequested;
+    public event Action OnDefenseBackRequested;
     public event Action OnLearnInfoToggleRequested;
 
     public CombatInputController(
@@ -42,7 +43,7 @@ public class CombatInputController
         RegisterButton(instantKillButton, () => TriggerPlayerAction(PlayerActionType.InstantKill));
         RegisterButton(learnButton, () => TriggerPlayerAction(PlayerActionType.Learn));
         RegisterButton(attackBackButton, () => OnBackRequested?.Invoke());
-        RegisterButton(defenseBackButton, () => OnBackRequested?.Invoke());
+        RegisterButton(defenseBackButton, () => OnDefenseBackRequested?.Invoke());
         RegisterButton(specialBackButton, () => OnBackRequested?.Invoke());
         RegisterButton(learnInfoIconButton, () => OnLearnInfoToggleRequested?.Invoke());
     }
