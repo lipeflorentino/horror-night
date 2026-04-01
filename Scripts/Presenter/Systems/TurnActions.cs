@@ -84,7 +84,7 @@ public class TurnActions
         int statValue = GetStatByRollType(rollType, isPlayer);
         int roll = statValue <= 0 ? 0 : UnityEngine.Random.Range(0, statValue + 1);
 
-        if (bindings != null)
+        if (bindings != null && isPlayer)
             yield return bindings.PlayDiceRoll(roll);
 
         onFinished?.Invoke(roll);
@@ -92,8 +92,6 @@ public class TurnActions
 
     public IEnumerator ResolveActions(bool attackerIsPlayer, PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
-        yield return new WaitForSeconds(1f);
-
         if (attackerIsPlayer)
         {
             if (playerTurnActions.IsAttack(playerAction))
@@ -103,13 +101,13 @@ public class TurnActions
 
                 if (!success)
                 {
-                    bindings.SetCombatLog($"Seu ataque falhou: {playerRoll} <= defesa inimiga {enemyRoll}.", CombatLogCategory.Action);
-                    bindings.ResetDiceValue();
+                    bindings.SetCombatLog($"Seu ataque falhou", CombatLogCategory.Action);
                     yield break;
                 }
 
                 int damage = Mathf.Max(1, PlayerStats.attack - EnemyStats.defense);
                 bool criticalHit = RollPercent() < PlayerStats.criticalHitChance;
+                
                 if (criticalHit)
                     damage *= 2;
 
@@ -118,17 +116,15 @@ public class TurnActions
                 bindings.SetCombatLog(criticalHit
                     ? $"Ataque crítico! Dano causado: {damage}."
                     : $"Ataque bem sucedido! Dano causado: {damage}.", CombatLogCategory.Damage);
-                bindings.ResetDiceValue();
+                    
                 yield break;
             }
-
-            bindings.ResetDiceValue();
+            
             yield break;
         }
 
         string resultLog = ResolveDefensiveResponse(playerAction, enemyAction, playerRoll, enemyRoll, bindings);
         bindings.SetCombatLog(resultLog, CombatLogCategory.Action);
-        bindings.ResetDiceValue();
     }
 
     public SpecialActionResolution ResolvePlayerSpecialAction(PlayerActionType action, CombatSceneBindings bindings)
@@ -152,38 +148,32 @@ public class TurnActions
                 {
                     result.endCombat = true;
                     result.forcedOutcome = CombatOutcome.Fled;
-                    result.log = $"Fuga bem sucedida! Chance {chance}% (rolagem {roll}).";
-                    result.feedback = "Você escapou, mas ficou mais tenso.";
+                    result.log = $"Fuga bem sucedida!";
+                    result.feedback = "Você escapou.";
                 }
                 else
                 {
-                    result.log = $"Tentativa de fuga falhou. Chance {chance}% (rolagem {roll}).";
+                    result.log = $"Tentativa de fuga falhou.";
                     result.feedback = "A fuga falhou.";
                 }
 
                 return result;
 
             case PlayerActionType.InstantKill:
-                if (!CanUseInstantKill())
-                {
-                    result.success = false;
-                    result.log = "Instant Kill indisponível: reduza Coração, Corpo ou Mente do inimigo a 0.";
-                    result.feedback = "Instant Kill bloqueado.";
-                    return result;
-                }
-
                 if (success)
                 {
                     EnemyHeart = 0;
+                    EnemyBody = 0;
+                    EnemyMind = 0;
                     result.endCombat = true;
                     result.forcedOutcome = CombatOutcome.Victory;
-                    result.log = $"Instant Kill ativado! Chance {chance}% (rolagem {roll}).";
+                    result.log = $"Instant Kill ativado!";
                     result.feedback = "Golpe fatal!";
                     result.postDelay = 0.8f;
                 }
                 else
                 {
-                    result.log = $"Instant Kill falhou. Chance {chance}% (rolagem {roll}).";
+                    result.log = $"Instant Kill falhou.";
                     result.feedback = "O golpe fatal falhou.";
                 }
 
@@ -193,14 +183,6 @@ public class TurnActions
                 return result;
 
             case PlayerActionType.Learn:
-                if (!CanUseLearn())
-                {
-                    result.success = false;
-                    result.log = "Learn indisponível: inimigo já totalmente revelado.";
-                    result.feedback = "Learn bloqueado.";
-                    return result;
-                }
-
                 if (success)
                 {
                     EnemyRevealLevel = Mathf.Clamp(EnemyRevealLevel + 1, 0, 2);
@@ -231,17 +213,17 @@ public class TurnActions
     public string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
         bool defenseSuccess = playerRoll >= enemyRoll;
-        bindings.NotifyPlayerAction(defenseSuccess ? "Defesa bem sucedida!" : "Defesa falhou!");
+        bindings.NotifyPlayerAction(defenseSuccess ? "Defendido!" : "Defesa falhou!");
 
         if (playerAction == PlayerActionType.Defend)
         {
             if (defenseSuccess)
-                return $"Defesa bem sucedida: {playerRoll} >= {enemyRoll}. Nenhum dano recebido.";
+                return $"Defesa bem sucedida.";
 
             int damage = Mathf.Max(1, EnemyStats.attack - PlayerStats.defense);
             ApplyDamageToPlayer(enemyAction, damage, bindings);
             bindings.NotifyPlayerDamage(damage);
-            return $"Defesa falhou ({playerRoll} < {enemyRoll}). Você recebeu {damage} de dano.";
+            return $"Defesa falhou! Você recebeu {damage} de dano.";
         }
 
         int parryRoll = RollPercent();

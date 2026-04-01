@@ -22,5 +22,14 @@ Exemplos para seu RPG:
     
 TO DO 
     - Implementar sistemas que faltam
-        - Encounter, Presence, Tension, Treasure
-    - 
+        - Presence, Treasure
+    - Ajustar painel de infos (fechamento)
+    - Ajustar fluxo de combate e feedbacks de ações
+    - Implementar botão de voltar na UI de ações
+    - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
+
+
+
+Começa o combate 
+- define quem começa o turno 
+- 

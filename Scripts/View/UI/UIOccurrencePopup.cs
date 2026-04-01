@@ -62,6 +62,8 @@ public class UIOccurrencePopup : MonoBehaviour
                 onClose?.Invoke();
                 if (root != null)
                     root.SetActive(false);
+                
+                diceRollUI.ClearValue();
             });
         }
     }

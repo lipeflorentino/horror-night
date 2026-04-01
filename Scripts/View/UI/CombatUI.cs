@@ -387,6 +387,7 @@ public class CombatUI
     private void ShowFeedbackText(bool isPlayer, string value, Color color)
     {
         TMP_Text feedbackText = isPlayer ? playerFeedbackText : enemyFeedbackText;
+        
         if (feedbackText == null)
             return;
 

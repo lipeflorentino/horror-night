@@ -5251,11 +5251,11 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1825431450}
-  - {fileID: 101273163}
-  - {fileID: 347950572}
   - {fileID: 364218930}
   - {fileID: 1518624153}
+  - {fileID: 1825431450}
+  - {fileID: 347950572}
+  - {fileID: 101273163}
   m_Father: {fileID: 1435382828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6659,42 +6659,14 @@ PrefabInstance:
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
-    - target: {fileID: 2080139850321150137, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4358587489585040219, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4487196636439806813, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -175.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5058512529695600778, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5342978682417247641, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
-    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.7589186
-      objectReference: {fileID: 0}
-    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.7589186
-      objectReference: {fileID: 0}
-    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.7589186
-      objectReference: {fileID: 0}
-    - target: {fileID: 6659926549253984429, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -177.09999
-      objectReference: {fileID: 0}
     - target: {fileID: 7760248086195083446, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

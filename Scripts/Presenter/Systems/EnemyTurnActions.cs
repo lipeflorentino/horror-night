@@ -74,10 +74,10 @@ public class EnemyTurnActions
     {
         return action switch
         {
-            EnemyActionType.AttackHeart => "Ataque de Vida",
-            EnemyActionType.AttackBody => "Ataque Físico",
-            EnemyActionType.AttackMind => "Ataque Mental",
-            EnemyActionType.Defend => "Defesa",
+            EnemyActionType.AttackHeart => "Heart Atack",
+            EnemyActionType.AttackBody => "Body Atack",
+            EnemyActionType.AttackMind => "Mind Atack",
+            EnemyActionType.Defend => "Defend",
             _ => action.ToString()
         };
     }

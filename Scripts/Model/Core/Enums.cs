@@ -15,3 +15,12 @@ public enum NodeFlags
     OneTimeOnly     = 1 << 4,
     Dangerous       = 1 << 5
 }
+
+public enum CombatLogCategory
+{
+    Default,
+    Action,
+    Damage,
+    Victory,
+    Defeat
+}

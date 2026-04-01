@@ -42,7 +42,7 @@ public class TurnManager
         bool playerAttacking = (PlayerHeart + PlayerBody + PlayerMind) >= (EnemyHeart + EnemyBody + EnemyMind);
         bindings.SetCombatLog("O combate começou.", CombatLogCategory.Action);
 
-        while (PlayerHeart > 0 && EnemyHeart > 0 && Outcome == CombatOutcome.Ongoing)
+        while (IsPlayerAlive() && IsEnemyAlive() && Outcome == CombatOutcome.Ongoing)
         {
             bindings.UpdateAttackButtonAvailability(turnActions.CanAttackEnemyHeart(), turnActions.CanAttackEnemyBody(), turnActions.CanAttackEnemyMind());
             bindings.UpdateSpecialActionAvailability(turnActions.CanUseInstantKill(), turnActions.CanUseLearn());
@@ -56,11 +56,11 @@ public class TurnManager
             if (Outcome != CombatOutcome.Ongoing)
                 break;
 
-            if (EnemyHeart <= 0 || PlayerHeart <= 0)
+            if (!IsPlayerAlive() || !IsEnemyAlive())
                 break;
 
             playerAttacking = !playerAttacking;
-            yield return new WaitForSeconds(0.35f);
+            yield return new WaitForSeconds(0.7f);
         }
 
         if (Outcome == CombatOutcome.Fled)
@@ -70,24 +70,24 @@ public class TurnManager
             yield break;
         }
 
-        if (EnemyHeart <= 0)
+        if (!IsEnemyAlive())
         {
             bindings.SetTurnText("Vitória");
-            bindings.SetCombatLog("Inimigo derrotado. Placeholder de recompensa gerado.", CombatLogCategory.Victory);
+            bindings.SetCombatLog("Inimigo derrotado! Placeholder de recompensa gerado.", CombatLogCategory.Victory);
             Outcome = CombatOutcome.Victory;
             yield break;
         }
 
         bindings.SetTurnText("Derrota");
-        bindings.SetCombatLog("Você foi derrotado.", CombatLogCategory.Defeat);
+        bindings.SetCombatLog("Você foi derrotado!", CombatLogCategory.Defeat);
         Outcome = CombatOutcome.Defeat;
     }
 
     private IEnumerator ExecutePlayerAttackTurn(CombatSceneBindings bindings)
     {
         pendingPlayerAction = null;
-        bindings.SetTurnText("Seu turno: Ataque");
-        bindings.SetCombatLog("Escolha seu ataque ou ação especial.", CombatLogCategory.Action);
+        bindings.SetTurnText("Turno do jogador");
+        bindings.SetCombatLog("Escolha sua ação.", CombatLogCategory.Action);
         bindings.SetActionsVisible(true);
         bindings.OnPlayerActionSelected += CachePlayerTurnAction;
 
@@ -102,7 +102,6 @@ public class TurnManager
         if (playerTurnActions.IsAttack(selectedAction))
         {
             EnemyActionType enemyDefense = enemyTurnActions.ChooseEnemyDefenseAction();
-            bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
 
             int playerRoll = 0;
             int enemyRoll = 0;
@@ -111,6 +110,9 @@ public class TurnManager
             yield return turnActions.RollForAction(bindings, enemyTurnActions.GetRollType(enemyDefense), false, v => enemyRoll = v);
 
             yield return turnActions.ResolveActions(true, selectedAction, enemyDefense, playerRoll, enemyRoll, bindings);
+            
+            // NOTIFICAÇÂO DE DEFESA DO INIMIGO
+            bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyDefense)}");
             yield break;
         }
 
@@ -128,6 +130,8 @@ public class TurnManager
 
             Outcome = specialResult.forcedOutcome;
         }
+
+        yield return new WaitForSeconds(0.5f);
     }
 
     private IEnumerator ExecuteEnemyAttackTurn(CombatSceneBindings bindings)
@@ -143,10 +147,14 @@ public class TurnManager
             EnemyBody,
             EnemyMind);
 
-        bindings.SetCombatLog("Inimigo vai atacar. Escolha sua defesa.", CombatLogCategory.Action);
+        bindings.SetCombatLog("Inimigo vai atacar, prepare-se!");
+
+        yield return new WaitForSeconds(1f);
+
         bindings.NotifyEnemyAction($"{enemyTurnActions.Format(enemyAttack)}");
 
         bindings.ShowDefenseMenu();
+        bindings.SetCombatLog("Escolha sua defesa.", CombatLogCategory.Action);
         bindings.OnPlayerActionSelected += CacheDefenseAction;
 
         while (!pendingPlayerAction.HasValue)
@@ -155,7 +163,6 @@ public class TurnManager
         bindings.OnPlayerActionSelected -= CacheDefenseAction;
 
         PlayerActionType playerDefense = pendingPlayerAction.Value;
-        bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerDefense)}");
 
         int enemyRoll = 0;
         int playerRoll = 0;
@@ -164,6 +171,10 @@ public class TurnManager
         yield return turnActions.RollForAction(bindings, playerTurnActions.GetRollType(playerDefense), true, v => playerRoll = v);
 
         yield return turnActions.ResolveActions(false, playerDefense, enemyAttack, playerRoll, enemyRoll, bindings);
+
+        // NOTIFICAÇÂO DE DEFESA DO PLAYER
+        bindings.NotifyPlayerAction($"{playerTurnActions.Format(playerDefense)}");
+        yield return new WaitForSeconds(0.5f);
     }
 
     private void CachePlayerTurnAction(PlayerActionType action)
@@ -176,5 +187,15 @@ public class TurnManager
     {
         if (action == PlayerActionType.Defend || action == PlayerActionType.Parry)
             pendingPlayerAction = action;
+    }
+
+    private bool IsPlayerAlive()
+    {
+        return PlayerHeart > 0 || PlayerMind > 0 || PlayerBody > 0;
+    }
+
+    private bool IsEnemyAlive()
+    {
+        return EnemyHeart > 0 || EnemyMind > 0 || EnemyBody > 0;
     }
 }

@@ -140,12 +140,3 @@ public class CombatSceneBindings : MonoBehaviour
     public void NotifyPlayerAction(string actionText) => presenter.NotifyPlayerAction(actionText);
     public void NotifyEnemyAction(string actionText) => presenter.NotifyEnemyAction(actionText);
 }
-
-public enum CombatLogCategory
-{
-    Default,
-    Action,
-    Damage,
-    Victory,
-    Defeat
-}

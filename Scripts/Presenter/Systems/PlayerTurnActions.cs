@@ -38,15 +38,15 @@ public class PlayerTurnActions
     {
         return action switch
         {
-            PlayerActionType.AttackHeart => "Ataque de Vida",
-            PlayerActionType.AttackBody => "Ataque Físico",
-            PlayerActionType.AttackMind => "Ataque Mind",
-            PlayerActionType.Defend => "Defesa",
+            PlayerActionType.AttackHeart => "Heart Atack",
+            PlayerActionType.AttackBody => "Body Atack",
+            PlayerActionType.AttackMind => "Mind Atack",
+            PlayerActionType.Defend => "Defend",
             PlayerActionType.Parry => "Parry",
-            PlayerActionType.Flee => "Fuga",
+            PlayerActionType.Flee => "Flee",
             PlayerActionType.InstantKill => "Instant Kill",
             PlayerActionType.Learn => "Learn",
-            PlayerActionType.Item => "Item",
+            PlayerActionType.Item => "Use Item",
             _ => action.ToString()
         };
     }
