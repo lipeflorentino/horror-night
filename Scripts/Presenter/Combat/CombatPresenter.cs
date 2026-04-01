@@ -5,6 +5,7 @@ public class CombatPresenter
 {
     private readonly CombatUI combatUI;
     private readonly CombatInputController inputController;
+    private bool isAwaitingDefenseAction;
 
     public event Action<PlayerActionType> OnPlayerActionSelected;
 
@@ -16,6 +17,7 @@ public class CombatPresenter
         this.inputController.OnAttackMenuRequested += HandleAttackMenuRequested;
         this.inputController.OnSpecialMenuRequested += HandleSpecialMenuRequested;
         this.inputController.OnBackRequested += HandleBackRequested;
+        this.inputController.OnDefenseBackRequested += HandleDefenseBackRequested;
         this.inputController.OnLearnInfoToggleRequested += HandleLearnInfoToggleRequested;
         this.inputController.OnPlayerActionSelected += HandlePlayerActionSelected;
     }
@@ -36,8 +38,10 @@ public class CombatPresenter
     public void RefreshCombatVisualReferences() => combatUI.RefreshCombatVisualReferences();
     public void NotifyPlayerDamage(int amount, bool critical = false) => combatUI.NotifyPlayerDamage(amount, critical);
     public void NotifyEnemyDamage(int amount, bool critical = false) => combatUI.NotifyEnemyDamage(amount, critical);
-    public void NotifyPlayerAction(string actionText) => combatUI.NotifyPlayerAction(actionText);
-    public void NotifyEnemyAction(string actionText) => combatUI.NotifyEnemyAction(actionText);
+    public void NotifyPlayerAction(string actionText, PlayerActionType? actionType = null) => combatUI.NotifyPlayerAction(actionText, actionType);
+    public void NotifyEnemyAction(string actionText, EnemyActionType? actionType = null) => combatUI.NotifyEnemyAction(actionText, actionType);
+    public void BeginDefenseSelection() => isAwaitingDefenseAction = true;
+    public void EndDefenseSelection() => isAwaitingDefenseAction = false;
 
     private void HandleAttackMenuRequested()
     {
@@ -56,6 +60,14 @@ public class CombatPresenter
 
     private void HandleBackRequested()
     {
+        combatUI.ShowInitialMenu();
+    }
+
+    private void HandleDefenseBackRequested()
+    {
+        if (isAwaitingDefenseAction)
+            return;
+
         combatUI.ShowInitialMenu();
     }
 
