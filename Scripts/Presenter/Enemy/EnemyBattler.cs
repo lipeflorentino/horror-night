@@ -11,6 +11,7 @@ public class EnemyBattler : MonoBehaviour
     public int mind;
     public int attack;
     public int defense;
+    public int initiative;
     public int criticalHitChance;
     public int parryChance;
 
@@ -36,6 +37,7 @@ public class EnemyBattler : MonoBehaviour
         mind = enemyData.mind;
         attack = enemyData.combatStats.attack;
         defense = enemyData.combatStats.defense;
+        initiative = enemyData.combatStats.initiative;
         criticalHitChance = enemyData.combatStats.criticalHitChance;
         parryChance = enemyData.combatStats.parryChance;
 

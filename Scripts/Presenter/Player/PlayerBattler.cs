@@ -8,6 +8,7 @@ public class PlayerBattler : MonoBehaviour
 
     public int attack;
     public int defense;
+    public int initiative;
     public int criticalHitChance;
     public int parryChance;
     public int fleeChance;
@@ -22,6 +23,7 @@ public class PlayerBattler : MonoBehaviour
 
         attack = combatStats.attack;
         defense = combatStats.defense;
+        initiative = combatStats.initiative;
         criticalHitChance = combatStats.criticalHitChance;
         parryChance = combatStats.parryChance;
         fleeChance = combatStats.fleeChance;

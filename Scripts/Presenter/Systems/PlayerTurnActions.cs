@@ -23,6 +23,17 @@ public class PlayerTurnActions
         };
     }
 
+    public RollType GetDefenseRollTypeByIncomingAttack(EnemyActionType enemyAttack)
+    {
+        return enemyAttack switch
+        {
+            EnemyActionType.AttackHeart => RollType.Heart,
+            EnemyActionType.AttackBody => RollType.Body,
+            EnemyActionType.AttackMind => RollType.Mind,
+            _ => RollType.Body
+        };
+    }
+
     public int GetSpecialChance(PlayerActionType action, TurnManagerStats stats)
     {
         return action switch

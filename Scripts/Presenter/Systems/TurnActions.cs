@@ -90,22 +90,21 @@ public class TurnActions
         onFinished?.Invoke(roll);
     }
 
+    public bool CanRollForAction(RollType rollType, bool isPlayer)
+    {
+        return GetStatByRollType(rollType, isPlayer) > 0;
+    }
+
     public IEnumerator ResolveActions(bool attackerIsPlayer, PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
         if (attackerIsPlayer)
         {
             if (playerTurnActions.IsAttack(playerAction))
             {
-                bool success = playerRoll > enemyRoll;
-                bindings.NotifyPlayerAction(success ? "Sucesso no ataque!" : "Falha no ataque!");
-
-                if (!success)
-                {
-                    bindings.SetCombatLog($"Seu ataque falhou", CombatLogCategory.Action);
-                    yield break;
-                }
-
-                int damage = Mathf.Max(1, PlayerStats.attack - EnemyStats.defense);
+                bool defenseSucceeded = enemyRoll >= playerRoll;
+                int damage = defenseSucceeded
+                    ? Mathf.Max(1, PlayerStats.attack - EnemyStats.defense)
+                    : Mathf.Max(1, PlayerStats.attack);
                 bool criticalHit = RollPercent() < PlayerStats.criticalHitChance;
                 
                 if (criticalHit)
@@ -113,9 +112,13 @@ public class TurnActions
 
                 ApplyDamageToEnemy(playerAction, damage, bindings);
                 bindings.NotifyEnemyDamage(damage, criticalHit);
+                bindings.SetCombatLog(defenseSucceeded
+                        ? $"Inimigo defendeu parcialmente. Dano causado: {damage}."
+                        : "Ataque acertou em cheio.",
+                    CombatLogCategory.Action);
                 bindings.SetCombatLog(criticalHit
                     ? $"Ataque crítico! Dano causado: {damage}."
-                    : $"Ataque bem sucedido! Dano causado: {damage}.", CombatLogCategory.Damage);
+                    : $"Dano causado: {damage}.", CombatLogCategory.Damage);
                     
                 yield break;
             }
@@ -213,17 +216,18 @@ public class TurnActions
     public string ResolveDefensiveResponse(PlayerActionType playerAction, EnemyActionType enemyAction, int playerRoll, int enemyRoll, CombatSceneBindings bindings)
     {
         bool defenseSuccess = playerRoll >= enemyRoll;
-        bindings.NotifyPlayerAction(defenseSuccess ? "Defendido!" : "Defesa falhou!");
+        bindings.NotifyPlayerAction(defenseSuccess ? "Defesa parcial!" : "Defesa falhou!");
 
         if (playerAction == PlayerActionType.Defend)
         {
-            if (defenseSuccess)
-                return $"Defesa bem sucedida.";
-
-            int damage = Mathf.Max(1, EnemyStats.attack - PlayerStats.defense);
+            int damage = defenseSuccess
+                ? Mathf.Max(1, EnemyStats.attack - PlayerStats.defense)
+                : Mathf.Max(1, EnemyStats.attack);
             ApplyDamageToPlayer(enemyAction, damage, bindings);
             bindings.NotifyPlayerDamage(damage);
-            return $"Defesa falhou! Você recebeu {damage} de dano.";
+            return defenseSuccess
+                ? $"Defesa reduziu o dano. Você recebeu {damage} de dano."
+                : $"Defesa falhou! Você recebeu {damage} de dano.";
         }
 
         int parryRoll = RollPercent();
@@ -237,7 +241,9 @@ public class TurnActions
             return $"Parry perfeito! Você refletiu {reflectedDamage} de dano ao inimigo.";
         }
 
-        int parryFailDamage = Mathf.Max(1, EnemyStats.attack - PlayerStats.defense);
+        int parryFailDamage = defenseSuccess
+            ? Mathf.Max(1, EnemyStats.attack - PlayerStats.defense)
+            : Mathf.Max(1, EnemyStats.attack);
         ApplyDamageToPlayer(enemyAction, parryFailDamage, bindings);
         bindings.NotifyPlayerDamage(parryFailDamage);
         return $"Parry falhou. Você recebeu {parryFailDamage} de dano.";

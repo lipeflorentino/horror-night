@@ -19,6 +19,8 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private SpriteRenderer enemySpriteRenderer;
     [SerializeField] private TMP_Text playerFeedbackText;
     [SerializeField] private TMP_Text enemyFeedbackText;
+    [SerializeField] private Image playerActionIcon;
+    [SerializeField] private Image enemyActionIcon;
     [SerializeField] private float damageFlashDuration = 0.15f;
     [SerializeField] private Color damageFlashColor = Color.red;
     [SerializeField] private Color actionFeedbackColor = new(1f, 0.9f, 0.3f);
@@ -43,6 +45,9 @@ public class CombatSceneBindings : MonoBehaviour
     [SerializeField] private Button fleeButton;
     [SerializeField] private Button instantKillButton;
     [SerializeField] private Button learnButton;
+    [SerializeField] private Button attackBackButton;
+    [SerializeField] private Button defenseBackButton;
+    [SerializeField] private Button specialBackButton;
 
     [Header("Learn UI")]
     [SerializeField] private Button learnInfoIconButton;
@@ -84,6 +89,8 @@ public class CombatSceneBindings : MonoBehaviour
             enemySpriteRenderer,
             playerFeedbackText,
             enemyFeedbackText,
+            playerActionIcon,
+            enemyActionIcon,
             damageFlashDuration,
             damageFlashColor,
             actionFeedbackColor,
@@ -97,6 +104,9 @@ public class CombatSceneBindings : MonoBehaviour
             attackMindButton,
             instantKillButton,
             learnButton,
+            attackBackButton,
+            defenseBackButton,
+            specialBackButton,
             learnInfoIconButton,
             learnInfoPanel,
             learnInfoText,
@@ -117,6 +127,9 @@ public class CombatSceneBindings : MonoBehaviour
             fleeButton,
             instantKillButton,
             learnButton,
+            attackBackButton,
+            defenseBackButton,
+            specialBackButton,
             learnInfoIconButton);
 
         presenter = new CombatPresenter(combatUI, inputController);
@@ -127,6 +140,7 @@ public class CombatSceneBindings : MonoBehaviour
     public IEnumerator PlayDiceRoll(int value) => presenter.PlayDiceRoll(value);
     public void SetActionsVisible(bool visible) => presenter.SetActionsVisible(visible);
     public void ShowAttackMenu() => presenter.ShowAttackMenu();
+    public void ShowInitialMenu() => presenter.ShowInitialMenu();
     public void ShowDefenseMenu() => presenter.ShowDefenseMenu();
     public void UpdateAttackButtonAvailability(bool heartEnabled, bool bodyEnabled, bool mindEnabled) => presenter.UpdateAttackButtonAvailability(heartEnabled, bodyEnabled, mindEnabled);
     public void UpdateSpecialActionAvailability(bool instantKillEnabled, bool learnEnabled) => presenter.UpdateSpecialActionAvailability(instantKillEnabled, learnEnabled);
