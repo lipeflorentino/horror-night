@@ -1,78 +1,7 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 public class PlayerStatusManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class StatHudBinding
-    {
-        public Image fillImage;
-        public TMP_Text valueText;
-
-        public void SetValue(float current, float max)
-        {
-            if (fillImage != null)
-                fillImage.fillAmount = max <= 0f ? 0f : Mathf.Clamp01(current / max);
-
-            if (valueText != null)
-                valueText.text = Mathf.RoundToInt(current).ToString();
-        }
-    }
-
-    [System.Serializable]
-    public struct ArchetypePoints
-    {
-        [SerializeField] public int nt;
-        [SerializeField] public int nf;
-        [SerializeField] public int sj;
-        [SerializeField] public int sp;
-
-        public int Get(PlayerArchetype archetype)
-        {
-            return archetype switch
-            {
-                PlayerArchetype.NF => nf,
-                PlayerArchetype.SJ => sj,
-                PlayerArchetype.SP => sp,
-                _ => nt
-            };
-        }
-
-        public void Add(PlayerArchetype archetype, int amount)
-        {
-            switch (archetype)
-            {
-                case PlayerArchetype.NF:
-                    nf += amount;
-                    break;
-                case PlayerArchetype.SJ:
-                    sj += amount;
-                    break;
-                case PlayerArchetype.SP:
-                    sp += amount;
-                    break;
-                default:
-                    nt += amount;
-                    break;
-            }
-        }
-    }
-
-    [System.Serializable]
-    public struct PlayerStatusSnapshot
-    {
-        [SerializeField] public float heart;
-        [SerializeField] public float body;
-        [SerializeField] public float mind;
-        [SerializeField] public float maxHeart;
-        [SerializeField] public float maxBody;
-        [SerializeField] public float maxMind;
-        [SerializeField] public PlayerArchetype currentArchetype;
-        [SerializeField] public ArchetypePoints archetypePoints;
-        public TurnManagerStats combatStats;
-    }
 
     [Header("Archetype")]
     [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.NT;
@@ -230,19 +159,6 @@ public class PlayerStatusManager : MonoBehaviour
 
     public PlayerStatusSnapshot GetSnapshot()
     {
-        TurnManagerStats stats = new TurnManagerStats
-        {
-            attack = attack,
-            defense = defense,
-            initiative = initiative,
-            criticalHitChance = criticalHitChance,
-            parryChance = parryChance,
-            fleeChance = fleeChance,
-            instantKillChance = instantKillChance,
-            learnChance = learnChance
-        };
-        stats.Normalize();
-
         return new PlayerStatusSnapshot
         {
             heart = currentHeart,
@@ -252,8 +168,7 @@ public class PlayerStatusManager : MonoBehaviour
             maxBody = maxBody,
             maxMind = maxMind,
             currentArchetype = currentArchetype,
-            archetypePoints = archetypePoints,
-            combatStats = stats
+            archetypePoints = archetypePoints
         };
     }
 
@@ -268,34 +183,8 @@ public class PlayerStatusManager : MonoBehaviour
         currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
-
-        TurnManagerStats restoredStats = snapshot.combatStats;
-        restoredStats.Normalize();
-
-        attack = restoredStats.attack;
-        defense = restoredStats.defense;
-        initiative = restoredStats.initiative;
-        criticalHitChance = restoredStats.criticalHitChance;
-        parryChance = restoredStats.parryChance;
-        fleeChance = restoredStats.fleeChance;
-        instantKillChance = restoredStats.instantKillChance;
-        learnChance = restoredStats.learnChance;
-
+        
         RefreshAllBars();
-    }
-
-    public bool CanSpendBody(float amount)
-    {
-        return amount >= 0f && currentBody >= amount;
-    }
-
-    public bool TrySpendBody(float amount)
-    {
-        if (!CanSpendBody(amount))
-            return false;
-
-        DecreaseBody(amount);
-        return true;
     }
 
     private void RefreshAllBars()
