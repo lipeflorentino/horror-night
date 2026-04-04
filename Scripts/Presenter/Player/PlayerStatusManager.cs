@@ -113,6 +113,15 @@ public class PlayerStatusManager : MonoBehaviour
     public float GetBodyRatio() => maxBody <= 0f ? 0f : currentBody / maxBody;
     public float GetMindRatio() => maxMind <= 0f ? 0f : currentMind / maxMind;
 
+    public int GetAttack() => attack;
+    public int GetDefense() => defense;
+    public int GetInitiative() => initiative;
+    public int GetCriticalHitChance() => criticalHitChance;
+    public int GetParryChance() => parryChance;
+    public int GetFleeChance() => fleeChance;
+    public int GetInstantKillChance() => instantKillChance;
+    public int GetLearnChance() => learnChance;
+
     public int GetStatValue(string statName)
     {
         switch (NormalizeStatName(statName))
