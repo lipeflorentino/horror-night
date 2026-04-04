@@ -84,25 +84,13 @@ public class EnemySO : ScriptableObject
         int rolledInstantKillChance = instantKillChance.Roll(1f);
         int rolledLearnChance = learnChance.Roll(1f);
 
-        TurnManagerStats stats = TurnManagerStats.BuildDefault(rolledHeart, rolledBody, rolledMind);
-        
-        stats.attack = rolledAttack > 0 ? rolledAttack : stats.attack;
-        stats.defense = rolledDefense > 0 ? rolledDefense : stats.defense;
-        stats.criticalHitChance = rolledCritChance > 0 ? rolledCritChance : stats.criticalHitChance;
-        stats.parryChance = rolledParryChance > 0 ? rolledParryChance : stats.parryChance;
-        stats.fleeChance = rolledFleeChance > 0 ? rolledFleeChance : stats.fleeChance;
-        stats.instantKillChance = rolledInstantKillChance > 0 ? rolledInstantKillChance : stats.instantKillChance;
-        stats.learnChance = rolledLearnChance > 0 ? rolledLearnChance : stats.learnChance;
-        stats.Normalize();
-
         return new EnemyInstance
         {
             source = this,
             heart = rolledHeart,
             body = rolledBody,
             mind = rolledMind,
-            runTier = context != null ? context.tier : 0,
-            combatStats = stats
+            runTier = context != null ? context.tier : 0
         };
     }
 }
