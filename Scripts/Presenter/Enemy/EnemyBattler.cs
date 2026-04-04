@@ -35,12 +35,7 @@ public class EnemyBattler : MonoBehaviour
         heart = enemyData.heart;
         body = enemyData.body;
         mind = enemyData.mind;
-        attack = enemyData.combatStats.attack;
-        defense = enemyData.combatStats.defense;
-        initiative = enemyData.combatStats.initiative;
-        criticalHitChance = enemyData.combatStats.criticalHitChance;
-        parryChance = enemyData.combatStats.parryChance;
 
-        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName} | heart: {heart}, body: {body}, mind: {mind}, atk: {attack}, def: {defense}");
+        Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName} | heart: {heart}, body: {body}, mind: {mind}");
     }
 }
