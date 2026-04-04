@@ -21,7 +21,7 @@ public class TensionSystem : MonoBehaviour
     [SerializeField] private TensionUI tensionUI;
 
     private float lowStatTickTimer;
-    private PlayerStatusManager cachedStatus;
+    // private PlayerStatusManager cachedStatus;
 
     public int CurrentTension => currentTension;
 
@@ -87,7 +87,9 @@ public class TensionSystem : MonoBehaviour
 
     private void TickLowStatsTension()
     {
-        if (lowStatTickInterval <= 0f)
+        // TODO: implement this
+        
+        /* if (lowStatTickInterval <= 0f)
             return;
 
         if (cachedStatus == null)
@@ -107,7 +109,7 @@ public class TensionSystem : MonoBehaviour
         bool lowMind = cachedStatus.GetMindRatio() <= lowStatThreshold;
 
         if (lowHeart || lowBody || lowMind)
-            AddTension(lowStatTensionGain);
+            AddTension(lowStatTensionGain); */
     }
 
     private int GetEncounterThreshold()

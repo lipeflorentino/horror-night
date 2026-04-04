@@ -24,3 +24,11 @@ public enum CombatLogCategory
     Victory,
     Defeat
 }
+
+public enum CombatOutcome
+{
+    Ongoing,
+    Victory,
+    Defeat,
+    Fled
+}

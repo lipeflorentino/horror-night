@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [System.Serializable]
 public struct StatModifier
@@ -32,7 +31,6 @@ public class RunStateSnapshot
     public LevelSO level;
     public int levelIndex;
     public bool[] exploredNodes;
-    public PlayerStatusManager.PlayerStatusSnapshot playerStatus;
     public List<ItemSO> inventoryItems;
     public int currentTension;
 }
