@@ -77,27 +77,6 @@ public class EnemySO : ScriptableObject
         int rolledBody = body.Roll(difficulty);
         int rolledMind = mind.Roll(difficulty);
 
-        int rolledAttack = attack.Roll(difficulty);
-        int rolledDefense = defense.Roll(difficulty);
-        int rolledInitiative = initiative.Roll(difficulty);
-        int rolledCritChance = criticalHitChance.Roll(1f);
-        int rolledParryChance = parryChance.Roll(1f);
-        int rolledFleeChance = fleeChance.Roll(1f);
-        int rolledInstantKillChance = instantKillChance.Roll(1f);
-        int rolledLearnChance = learnChance.Roll(1f);
-
-        TurnManagerStats stats = TurnManagerStats.BuildDefault(rolledHeart, rolledBody, rolledMind);
-        
-        stats.attack = rolledAttack > 0 ? rolledAttack : stats.attack;
-        stats.defense = rolledDefense > 0 ? rolledDefense : stats.defense;
-        stats.initiative = rolledInitiative > 0 ? rolledInitiative : stats.initiative;
-        stats.criticalHitChance = rolledCritChance > 0 ? rolledCritChance : stats.criticalHitChance;
-        stats.parryChance = rolledParryChance > 0 ? rolledParryChance : stats.parryChance;
-        stats.fleeChance = rolledFleeChance > 0 ? rolledFleeChance : stats.fleeChance;
-        stats.instantKillChance = rolledInstantKillChance > 0 ? rolledInstantKillChance : stats.instantKillChance;
-        stats.learnChance = rolledLearnChance > 0 ? rolledLearnChance : stats.learnChance;
-        stats.Normalize();
-
         return new EnemyInstance
         {
             source = this,
@@ -105,7 +84,6 @@ public class EnemySO : ScriptableObject
             body = rolledBody,
             mind = rolledMind,
             runTier = context != null ? context.tier : 0,
-            combatStats = stats
         };
     }
 }
