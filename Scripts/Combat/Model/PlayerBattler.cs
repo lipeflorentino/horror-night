@@ -5,7 +5,6 @@ public class PlayerBattler : MonoBehaviour
     public int heart;
     public int body;
     public int mind;
-
     public int attack;
     public int defense;
     public int initiative;

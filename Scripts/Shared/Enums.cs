@@ -22,7 +22,8 @@ public enum CombatLogStyle
     Neutral,
     Positive,
     Negative,
-    Action
+    Action,
+    Info
 }
 public enum CombatFlowState
 {
