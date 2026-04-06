@@ -40,6 +40,7 @@ public class EnemySO : ScriptableObject
     public EnemyTagSet tags = new EnemyTagSet();
 
     [Header("Stats Range")]
+    public StatRange hp;
     public StatRange heart;
     public StatRange body;
     public StatRange mind;
@@ -72,6 +73,7 @@ public class EnemySO : ScriptableObject
     {
         float difficulty = context != null ? context.DifficultyModifier : 1f;
 
+        int rolledHp = hp.Roll(difficulty);
         int rolledHeart = heart.Roll(difficulty);
         int rolledBody = body.Roll(difficulty);
         int rolledMind = mind.Roll(difficulty);
@@ -87,9 +89,13 @@ public class EnemySO : ScriptableObject
         return new EnemyInstance
         {
             source = this,
+            hp = rolledHp,
             heart = rolledHeart,
             body = rolledBody,
             mind = rolledMind,
+            attack = rolledAttack,
+            defense = rolledDefense,
+            initiative = Mathf.Max(0, rolledMind),
             runTier = context != null ? context.tier : 0
         };
     }

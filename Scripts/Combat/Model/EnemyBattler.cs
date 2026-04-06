@@ -9,6 +9,7 @@ public class EnemyBattler : MonoBehaviour
     public int heart;
     public int body;
     public int mind;
+    public int hp;
     public int attack;
     public int defense;
     public int initiative;
@@ -35,6 +36,10 @@ public class EnemyBattler : MonoBehaviour
         heart = enemyData.heart;
         body = enemyData.body;
         mind = enemyData.mind;
+        hp = enemyData.hp;
+        attack = enemyData.attack;
+        defense = enemyData.defense;
+        initiative = enemyData.initiative;
 
         Debug.Log($"Setup Enemy! enemy: {enemy.source.enemyName} | heart: {heart}, body: {body}, mind: {mind}");
     }
