@@ -35,6 +35,10 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private float maxMind = 100f;
     [SerializeField] private float currentMind = 100f;
 
+    [Header("HP")]
+    [SerializeField] private float maxHp = 100f;
+    [SerializeField] private float currentHp = 100f;
+
     private void Awake()
     {
         currentArchetype = initialArchetype;
@@ -42,6 +46,7 @@ public class PlayerStatusManager : MonoBehaviour
         currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
         currentBody = Mathf.Clamp(currentBody, 0f, maxBody);
         currentMind = Mathf.Clamp(currentMind, 0f, maxMind);
+        currentHp = Mathf.Clamp(currentHp, 0f, maxHp);
 
         RefreshAllBars();
     }
@@ -164,9 +169,11 @@ public class PlayerStatusManager : MonoBehaviour
             heart = currentHeart,
             body = currentBody,
             mind = currentMind,
+            hp = currentHp,
             maxHeart = maxHeart,
             maxBody = maxBody,
             maxMind = maxMind,
+            maxHp = maxHp,
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints
         };
@@ -177,10 +184,12 @@ public class PlayerStatusManager : MonoBehaviour
         maxHeart = Mathf.Max(1f, snapshot.maxHeart > 0f ? snapshot.maxHeart : maxHeart);
         maxBody = Mathf.Max(1f, snapshot.maxBody > 0f ? snapshot.maxBody : maxBody);
         maxMind = Mathf.Max(1f, snapshot.maxMind > 0f ? snapshot.maxMind : maxMind);
+        maxHp = Mathf.Max(1f, snapshot.maxHp > 0f ? snapshot.maxHp : maxHp);
 
         currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
         currentBody = Mathf.Clamp(snapshot.body, 0f, maxBody);
         currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
+        currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
         
