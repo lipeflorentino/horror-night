@@ -2,22 +2,20 @@ using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
-    [SerializeField] private CombatUI combatUI;
-
-    [SerializeField] private CombatBattlerModel playerModel;
-    [SerializeField] private CombatBattlerModel enemyModel;
-    [SerializeField] private PlayerStatusSnapshot basePlayerSnapshot;
-
-    [SerializeField] private CombatStateModel combatStateModel;
-    [SerializeField] private TurnManager turnManager;
-    [SerializeField] private DiceService diceService;
-    [SerializeField] private CombatTurnService combatTurnService;
-    [SerializeField] private ActionResolverService actionResolverService;
-    [SerializeField] private CombatResolutionService combatResolutionService;
-    [SerializeField] private CombatInputHandler combatInputHandler;
-    [SerializeField] private CombatPresenter combatPresenter;
-    [SerializeField] private CombatEndService combatEndService;
-    [SerializeField] private CombatModelFactory combatModelFactory;
+    private CombatUI combatUI;
+    private CombatBattlerModel playerModel;
+    private CombatBattlerModel enemyModel;
+    private PlayerStatusSnapshot basePlayerSnapshot;
+    private CombatStateModel combatStateModel;
+    private TurnManager turnManager;
+    private DiceService diceService;
+    private CombatTurnService combatTurnService;
+    private ActionResolverService actionResolverService;
+    private CombatResolutionService combatResolutionService;
+    private CombatInputHandler combatInputHandler;
+    private CombatPresenter combatPresenter;
+    private CombatEndService combatEndService;
+    private CombatModelFactory combatModelFactory;
 
     private void Awake()
     {

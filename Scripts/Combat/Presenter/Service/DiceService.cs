@@ -24,7 +24,7 @@ public class DiceService
         return rolls;
     }
 
-    public int truncateDice()
+    public int TruncateDice()
     {
         int roll;
 
