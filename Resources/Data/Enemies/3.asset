@@ -24,6 +24,9 @@ MonoBehaviour:
     behavior: "Implac\xE1vel"
     style: "Ritual\xEDstico"
     type: Entidade
+  hp:
+    min: 20
+    max: 30
   heart:
     min: 3
     max: 6

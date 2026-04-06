@@ -24,6 +24,9 @@ MonoBehaviour:
     behavior: Cauteloso
     style: Furtivo
     type: "Esp\xEDrito"
+  hp:
+    min: 20
+    max: 30
   heart:
     min: 3
     max: 7

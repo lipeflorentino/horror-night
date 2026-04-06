@@ -3,7 +3,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class CombatUIViewBinder : MonoBehaviour
 {
-    [SerializeField] private CombatUI combatUI;
+    private CombatUI combatUI;
     [SerializeField] private FeedbackView feedbackView;
     [SerializeField] private LogView logView;
     [SerializeField] private HudView hudView;
@@ -44,5 +44,10 @@ public class CombatUIViewBinder : MonoBehaviour
     {
         if (hudView != null)
             hudView.UpdateDice(value);
+    }
+
+    public void Bind(CombatUI ui)
+    {
+        combatUI = ui;
     }
 }

@@ -8,7 +8,7 @@ public class EncounterSystem : MonoBehaviour
     [SerializeField] private EnemyDatabase enemyDatabase;
     [SerializeField] private LevelController levelController;
     [SerializeField] private PlayerStatusManager playerStatusManager;
-    [SerializeField] private string combatSceneName = "CombatScene";
+    [SerializeField] private string combatSceneName = "Combat";
 
     private float riskModifier = 1f;
 

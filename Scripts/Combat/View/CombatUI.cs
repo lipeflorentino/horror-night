@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 public class CombatUI
 {
@@ -13,6 +14,7 @@ public class CombatUI
 
     public void UpdateHud(int availableDice)
     {
+        Debug.Print($"availableDice: {availableDice}");
         Hud?.Invoke(availableDice);
     }
 

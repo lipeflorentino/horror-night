@@ -24,6 +24,9 @@ MonoBehaviour:
     behavior: Cauteloso
     style: Brutal
     type: Humanoide
+  hp:
+    min: 20
+    max: 30
   heart:
     min: 2
     max: 4

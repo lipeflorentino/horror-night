@@ -4,20 +4,20 @@ public class CombatManager : MonoBehaviour
 {
     [SerializeField] private CombatUI combatUI;
 
-    private CombatBattlerModel playerModel;
-    private CombatBattlerModel enemyModel;
-    private PlayerStatusSnapshot basePlayerSnapshot;
+    [SerializeField] private CombatBattlerModel playerModel;
+    [SerializeField] private CombatBattlerModel enemyModel;
+    [SerializeField] private PlayerStatusSnapshot basePlayerSnapshot;
 
-    private CombatStateModel combatStateModel;
-    private TurnManager turnManager;
-    private DiceService diceService;
-    private CombatTurnService combatTurnService;
-    private ActionResolverService actionResolverService;
-    private CombatResolutionService combatResolutionService;
-    private CombatInputHandler combatInputHandler;
-    private CombatPresenter combatPresenter;
-    private CombatEndService combatEndService;
-    private CombatModelFactory combatModelFactory;
+    [SerializeField] private CombatStateModel combatStateModel;
+    [SerializeField] private TurnManager turnManager;
+    [SerializeField] private DiceService diceService;
+    [SerializeField] private CombatTurnService combatTurnService;
+    [SerializeField] private ActionResolverService actionResolverService;
+    [SerializeField] private CombatResolutionService combatResolutionService;
+    [SerializeField] private CombatInputHandler combatInputHandler;
+    [SerializeField] private CombatPresenter combatPresenter;
+    [SerializeField] private CombatEndService combatEndService;
+    [SerializeField] private CombatModelFactory combatModelFactory;
 
     private void Awake()
     {
@@ -28,16 +28,21 @@ public class CombatManager : MonoBehaviour
     {
         combatModelFactory = new CombatModelFactory();
 
+        CombatUIViewBinder binder = FindObjectOfType<CombatUIViewBinder>();
         CombatSessionData sessionData = CombatSessionStore.Consume();
+
         if (sessionData == null || sessionData.enemyInstance == null)
         {
-            Debug.LogError("Combat session data was not found. CombatManager requires CombatSessionStore data to initialize.");
+            Debug.LogWarning("Combat session data was not found. CombatManager requires CombatSessionStore data to initialize.");
             return;
         }
 
         playerModel = combatModelFactory.CreatePlayer(sessionData.playerSnapshot);
         enemyModel = combatModelFactory.CreateEnemy(sessionData.enemyInstance);
         basePlayerSnapshot = sessionData.playerSnapshot;
+        
+        combatUI = new CombatUI();
+        binder.Bind(combatUI);
 
         combatStateModel = new CombatStateModel();
         turnManager = new TurnManager();

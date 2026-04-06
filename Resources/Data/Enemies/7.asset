@@ -24,6 +24,9 @@ MonoBehaviour:
     behavior: Agressivo
     style: "Fren\xE9tico"
     type: "Aberra\xE7\xE3o"
+  hp:
+    min: 20
+    max: 30
   heart:
     min: 3
     max: 7

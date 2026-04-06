@@ -3552,6 +3552,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1005889730}
+  - component: {fileID: 1005889731}
   m_Layer: 0
   m_Name: CombatManager
   m_TagString: Untagged
@@ -3574,6 +3575,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 622765729}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1005889731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005889729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfd327d474b0f71479ce804669df8f01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1017264759
 GameObject:
   m_ObjectHideFlags: 0
@@ -6434,6 +6447,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyDatabase: {fileID: 89461817}
   levelController: {fileID: 1455491027}
+  playerStatusManager: {fileID: 0}
+  combatSceneName: Combat
 --- !u!1 &2140492347
 GameObject:
   m_ObjectHideFlags: 0

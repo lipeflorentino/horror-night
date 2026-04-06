@@ -24,6 +24,9 @@ MonoBehaviour:
     behavior: Agressivo
     style: Furtivo
     type: "Aberra\xE7\xE3o"
+  hp:
+    min: 10
+    max: 20
   heart:
     min: 3
     max: 6
