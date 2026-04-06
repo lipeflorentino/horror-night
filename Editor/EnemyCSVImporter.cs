@@ -68,8 +68,9 @@ public class EnemyCSVImporter
             enemy.body = BuildRange(values[12], values[13]);
             enemy.mind = BuildRange(values[14], values.Length > 15 ? values[15] : values[14]);
             enemy.specialRule = values.Length > 16 ? values[16] : string.Empty;
+            enemy.hp = BuildRange(values[18], values[19]);
 
-            if (values.Length > 17)
+            if (values.Length > 19)
             {
                 Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(values[17]);
                 enemy.image = sprite;
