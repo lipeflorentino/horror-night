@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EncounterSystem : MonoBehaviour
 {
@@ -6,6 +7,8 @@ public class EncounterSystem : MonoBehaviour
 
     [SerializeField] private EnemyDatabase enemyDatabase;
     [SerializeField] private LevelController levelController;
+    [SerializeField] private PlayerStatusManager playerStatusManager;
+    [SerializeField] private string combatSceneName = "CombatScene";
 
     private float riskModifier = 1f;
 
@@ -18,6 +21,9 @@ public class EncounterSystem : MonoBehaviour
 
         if (levelController == null)
             levelController = FindObjectOfType<LevelController>();
+
+        if (playerStatusManager == null)
+            playerStatusManager = FindObjectOfType<PlayerStatusManager>();
     }
 
     public void SetRiskModifier(float value)
@@ -49,7 +55,20 @@ public class EncounterSystem : MonoBehaviour
         EnemyInstance selectedEnemy = enemyDatabase != null ? enemyDatabase.RollRandomEnemy(context) : null;
 
         float modifier = isForced ? riskModifier * 1.5f : riskModifier;
-        // TODO: CombatManager.EnsureInstance().StartCombat(selectedEnemy, modifier);
+
+        if (selectedEnemy == null || playerStatusManager == null)
+            return;
+
+        PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
+        CombatSessionData sessionData = new CombatSessionData
+        {
+            playerSnapshot = snapshot,
+            enemyInstance = selectedEnemy,
+            riskModifier = modifier
+        };
+
+        CombatSessionStore.SetSession(sessionData);
+        SceneManager.LoadScene(combatSceneName);
     }
 
     private EnemyRunContext BuildContext(bool isForced)

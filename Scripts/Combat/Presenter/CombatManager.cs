@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
-    [Header("Scene References")]
     [SerializeField] private CombatUI combatUI;
-    [SerializeField] private PlayerBattler playerBattler;
-    [SerializeField] private EnemyBattler enemyBattler;
 
     private CombatBattlerModel playerModel;
     private CombatBattlerModel enemyModel;
@@ -19,6 +16,7 @@ public class CombatManager : MonoBehaviour
     private CombatInputHandler combatInputHandler;
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
+    private CombatModelFactory combatModelFactory;
 
     private void Awake()
     {
@@ -27,8 +25,17 @@ public class CombatManager : MonoBehaviour
 
     public void InitializeCombat()
     {
-        playerModel = CreateModelFromPlayer(playerBattler);
-        enemyModel = CreateModelFromEnemy(enemyBattler);
+        combatModelFactory = new CombatModelFactory();
+
+        CombatSessionData sessionData = CombatSessionStore.Consume();
+        if (sessionData == null || sessionData.enemyInstance == null)
+        {
+            Debug.LogError("Combat session data was not found. CombatManager requires CombatSessionStore data to initialize.");
+            return;
+        }
+
+        playerModel = combatModelFactory.CreatePlayer(sessionData.playerSnapshot);
+        enemyModel = combatModelFactory.CreateEnemy(sessionData.enemyInstance);
 
         combatStateModel = new CombatStateModel();
         turnManager = new TurnManager();
@@ -91,41 +98,5 @@ public class CombatManager : MonoBehaviour
         {
             combatStateModel.EndCombat(outcome.Value);
         }
-    }
-
-    private static CombatBattlerModel CreateModelFromPlayer(PlayerBattler source)
-    {
-        return new CombatBattlerModel
-        {
-            heart = source.heart,
-            body = source.body,
-            mind = source.mind,
-            maxHeart = source.heart,
-            maxBody = source.body,
-            maxMind = source.mind,
-            hp = source.body,
-            maxHp = source.body,
-            attack = source.attack,
-            defense = source.defense,
-            initiative = source.initiative
-        };
-    }
-
-    private static CombatBattlerModel CreateModelFromEnemy(EnemyBattler source)
-    {
-        return new CombatBattlerModel
-        {
-            heart = source.heart,
-            body = source.body,
-            mind = source.mind,
-            maxHeart = source.heart,
-            maxBody = source.body,
-            maxMind = source.mind,
-            hp = source.body,
-            maxHp = source.body,
-            attack = source.attack,
-            defense = source.defense,
-            initiative = source.initiative
-        };
     }
 }

@@ -35,8 +35,12 @@ public class EnemyRunContext
 public class EnemyInstance
 {
     public EnemySO source;
+    public int hp;
     public int heart;
     public int body;
     public int mind;
+    public int attack;
+    public int defense;
+    public int initiative;
     public int runTier;
 }
