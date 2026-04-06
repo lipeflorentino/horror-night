@@ -6,6 +6,7 @@ public class CombatManager : MonoBehaviour
 
     private CombatBattlerModel playerModel;
     private CombatBattlerModel enemyModel;
+    private PlayerStatusSnapshot basePlayerSnapshot;
 
     private CombatStateModel combatStateModel;
     private TurnManager turnManager;
@@ -36,6 +37,7 @@ public class CombatManager : MonoBehaviour
 
         playerModel = combatModelFactory.CreatePlayer(sessionData.playerSnapshot);
         enemyModel = combatModelFactory.CreateEnemy(sessionData.enemyInstance);
+        basePlayerSnapshot = sessionData.playerSnapshot;
 
         combatStateModel = new CombatStateModel();
         turnManager = new TurnManager();
@@ -70,7 +72,7 @@ public class CombatManager : MonoBehaviour
 
         if (result.success)
         {
-            combatStateModel.EndCombat(CombatOutcome.Fled);
+            EndCombat(CombatOutcome.Fled);
         }
 
         return result;
@@ -96,7 +98,34 @@ public class CombatManager : MonoBehaviour
         CombatOutcome? outcome = combatEndService.CheckEnd(playerModel, enemyModel);
         if (outcome.HasValue)
         {
-            combatStateModel.EndCombat(outcome.Value);
+            EndCombat(outcome.Value);
         }
+    }
+
+    private void EndCombat(CombatOutcome outcome)
+    {
+        combatStateModel.EndCombat(outcome);
+        CombatResultStore.SetResult(new CombatResultSnapshot
+        {
+            playerSnapshot = CreatePlayerSnapshot(),
+            outcome = outcome
+        });
+    }
+
+    private PlayerStatusSnapshot CreatePlayerSnapshot()
+    {
+        return new PlayerStatusSnapshot
+        {
+            heart = playerModel.heart,
+            body = playerModel.body,
+            mind = playerModel.mind,
+            hp = playerModel.hp,
+            maxHeart = playerModel.maxHeart,
+            maxBody = playerModel.maxBody,
+            maxMind = playerModel.maxMind,
+            maxHp = playerModel.maxHp,
+            currentArchetype = basePlayerSnapshot.currentArchetype,
+            archetypePoints = basePlayerSnapshot.archetypePoints
+        };
     }
 }
