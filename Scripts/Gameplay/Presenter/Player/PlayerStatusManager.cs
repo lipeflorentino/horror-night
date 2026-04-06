@@ -12,6 +12,7 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private StatHudBinding heartHud;
     [SerializeField] private StatHudBinding bodyHud;
     [SerializeField] private StatHudBinding mindHud;
+    [SerializeField] private PlayerInventory playerInventory;
 
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
@@ -49,6 +50,15 @@ public class PlayerStatusManager : MonoBehaviour
         currentHp = Mathf.Clamp(currentHp, 0f, maxHp);
 
         RefreshAllBars();
+    }
+
+    private void Start()
+    {
+        CombatResultSnapshot result = CombatResultStore.Consume();
+        if (result == null)
+            return;
+
+        RestoreSnapshot(result.playerSnapshot);
     }
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;
@@ -175,7 +185,8 @@ public class PlayerStatusManager : MonoBehaviour
             maxMind = maxMind,
             maxHp = maxHp,
             currentArchetype = currentArchetype,
-            archetypePoints = archetypePoints
+            archetypePoints = archetypePoints,
+            inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot()
         };
     }
 
@@ -192,6 +203,8 @@ public class PlayerStatusManager : MonoBehaviour
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
+        if (playerInventory != null)
+            playerInventory.RestoreSnapshot(snapshot.inventory);
         
         RefreshAllBars();
     }

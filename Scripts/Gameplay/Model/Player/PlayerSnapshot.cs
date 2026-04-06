@@ -13,4 +13,5 @@ public struct PlayerStatusSnapshot
     [SerializeField] public float maxHp;
     [SerializeField] public PlayerArchetype currentArchetype;
     [SerializeField] public ArchetypePoints archetypePoints;
+    [SerializeField] public PlayerInventorySnapshot inventory;
 }
