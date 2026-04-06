@@ -28,8 +28,5 @@ TO DO
     - Implementar botão de voltar na UI de ações
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
 
-
-
-Começa o combate 
-- define quem começa o turno 
-- 
+    → adicionar uso de item em combate afetando snapshot (consumo real)
+    → ou loot de inimigo integrado ao CombatResultSnapshot
