@@ -6,6 +6,7 @@ public class CombatUI
     public Action<string, bool> Feedback;
     public Action<int> Hud;
     public Action<string, CombatLogStyle> Log;
+    public Action<string> TurnText;
 
     public void ShowFeedback(string text, bool popup)
     {
@@ -20,5 +21,10 @@ public class CombatUI
     public void AddLog(string text, CombatLogStyle style)
     {
         Log?.Invoke(text, style);
+    }
+    
+    public void SetTurnText(string text)
+    {
+        TurnText?.Invoke(text);
     }
 }

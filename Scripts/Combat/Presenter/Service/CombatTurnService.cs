@@ -1,5 +1,10 @@
+using System.Collections;
+using UnityEngine;
+
 public class CombatTurnService
 {
+    private static readonly WaitForSeconds _waitForSeconds1 = new(1f);
+
     private readonly CombatStateModel combatStateModel;
     private readonly TurnManager turnManager;
     private readonly DiceService dice;
@@ -14,29 +19,31 @@ public class CombatTurnService
         lastEnemyAction = EnemyTurnAction.None;
     }
 
-    public void StartFirstTurn(CombatBattlerModel player, CombatBattlerModel enemy)
+    public bool StartFirstTurn(CombatBattlerModel player, CombatBattlerModel enemy)
     {
         InitiativeResolver initResolver = new(dice);
 
-        if (initResolver.PlayerStarts(player, enemy))
-            StartPlayerTurn();
-        else 
+        bool isPlayerTurn = initResolver.PlayerStarts(player, enemy);
+
+        if (isPlayerTurn)
+            StartPlayerTurn(player);
+        else
             StartEnemyTurn();
+
+        return isPlayerTurn;
     }
 
-    public void StartPlayerTurn()
+    public void StartPlayerTurn(CombatBattlerModel player)
     {
         combatStateModel.SetPlayerTurn();
-        turnManager.ResetDice();
-        turnManager.StartTurn();
+        turnManager.StartTurn(3);
+        player.RecoverResources(1);
         lastEnemyAction = EnemyTurnAction.None;
     }
 
-    public void StartEnemyTurn()
+    public IEnumerator StartEnemyTurn()
     {
         combatStateModel.SetEnemyTurn();
-
-        int aiRoll = dice.RollD6();
-        lastEnemyAction = aiRoll <= 3 ? EnemyTurnAction.Attack : EnemyTurnAction.Defend;
+        yield return _waitForSeconds1;
     }
 }

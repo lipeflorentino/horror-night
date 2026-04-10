@@ -12,6 +12,9 @@ public class InputView : MonoBehaviour
     [SerializeField] private Button fleeButton;
     [SerializeField] private Button attackButton;
     [SerializeField] private Button endTurnButton;
+    [SerializeField] private Button useItemButton;
+    [SerializeField] private Button skillsButton;
+    [SerializeField] private Button infoButton;
 
     [Header("Flee")]
     [SerializeField] private int fleeDiceAmount = 1;
@@ -22,6 +25,9 @@ public class InputView : MonoBehaviour
     public event Action OnAttack;
     public event Action OnEndTurn;
     public event Action<int> OnFlee;
+    public event Action OnUseItem;
+    public event Action OnSkills;
+    public event Action OnInfo;
 
     private void Awake()
     {
@@ -42,6 +48,15 @@ public class InputView : MonoBehaviour
 
         if (endTurnButton != null)
             endTurnButton.onClick.AddListener(RaiseEndTurn);
+
+        if (useItemButton != null)
+            useItemButton.onClick.AddListener(RaiseUseItem);
+
+        if (skillsButton != null)
+            skillsButton.onClick.AddListener(RaiseSkills);
+
+        if (infoButton != null)
+            infoButton.onClick.AddListener(RaiseInfo);
     }
 
     private void OnDestroy()
@@ -63,6 +78,15 @@ public class InputView : MonoBehaviour
 
         if (endTurnButton != null)
             endTurnButton.onClick.RemoveListener(RaiseEndTurn);
+
+        if (useItemButton != null)
+            useItemButton.onClick.RemoveListener(RaiseUseItem);
+
+        if (skillsButton != null)
+            skillsButton.onClick.RemoveListener(RaiseSkills);
+
+        if (infoButton != null)
+            infoButton.onClick.RemoveListener(RaiseInfo);
     }
 
     private void RaiseRecharge() => OnRecharge?.Invoke();
@@ -76,4 +100,10 @@ public class InputView : MonoBehaviour
     private void RaiseAttack() => OnAttack?.Invoke();
 
     private void RaiseEndTurn() => OnEndTurn?.Invoke();
+
+    private void RaiseUseItem() => OnUseItem?.Invoke();
+
+    private void RaiseSkills() => OnSkills?.Invoke();
+    
+    private void RaiseInfo() => OnInfo?.Invoke();
 }

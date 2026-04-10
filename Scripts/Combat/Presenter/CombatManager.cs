@@ -88,11 +88,25 @@ public class CombatManager : MonoBehaviour
         return result;
     }
 
+    public void PlayerUseItem()
+    {
+        combatPresenter.OnUseItem();
+    }
+
+    public void PlayerSkills()
+    {
+        combatPresenter.OnSkills();
+    }
+
+    public void PlayerInfo()
+    {
+        combatPresenter.OnInfo();
+    }
+
+
     public ActionResult EndPlayerTurn()
     {
-        ActionResult result = combatPresenter.OnEndTurn();
-        combatTurnService.StartEnemyTurn();
-        combatTurnService.StartPlayerTurn();
+        ActionResult result = combatPresenter.OnEndTurn(playerModel);
         return result;
     }
 

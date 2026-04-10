@@ -27,6 +27,9 @@ public class CombatUIBinder : MonoBehaviour
         inputView.OnFlee += HandleFlee;
         inputView.OnAttack += HandleAttack;
         inputView.OnEndTurn += HandleEndTurn;
+        inputView.OnUseItem += HandleUseItem;
+        inputView.OnSkills += HandleSkills;
+        inputView.OnInfo += HandleInfo;
     }
 
     private void OnDisable()
@@ -40,6 +43,9 @@ public class CombatUIBinder : MonoBehaviour
         inputView.OnFlee -= HandleFlee;
         inputView.OnAttack -= HandleAttack;
         inputView.OnEndTurn -= HandleEndTurn;
+        inputView.OnUseItem -= HandleUseItem;
+        inputView.OnSkills -= HandleSkills;
+        inputView.OnInfo -= HandleInfo;
     }
 
     private void HandleRecharge()
@@ -76,5 +82,23 @@ public class CombatUIBinder : MonoBehaviour
     {
         if (combatManager != null)
             combatManager.EndPlayerTurn();
+    }
+
+    private void HandleUseItem()
+    {
+        if (combatManager != null)
+            combatManager.PlayerUseItem();
+    }
+
+    private void HandleSkills()
+    {
+        if (combatManager != null)
+            combatManager.PlayerSkills();
+    }
+
+    private void HandleInfo()
+    {
+        if (combatManager != null)
+            combatManager.PlayerInfo();
     }
 }

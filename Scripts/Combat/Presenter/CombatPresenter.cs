@@ -19,7 +19,8 @@ public class CombatPresenter
 
     public void OnTurnStart(CombatBattlerModel player, CombatBattlerModel enemy)
     {
-        combatTurnService.StartFirstTurn(player, enemy);
+        bool isPlayerTurn = combatTurnService.StartFirstTurn(player, enemy);
+        combatUI.SetTurnText($"Turno do {(isPlayerTurn ? "Jogador" : "Inimigo")}");
         combatUI.UpdateHud(turnManager.availableDice);
         combatUI.AddLog("Turn started.", CombatLogStyle.Neutral);
     }
@@ -52,10 +53,34 @@ public class CombatPresenter
         return result;
     }
 
-    public ActionResult OnEndTurn()
+    public void OnUseItem()
+    {
+        combatUI.AddLog("Inventory not implemented yet", CombatLogStyle.Neutral);
+    }
+
+    public void OnSkills()
+    {
+        combatUI.AddLog("Skills not implemented yet", CombatLogStyle.Neutral);
+    }
+
+    public void OnInfo()
+    {
+        combatUI.AddLog("No information available", CombatLogStyle.Neutral);
+    }
+
+    public ActionResult OnEndTurn(CombatBattlerModel player)
     {
         ActionResult result = combatInputHandler.HandleEndTurn();
         PublishResult("End Turn", result);
+
+        combatUI.SetTurnText("Turno do inimigo");
+        combatTurnService.StartEnemyTurn();
+        combatUI.AddLog("Enemy turn finished", CombatLogStyle.Neutral);
+
+        combatTurnService.StartPlayerTurn(player);
+        combatUI.SetTurnText("Turno do jogador");
+        combatUI.UpdateHud(turnManager.availableDice);
+
         return result;
     }
 

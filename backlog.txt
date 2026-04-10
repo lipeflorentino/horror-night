@@ -30,3 +30,4 @@ TO DO
 
     → adicionar uso de item em combate afetando snapshot (consumo real)
     → ou loot de inimigo integrado ao CombatResultSnapshot
+    - transformar CombatActionData em ActionDefinition + ActionInstance
