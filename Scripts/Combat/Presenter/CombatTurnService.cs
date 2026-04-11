@@ -20,7 +20,7 @@ public class CombatTurnService
 
         if (initResolver.PlayerStarts(player, enemy))
             StartPlayerTurn();
-        else 
+        else
             StartEnemyTurn();
     }
 

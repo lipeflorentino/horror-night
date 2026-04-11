@@ -24,33 +24,38 @@ public class CombatInputHandler
             return Fail("Not player turn.");
         }
 
-        int diceCost = boosted ? 1 : 0;
-        if (!turnManager.TrySpendDice(diceCost))
+        var action = new CombatActionData
         {
-            return Fail("Not enough dice.");
-        }
+            actionType = PlayerActionType.UseSkill,
+            diceCost = boosted ? 1 : 0,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0
+        };
 
-        ActionResult result = actionResolverService.ResolveRecharge(boosted);
-        combatResolutionService.ApplyRecovery(player, result.damage);
-        return result;
+        return TryReserveAction(player, action, "Recharge queued.");
     }
 
-    public ActionResult HandleInvestigate()
+    public ActionResult HandleInvestigate(CombatBattlerModel player)
     {
         if (!IsPlayerTurn())
         {
             return Fail("Not player turn.");
         }
 
-        if (!turnManager.TrySpendDice(1))
+        var action = new CombatActionData
         {
-            return Fail("Not enough dice.");
-        }
+            actionType = PlayerActionType.Investigate,
+            diceCost = 1,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0
+        };
 
-        return actionResolverService.ResolveInvestigate();
+        return TryReserveAction(player, action, "Investigate queued.");
     }
 
-    public ActionResult HandleFlee(int dice)
+    public ActionResult HandleFlee(CombatBattlerModel player, int dice)
     {
         if (!IsPlayerTurn())
         {
@@ -58,51 +63,123 @@ public class CombatInputHandler
         }
 
         int diceCost = dice < 0 ? 0 : dice;
-        if (!turnManager.TrySpendDice(diceCost))
+        var action = new CombatActionData
         {
-            return Fail("Not enough dice.");
-        }
+            actionType = PlayerActionType.UseSkill,
+            diceCost = diceCost,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0
+        };
 
-        return actionResolverService.ResolveFlee(diceCost);
+        return TryReserveAction(player, action, "Flee queued.");
     }
 
-    public ActionResult HandleAttack(CombatBattlerModel target, int baseAttack, int defense)
+    public ActionResult HandleAttack(CombatBattlerModel player, CombatBattlerModel target, int baseAttack, int defense)
     {
         if (!IsPlayerTurn())
         {
             return Fail("Not player turn.");
         }
 
-        if (!turnManager.TrySpendDice(1))
+        var action = new CombatActionData
         {
-            return Fail("Not enough dice.");
-        }
+            actionType = PlayerActionType.Attack,
+            diceCost = 1,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0,
+            predictedValue = baseAttack
+        };
 
-        ActionResult result = actionResolverService.ResolveAttack(baseAttack);
-        int mitigatedDamage = DamageCalculator.CalculateDamage(result.damage, 0, defense);
-        int appliedDamage = combatResolutionService.ApplyDamage(target, mitigatedDamage);
-
-        result.damage = appliedDamage;
-        return result;
+        return TryReserveAction(player, action, "Attack queued.");
     }
 
-    public ActionResult HandleEndTurn()
+    public ActionResult HandleEndTurn(CombatBattlerModel player)
     {
         if (!IsPlayerTurn())
         {
             return Fail("Not player turn.");
         }
 
-        combatStateModel.SetEnemyTurn();
+        var action = new CombatActionData
+        {
+            actionType = PlayerActionType.EndTurn,
+            diceCost = 0,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0
+        };
+
+        return TryReserveAction(player, action, "End turn queued.");
+    }
+
+    private ActionResult TryReserveAction(CombatBattlerModel player, CombatActionData action, string successMessage)
+    {
+        if (turnManager.availableDice <= 0)
+        {
+            return Fail("No dice available.");
+        }
+
+        if (!HasAnyResources(player))
+        {
+            return Fail("No resources available.");
+        }
+
+        if (action.diceCost > turnManager.availableDice)
+        {
+            return Fail("Not enough dice.");
+        }
+
+        if (!HasEnoughResources(player, action.heartCost, action.bodyCost, action.mindCost))
+        {
+            return Fail("Not enough resources.");
+        }
+
+        if (!turnManager.TrySpendDice(action.diceCost))
+        {
+            return Fail("Not enough dice.");
+        }
+
+        if (player != null && !player.SpendResources(action.heartCost, action.bodyCost, action.mindCost))
+        {
+            return Fail("Not enough resources.");
+        }
+
+        turnManager.QueueAction(action);
 
         return new ActionResult
         {
-            diceSpent = 0,
+            diceSpent = action.diceCost,
             roll = 0,
             success = true,
             damage = 0,
-            message = "Turn ended."
+            message = successMessage
         };
+    }
+
+    private static bool HasAnyResources(CombatBattlerModel player)
+    {
+        if (player == null)
+        {
+            return false;
+        }
+
+        return player.heart > 0 || player.body > 0 || player.mind > 0;
+    }
+
+    private static bool HasEnoughResources(CombatBattlerModel player, int heartCost, int bodyCost, int mindCost)
+    {
+        int safeHeartCost = heartCost < 0 ? 0 : heartCost;
+        int safeBodyCost = bodyCost < 0 ? 0 : bodyCost;
+        int safeMindCost = mindCost < 0 ? 0 : mindCost;
+
+        if (player == null)
+        {
+            return safeHeartCost == 0 && safeBodyCost == 0 && safeMindCost == 0;
+        }
+
+        return player.heart >= safeHeartCost && player.body >= safeBodyCost && player.mind >= safeMindCost;
     }
 
     private bool IsPlayerTurn()

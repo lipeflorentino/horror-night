@@ -15,6 +15,9 @@ public class CombatManager : MonoBehaviour
     private ActionResolverService actionResolverService;
     private CombatResolutionService combatResolutionService;
     private CombatInputHandler combatInputHandler;
+    private CombatTurnResolver combatTurnResolver;
+    private EnemyActionPlanner enemyActionPlanner;
+    private EnemyTurnHandler enemyTurnHandler;
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
     private CombatModelFactory combatModelFactory;
@@ -46,7 +49,10 @@ public class CombatManager : MonoBehaviour
         actionResolverService = new ActionResolverService(diceService);
         combatResolutionService = new CombatResolutionService();
         combatInputHandler = new CombatInputHandler(turnManager, actionResolverService, combatResolutionService, combatStateModel);
-        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, turnManager);
+        combatTurnResolver = new CombatTurnResolver(combatResolutionService);
+        enemyActionPlanner = new EnemyActionPlanner();
+        enemyTurnHandler = new EnemyTurnHandler(combatTurnService, enemyActionPlanner, combatTurnResolver);
+        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, combatTurnResolver, enemyTurnHandler, turnManager);
         combatEndService = new CombatEndService();
 
         combatPresenter.OnTurnStart(playerModel, enemyModel);
@@ -54,43 +60,27 @@ public class CombatManager : MonoBehaviour
 
     public ActionResult PlayerRecharge(bool boosted)
     {
-        ActionResult result = combatPresenter.OnRecharge(playerModel, boosted);
-        ResolveCombatEnd();
-        return result;
+        return combatPresenter.OnRecharge(playerModel, boosted);
     }
 
     public ActionResult PlayerInvestigate()
     {
-        ActionResult result = combatPresenter.OnInvestigate();
-        ResolveCombatEnd();
-        return result;
+        return combatPresenter.OnInvestigate(playerModel);
     }
 
     public ActionResult PlayerFlee(int dice)
     {
-        ActionResult result = combatPresenter.OnFlee(dice);
-
-        if (result.success)
-        {
-            EndCombat(CombatOutcome.Fled);
-        }
-
-        return result;
+        return combatPresenter.OnFlee(playerModel, dice);
     }
 
     public ActionResult PlayerAttack()
     {
-        ActionResult result = combatPresenter.OnDamage(enemyModel, playerModel.attack, enemyModel.defense);
-        ResolveCombatEnd();
-        return result;
+        return combatPresenter.OnDamage(playerModel, enemyModel, playerModel.attack, enemyModel.defense);
     }
 
     public ActionResult EndPlayerTurn()
     {
-        ActionResult result = combatPresenter.OnEndTurn();
-        combatTurnService.StartEnemyTurn();
-        combatTurnService.StartPlayerTurn();
-        return result;
+        return combatPresenter.OnEndTurn(playerModel);
     }
 
     private void ResolveCombatEnd()

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -7,6 +8,7 @@ public class CombatUIViewBinder : MonoBehaviour
     [SerializeField] private FeedbackView feedbackView;
     [SerializeField] private LogView logView;
     [SerializeField] private HudView hudView;
+    [SerializeField] private TMP_Text actionQueueText;
 
     private void OnEnable()
     {
@@ -16,6 +18,7 @@ public class CombatUIViewBinder : MonoBehaviour
         combatUI.Feedback += HandleFeedback;
         combatUI.Log += HandleLog;
         combatUI.Hud += HandleHud;
+        combatUI.ActionQueued += HandleActionQueued;
     }
 
     private void OnDisable()
@@ -26,6 +29,7 @@ public class CombatUIViewBinder : MonoBehaviour
         combatUI.Feedback -= HandleFeedback;
         combatUI.Log -= HandleLog;
         combatUI.Hud -= HandleHud;
+        combatUI.ActionQueued -= HandleActionQueued;
     }
 
     private void HandleFeedback(string text, bool popup)
@@ -44,5 +48,19 @@ public class CombatUIViewBinder : MonoBehaviour
     {
         if (hudView != null)
             hudView.UpdateDice(value);
+    }
+
+    private void HandleActionQueued(string text)
+    {
+        if (actionQueueText == null)
+            return;
+
+        if (string.IsNullOrEmpty(actionQueueText.text))
+        {
+            actionQueueText.text = $"- {text}";
+            return;
+        }
+
+        actionQueueText.text += $"\n- {text}";
     }
 }

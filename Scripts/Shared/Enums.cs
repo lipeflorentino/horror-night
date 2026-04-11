@@ -16,6 +16,14 @@ public enum NodeFlags
     Dangerous       = 1 << 5
 }
 
+public enum PlayerActionType
+{
+    Attack,
+    Investigate,
+    UseItem,
+    UseSkill,
+    EndTurn
+}
 
 public enum CombatLogStyle
 {
