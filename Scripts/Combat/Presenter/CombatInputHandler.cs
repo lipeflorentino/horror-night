@@ -1,9 +1,8 @@
 public class CombatInputHandler
 {
     private readonly TurnManager turnManager;
-    private readonly ActionResolverService actionResolverService;
-    private readonly CombatResolutionService combatResolutionService;
     private readonly CombatStateModel combatStateModel;
+    private readonly ActionDefinitionFactory actionDefinitionFactory;
 
     public CombatInputHandler(
         TurnManager turnManager,
@@ -12,78 +11,98 @@ public class CombatInputHandler
         CombatStateModel combatStateModel)
     {
         this.turnManager = turnManager;
-        this.actionResolverService = actionResolverService;
-        this.combatResolutionService = combatResolutionService;
         this.combatStateModel = combatStateModel;
+        actionDefinitionFactory = new ActionDefinitionFactory();
     }
 
     public ActionResult HandleRecharge(CombatBattlerModel player, bool boosted)
     {
-        if (!IsPlayerTurn())
+        ActionInstance action = new ActionInstance
         {
-            return Fail("Not player turn.");
-        }
+            definition = actionDefinitionFactory.CreateDefend(),
+            allocatedDice = boosted ? 1 : 0,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0
+        };
 
-        int diceCost = boosted ? 1 : 0;
-        if (!turnManager.TrySpendDice(diceCost))
-        {
-            return Fail("Not enough dice.");
-        }
-
-        ActionResult result = actionResolverService.ResolveRecharge(boosted);
-        combatResolutionService.ApplyRecovery(player, result.damage);
-        return result;
+        return TryQueueAction(player, action, "Defend queued.");
     }
 
-    public ActionResult HandleInvestigate()
+    public ActionResult QueueInvestigate(CombatBattlerModel player, int diceAmount)
     {
-        if (!IsPlayerTurn())
-        {
-            return Fail("Not player turn.");
-        }
+        int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
 
-        if (!turnManager.TrySpendDice(1))
+        ActionInstance action = new ActionInstance
         {
-            return Fail("Not enough dice.");
-        }
+            definition = actionDefinitionFactory.CreateInvestigate(),
+            allocatedDice = allocatedDice - 1,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0
+        };
 
-        return actionResolverService.ResolveInvestigate();
+        return TryQueueAction(player, action, "Investigate queued.");
     }
 
-    public ActionResult HandleFlee(int dice)
+    public ActionResult HandleFlee(CombatBattlerModel player, int dice)
     {
-        if (!IsPlayerTurn())
+        ActionInstance action = new ActionInstance
         {
-            return Fail("Not player turn.");
-        }
+            definition = actionDefinitionFactory.CreateDefend(),
+            allocatedDice = dice < 1 ? 0 : dice - 1,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0
+        };
 
-        int diceCost = dice < 0 ? 0 : dice;
-        if (!turnManager.TrySpendDice(diceCost))
-        {
-            return Fail("Not enough dice.");
-        }
-
-        return actionResolverService.ResolveFlee(diceCost);
+        return TryQueueAction(player, action, "Defend queued.");
     }
 
-    public ActionResult HandleAttack(CombatBattlerModel target, int baseAttack, int defense)
+    public ActionResult QueueAttack(CombatBattlerModel player, int diceAmount)
     {
-        if (!IsPlayerTurn())
+        int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
+
+        ActionInstance action = new ActionInstance
         {
-            return Fail("Not player turn.");
-        }
+            definition = actionDefinitionFactory.CreateAttack(),
+            allocatedDice = allocatedDice - 1,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0
+        };
 
-        if (!turnManager.TrySpendDice(1))
+        return TryQueueAction(player, action, "Attack queued.");
+    }
+
+    public ActionResult QueueUseItemSelection(CombatBattlerModel player, int itemId)
+    {
+        ActionInstance action = new ActionInstance
         {
-            return Fail("Not enough dice.");
-        }
+            definition = actionDefinitionFactory.CreateUseItem(),
+            allocatedDice = 0,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0,
+            itemId = itemId
+        };
 
-        ActionResult result = actionResolverService.ResolveAttack(baseAttack);
-        int mitigatedDamage = DamageCalculator.CalculateDamage(result.damage, 0, defense);
-        int appliedDamage = combatResolutionService.ApplyDamage(target, mitigatedDamage);
+        return TryQueueAction(player, action, $"Use Item queued (item {itemId}).");
+    }
 
-        result.damage = appliedDamage;
-        return result;
+    public ActionResult QueueUseSkillSelection(CombatBattlerModel player, int skillId)
+    {
+        ActionInstance action = new ActionInstance
+        {
+            definition = actionDefinitionFactory.CreateUseSkill(),
+            allocatedDice = 0,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0,
+            skillId = skillId
+        };
+
+        return TryQueueAction(player, action, $"Use Skill queued (skill {skillId}).");
     }
 
     public ActionResult HandleEndTurn()
@@ -93,8 +112,6 @@ public class CombatInputHandler
             return Fail("Not player turn.");
         }
 
-        combatStateModel.SetEnemyTurn();
-
         return new ActionResult
         {
             diceSpent = 0,
@@ -102,6 +119,65 @@ public class CombatInputHandler
             success = true,
             damage = 0,
             message = "Turn ended."
+        };
+    }
+
+    private ActionResult TryQueueAction(CombatBattlerModel player, ActionInstance action, string successMessage)
+    {
+        if (!IsPlayerTurn())
+        {
+            return Fail("Not player turn.");
+        }
+
+        if (player == null)
+        {
+            return Fail("Player not found.");
+        }
+
+        if (turnManager.availableDice <= 0)
+        {
+            return Fail("No dice available.");
+        }
+
+        if (player.heart <= 0 && player.body <= 0 && player.mind <= 0)
+        {
+            return Fail("No resources available.");
+        }
+
+        if (!turnManager.CanAfford(action))
+        {
+            return Fail("Cannot afford action.");
+        }
+
+        int totalDice = action.TotalDiceCost();
+        int heartCost = action.definition.heartCost + action.allocatedHeart;
+        int bodyCost = action.definition.bodyCost + action.allocatedBody;
+        int mindCost = action.definition.mindCost + action.allocatedMind;
+
+        if (!turnManager.TrySpendDice(totalDice))
+        {
+            return Fail("Not enough dice.");
+        }
+
+        if (!turnManager.TrySpendResources(heartCost, bodyCost, mindCost))
+        {
+            return Fail("Not enough resources.");
+        }
+
+        if (!player.SpendResources(heartCost, bodyCost, mindCost))
+        {
+            return Fail("Not enough resources.");
+        }
+
+        turnManager.QueueAction(action);
+
+        return new ActionResult
+        {
+            diceSpent = totalDice,
+            roll = 0,
+            success = true,
+            damage = 0,
+            message = successMessage
         };
     }
 

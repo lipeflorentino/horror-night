@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 
 public class CombatUI
 {
@@ -7,6 +6,9 @@ public class CombatUI
     public Action<int> Hud;
     public Action<string, CombatLogStyle> Log;
     public Action<string> TurnText;
+    public Action<string> ActionQueued;
+    public Action InventorySelectionRequested;
+    public Action SkillSelectionRequested;
 
     public void ShowFeedback(string text, bool popup)
     {
@@ -26,5 +28,20 @@ public class CombatUI
     public void SetTurnText(string text)
     {
         TurnText?.Invoke(text);
+    }
+
+    public void NotifyActionQueued(string text)
+    {
+        ActionQueued?.Invoke(text);
+    }
+
+    public void RequestInventorySelection()
+    {
+        InventorySelectionRequested?.Invoke();
+    }
+
+    public void RequestSkillSelection()
+    {
+        SkillSelectionRequested?.Invoke();
     }
 }

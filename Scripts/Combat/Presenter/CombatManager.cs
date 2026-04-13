@@ -12,6 +12,7 @@ public class CombatManager : MonoBehaviour
     private CombatTurnService combatTurnService;
     private ActionResolverService actionResolverService;
     private CombatResolutionService combatResolutionService;
+    private CombatTurnResolver combatTurnResolver;
     private CombatInputHandler combatInputHandler;
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
@@ -48,8 +49,9 @@ public class CombatManager : MonoBehaviour
         combatTurnService = new CombatTurnService(combatStateModel, turnManager, diceService);
         actionResolverService = new ActionResolverService(diceService);
         combatResolutionService = new CombatResolutionService();
+        combatTurnResolver = new CombatTurnResolver(combatResolutionService, diceService);
         combatInputHandler = new CombatInputHandler(turnManager, actionResolverService, combatResolutionService, combatStateModel);
-        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, turnManager);
+        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, combatTurnResolver, turnManager);
         combatEndService = new CombatEndService();
 
         combatPresenter.OnTurnStart(playerModel, enemyModel);
@@ -64,38 +66,54 @@ public class CombatManager : MonoBehaviour
 
     public ActionResult PlayerInvestigate()
     {
-        ActionResult result = combatPresenter.OnInvestigate();
+        ActionResult result = combatPresenter.OnAddInvestigateDice(playerModel, 1);
         ResolveCombatEnd();
+        return result;
+    }
+
+    public ActionResult PlayerAddInvestigateDice(int dice)
+    {
+        ActionResult result = combatPresenter.OnAddInvestigateDice(playerModel, dice);
         return result;
     }
 
     public ActionResult PlayerFlee(int dice)
     {
-        ActionResult result = combatPresenter.OnFlee(dice);
-
-        if (result.success)
-        {
-            EndCombat(CombatOutcome.Fled);
-        }
-
+        ActionResult result = combatPresenter.OnFlee(playerModel, dice);
         return result;
     }
 
     public ActionResult PlayerAttack()
     {
-        ActionResult result = combatPresenter.OnDamage(enemyModel, playerModel.attack, enemyModel.defense);
+        ActionResult result = combatPresenter.OnAddAttackDice(playerModel, 1);
         ResolveCombatEnd();
         return result;
     }
 
-    public void PlayerUseItem()
+    public ActionResult PlayerAddAttackDice(int dice)
     {
-        combatPresenter.OnUseItem();
+        ActionResult result = combatPresenter.OnAddAttackDice(playerModel, dice);
+        return result;
     }
 
-    public void PlayerSkills()
+    public ActionResult PlayerUseItem()
     {
-        combatPresenter.OnSkills();
+        return combatPresenter.OnUseItem();
+    }
+
+    public ActionResult PlayerSelectItem(int itemId)
+    {
+        return combatPresenter.OnItemSelected(playerModel, itemId);
+    }
+
+    public ActionResult PlayerSkills()
+    {
+        return combatPresenter.OnSkills();
+    }
+
+    public ActionResult PlayerSelectSkill(int skillId)
+    {
+        return combatPresenter.OnSkillSelected(playerModel, skillId);
     }
 
     public void PlayerInfo()
@@ -106,7 +124,8 @@ public class CombatManager : MonoBehaviour
 
     public ActionResult EndPlayerTurn()
     {
-        ActionResult result = combatPresenter.OnEndTurn(playerModel);
+        ActionResult result = combatPresenter.OnEndTurn(playerModel, enemyModel);
+        ResolveCombatEnd();
         return result;
     }
 

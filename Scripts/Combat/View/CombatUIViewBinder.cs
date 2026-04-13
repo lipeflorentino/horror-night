@@ -9,6 +9,7 @@ public class CombatUIViewBinder : MonoBehaviour
     [SerializeField] private LogView logView;
     [SerializeField] private HudView hudView;
     [SerializeField] private TMP_Text turnText;
+    [SerializeField] private TMP_Text actionQueueText;
 
     private void OnEnable()
     {
@@ -19,6 +20,7 @@ public class CombatUIViewBinder : MonoBehaviour
         combatUI.Log += HandleLog;
         combatUI.Hud += HandleHud;
         combatUI.TurnText += HandleTurnText;
+        combatUI.ActionQueued += HandleActionQueued;
     }
 
     private void OnDisable()
@@ -30,6 +32,7 @@ public class CombatUIViewBinder : MonoBehaviour
         combatUI.Log -= HandleLog;
         combatUI.Hud -= HandleHud;
         combatUI.TurnText -= HandleTurnText;
+        combatUI.ActionQueued -= HandleActionQueued;
     }
 
     private void HandleFeedback(string text, bool popup)
@@ -56,8 +59,16 @@ public class CombatUIViewBinder : MonoBehaviour
             turnText.text = text;
     }
 
+    private void HandleActionQueued(string text)
+    {
+        if (actionQueueText != null)
+            actionQueueText.text += $"\n- {text}";
+    }
+
     public void Bind(CombatUI ui)
     {
         combatUI = ui;
+        if (actionQueueText != null)
+            actionQueueText.text = "Queued Actions:";
     }
 }

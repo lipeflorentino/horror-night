@@ -21,13 +21,16 @@ public class InputView : MonoBehaviour
 
     public event Action OnRecharge;
     public event Action OnRechargeBoosted;
-    public event Action OnInvestigate;
-    public event Action OnAttack;
+    public event Action<int> OnAddInvestigateDice;
+    public event Action<int> OnAddAttackDice;
     public event Action OnEndTurn;
     public event Action<int> OnFlee;
     public event Action OnUseItem;
     public event Action OnSkills;
     public event Action OnInfo;
+
+    private int attackDiceAllocation;
+    private int investigateDiceAllocation;
 
     private void Awake()
     {
@@ -38,13 +41,13 @@ public class InputView : MonoBehaviour
             rechargeBoostedButton.onClick.AddListener(RaiseRechargeBoosted);
 
         if (investigateButton != null)
-            investigateButton.onClick.AddListener(RaiseInvestigate);
+            investigateButton.onClick.AddListener(RaiseAddInvestigateDice);
 
         if (fleeButton != null)
             fleeButton.onClick.AddListener(RaiseFlee);
 
         if (attackButton != null)
-            attackButton.onClick.AddListener(RaiseAttack);
+            attackButton.onClick.AddListener(RaiseAddAttackDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.AddListener(RaiseEndTurn);
@@ -68,13 +71,13 @@ public class InputView : MonoBehaviour
             rechargeBoostedButton.onClick.RemoveListener(RaiseRechargeBoosted);
 
         if (investigateButton != null)
-            investigateButton.onClick.RemoveListener(RaiseInvestigate);
+            investigateButton.onClick.RemoveListener(RaiseAddInvestigateDice);
 
         if (fleeButton != null)
             fleeButton.onClick.RemoveListener(RaiseFlee);
 
         if (attackButton != null)
-            attackButton.onClick.RemoveListener(RaiseAttack);
+            attackButton.onClick.RemoveListener(RaiseAddAttackDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.RemoveListener(RaiseEndTurn);
@@ -93,11 +96,19 @@ public class InputView : MonoBehaviour
 
     private void RaiseRechargeBoosted() => OnRechargeBoosted?.Invoke();
 
-    private void RaiseInvestigate() => OnInvestigate?.Invoke();
+    private void RaiseAddInvestigateDice()
+    {
+        investigateDiceAllocation++;
+        OnAddInvestigateDice?.Invoke(investigateDiceAllocation);
+    }
 
     private void RaiseFlee() => OnFlee?.Invoke(fleeDiceAmount);
 
-    private void RaiseAttack() => OnAttack?.Invoke();
+    private void RaiseAddAttackDice()
+    {
+        attackDiceAllocation++;
+        OnAddAttackDice?.Invoke(attackDiceAllocation);
+    }
 
     private void RaiseEndTurn() => OnEndTurn?.Invoke();
 
