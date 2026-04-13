@@ -86,6 +86,27 @@ public class CombatPresenter
         return result;
     }
 
+    public ActionResult OnSubtractAttackDice()
+    {
+        ActionResult result = combatInputHandler.TryRemoveAttackDice(1);
+        PublishResult("Remove Attack Dice", result);
+        return result;
+    }
+
+    public ActionResult OnSubtractInvestigateDice()
+    {
+        ActionResult result = combatInputHandler.TryRemoveInvestigateDice(1);
+        PublishResult("Remove Investigate Dice", result);
+        return result;
+    }
+
+    public ActionResult OnSubtractDefendDice()
+    {
+        ActionResult result = combatInputHandler.TryRemoveDefendDice(1);
+        PublishResult("Remove Defend Dice", result);
+        return result;
+    }
+
     public ActionResult OnUseItem()
     {
         combatUI.RequestInventorySelection();

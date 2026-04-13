@@ -16,6 +16,9 @@ public class InputView : MonoBehaviour
     [SerializeField] private Button addAttackDiceButton;
     [SerializeField] private Button addInvestigateDiceButton;
     [SerializeField] private Button addDefendDiceButton;
+    [SerializeField] private Button subtractAttackDiceButton;
+    [SerializeField] private Button subtractInvestigateDiceButton;
+    [SerializeField] private Button subtractDefendDiceButton;
     [SerializeField] private Button useItemButton;
     [SerializeField] private Button useSkillButton;
     [SerializeField] private Button endTurnButton;
@@ -33,6 +36,9 @@ public class InputView : MonoBehaviour
     public event Action<int> OnAddAttackDice;
     public event Action<int> OnAddInvestigateDice;
     public event Action<int> OnAddDefendDice;
+    public event Action<int> OnSubtractAttackDice;
+    public event Action<int> OnSubtractInvestigateDice;
+    public event Action<int> OnSubtractDefendDice;
     public event Action OnUseItem;
     public event Action OnUseSkill;
     public event Action OnInfo;
@@ -61,6 +67,15 @@ public class InputView : MonoBehaviour
 
         if (addDefendDiceButton != null)
             addDefendDiceButton.onClick.AddListener(RaiseAddDefendDice);
+
+        if (subtractAttackDiceButton != null)
+            subtractAttackDiceButton.onClick.AddListener(RaiseSubtractAttackDice);
+
+        if (subtractInvestigateDiceButton != null)
+            subtractInvestigateDiceButton.onClick.AddListener(RaiseSubtractInvestigateDice);
+
+        if (subtractDefendDiceButton != null)
+            subtractDefendDiceButton.onClick.AddListener(RaiseSubtractDefendDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.AddListener(RaiseEndTurn);
@@ -100,6 +115,15 @@ public class InputView : MonoBehaviour
 
         if (addDefendDiceButton != null)
             addDefendDiceButton.onClick.RemoveListener(RaiseAddDefendDice);
+
+        if (subtractAttackDiceButton != null)
+            subtractAttackDiceButton.onClick.RemoveListener(RaiseSubtractAttackDice);
+
+        if (subtractInvestigateDiceButton != null)
+            subtractInvestigateDiceButton.onClick.RemoveListener(RaiseSubtractInvestigateDice);
+
+        if (subtractDefendDiceButton != null)
+            subtractDefendDiceButton.onClick.RemoveListener(RaiseSubtractDefendDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.RemoveListener(RaiseEndTurn);
@@ -157,6 +181,36 @@ public class InputView : MonoBehaviour
         defendBonusDice++;
         defendDiceCountText.text = "" + defendBonusDice;
         OnAddDefendDice?.Invoke(1 + defendBonusDice);
+    }
+
+    private void RaiseSubtractAttackDice()
+    {
+        if (attackBonusDice > 0)
+        {
+            attackBonusDice--;
+            attackDiceCountText.text = "" + attackBonusDice;
+            OnSubtractAttackDice?.Invoke(1);
+        }
+    }
+
+    private void RaiseSubtractInvestigateDice()
+    {
+        if (investigateBonusDice > 0)
+        {
+            investigateBonusDice--;
+            investigateDiceCountText.text = "" + investigateBonusDice;
+            OnSubtractInvestigateDice?.Invoke(1);
+        }
+    }
+
+    private void RaiseSubtractDefendDice()
+    {
+        if (defendBonusDice > 0)
+        {
+            defendBonusDice--;
+            defendDiceCountText.text = "" + defendBonusDice;
+            OnSubtractDefendDice?.Invoke(1);
+        }
     }
 
     private void RaiseEndTurn() => OnEndTurn?.Invoke();

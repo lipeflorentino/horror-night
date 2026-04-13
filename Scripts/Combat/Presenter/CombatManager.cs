@@ -207,6 +207,27 @@ public class CombatManager : MonoBehaviour
         return combatPresenter.OnAddDefendDice(playerModel, dice);
     }
 
+    public ActionResult PlayerSubtractAttackDice()
+    {
+        ActionResult result = combatPresenter.OnSubtractAttackDice();
+        combatUI.UpdateHud(turnManager.availableDice);
+        return result;
+    }
+
+    public ActionResult PlayerSubtractInvestigateDice()
+    {
+        ActionResult result = combatPresenter.OnSubtractInvestigateDice();
+        combatUI.UpdateHud(turnManager.availableDice);
+        return result;
+    }
+
+    public ActionResult PlayerSubtractDefendDice()
+    {
+        ActionResult result = combatPresenter.OnSubtractDefendDice();
+        combatUI.UpdateHud(turnManager.availableDice);
+        return result;
+    }
+
     public ActionResult PlayerUseItem()
     {
         return combatPresenter.OnUseItem();
@@ -309,131 +330,5 @@ public class CombatManager : MonoBehaviour
         {
             StopCoroutine(combatLoopCoroutine);
         }
-    }
-}
-
-    public ActionResult PlayerRecharge(bool boosted)
-    {
-        ActionResult result = combatPresenter.OnRecharge(playerModel, boosted);
-        ResolveCombatEnd();
-        return result;
-    }
-
-    public ActionResult PlayerInvestigate()
-    {
-        ActionResult result = combatPresenter.OnInvestigate(playerModel);
-        ResolveCombatEnd();
-        return result;
-    }
-
-    public ActionResult PlayerAddInvestigateDice(int dice)
-    {
-        ActionResult result = combatPresenter.OnAddInvestigateDice(playerModel, dice);
-        return result;
-    }
-
-    public ActionResult PlayerFlee(int dice)
-    {
-        ActionResult result = combatPresenter.OnFlee(playerModel, dice);
-        return result;
-    }
-
-    public ActionResult PlayerAttack()
-    {
-        ActionResult result = combatPresenter.OnAttack(playerModel);
-        ResolveCombatEnd();
-        return result;
-    }
-
-    public ActionResult PlayerDefend()
-    {
-        ActionResult result = combatPresenter.OnDefend(playerModel);
-        ResolveCombatEnd();
-        return result;
-    }
-
-    public ActionResult PlayerAddAttackDice(int dice)
-    {
-        ActionResult result = combatPresenter.OnAddAttackDice(playerModel, dice);
-        return result;
-    }
-
-    public ActionResult PlayerAddDefendDice(int dice)
-    {
-        return combatPresenter.OnAddDefendDice(playerModel, dice);
-    }
-
-    public ActionResult PlayerUseItem()
-    {
-        return combatPresenter.OnUseItem();
-    }
-
-    public ActionResult PlayerSelectItem(int itemId)
-    {
-        return combatPresenter.OnItemSelected(playerModel, itemId);
-    }
-
-    public ActionResult PlayerSkills()
-    {
-        return combatPresenter.OnSkills();
-    }
-
-    public ActionResult PlayerSelectSkill(int skillId)
-    {
-        return combatPresenter.OnSkillSelected(playerModel, skillId);
-    }
-
-    public ActionResult PlayerUseSkill()
-    {
-        return combatPresenter.OnUseSkill(playerModel, 1);
-    }
-
-    public void PlayerInfo()
-    {
-        combatPresenter.OnInfo();
-    }
-
-
-    public ActionResult EndPlayerTurn()
-    {
-        ActionResult result = combatPresenter.OnEndTurn(playerModel, enemyModel);
-        ResolveCombatEnd();
-        return result;
-    }
-
-    private void ResolveCombatEnd()
-    {
-        CombatOutcome? outcome = combatEndService.CheckEnd(playerModel, enemyModel);
-        if (outcome.HasValue)
-        {
-            EndCombat(outcome.Value);
-        }
-    }
-
-    private void EndCombat(CombatOutcome outcome)
-    {
-        combatStateModel.EndCombat(outcome);
-        CombatResultStore.SetResult(new CombatResultSnapshot
-        {
-            playerSnapshot = CreatePlayerSnapshot(),
-            outcome = outcome
-        });
-    }
-
-    private PlayerStatusSnapshot CreatePlayerSnapshot()
-    {
-        return new PlayerStatusSnapshot
-        {
-            heart = playerModel.heart,
-            body = playerModel.body,
-            mind = playerModel.mind,
-            hp = playerModel.hp,
-            maxHeart = playerModel.maxHeart,
-            maxBody = playerModel.maxBody,
-            maxMind = playerModel.maxMind,
-            maxHp = playerModel.maxHp,
-            currentArchetype = basePlayerSnapshot.currentArchetype,
-            archetypePoints = basePlayerSnapshot.archetypePoints
-        };
     }
 }
