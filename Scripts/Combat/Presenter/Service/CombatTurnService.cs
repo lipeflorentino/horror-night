@@ -44,7 +44,7 @@ public class CombatTurnService
 
     public List<ActionInstance> GenerateEnemyActions()
     {
-        ActionDefinitionFactory factory = new ActionDefinitionFactory();
+        ActionDefinitionFactory factory = new();
         int roll = dice.RollD6();
         ActionDefinition definition = roll <= 3 ? factory.CreateDefend() : factory.CreateAttack();
 

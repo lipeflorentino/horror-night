@@ -16,7 +16,7 @@ public class CombatTurnResolver
         CombatBattlerModel enemy,
         IReadOnlyList<ActionInstance> actions)
     {
-        List<ActionResult> results = new List<ActionResult>();
+        List<ActionResult> results = new();
 
         if (player == null || enemy == null || actions == null)
         {

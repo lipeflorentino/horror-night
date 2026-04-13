@@ -23,8 +23,8 @@ public class ActionDefinitionFactory
             type = PlayerActionType.Defend,
             displayName = "Defend",
             baseDiceCost = 1,
-            heartCost = 1,
-            bodyCost = 0,
+            heartCost = 0,
+            bodyCost = 1,
             mindCost = 0,
             requiresTarget = false,
             consumesItem = false,
@@ -54,7 +54,7 @@ public class ActionDefinitionFactory
         {
             type = PlayerActionType.UseItem,
             displayName = "Use Item",
-            baseDiceCost = 1,
+            baseDiceCost = 0,
             heartCost = 0,
             bodyCost = 0,
             mindCost = 0,
@@ -70,10 +70,10 @@ public class ActionDefinitionFactory
         {
             type = PlayerActionType.UseSkill,
             displayName = "Use Skill",
-            baseDiceCost = 1,
+            baseDiceCost = 0,
             heartCost = 0,
             bodyCost = 0,
-            mindCost = 1,
+            mindCost = 0,
             requiresTarget = false,
             consumesItem = false,
             isDefensive = false

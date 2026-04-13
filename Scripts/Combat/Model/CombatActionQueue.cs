@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class CombatActionQueue
 {
-    private readonly List<ActionInstance> actions = new List<ActionInstance>();
+    private readonly List<ActionInstance> actions = new();
 
     public void Add(ActionInstance action)
     {
