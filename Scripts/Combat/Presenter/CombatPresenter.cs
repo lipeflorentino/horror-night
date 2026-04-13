@@ -7,19 +7,22 @@ public class CombatPresenter
     private readonly CombatTurnService combatTurnService;
     private readonly CombatTurnResolver combatTurnResolver;
     private readonly TurnManager turnManager;
+    private InputView inputView;
 
     public CombatPresenter(
         CombatUI combatUI,
         CombatInputHandler combatInputHandler,
         CombatTurnService combatTurnService,
         CombatTurnResolver combatTurnResolver,
-        TurnManager turnManager)
+        TurnManager turnManager,
+        InputView inputView = null)
     {
         this.combatUI = combatUI;
         this.combatInputHandler = combatInputHandler;
         this.combatTurnService = combatTurnService;
         this.combatTurnResolver = combatTurnResolver;
         this.turnManager = turnManager;
+        this.inputView = inputView;
     }
 
     public void OnTurnStart(CombatBattlerModel player, CombatBattlerModel enemy)
@@ -205,5 +208,60 @@ public class CombatPresenter
 
         combatUI.ShowFeedback(result.message, true);
         combatUI.AddLog($"{action}: {result.message}", result.success ? CombatLogStyle.Action : CombatLogStyle.Negative);
+    }
+
+    /// <summary>
+    /// Atualiza a UI para mostrar que é o turno do jogador.
+    /// Ativa botões e reseta estado de ação primária.
+    /// </summary>
+    public void OnPlayerTurnUIUpdate()
+    {
+        if (inputView != null)
+        {
+            inputView.ShowPlayerTurnUI();
+            inputView.ResetPrimaryActions();
+        }
+    }
+
+    /// <summary>
+    /// Atualiza a UI para mostrar que é o turno do inimigo.
+    /// Desativa botões do jogador.
+    /// </summary>
+    public void OnEnemyTurnUIUpdate()
+    {
+        if (inputView != null)
+        {
+            inputView.ShowEnemyTurnUI();
+        }
+    }
+
+    /// <summary>
+    /// Desabilita os botões de ação primária após um ser selecionado.
+    /// </summary>
+    public void OnPrimaryActionSelected()
+    {
+        if (inputView != null)
+        {
+            inputView.DisablePrimaryActions();
+        }
+    }
+
+    /// <summary>
+    /// Atualiza os contadores de dados alocados na UI.
+    /// </summary>
+    public void UpdateDiceCounters()
+    {
+        if (inputView != null)
+        {
+            inputView.UpdateDiceCounters();
+        }
+    }
+
+    /// <summary>
+    /// Define a referência ao InputView (pode ser definida após construção).
+    /// </summary>
+    public void SetInputView(InputView view)
+    {
+        inputView = view;
     }
 }

@@ -19,6 +19,7 @@ public class CombatManager : MonoBehaviour
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
     private CombatModelFactory combatModelFactory;
+    private InputView inputView;
 
     private Coroutine combatLoopCoroutine;
 
@@ -58,6 +59,16 @@ public class CombatManager : MonoBehaviour
         combatInputHandler = new CombatInputHandler(turnManager, actionResolverService, combatResolutionService, combatStateModel);
         combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, combatTurnResolver, turnManager);
         combatEndService = new CombatEndService();
+
+        // Encontrar InputView e conectar ao presenter
+        inputView = FindObjectOfType<InputView>();
+        if (inputView != null)
+        {
+            combatPresenter.SetInputView(inputView);
+        }
+
+        // Subscribir aos eventos de ação primária
+        turnManager.OnPrimaryActionSet += HandlePrimaryActionSelected;
 
         // Subscribir aos eventos do estado de combate
         combatStateModel.OnPlayerTurnStart += HandlePlayerTurnStart;
@@ -111,12 +122,19 @@ public class CombatManager : MonoBehaviour
     {
         combatUI.SetTurnText("Seu turno!");
         combatUI.AddLog("Seu turno começou.", CombatLogStyle.Neutral);
+        combatPresenter.OnPlayerTurnUIUpdate();
     }
 
     private void HandleEnemyTurnStart()
     {
         combatUI.SetTurnText("Turno do inimigo...");
         combatUI.AddLog("O inimigo está atacando!", CombatLogStyle.Negative);
+        combatPresenter.OnEnemyTurnUIUpdate();
+    }
+
+    private void HandlePrimaryActionSelected(PlayerActionType actionType)
+    {
+        combatPresenter.OnPrimaryActionSelected();
     }
 
     private void HandlePlayerTurnReady()
@@ -323,6 +341,11 @@ public class CombatManager : MonoBehaviour
         {
             turnTransitionManager.OnPlayerTurnReady -= HandlePlayerTurnReady;
             turnTransitionManager.OnEnemyTurnStarting -= HandleEnemyTurnStarting;
+        }
+
+        if (turnManager != null)
+        {
+            turnManager.OnPrimaryActionSet -= HandlePrimaryActionSelected;
         }
 
         // Parar corrotina se ainda ativa

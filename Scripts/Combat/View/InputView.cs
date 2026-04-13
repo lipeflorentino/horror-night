@@ -224,4 +224,141 @@ public class InputView : MonoBehaviour
     private void RaiseUseSkill() => OnUseSkill?.Invoke();
 
     private void RaiseInfo() => OnInfo?.Invoke();
+
+    /// <summary>
+    /// Mostra UI para turno do jogador - ativa todos os botões de ação.
+    /// </summary>
+    public void ShowPlayerTurnUI()
+    {
+        SetPrimaryActionsEnabled(true);
+        SetSecondaryActionsEnabled(true);
+        SetDiceManipulationEnabled(true);
+        
+        if (endTurnButton != null)
+            endTurnButton.interactable = true;
+    }
+
+    /// <summary>
+    /// Mostra UI para turno do inimigo - desativa botões do jogador.
+    /// </summary>
+    public void ShowEnemyTurnUI()
+    {
+        SetPrimaryActionsEnabled(false);
+        SetSecondaryActionsEnabled(false);
+        SetDiceManipulationEnabled(false);
+        
+        if (endTurnButton != null)
+            endTurnButton.interactable = false;
+    }
+
+    /// <summary>
+    /// Desabilita os botões de ação primária após um ser selecionado.
+    /// Mantém os botões de adicionar/remover dados habilitados.
+    /// </summary>
+    public void DisablePrimaryActions()
+    {
+        if (attackButton != null)
+            attackButton.interactable = false;
+
+        if (investigateButton != null)
+            investigateButton.interactable = false;
+
+        if (defendButton != null)
+            defendButton.interactable = false;
+    }
+
+    /// <summary>
+    /// Reabilita os botões de ação primária.
+    /// Chamado no início de cada novo turno.
+    /// </summary>
+    public void ResetPrimaryActions()
+    {
+        if (attackButton != null)
+            attackButton.interactable = true;
+
+        if (investigateButton != null)
+            investigateButton.interactable = true;
+
+        if (defendButton != null)
+            defendButton.interactable = true;
+
+        // Reset dos contadores
+        attackBonusDice = 0;
+        investigateBonusDice = 0;
+        defendBonusDice = 0;
+        
+        UpdateDiceCounters();
+    }
+
+    /// <summary>
+    /// Atualiza os contadores visuais de dados alocados.
+    /// </summary>
+    public void UpdateDiceCounters()
+    {
+        if (attackDiceCountText != null)
+            attackDiceCountText.text = attackBonusDice.ToString();
+
+        if (investigateDiceCountText != null)
+            investigateDiceCountText.text = investigateBonusDice.ToString();
+
+        if (defendDiceCountText != null)
+            defendDiceCountText.text = defendBonusDice.ToString();
+    }
+
+    /// <summary>
+    /// Habilita/Desabilita os botões de ação primária.
+    /// </summary>
+    private void SetPrimaryActionsEnabled(bool enabled)
+    {
+        if (attackButton != null)
+            attackButton.interactable = enabled;
+
+        if (investigateButton != null)
+            investigateButton.interactable = enabled;
+
+        if (defendButton != null)
+            defendButton.interactable = enabled;
+    }
+
+    /// <summary>
+    /// Habilita/Desabilita os botões de ação secundária.
+    /// </summary>
+    private void SetSecondaryActionsEnabled(bool enabled)
+    {
+        if (itemButton != null)
+            itemButton.interactable = enabled;
+
+        if (skillButton != null)
+            skillButton.interactable = enabled;
+
+        if (useItemButton != null)
+            useItemButton.interactable = enabled;
+
+        if (useSkillButton != null)
+            useSkillButton.interactable = enabled;
+    }
+
+    /// <summary>
+    /// Habilita/Desabilita os botões de manipulação de dados.
+    /// </summary>
+    private void SetDiceManipulationEnabled(bool enabled)
+    {
+        if (addAttackDiceButton != null)
+            addAttackDiceButton.interactable = enabled;
+
+        if (addInvestigateDiceButton != null)
+            addInvestigateDiceButton.interactable = enabled;
+
+        if (addDefendDiceButton != null)
+            addDefendDiceButton.interactable = enabled;
+
+        if (subtractAttackDiceButton != null)
+            subtractAttackDiceButton.interactable = enabled;
+
+        if (subtractInvestigateDiceButton != null)
+            subtractInvestigateDiceButton.interactable = enabled;
+
+        if (subtractDefendDiceButton != null)
+            subtractDefendDiceButton.interactable = enabled;
+    }
 }
