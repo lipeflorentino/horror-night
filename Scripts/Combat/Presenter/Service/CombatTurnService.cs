@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CombatTurnService
 {
+    private static WaitForSeconds _waitForSeconds0_5 = new WaitForSeconds(0.5f);
+
     private static readonly WaitForSeconds _waitForSeconds1 = new(1f);
     private static readonly WaitForSeconds _waitForSeconds2 = new(2f);
 
@@ -13,11 +15,6 @@ public class CombatTurnService
     private readonly DiceService dice;
 
     public EnemyTurnAction lastEnemyAction;
-    
-    /// <summary>
-    /// Event disparado quando a ação do inimigo é determinada.
-    /// Dispara durante o delay, permitindo UI feedback.
-    /// </summary>
     public event Action<EnemyTurnAction> OnEnemyActionDetermined;
 
     public CombatTurnService(CombatStateModel combatStateModel, TurnManager turnManager, DiceService dice)
@@ -72,19 +69,13 @@ public class CombatTurnService
             }
         };
     }
-
-    /// <summary>
-    /// Executa o turno do inimigo com delay e feedback visual.
-    /// Sequência: aguarda 0.5s, dispara evento de ação, aguarda 1.5s antes de resolver.
-    /// </summary>
+    
     public IEnumerator ExecuteEnemyTurn(CombatBattlerModel enemy)
     {
         combatStateModel.SetEnemyTurn();
         
-        // Pequeno delay antes de revelar ação
-        yield return new WaitForSeconds(0.5f);
+        yield return _waitForSeconds0_5;
 
-        // Gerar ação do inimigo
         var enemyActions = GenerateEnemyActions();
         if (enemyActions.Count > 0)
         {
@@ -92,24 +83,16 @@ public class CombatTurnService
                 ? EnemyTurnAction.Attack 
                 : EnemyTurnAction.Defend;
             
-            // Disparar evento para feedback visual
             OnEnemyActionDetermined?.Invoke(lastEnemyAction);
         }
 
-        // Aguardar antes de resolver a ação
-        yield return new WaitForSeconds(1.5f);
+        yield return _waitForSeconds2;
     }
 
-    /// <summary>
-    /// Aguarda o turno do jogador (aguarda input do usuário).
-    /// Este método não faz nada além de preparar o estado - o gameplay real é controlado por eventos.
-    /// </summary>
     public IEnumerator ExecutePlayerTurn(CombatBattlerModel player)
     {
         StartPlayerTurn(player);
         
-        // Aguardar indefinidamente até que o jogador termine seu turno
-        // (Isso será resolvido via callback de OnEndTurn)
         yield return new WaitUntil(() => combatStateModel.IsEnemyTurn() || combatStateModel.IsCombatFinished());
     }
 }

@@ -62,52 +62,41 @@ public class CombatManager : MonoBehaviour
         combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, combatTurnResolver, turnManager);
         combatEndService = new CombatEndService();
 
-        // Encontrar InputView e conectar ao presenter
         inputView = FindObjectOfType<InputView>();
         if (inputView != null)
         {
             combatPresenter.SetInputView(inputView);
         }
 
-        // Encontrar HudView e conectar ao presenter
         hudView = FindObjectOfType<HudView>();
         if (hudView != null)
         {
             combatPresenter.SetHudView(hudView);
-            // Atualizar displays iniciais
             hudView.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
             hudView.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
             hudView.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
         }
 
-        // Subscribir aos eventos de ação primária
         turnManager.OnPrimaryActionSet += HandlePrimaryActionSelected;
 
-        // Subscribir aos eventos do estado de combate
         combatStateModel.OnPlayerTurnStart += HandlePlayerTurnStart;
         combatStateModel.OnEnemyTurnStart += HandleEnemyTurnStart;
         combatStateModel.OnCombatEnded += HandleCombatEnded;
 
-        // Subscribir aos eventos do TurnTransitionManager
         turnTransitionManager.OnPlayerTurnReady += HandlePlayerTurnReady;
         turnTransitionManager.OnEnemyTurnStarting += HandleEnemyTurnStarting;
 
-        // Subscribir ao evento de ação do inimigo determinada
         combatTurnService.OnEnemyActionDetermined += HandleEnemyActionDetermined;
 
-        // Iniciar o combate
         bool isPlayerTurn = combatTurnService.StartFirstTurn(playerModel, enemyModel);
+
         combatUI.SetTurnText($"Turno do {(isPlayerTurn ? "Jogador" : "Inimigo")}");
         combatUI.UpdateHud(turnManager.availableDice);
         combatUI.AddLog("Combate iniciado!", CombatLogStyle.Neutral);
 
-        // Iniciar corrotina de loop de combate
         combatLoopCoroutine = StartCoroutine(CombatLoop());
     }
 
-    /// <summary>
-    /// Loop principal de combate. Alterna entre turnos do jogador e inimigo até o fim.
-    /// </summary>
     private IEnumerator CombatLoop()
     {
         while (!combatStateModel.IsCombatFinished())
@@ -119,18 +108,15 @@ public class CombatManager : MonoBehaviour
             else if (combatStateModel.IsEnemyTurn())
             {
                 yield return StartCoroutine(turnTransitionManager.PlayEnemyTurn(enemyModel));
-                // Após turno do inimigo, resolver danos e transicionar
                 ResolveEnemyAction();
                 turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
                 combatStateModel.SetPlayerTurn();
             }
 
-            // Checar se o combate acabou
             ResolveCombatEnd();
             yield return null;
         }
 
-        // Combate terminado
         yield break;
     }
 
@@ -167,8 +153,6 @@ public class CombatManager : MonoBehaviour
     {
         string actionText = action == EnemyTurnAction.Attack ? "Ataque!" : "Defesa!";
         combatUI.AddLog($"Inimigo: {actionText}", CombatLogStyle.Action);
-        
-        // Mostrar feedback na HUD
         combatPresenter.ShowActionFeedback($"Enemy {actionText}");
     }
 
@@ -181,27 +165,20 @@ public class CombatManager : MonoBehaviour
             outcome = outcome
         });
     }
-
-    /// <summary>
-    /// Resolve a ação do inimigo e aplica dano ao jogador com feedback visual.
-    /// Considera defesa do jogador para reduzir dano.
-    /// </summary>
+    
     private void ResolveEnemyAction()
     {
         if (combatTurnService.lastEnemyAction == EnemyTurnAction.Attack)
         {
-            // Calcular dano com redução de defesa do jogador
             int baseDamage = enemyModel.attack;
-            int damage = Mathf.Max(1, baseDamage - playerModel.defense); // Mínimo 1 de dano
+            int damage = Mathf.Max(1, baseDamage - playerModel.defense);
             
             playerModel.TakeDamage(damage);
             combatUI.AddLog($"Inimigo atacou! Dano recebido: {damage} (ataque: {baseDamage}, defesa: {playerModel.defense})", CombatLogStyle.Negative);
             
-            // Feedback visual de dano
             combatPresenter.ShowDamagePopup(damage);
             combatPresenter.PlayDamageShake();
 
-            // Atualizar HUD com novo HP
             combatPresenter.UpdatePlayerHPDisplay(playerModel.hp, playerModel.maxHp);
         }
         else if (combatTurnService.lastEnemyAction == EnemyTurnAction.Defend)
@@ -211,11 +188,7 @@ public class CombatManager : MonoBehaviour
             // Por enquanto, apenas registra no log
         }
     }
-
-    /// <summary>
-    /// Resolve as ações do jogador contra o inimigo.
-    /// Aplica dano, feedback visual, e atualiza HP do inimigo na HUD.
-    /// </summary>
+    
     private void ResolvePlayerAction()
     {
         IReadOnlyList<ActionInstance> queuedActions = combatPresenter.GetQueuedPlayerActions();
@@ -226,7 +199,6 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        // Resolver a primeira ação (primária)
         ActionInstance action = queuedActions[0];
         if (action == null || action.definition == null)
         {
@@ -235,7 +207,6 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        // Processar baseado no tipo de ação
         switch (action.definition.type)
         {
             case PlayerActionType.Attack:
@@ -265,32 +236,23 @@ public class CombatManager : MonoBehaviour
 
         combatPresenter.ClearActionQueue();
     }
-
-    /// <summary>
-    /// Resolve ataque do jogador contra o inimigo.
-    /// Calcula dano considerando a defesa do inimigo.
-    /// </summary>
+    
     private void ResolvePlayerAttack(ActionInstance action)
     {
         int roll = diceService.RollD6();
         int baseDamage = playerModel.attack + roll + action.allocatedDice;
-        int damage = Mathf.Max(1, baseDamage - enemyModel.defense); // Mínimo 1 de dano
+        int damage = Mathf.Max(1, baseDamage - enemyModel.defense); 
 
         enemyModel.TakeDamage(damage);
         
         combatUI.AddLog($"Você atacou! Dano aplicado: {damage} (ataque: {baseDamage}, defesa: {enemyModel.defense})", CombatLogStyle.Action);
         
-        // Feedback visual: mostrar ação, dano e animar
         combatPresenter.ShowActionFeedback("Ataque!");
         combatPresenter.ShowDamagePopup(damage);
         
-        // Atualizar HUD com novo HP do inimigo
         combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
     }
 
-    /// <summary>
-    /// Resolve defesa do jogador (aumenta recursos).
-    /// </summary>
     private void ResolvePlayerDefend(ActionInstance action)
     {
         int recovery = 1 + action.allocatedDice;
@@ -299,13 +261,9 @@ public class CombatManager : MonoBehaviour
         combatUI.AddLog($"Você se defendeu e recuperou {recovery} recurso(s).", CombatLogStyle.Action);
         combatPresenter.ShowActionFeedback("Defesa!");
         
-        // Atualizar HUD com novos recursos
         combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
     }
 
-    /// <summary>
-    /// Resolve investigação do jogador.
-    /// </summary>
     private void ResolvePlayerInvestigate(ActionInstance action)
     {
         int roll = diceService.RollD6();
@@ -326,10 +284,7 @@ public class CombatManager : MonoBehaviour
         
         combatPresenter.ShowActionFeedback("Investigando...");
     }
-
-    /// <summary>
-    /// Resolve uso de item do jogador.
-    /// </summary>
+    
     private void ResolvePlayerUseItem(ActionInstance action)
     {
         int healAmount = 2;
@@ -339,17 +294,13 @@ public class CombatManager : MonoBehaviour
         combatPresenter.ShowActionFeedback($"Item #{action.itemId}");
         combatPresenter.ShowHealingPopup(healAmount);
         
-        // Atualizar HUD
         combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
     }
-
-    /// <summary>
-    /// Resolve uso de skill do jogador.
-    /// </summary>
+    
     private void ResolvePlayerUseSkill(ActionInstance action)
     {
         int roll = diceService.RollD6();
-        int skillDamage = Mathf.Max(1, (playerModel.attack + 2 + roll) - enemyModel.defense);
+        int skillDamage = Mathf.Max(1, playerModel.attack + 2 + roll - enemyModel.defense);
         
         enemyModel.TakeDamage(skillDamage);
         
@@ -357,7 +308,6 @@ public class CombatManager : MonoBehaviour
         combatPresenter.ShowActionFeedback($"Skill #{action.skillId}!");
         combatPresenter.ShowDamagePopup(skillDamage);
         
-        // Atualizar HUD
         combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
     }
 
@@ -469,10 +419,7 @@ public class CombatManager : MonoBehaviour
         
         if (result.success)
         {
-            // Resolver ações do jogador (dano, feedback, etc)
             ResolvePlayerAction();
-            
-            // Transicionar para turno do inimigo
             combatStateModel.SetEnemyTurn();
         }
 
@@ -492,8 +439,6 @@ public class CombatManager : MonoBehaviour
     private void EndCombat(CombatOutcome outcome)
     {
         combatStateModel.EndCombat(outcome);
-        
-        // Parar o loop de combate
         if (combatLoopCoroutine != null)
         {
             StopCoroutine(combatLoopCoroutine);
@@ -519,7 +464,6 @@ public class CombatManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Desinscrever dos eventos
         if (combatStateModel != null)
         {
             combatStateModel.OnPlayerTurnStart -= HandlePlayerTurnStart;
@@ -543,7 +487,6 @@ public class CombatManager : MonoBehaviour
             turnManager.OnPrimaryActionSet -= HandlePrimaryActionSelected;
         }
 
-        // Parar corrotina se ainda ativa
         if (combatLoopCoroutine != null)
         {
             StopCoroutine(combatLoopCoroutine);

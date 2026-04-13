@@ -225,9 +225,6 @@ public class InputView : MonoBehaviour
 
     private void RaiseInfo() => OnInfo?.Invoke();
 
-    /// <summary>
-    /// Mostra UI para turno do jogador - ativa todos os botões de ação.
-    /// </summary>
     public void ShowPlayerTurnUI()
     {
         SetPrimaryActionsEnabled(true);
@@ -238,9 +235,6 @@ public class InputView : MonoBehaviour
             endTurnButton.interactable = true;
     }
 
-    /// <summary>
-    /// Mostra UI para turno do inimigo - desativa botões do jogador.
-    /// </summary>
     public void ShowEnemyTurnUI()
     {
         SetPrimaryActionsEnabled(false);
@@ -251,10 +245,6 @@ public class InputView : MonoBehaviour
             endTurnButton.interactable = false;
     }
 
-    /// <summary>
-    /// Desabilita os botões de ação primária após um ser selecionado.
-    /// Mantém os botões de adicionar/remover dados habilitados.
-    /// </summary>
     public void DisablePrimaryActions()
     {
         if (attackButton != null)
@@ -267,10 +257,6 @@ public class InputView : MonoBehaviour
             defendButton.interactable = false;
     }
 
-    /// <summary>
-    /// Reabilita os botões de ação primária.
-    /// Chamado no início de cada novo turno.
-    /// </summary>
     public void ResetPrimaryActions()
     {
         if (attackButton != null)
@@ -282,7 +268,6 @@ public class InputView : MonoBehaviour
         if (defendButton != null)
             defendButton.interactable = true;
 
-        // Reset dos contadores
         attackBonusDice = 0;
         investigateBonusDice = 0;
         defendBonusDice = 0;
@@ -290,9 +275,6 @@ public class InputView : MonoBehaviour
         UpdateDiceCounters();
     }
 
-    /// <summary>
-    /// Atualiza os contadores visuais de dados alocados.
-    /// </summary>
     public void UpdateDiceCounters()
     {
         if (attackDiceCountText != null)
@@ -305,9 +287,6 @@ public class InputView : MonoBehaviour
             defendDiceCountText.text = defendBonusDice.ToString();
     }
 
-    /// <summary>
-    /// Habilita/Desabilita os botões de ação primária.
-    /// </summary>
     private void SetPrimaryActionsEnabled(bool enabled)
     {
         if (attackButton != null)
@@ -320,9 +299,6 @@ public class InputView : MonoBehaviour
             defendButton.interactable = enabled;
     }
 
-    /// <summary>
-    /// Habilita/Desabilita os botões de ação secundária.
-    /// </summary>
     private void SetSecondaryActionsEnabled(bool enabled)
     {
         if (itemButton != null)
@@ -338,9 +314,6 @@ public class InputView : MonoBehaviour
             useSkillButton.interactable = enabled;
     }
 
-    /// <summary>
-    /// Habilita/Desabilita os botões de manipulação de dados.
-    /// </summary>
     private void SetDiceManipulationEnabled(bool enabled)
     {
         if (addAttackDiceButton != null)

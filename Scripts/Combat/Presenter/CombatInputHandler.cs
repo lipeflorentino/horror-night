@@ -16,10 +16,6 @@ public class CombatInputHandler
         actionDefinitionFactory = new ActionDefinitionFactory();
         actionValidator = new ActionValidator(turnManager, combatStateModel);
     }
-
-    /// <summary>
-    /// Tenta adicionar dado a uma ação de ataque.
-    /// </summary>
     public ActionResult TryAddAttackDice(int diceToAdd)
     {
         string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Attack, diceToAdd);
@@ -38,9 +34,6 @@ public class CombatInputHandler
         };
     }
 
-    /// <summary>
-    /// Tenta remover dado de uma ação de ataque.
-    /// </summary>
     public ActionResult TryRemoveAttackDice(int diceToRemove)
     {
         string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Attack, diceToRemove);
@@ -59,9 +52,6 @@ public class CombatInputHandler
         };
     }
 
-    /// <summary>
-    /// Tenta adicionar dado a uma ação de investigação.
-    /// </summary>
     public ActionResult TryAddInvestigateDice(int diceToAdd)
     {
         string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Investigate, diceToAdd);
@@ -80,9 +70,6 @@ public class CombatInputHandler
         };
     }
 
-    /// <summary>
-    /// Tenta remover dado de uma ação de investigação.
-    /// </summary>
     public ActionResult TryRemoveInvestigateDice(int diceToRemove)
     {
         string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Investigate, diceToRemove);
@@ -101,9 +88,6 @@ public class CombatInputHandler
         };
     }
 
-    /// <summary>
-    /// Tenta adicionar dado a uma ação de defesa.
-    /// </summary>
     public ActionResult TryAddDefendDice(int diceToAdd)
     {
         string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Defend, diceToAdd);
@@ -122,9 +106,6 @@ public class CombatInputHandler
         };
     }
 
-    /// <summary>
-    /// Tenta remover dado de uma ação de defesa.
-    /// </summary>
     public ActionResult TryRemoveDefendDice(int diceToRemove)
     {
         string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Defend, diceToRemove);
@@ -145,7 +126,6 @@ public class CombatInputHandler
 
     public ActionResult HandleRecharge(CombatBattlerModel player, bool boosted)
     {
-        // Validar que é ação de defesa
         string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Defend);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -167,7 +147,6 @@ public class CombatInputHandler
 
     public ActionResult QueueInvestigate(CombatBattlerModel player, int diceAmount)
     {
-        // Validar ação primária
         string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Investigate);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -191,7 +170,6 @@ public class CombatInputHandler
 
     public ActionResult QueueDefend(CombatBattlerModel player, int diceAmount)
     {
-        // Validar ação primária
         string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Defend);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -229,7 +207,6 @@ public class CombatInputHandler
 
     public ActionResult QueueAttack(CombatBattlerModel player, int diceAmount)
     {
-        // Validar ação primária
         string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Attack);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -253,7 +230,6 @@ public class CombatInputHandler
 
     public ActionResult QueueUseItemSelection(CombatBattlerModel player, int itemId)
     {
-        // Validar ação secundária
         string validationError = actionValidator.ValidateSecondaryAction(PlayerActionType.UseItem);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -276,7 +252,6 @@ public class CombatInputHandler
 
     public ActionResult QueueUseSkillSelection(CombatBattlerModel player, int skillId)
     {
-        // Validar ação secundária
         string validationError = actionValidator.ValidateSecondaryAction(PlayerActionType.UseSkill);
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -299,7 +274,6 @@ public class CombatInputHandler
 
     public ActionResult HandleEndTurn()
     {
-        // Validar que pode terminar turno
         string validationError = actionValidator.ValidateEndTurn();
         if (!string.IsNullOrEmpty(validationError))
             return Fail(validationError);
@@ -336,7 +310,6 @@ public class CombatInputHandler
             return Fail("No resources available.");
         }
 
-        // Validar custos de recursos
         string costError = actionValidator.ValidateResourceCost(action, player);
         if (!string.IsNullOrEmpty(costError))
             return Fail(costError);

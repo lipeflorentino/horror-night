@@ -150,11 +150,6 @@ public class CombatPresenter
     {
         combatUI.AddLog("No information available", CombatLogStyle.Neutral);
     }
-
-    /// <summary>
-    /// Valida se o turno pode ser encerrado. Não resolve ações.
-    /// Resolução acontece em CombatManager.ResolvePlayerAction().
-    /// </summary>
     public ActionResult OnEndTurn(CombatBattlerModel player, CombatBattlerModel enemy)
     {
         ActionResult endTurnResult = combatInputHandler.HandleEndTurn();
@@ -168,35 +163,14 @@ public class CombatPresenter
         return endTurnResult;
     }
 
-    /// <summary>
-    /// Retorna as ações enfileiradas do turno atual do jogador.
-    /// </summary>
     public IReadOnlyList<ActionInstance> GetQueuedPlayerActions()
     {
         return turnManager.actionQueue?.GetAll() ?? new List<ActionInstance>();
     }
 
-    /// <summary>
-    /// Limpa a fila de ações após resolução do turno.
-    /// </summary>
     public void ClearActionQueue()
     {
         turnManager.actionQueue?.Clear();
-    }
-
-    private void ResolvePlayerTurn(CombatBattlerModel player, CombatBattlerModel enemy)
-    {
-        IReadOnlyList<ActionInstance> playerActions = turnManager.actionQueue?.GetAll();
-        List<ActionResult> playerResults = combatTurnResolver.ResolvePlayerTurn(player, enemy, playerActions);
-        PublishResolvedActions("Player", playerResults);
-    }
-
-    private void ResolveEnemyTurn(CombatBattlerModel enemy, CombatBattlerModel player)
-    {
-        combatUI.SetTurnText("Turno do inimigo");
-        List<ActionInstance> enemyActions = combatTurnService.GenerateEnemyActions();
-        List<ActionResult> enemyResults = combatTurnResolver.ResolvePlayerTurn(enemy, player, enemyActions);
-        PublishResolvedActions("Enemy", enemyResults);
     }
 
     private void PublishResolvedActions(string owner, List<ActionResult> results)
@@ -226,10 +200,6 @@ public class CombatPresenter
         combatUI.AddLog($"{action}: {result.message}", result.success ? CombatLogStyle.Action : CombatLogStyle.Negative);
     }
 
-    /// <summary>
-    /// Atualiza a UI para mostrar que é o turno do jogador.
-    /// Ativa botões e reseta estado de ação primária.
-    /// </summary>
     public void OnPlayerTurnUIUpdate()
     {
         if (inputView != null)
@@ -238,11 +208,7 @@ public class CombatPresenter
             inputView.ResetPrimaryActions();
         }
     }
-
-    /// <summary>
-    /// Atualiza a UI para mostrar que é o turno do inimigo.
-    /// Desativa botões do jogador.
-    /// </summary>
+    
     public void OnEnemyTurnUIUpdate()
     {
         if (inputView != null)
@@ -250,10 +216,7 @@ public class CombatPresenter
             inputView.ShowEnemyTurnUI();
         }
     }
-
-    /// <summary>
-    /// Desabilita os botões de ação primária após um ser selecionado.
-    /// </summary>
+    
     public void OnPrimaryActionSelected()
     {
         if (inputView != null)
@@ -261,10 +224,7 @@ public class CombatPresenter
             inputView.DisablePrimaryActions();
         }
     }
-
-    /// <summary>
-    /// Atualiza os contadores de dados alocados na UI.
-    /// </summary>
+    
     public void UpdateDiceCounters()
     {
         if (inputView != null)
@@ -272,89 +232,58 @@ public class CombatPresenter
             inputView.UpdateDiceCounters();
         }
     }
-
-    /// <summary>
-    /// Define a referência ao InputView (pode ser definida após construção).
-    /// </summary>
+    
     public void SetInputView(InputView view)
     {
         inputView = view;
     }
-
-    /// <summary>
-    /// Define a referência ao HudView (pode ser definida após construção).
-    /// </summary>
+    
     public void SetHudView(HudView view)
     {
         hudView = view;
     }
-
-    /// <summary>
-    /// Atualiza o display de HP do jogador na HUD.
-    /// </summary>
+    
     public void UpdatePlayerHPDisplay(int currentHP, int maxHP)
     {
         if (hudView != null)
             hudView.UpdatePlayerHP(currentHP, maxHP);
     }
-
-    /// <summary>
-    /// Atualiza o display de recursos (Heart, Body, Mind) do jogador.
-    /// </summary>
+    
     public void UpdatePlayerResourcesDisplay(int heart, int body, int mind)
     {
         if (hudView != null)
             hudView.UpdatePlayerResources(heart, body, mind);
     }
-
-    /// <summary>
-    /// Atualiza o display de HP do inimigo na HUD.
-    /// </summary>
+    
     public void UpdateEnemyHPDisplay(int currentHP, int maxHP)
     {
         if (hudView != null)
             hudView.UpdateEnemyHP(currentHP, maxHP);
     }
-
-    /// <summary>
-    /// Mostra feedback de dano recebido com animação.
-    /// </summary>
+    
     public void ShowDamagePopup(int damageAmount)
     {
         if (hudView != null)
             hudView.ShowDamagePopup(damageAmount);
     }
-
-    /// <summary>
-    /// Mostra feedback de cura com animação.
-    /// </summary>
+    
     public void ShowHealingPopup(int healAmount)
     {
         if (hudView != null)
             hudView.ShowHealingPopup(healAmount);
     }
-
-    /// <summary>
-    /// Anima um shake de câmera ao receber dano.
-    /// </summary>
+    
     public void PlayDamageShake()
     {
         if (hudView != null)
             hudView.PlayDamageShake();
     }
-
-    /// <summary>
-    /// Mostra feedback de ação executada.
-    /// </summary>
     public void ShowActionFeedback(string actionName)
     {
         if (hudView != null)
             hudView.ShowActionFeedback(actionName);
     }
-
-    /// <summary>
-    /// Resolve os resultados das ações de um turno e publica no log.
-    /// </summary>
+    
     public void PublishPlayerActionResults(List<ActionResult> results)
     {
         PublishResolvedActions("Player", results);

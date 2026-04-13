@@ -3,17 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Gerencia animações de feedback visual da HUD.
-/// Fornece métodos para animar popups de dano, feedback de ações, e shake de câmera.
-/// </summary>
 public class HUDAnimator
 {
-    /// <summary>
-    /// Anima um popup de dano/cura que desaparece gradualmente.
-    /// Move o texto para cima enquanto reduz a opacidade.
-    /// </summary>
-    public IEnumerator AnimateDamagePopup(CanvasGroup canvasGroup, float duration)
+     public IEnumerator AnimateDamagePopup(CanvasGroup canvasGroup, float duration)
     {
         if (canvasGroup == null)
             yield break;
@@ -29,10 +21,7 @@ public class HUDAnimator
             elapsed += Time.deltaTime;
             float progress = elapsed / duration;
 
-            // Interpolação linear para posição
             canvasGroup.transform.localPosition = Vector3.Lerp(startPosition, endPosition, progress);
-
-            // Fade out
             canvasGroup.alpha = Mathf.Lerp(1f, 0f, progress);
 
             yield return null;
@@ -42,9 +31,6 @@ public class HUDAnimator
         canvasGroup.transform.localPosition = startPosition;
     }
 
-    /// <summary>
-    /// Anima o feedback de ação com fade in e fade out.
-    /// </summary>
     public IEnumerator AnimateActionFeedback(TMP_Text feedbackText, float duration)
     {
         if (feedbackText == null)
@@ -56,7 +42,6 @@ public class HUDAnimator
         Color originalColor = feedbackText.color;
         Color transparent = new Color(originalColor.r, originalColor.g, originalColor.b, 0f);
 
-        // Fade in
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -67,12 +52,10 @@ public class HUDAnimator
 
         feedbackText.color = originalColor;
 
-        // Wait
         yield return new WaitForSeconds(duration - (fadeDuration * 2f));
 
         elapsed = 0f;
 
-        // Fade out
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -84,9 +67,6 @@ public class HUDAnimator
         feedbackText.color = transparent;
     }
 
-    /// <summary>
-    /// Anima um shake de câmera para simular impacto de dano.
-    /// </summary>
     public IEnumerator AnimateShake(Transform target, float duration, float magnitude)
     {
         Vector3 originalPosition = target.localPosition;
@@ -107,9 +87,6 @@ public class HUDAnimator
         target.localPosition = originalPosition;
     }
 
-    /// <summary>
-    /// Anima uma barra (HP slider) com suavidade.
-    /// </summary>
     public IEnumerator AnimateSlider(Slider slider, float targetValue, float duration)
     {
         if (slider == null)
@@ -130,9 +107,6 @@ public class HUDAnimator
         slider.value = targetValue;
     }
 
-    /// <summary>
-    /// Pulsa um texto (para destacar informação importante).
-    /// </summary>
     public IEnumerator AnimatePulse(TMP_Text text, float duration, float scaleAmount = 1.2f)
     {
         if (text == null)
@@ -148,7 +122,6 @@ public class HUDAnimator
             elapsed += Time.deltaTime;
             float progress = elapsed / duration;
 
-            // Pulsar usando sine wave para efeito suave
             float scale = Mathf.Lerp(1f, scaleAmount, Mathf.Sin(progress * Mathf.PI));
             text.transform.localScale = originalScale * scale;
 

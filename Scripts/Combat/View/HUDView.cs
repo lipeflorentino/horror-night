@@ -38,10 +38,7 @@ public class HudView : MonoBehaviour
 
         diceText.text = value.ToString();
     }
-
-    /// <summary>
-    /// Atualiza display de HP do jogador.
-    /// </summary>
+    
     public void UpdatePlayerHP(int currentHP, int maxHP)
     {
         if (playerHpText != null)
@@ -53,10 +50,7 @@ public class HudView : MonoBehaviour
             playerHpSlider.value = currentHP;
         }
     }
-
-    /// <summary>
-    /// Atualiza display de recursos (Heart, Body, Mind) do jogador.
-    /// </summary>
+    
     public void UpdatePlayerResources(int heart, int body, int mind)
     {
         if (playerHeartText != null)
@@ -68,10 +62,6 @@ public class HudView : MonoBehaviour
         if (playerMindText != null)
             playerMindText.text = mind.ToString();
     }
-
-    /// <summary>
-    /// Atualiza display de HP do inimigo.
-    /// </summary>
     public void UpdateEnemyHP(int currentHP, int maxHP)
     {
         if (enemyHpText != null)
@@ -83,11 +73,7 @@ public class HudView : MonoBehaviour
             enemyHpSlider.value = currentHP;
         }
     }
-
-    /// <summary>
-    /// Mostra feedback de dano recebido com animação.
-    /// Número flutuante em vermelho que desaparece.
-    /// </summary>
+    
     public void ShowDamagePopup(int damageAmount)
     {
         if (damagePopupText != null && damagePopupCanvasGroup != null)
@@ -97,11 +83,7 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.5f));
         }
     }
-
-    /// <summary>
-    /// Mostra feedback de cura com animação.
-    /// Número flutuante em verde.
-    /// </summary>
+    
     public void ShowHealingPopup(int healAmount)
     {
         if (damagePopupText != null && damagePopupCanvasGroup != null)
@@ -111,10 +93,7 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.5f));
         }
     }
-
-    /// <summary>
-    /// Mostra feedback de recurso gasto com animação.
-    /// </summary>
+    
     public void ShowResourceSpent(int amount, Color resourceColor)
     {
         if (damagePopupText != null && damagePopupCanvasGroup != null)
@@ -124,10 +103,7 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.4f));
         }
     }
-
-    /// <summary>
-    /// Mostra ação executada no feedback de ação.
-    /// </summary>
+    
     public void ShowActionFeedback(string actionName)
     {
         if (actionFeedbackText != null)
@@ -136,10 +112,7 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateActionFeedback(actionFeedbackText, 1f));
         }
     }
-
-    /// <summary>
-    /// Anima um shake de câmera ao receber dano.
-    /// </summary>
+    
     public void PlayDamageShake()
     {
         StartCoroutine(hudAnimator.AnimateShake(transform, 0.2f, 5f));

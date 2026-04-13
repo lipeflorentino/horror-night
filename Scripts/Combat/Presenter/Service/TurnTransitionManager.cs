@@ -54,52 +54,30 @@ public class TurnTransitionManager
         combatStateModel.SetPlayerTurn();
         OnPlayerTurnReady?.Invoke();
         
-        // Aguardar até que o estado mude para Enemy Turn ou Combat Finished
         yield return new WaitUntil(() => 
             combatStateModel.IsEnemyTurn() || combatStateModel.IsCombatFinished());
     }
 
-    /// <summary>
-    /// Corrotina que executa um ciclo completo de turno do inimigo.
-    /// 1. Aguarda delay visual
-    /// 2. Executa ação do inimigo
-    /// 3. Mostra feedback
-    /// 4. Transiciona para próximo turno
-    /// </summary>
     public IEnumerator PlayEnemyTurn(CombatBattlerModel enemy)
     {
         OnEnemyTurnStarting?.Invoke();
-        yield return combatTurnService.ExecuteEnemyTurn(enemy);
-        
-        // Transição automática para o próximo turno do jogador
+        yield return combatTurnService.ExecuteEnemyTurn(enemy);        
         OnTurnTransitioned?.Invoke(CombatFlowState.PlayerTurn);
     }
 
-    /// <summary>
-    /// Reseta os dados e recursos alocados para o novo turno.
-    /// Chamado no início do turno do jogador.
-    /// </summary>
     private void ResetTurnData()
     {
         turnManager.ResetDice();
     }
 
-    /// <summary>
-    /// Valida se o turno pode mudar baseado no estado do combate.
-    /// Retorna true se a transição é válida.
-    /// </summary>
     public bool CanTransitionTurn()
     {
-        // Se o combate acabou, não pode transicionar
         if (combatStateModel.IsCombatFinished())
             return false;
 
         return true;
     }
 
-    /// <summary>
-    /// Força a transição de turno (útil para debug ou situações especiais).
-    /// </summary>
     public void ForceTransitionToNextTurn()
     {
         if (combatStateModel.IsPlayerTurn())
