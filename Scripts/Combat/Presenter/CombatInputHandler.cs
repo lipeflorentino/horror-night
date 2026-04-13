@@ -3,6 +3,7 @@ public class CombatInputHandler
     private readonly TurnManager turnManager;
     private readonly CombatStateModel combatStateModel;
     private readonly ActionDefinitionFactory actionDefinitionFactory;
+    private readonly ActionValidator actionValidator;
 
     public CombatInputHandler(
         TurnManager turnManager,
@@ -13,10 +14,145 @@ public class CombatInputHandler
         this.turnManager = turnManager;
         this.combatStateModel = combatStateModel;
         actionDefinitionFactory = new ActionDefinitionFactory();
+        actionValidator = new ActionValidator(turnManager, combatStateModel);
+    }
+
+    /// <summary>
+    /// Tenta adicionar dado a uma ação de ataque.
+    /// </summary>
+    public ActionResult TryAddAttackDice(int diceToAdd)
+    {
+        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Attack, diceToAdd);
+        if (!string.IsNullOrEmpty(diceError))
+            return Fail(diceError);
+
+        if (!turnManager.TryAddDiceToAction(PlayerActionType.Attack, diceToAdd))
+            return Fail("Failed to allocate dice to attack.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Added {diceToAdd} to Attack. Total: {allocated}",
+            diceSpent = 0
+        };
+    }
+
+    /// <summary>
+    /// Tenta remover dado de uma ação de ataque.
+    /// </summary>
+    public ActionResult TryRemoveAttackDice(int diceToRemove)
+    {
+        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Attack, diceToRemove);
+        if (!string.IsNullOrEmpty(removalError))
+            return Fail(removalError);
+
+        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Attack, diceToRemove))
+            return Fail("Failed to remove dice from attack.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Removed {diceToRemove} from Attack. Total: {allocated}",
+            diceSpent = 0
+        };
+    }
+
+    /// <summary>
+    /// Tenta adicionar dado a uma ação de investigação.
+    /// </summary>
+    public ActionResult TryAddInvestigateDice(int diceToAdd)
+    {
+        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Investigate, diceToAdd);
+        if (!string.IsNullOrEmpty(diceError))
+            return Fail(diceError);
+
+        if (!turnManager.TryAddDiceToAction(PlayerActionType.Investigate, diceToAdd))
+            return Fail("Failed to allocate dice to investigate.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Added {diceToAdd} to Investigate. Total: {allocated}",
+            diceSpent = 0
+        };
+    }
+
+    /// <summary>
+    /// Tenta remover dado de uma ação de investigação.
+    /// </summary>
+    public ActionResult TryRemoveInvestigateDice(int diceToRemove)
+    {
+        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Investigate, diceToRemove);
+        if (!string.IsNullOrEmpty(removalError))
+            return Fail(removalError);
+
+        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Investigate, diceToRemove))
+            return Fail("Failed to remove dice from investigate.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Removed {diceToRemove} from Investigate. Total: {allocated}",
+            diceSpent = 0
+        };
+    }
+
+    /// <summary>
+    /// Tenta adicionar dado a uma ação de defesa.
+    /// </summary>
+    public ActionResult TryAddDefendDice(int diceToAdd)
+    {
+        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Defend, diceToAdd);
+        if (!string.IsNullOrEmpty(diceError))
+            return Fail(diceError);
+
+        if (!turnManager.TryAddDiceToAction(PlayerActionType.Defend, diceToAdd))
+            return Fail("Failed to allocate dice to defend.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Added {diceToAdd} to Defend. Total: {allocated}",
+            diceSpent = 0
+        };
+    }
+
+    /// <summary>
+    /// Tenta remover dado de uma ação de defesa.
+    /// </summary>
+    public ActionResult TryRemoveDefendDice(int diceToRemove)
+    {
+        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Defend, diceToRemove);
+        if (!string.IsNullOrEmpty(removalError))
+            return Fail(removalError);
+
+        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Defend, diceToRemove))
+            return Fail("Failed to remove dice from defend.");
+
+        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend);
+        return new ActionResult
+        {
+            success = true,
+            message = $"Removed {diceToRemove} from Defend. Total: {allocated}",
+            diceSpent = 0
+        };
     }
 
     public ActionResult HandleRecharge(CombatBattlerModel player, bool boosted)
     {
+        // Validar que é ação de defesa
+        string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Defend);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.SetPrimaryAction(PlayerActionType.Defend))
+            return Fail("Cannot change from current action.");
+
         ActionInstance action = new ActionInstance
         {
             definition = actionDefinitionFactory.CreateDefend(),
@@ -31,6 +167,14 @@ public class CombatInputHandler
 
     public ActionResult QueueInvestigate(CombatBattlerModel player, int diceAmount)
     {
+        // Validar ação primária
+        string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Investigate);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.SetPrimaryAction(PlayerActionType.Investigate))
+            return Fail("Cannot change from current action.");
+
         int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
 
         ActionInstance action = new ActionInstance
@@ -47,6 +191,14 @@ public class CombatInputHandler
 
     public ActionResult QueueDefend(CombatBattlerModel player, int diceAmount)
     {
+        // Validar ação primária
+        string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Defend);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.SetPrimaryAction(PlayerActionType.Defend))
+            return Fail("Cannot change from current action.");
+
         int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
 
         ActionInstance action = new ActionInstance
@@ -77,6 +229,14 @@ public class CombatInputHandler
 
     public ActionResult QueueAttack(CombatBattlerModel player, int diceAmount)
     {
+        // Validar ação primária
+        string validationError = actionValidator.ValidatePrimaryAction(PlayerActionType.Attack);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.SetPrimaryAction(PlayerActionType.Attack))
+            return Fail("Cannot change from current action.");
+
         int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
 
         ActionInstance action = new ActionInstance
@@ -93,6 +253,14 @@ public class CombatInputHandler
 
     public ActionResult QueueUseItemSelection(CombatBattlerModel player, int itemId)
     {
+        // Validar ação secundária
+        string validationError = actionValidator.ValidateSecondaryAction(PlayerActionType.UseItem);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.TryUseSecondaryAction())
+            return Fail("Cannot use secondary action.");
+
         ActionInstance action = new ActionInstance
         {
             definition = actionDefinitionFactory.CreateUseItem(),
@@ -108,6 +276,14 @@ public class CombatInputHandler
 
     public ActionResult QueueUseSkillSelection(CombatBattlerModel player, int skillId)
     {
+        // Validar ação secundária
+        string validationError = actionValidator.ValidateSecondaryAction(PlayerActionType.UseSkill);
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
+
+        if (!turnManager.TryUseSecondaryAction())
+            return Fail("Cannot use secondary action.");
+
         ActionInstance action = new ActionInstance
         {
             definition = actionDefinitionFactory.CreateUseSkill(),
@@ -123,10 +299,10 @@ public class CombatInputHandler
 
     public ActionResult HandleEndTurn()
     {
-        if (!IsPlayerTurn())
-        {
-            return Fail("Not player turn.");
-        }
+        // Validar que pode terminar turno
+        string validationError = actionValidator.ValidateEndTurn();
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
 
         return new ActionResult
         {
@@ -140,7 +316,7 @@ public class CombatInputHandler
 
     private ActionResult TryQueueAction(CombatBattlerModel player, ActionInstance action, string successMessage)
     {
-        if (!IsPlayerTurn())
+        if (!combatStateModel.IsPlayerTurn())
         {
             return Fail("Not player turn.");
         }
@@ -150,7 +326,7 @@ public class CombatInputHandler
             return Fail("Player not found.");
         }
 
-        if (turnManager.availableDice <= 0)
+        if (turnManager.availableDice <= 0 && action.definition.type != PlayerActionType.UseItem && action.definition.type != PlayerActionType.UseSkill)
         {
             return Fail("No dice available.");
         }
@@ -159,6 +335,11 @@ public class CombatInputHandler
         {
             return Fail("No resources available.");
         }
+
+        // Validar custos de recursos
+        string costError = actionValidator.ValidateResourceCost(action, player);
+        if (!string.IsNullOrEmpty(costError))
+            return Fail(costError);
 
         if (!turnManager.CanAfford(action))
         {
@@ -195,11 +376,6 @@ public class CombatInputHandler
             damage = 0,
             message = successMessage
         };
-    }
-
-    private bool IsPlayerTurn()
-    {
-        return combatStateModel.currentState == CombatFlowState.PlayerTurn;
     }
 
     private static ActionResult Fail(string message)
