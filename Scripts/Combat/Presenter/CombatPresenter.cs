@@ -37,6 +37,27 @@ public class CombatPresenter
         return result;
     }
 
+    public ActionResult OnAttack(CombatBattlerModel player)
+    {
+        ActionResult result = combatInputHandler.QueueAttack(player, 1);
+        PublishResult("Attack", result);
+        return result;
+    }
+
+    public ActionResult OnInvestigate(CombatBattlerModel player)
+    {
+        ActionResult result = combatInputHandler.QueueInvestigate(player, 1);
+        PublishResult("Investigate", result);
+        return result;
+    }
+
+    public ActionResult OnDefend(CombatBattlerModel player)
+    {
+        ActionResult result = combatInputHandler.QueueDefend(player, 1);
+        PublishResult("Defend", result);
+        return result;
+    }
+
     public ActionResult OnAddInvestigateDice(CombatBattlerModel player, int diceAmount)
     {
         ActionResult result = combatInputHandler.QueueInvestigate(player, diceAmount);
@@ -55,6 +76,13 @@ public class CombatPresenter
     {
         ActionResult result = combatInputHandler.QueueAttack(player, diceAmount);
         PublishResult("Attack", result);
+        return result;
+    }
+
+    public ActionResult OnAddDefendDice(CombatBattlerModel player, int diceAmount)
+    {
+        ActionResult result = combatInputHandler.QueueDefend(player, diceAmount);
+        PublishResult("Defend", result);
         return result;
     }
 
@@ -78,6 +106,13 @@ public class CombatPresenter
     }
 
     public ActionResult OnSkillSelected(CombatBattlerModel player, int skillId)
+    {
+        ActionResult result = combatInputHandler.QueueUseSkillSelection(player, skillId);
+        PublishResult("UseSkill", result);
+        return result;
+    }
+
+    public ActionResult OnUseSkill(CombatBattlerModel player, int skillId)
     {
         ActionResult result = combatInputHandler.QueueUseSkillSelection(player, skillId);
         PublishResult("UseSkill", result);

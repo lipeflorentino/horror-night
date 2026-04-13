@@ -21,14 +21,17 @@ public class CombatUIBinder : MonoBehaviour
         if (inputView == null)
             return;
 
-        inputView.OnRecharge += HandleRecharge;
-        inputView.OnRechargeBoosted += HandleRechargeBoosted;
-        inputView.OnAddInvestigateDice += HandleAddInvestigateDice;
-        inputView.OnFlee += HandleFlee;
+        inputView.OnAttack += HandleAttack;
+        inputView.OnInvestigate += HandleInvestigate;
+        inputView.OnDefend += HandleDefend;
         inputView.OnAddAttackDice += HandleAddAttackDice;
+        inputView.OnAddInvestigateDice += HandleAddInvestigateDice;
+        inputView.OnAddDefendDice += HandleAddDefendDice;
         inputView.OnEndTurn += HandleEndTurn;
+        inputView.OnItem += HandleItem;
+        inputView.OnSkill += HandleSkill;
         inputView.OnUseItem += HandleUseItem;
-        inputView.OnSkills += HandleSkills;
+        inputView.OnUseSkill += HandleUseSkill;
         inputView.OnInfo += HandleInfo;
     }
 
@@ -37,39 +40,36 @@ public class CombatUIBinder : MonoBehaviour
         if (inputView == null)
             return;
 
-        inputView.OnRecharge -= HandleRecharge;
-        inputView.OnRechargeBoosted -= HandleRechargeBoosted;
-        inputView.OnAddInvestigateDice -= HandleAddInvestigateDice;
-        inputView.OnFlee -= HandleFlee;
+        inputView.OnAttack -= HandleAttack;
+        inputView.OnInvestigate -= HandleInvestigate;
+        inputView.OnDefend -= HandleDefend;
         inputView.OnAddAttackDice -= HandleAddAttackDice;
+        inputView.OnAddInvestigateDice -= HandleAddInvestigateDice;
+        inputView.OnAddDefendDice -= HandleAddDefendDice;
         inputView.OnEndTurn -= HandleEndTurn;
+        inputView.OnItem -= HandleItem;
+        inputView.OnSkill -= HandleSkill;
         inputView.OnUseItem -= HandleUseItem;
-        inputView.OnSkills -= HandleSkills;
+        inputView.OnUseSkill -= HandleUseSkill;
         inputView.OnInfo -= HandleInfo;
     }
 
-    private void HandleRecharge()
+    private void HandleAttack()
     {
         if (combatManager != null)
-            combatManager.PlayerRecharge(false);
+            combatManager.PlayerAttack();
     }
 
-    private void HandleRechargeBoosted()
+    private void HandleInvestigate()
     {
         if (combatManager != null)
-            combatManager.PlayerRecharge(true);
+            combatManager.PlayerInvestigate();
     }
 
-    private void HandleAddInvestigateDice(int diceAmount)
+    private void HandleDefend()
     {
         if (combatManager != null)
-            combatManager.PlayerAddInvestigateDice(diceAmount);
-    }
-
-    private void HandleFlee(int diceAmount)
-    {
-        if (combatManager != null)
-            combatManager.PlayerFlee(diceAmount);
+            combatManager.PlayerDefend();
     }
 
     private void HandleAddAttackDice(int diceAmount)
@@ -78,22 +78,46 @@ public class CombatUIBinder : MonoBehaviour
             combatManager.PlayerAddAttackDice(diceAmount);
     }
 
+    private void HandleAddInvestigateDice(int diceAmount)
+    {
+        if (combatManager != null)
+            combatManager.PlayerAddInvestigateDice(diceAmount);
+    }
+
+    private void HandleAddDefendDice(int diceAmount)
+    {
+        if (combatManager != null)
+            combatManager.PlayerAddDefendDice(diceAmount);
+    }
+
     private void HandleEndTurn()
     {
         if (combatManager != null)
             combatManager.EndPlayerTurn();
     }
 
-    private void HandleUseItem()
+    private void HandleItem()
     {
         if (combatManager != null)
             combatManager.PlayerUseItem();
     }
 
-    private void HandleSkills()
+    private void HandleSkill()
     {
         if (combatManager != null)
             combatManager.PlayerSkills();
+    }
+
+    private void HandleUseItem()
+    {
+        if (combatManager != null)
+            combatManager.PlayerSelectItem(1);
+    }
+
+    private void HandleUseSkill()
+    {
+        if (combatManager != null)
+            combatManager.PlayerUseSkill();
     }
 
     private void HandleInfo()
