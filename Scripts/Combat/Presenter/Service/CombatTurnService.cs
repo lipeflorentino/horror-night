@@ -5,6 +5,7 @@ using UnityEngine;
 public class CombatTurnService
 {
     private static readonly WaitForSeconds _waitForSeconds1 = new(1f);
+    private static readonly WaitForSeconds _waitForSeconds2 = new(2f);
 
     private readonly CombatStateModel combatStateModel;
     private readonly TurnManager turnManager;
@@ -27,9 +28,13 @@ public class CombatTurnService
         bool isPlayerTurn = initResolver.PlayerStarts(player, enemy);
 
         if (isPlayerTurn)
+        {
             StartPlayerTurn(player);
+        }
         else
-            StartEnemyTurn();
+        {
+            combatStateModel.SetEnemyTurn();
+        }
 
         return isPlayerTurn;
     }
@@ -61,9 +66,40 @@ public class CombatTurnService
         };
     }
 
-    public IEnumerator StartEnemyTurn()
+    /// <summary>
+    /// Executa o turno do inimigo com delay e feedback visual.
+    /// Aguarda 1 segundo, mostra feedback, aguarda mais 1 segundo após execução.
+    /// </summary>
+    public IEnumerator ExecuteEnemyTurn(CombatBattlerModel enemy)
     {
         combatStateModel.SetEnemyTurn();
+        
+        // Aguardar feedback inicial
         yield return _waitForSeconds1;
+
+        // Gerar ação do inimigo
+        var enemyActions = GenerateEnemyActions();
+        if (enemyActions.Count > 0)
+        {
+            lastEnemyAction = enemyActions[0].definition.type == PlayerActionType.Attack 
+                ? EnemyTurnAction.Attack 
+                : EnemyTurnAction.Defend;
+        }
+
+        // Aguardar antes de resolver a ação
+        yield return _waitForSeconds1;
+    }
+
+    /// <summary>
+    /// Aguarda o turno do jogador (aguarda input do usuário).
+    /// Este método não faz nada além de preparar o estado - o gameplay real é controlado por eventos.
+    /// </summary>
+    public IEnumerator ExecutePlayerTurn(CombatBattlerModel player)
+    {
+        StartPlayerTurn(player);
+        
+        // Aguardar indefinidamente até que o jogador termine seu turno
+        // (Isso será resolvido via callback de OnEndTurn)
+        yield return new WaitUntil(() => combatStateModel.IsEnemyTurn() || combatStateModel.IsCombatFinished());
     }
 }

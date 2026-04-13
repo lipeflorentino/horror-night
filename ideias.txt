@@ -54,3 +54,204 @@ Após encontro, surge escolha de caminho.
 Criar script que irá escutar evento dispardo quando player chega ao node.
 - sortear atividade 
 - chamar o handler adequado
+
+
+📋 ANÁLISE DO PROJETO
+✅ O que já existe (bem estruturado):
+Arquitetura MVP com separação clara entre Model/Presenter/View
+TurnManager - gerencia dados, dados alocados e recursos por turno
+CombatStateModel - controla estados (PlayerTurn, EnemyTurn, Finished)
+InputView - TODOS os botões já estão presentes ✓
+ActionDefinition/ActionInstance - sistema de ações com custos
+Services - DiceService, ActionResolverService, CombatTurnResolver
+HUDView - base para mostrar dados (mas precisa expansão)
+⚠️ Deficiências identificadas:
+Fluxo de turno desincronizado - faltam corrotinas e esperas apropriadas
+IA do inimigo incompleta - gera ação mas não executa com delay/feedback
+Alternância de turno não automática - precisa de lógica de transição clara
+Botão de subtrair dados não existe - só adiciona
+Controle de botões inadequado - não há alternância visual Ataque/Defesa
+HUD minimalista - só mostra dados, não mostra danos/efeitos
+Sem feedback visual robusto - faltam animações e efeitos
+🎯 PLANO DE IMPLEMENTAÇÃO (PASSO A PASSO)
+FASE 1: Estrutura de Eventos e Turnos (Fundamentação)
+Objetivo: Criar um sistema robusto de transição entre turnos
+
+1.1 - Expandir CombatStateModel com eventos e métodos auxiliares
+
+ Adicionar delegate para eventos de mudança de turno
+ Adicionar método para validar estado atual
+ Evento OnTurnChanged, OnCombatEnded
+1.2 - Refatorar CombatTurnService para usar corrotinas
+
+ Métodos síncronos devem retornar IEnumerator para turnos inimigos
+ Aguardar delays antes de executar ação do inimigo
+ Invocar ação do inimigo com feedback visual
+ Transição automática para próximo turno
+1.3 - Criar TurnTransitionManager (novo)
+
+ Controlar sequência de turnos (Player → Enemy → Player...)
+ Validar condições de fim de combate
+ Invocar callbacks de início/fim de turno
+FASE 2: Sistema de Ações e Validação (Regras do combate)
+Objetivo: Implementar regras estritas sobre quais ações podem ser executadas
+
+2.1 - Estender TurnManager com estado de ação
+
+ Rastrear ação primária selecionada (Attack/Investigate/Defend)
+ Flag para ação secundária (UseItem/UseSkill)
+ Método HasPrimaryAction() e SetPrimaryAction(type)
+ Validação: uma ação primária por turno
+2.2 - Criar ActionValidator (novo)
+
+ CanExecuteAction(PlayerActionType) - verifica conflitos
+ ValidateDiceAllocation(int) - limita a dados disponíveis
+ ValidateResourceCost() - Heart, Body, Mind
+2.3 - Refatorar CombatInputHandler
+
+ Usar ActionValidator para validações
+ Retornar feedback de validação em ActionResult
+ Bloquear múltiplas ações primárias
+FASE 3: Sistema de Dados Alocados (Mecânica de aposta)
+Objetivo: Permitir adicionar/remover dados de ações com limites
+
+3.1 - Expandir InputView com botões de subtração
+
+ Botão "Subtract Attack Dice" (novo)
+ Botão "Subtract Investigate Dice" (novo)
+ Botão "Subtract Defend Dice" (novo)
+ Callback OnSubtractAttackDice, etc.
+3.2 - Estender lógica em CombatPresenter
+
+ Métodos OnSubtractAttackDice(int), OnSubtractInvestigateDice(int), etc.
+ Validar que não fica negativo
+ Atualizar HUD em tempo real
+3.3 - Validação em TurnManager
+
+ Método TryAddDiceToAction(int) - falha se > disponível
+ Método TryRemoveDiceFromAction(int) - valida mínimo
+FASE 4: UI e Controle de Botões (Feedback ao jogador)
+Objetivo: Mostrar apenas opções válidas conforme contexto
+
+4.1 - Expandir InputView
+
+ Método ShowPlayerTurnUI() - enabler botões do jogador
+ Método ShowEnemyTurnUI() - desabilita botões, mostra "Enemy turn..."
+ Método SetAttackButtonMode(bool isAttackTurn) - alterna Visual + tooltip
+ Método UpdateDiceCounters() - mostra valores em tempo real
+ Método DisablePrimaryActions() - após selecionar Attack/Investigate
+4.2 - Integrar com CombatPresenter
+
+ Chamar ShowPlayerTurnUI() ao iniciar turno do jogador
+ Chamar ShowEnemyTurnUI() ao iniciar turno do inimigo
+ Atualizar estado dos botões em cada ação
+4.3 - Lógica de alternância Attack/Defend
+
+ PlayerTurn sempre = "Attack button"
+ EnemyTurn = "Defense button" (para preparação)
+ Visual diferente: cor, ícone, tooltip
+FASE 5: Sistema de HUD Expandido (Feedback visual robusto)
+Objetivo: Mostrar danos, gastos de recursos, efeitos
+
+5.1 - Expandir HUDView
+
+ Mostrar HP do jogador em tempo real
+ Mostrar HP do inimigo em tempo real
+ Display de dano recebido (número flutuante red)
+ Display de ação executada (flutuante com cor)
+ Barra de recursos (Heart, Body, Mind)
+ Animação de shake ao receber dano
+ Efeito de destaque ao recuperar recursos
+5.2 - Criar HUDAnimator (novo)
+
+ AnimateDamage(int amount, Vector3 position)
+ AnimateHealing(int amount, Vector3 position)
+ AnimateResourceSpent(resourceType, amount)
+ Usar corrotinas para sequências
+FASE 6: Execução de Turno do Inimigo (IA + Delay)
+Objetivo: Inimigo executa ação com delay visual realista
+
+6.1 - Expandir CombatTurnService.StartEnemyTurn()
+
+ Gerar ação usando GenerateEnemyActions()
+ Mostrar feedback "Enemy is attacking..." no UI
+ Aguardar 1-2 segundos
+ Resolver ação (calcular dano, aplicar efeitos)
+ Mostrar resultado no HUD
+ Retornar controle ao turno do jogador
+6.2 - Integrar com CombatResolutionService
+
+ Executar ação queued do inimigo
+ Calcular dano contra defesa do jogador
+ Aplicar dano ao modelo do jogador
+ Atualizar HUD com novo HP
+6.3 - Tratamento de fim de combate
+
+ Se HP jogador = 0 → Combate termina (Defeat)
+ Se HP inimigo = 0 → Combate termina (Victory)
+ Invocar CombatEndService
+FASE 7: Fluxo Completo de Turno (Orquestração)
+Objetivo: Encadear todas as fases em um turno perfeito
+
+7.1 - Refatorar CombatManager
+
+ Usar corrotinas de turno: IEnumerator PlayTurn()
+ Estrutura:
+7.2 - Integrar TurnTransitionManager
+
+ Chamar transição após cada ação
+ Resetar TurnManager para novo turno
+ Invocar callbacks OnPlayerTurnStart, OnEnemyTurnStart
+7.3 - Tratamento de erro/edge cases
+
+ Combate sem ação selecionada (timeout após X segundos)
+ Recursos insuficientes (bloquear botão)
+ Ação do inimigo falha (executar padrão)
+FASE 8: Feedback e Polish (Qualidade)
+Objetivo: Tornar a experiência mais intuitiva e responsiva
+
+8.1 - Adicionar CombatFeedbackManager (novo)
+
+ Log de ações no LogView
+ Cores por tipo: neutral, positive, negative, action, info
+ Fila de mensagens (não sobrepor)
+8.2 - Expandir FeedbackView
+
+ Efeitos sonoros para ações
+ Animações de transição entre turnos
+ Indicador visual de "Your Turn / Enemy Turn"
+8.3 - Testes e refinamentos
+
+ Testar sequência completa de 5 turnos
+ Validar cálculos de dano
+ Assegurar responsividade da UI
+
+📊 DIAGRAMA DE ESTADOS
+
+🔧 ORDEM DE IMPLEMENTAÇÃO (Recomendada)
+
+FASE 1 → Estrutura de eventos e estados
+FASE 3 → Botões de subtração (quick win)
+FASE 2 → Validações (regras claras)
+FASE 4 → UI e controle de botões (feedback)
+FASE 5 → HUD expandido (visual feedback)
+FASE 6 → IA do inimigo (comportamento)
+FASE 7 → Fluxo completo (orquestração)
+FASE 8 → Polish (qualidade)
+
+📝 RESUMO DE CRIAÇÃO/MODIFICAÇÃO DE ARQUIVOS
+
+Ação	Arquivo	Descrição
+✏️ Modificar	CombatStateModel.cs	Adicionar eventos e métodos auxiliares
+✏️ Modificar	CombatTurnService.cs	Usar corrotinas e delays
+🆕 Criar	TurnTransitionManager.cs	Gerenciar sequência de turnos
+✏️ Modificar	TurnManager.cs	Rastrear ação primária
+🆕 Criar	ActionValidator.cs	Validar conflitos de ações
+✏️ Modificar	CombatInputHandler.cs	Usar validador
+✏️ Modificar	InputView.cs	Botões de subtração + métodos de controle
+✏️ Modificar	CombatPresenter.cs	Métodos para subtração e controle de UI
+✏️ Modificar	HUDView.cs	Expandir com múltiplos displays
+🆕 Criar	HUDAnimator.cs	Animações de feedback
+🆕 Criar	CombatFeedbackManager.cs	Gerenciar logs e feedback
+✏️ Modificar	CombatManager.cs	Usar corrotinas de turno
+✏️ Modificar	CombatResolutionService.cs	Integração com HUD

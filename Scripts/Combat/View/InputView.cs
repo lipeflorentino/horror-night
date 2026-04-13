@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,11 @@ public class InputView : MonoBehaviour
     [SerializeField] private Button useItemButton;
     [SerializeField] private Button useSkillButton;
     [SerializeField] private Button endTurnButton;
+
+    [Header("Counts")]
+    [SerializeField] private TMP_Text attackDiceCountText;
+    [SerializeField] private TMP_Text investigateDiceCountText;
+    [SerializeField] private TMP_Text defendDiceCountText;
 
     public event Action OnAttack;
     public event Action OnInvestigate;
@@ -135,18 +141,21 @@ public class InputView : MonoBehaviour
     private void RaiseAddAttackDice()
     {
         attackBonusDice++;
+        attackDiceCountText.text = "" + attackBonusDice;
         OnAddAttackDice?.Invoke(1 + attackBonusDice);
     }
 
     private void RaiseAddInvestigateDice()
     {
         investigateBonusDice++;
+        investigateDiceCountText.text = "" + investigateBonusDice;
         OnAddInvestigateDice?.Invoke(1 + investigateBonusDice);
     }
 
     private void RaiseAddDefendDice()
     {
         defendBonusDice++;
+        defendDiceCountText.text = "" + defendBonusDice;
         OnAddDefendDice?.Invoke(1 + defendBonusDice);
     }
 
