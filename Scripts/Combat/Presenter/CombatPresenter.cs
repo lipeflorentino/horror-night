@@ -151,6 +151,10 @@ public class CombatPresenter
         combatUI.AddLog("No information available", CombatLogStyle.Neutral);
     }
 
+    /// <summary>
+    /// Valida se o turno pode ser encerrado. Não resolve ações.
+    /// Resolução acontece em CombatManager.ResolvePlayerAction().
+    /// </summary>
     public ActionResult OnEndTurn(CombatBattlerModel player, CombatBattlerModel enemy)
     {
         ActionResult endTurnResult = combatInputHandler.HandleEndTurn();
@@ -160,15 +164,24 @@ public class CombatPresenter
             return endTurnResult;
         }
 
-        ResolvePlayerTurn(player, enemy);
-        ResolveEnemyTurn(enemy, player);
-
-        turnManager.actionQueue?.Clear();
-        combatTurnService.StartPlayerTurn(player);
-        combatUI.SetTurnText("Turno do jogador");
-        combatUI.UpdateHud(turnManager.availableDice);
-
+        PublishResult("End Turn", endTurnResult);
         return endTurnResult;
+    }
+
+    /// <summary>
+    /// Retorna as ações enfileiradas do turno atual do jogador.
+    /// </summary>
+    public IReadOnlyList<ActionInstance> GetQueuedPlayerActions()
+    {
+        return turnManager.actionQueue?.GetAll() ?? new List<ActionInstance>();
+    }
+
+    /// <summary>
+    /// Limpa a fila de ações após resolução do turno.
+    /// </summary>
+    public void ClearActionQueue()
+    {
+        turnManager.actionQueue?.Clear();
     }
 
     private void ResolvePlayerTurn(CombatBattlerModel player, CombatBattlerModel enemy)
@@ -337,5 +350,13 @@ public class CombatPresenter
     {
         if (hudView != null)
             hudView.ShowActionFeedback(actionName);
+    }
+
+    /// <summary>
+    /// Resolve os resultados das ações de um turno e publica no log.
+    /// </summary>
+    public void PublishPlayerActionResults(List<ActionResult> results)
+    {
+        PublishResolvedActions("Player", results);
     }
 }

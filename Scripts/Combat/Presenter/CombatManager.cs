@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CombatManager : MonoBehaviour
 {
@@ -211,6 +212,155 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resolve as ações do jogador contra o inimigo.
+    /// Aplica dano, feedback visual, e atualiza HP do inimigo na HUD.
+    /// </summary>
+    private void ResolvePlayerAction()
+    {
+        IReadOnlyList<ActionInstance> queuedActions = combatPresenter.GetQueuedPlayerActions();
+        if (queuedActions == null || queuedActions.Count == 0)
+        {
+            combatUI.AddLog("Nenhuma ação foi executada.", CombatLogStyle.Neutral);
+            combatPresenter.ClearActionQueue();
+            return;
+        }
+
+        // Resolver a primeira ação (primária)
+        ActionInstance action = queuedActions[0];
+        if (action == null || action.definition == null)
+        {
+            combatUI.AddLog("Ação inválida.", CombatLogStyle.Negative);
+            combatPresenter.ClearActionQueue();
+            return;
+        }
+
+        // Processar baseado no tipo de ação
+        switch (action.definition.type)
+        {
+            case PlayerActionType.Attack:
+                ResolvePlayerAttack(action);
+                break;
+
+            case PlayerActionType.Defend:
+                ResolvePlayerDefend(action);
+                break;
+
+            case PlayerActionType.Investigate:
+                ResolvePlayerInvestigate(action);
+                break;
+
+            case PlayerActionType.UseItem:
+                ResolvePlayerUseItem(action);
+                break;
+
+            case PlayerActionType.UseSkill:
+                ResolvePlayerUseSkill(action);
+                break;
+
+            default:
+                combatUI.AddLog($"Ação desconhecida: {action.definition.type}", CombatLogStyle.Negative);
+                break;
+        }
+
+        combatPresenter.ClearActionQueue();
+    }
+
+    /// <summary>
+    /// Resolve ataque do jogador contra o inimigo.
+    /// Calcula dano considerando a defesa do inimigo.
+    /// </summary>
+    private void ResolvePlayerAttack(ActionInstance action)
+    {
+        int roll = diceService.RollD6();
+        int baseDamage = playerModel.attack + roll + action.allocatedDice;
+        int damage = Mathf.Max(1, baseDamage - enemyModel.defense); // Mínimo 1 de dano
+
+        enemyModel.TakeDamage(damage);
+        
+        combatUI.AddLog($"Você atacou! Dano aplicado: {damage} (ataque: {baseDamage}, defesa: {enemyModel.defense})", CombatLogStyle.Action);
+        
+        // Feedback visual: mostrar ação, dano e animar
+        combatPresenter.ShowActionFeedback("Ataque!");
+        combatPresenter.ShowDamagePopup(damage);
+        
+        // Atualizar HUD com novo HP do inimigo
+        combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
+    }
+
+    /// <summary>
+    /// Resolve defesa do jogador (aumenta recursos).
+    /// </summary>
+    private void ResolvePlayerDefend(ActionInstance action)
+    {
+        int recovery = 1 + action.allocatedDice;
+        playerModel.RecoverResources(recovery);
+        
+        combatUI.AddLog($"Você se defendeu e recuperou {recovery} recurso(s).", CombatLogStyle.Action);
+        combatPresenter.ShowActionFeedback("Defesa!");
+        
+        // Atualizar HUD com novos recursos
+        combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
+    }
+
+    /// <summary>
+    /// Resolve investigação do jogador.
+    /// </summary>
+    private void ResolvePlayerInvestigate(ActionInstance action)
+    {
+        int roll = diceService.RollD6();
+        int investigateValue = roll + action.allocatedDice;
+        
+        if (investigateValue >= 5)
+        {
+            combatUI.AddLog($"Investigação bem-sucedida! Você obtém informação completa.", CombatLogStyle.Action);
+        }
+        else if (investigateValue >= 3)
+        {
+            combatUI.AddLog($"Investigação parcial. Você descobre algo útil.", CombatLogStyle.Action);
+        }
+        else
+        {
+            combatUI.AddLog($"Investigação falhou. Nenhuma informação útil.", CombatLogStyle.Negative);
+        }
+        
+        combatPresenter.ShowActionFeedback("Investigando...");
+    }
+
+    /// <summary>
+    /// Resolve uso de item do jogador.
+    /// </summary>
+    private void ResolvePlayerUseItem(ActionInstance action)
+    {
+        int healAmount = 2;
+        playerModel.RecoverResources(healAmount);
+        
+        combatUI.AddLog($"Item #{action.itemId} usado! Recuperou {healAmount} recursos.", CombatLogStyle.Action);
+        combatPresenter.ShowActionFeedback($"Item #{action.itemId}");
+        combatPresenter.ShowHealingPopup(healAmount);
+        
+        // Atualizar HUD
+        combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
+    }
+
+    /// <summary>
+    /// Resolve uso de skill do jogador.
+    /// </summary>
+    private void ResolvePlayerUseSkill(ActionInstance action)
+    {
+        int roll = diceService.RollD6();
+        int skillDamage = Mathf.Max(1, (playerModel.attack + 2 + roll) - enemyModel.defense);
+        
+        enemyModel.TakeDamage(skillDamage);
+        
+        combatUI.AddLog($"Skill #{action.skillId} usada! Dano: {skillDamage}", CombatLogStyle.Action);
+        combatPresenter.ShowActionFeedback($"Skill #{action.skillId}!");
+        combatPresenter.ShowDamagePopup(skillDamage);
+        
+        // Atualizar HUD
+        combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
+    }
+
     public ActionResult PlayerRecharge(bool boosted)
     {
         ActionResult result = combatPresenter.OnRecharge(playerModel, boosted);
@@ -319,6 +469,9 @@ public class CombatManager : MonoBehaviour
         
         if (result.success)
         {
+            // Resolver ações do jogador (dano, feedback, etc)
+            ResolvePlayerAction();
+            
             // Transicionar para turno do inimigo
             combatStateModel.SetEnemyTurn();
         }
