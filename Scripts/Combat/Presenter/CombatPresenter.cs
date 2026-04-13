@@ -8,6 +8,7 @@ public class CombatPresenter
     private readonly CombatTurnResolver combatTurnResolver;
     private readonly TurnManager turnManager;
     private InputView inputView;
+    private HudView hudView;
 
     public CombatPresenter(
         CombatUI combatUI,
@@ -15,7 +16,8 @@ public class CombatPresenter
         CombatTurnService combatTurnService,
         CombatTurnResolver combatTurnResolver,
         TurnManager turnManager,
-        InputView inputView = null)
+        InputView inputView = null,
+        HudView hudView = null)
     {
         this.combatUI = combatUI;
         this.combatInputHandler = combatInputHandler;
@@ -23,6 +25,7 @@ public class CombatPresenter
         this.combatTurnResolver = combatTurnResolver;
         this.turnManager = turnManager;
         this.inputView = inputView;
+        this.hudView = hudView;
     }
 
     public void OnTurnStart(CombatBattlerModel player, CombatBattlerModel enemy)
@@ -263,5 +266,76 @@ public class CombatPresenter
     public void SetInputView(InputView view)
     {
         inputView = view;
+    }
+
+    /// <summary>
+    /// Define a referência ao HudView (pode ser definida após construção).
+    /// </summary>
+    public void SetHudView(HudView view)
+    {
+        hudView = view;
+    }
+
+    /// <summary>
+    /// Atualiza o display de HP do jogador na HUD.
+    /// </summary>
+    public void UpdatePlayerHPDisplay(int currentHP, int maxHP)
+    {
+        if (hudView != null)
+            hudView.UpdatePlayerHP(currentHP, maxHP);
+    }
+
+    /// <summary>
+    /// Atualiza o display de recursos (Heart, Body, Mind) do jogador.
+    /// </summary>
+    public void UpdatePlayerResourcesDisplay(int heart, int body, int mind)
+    {
+        if (hudView != null)
+            hudView.UpdatePlayerResources(heart, body, mind);
+    }
+
+    /// <summary>
+    /// Atualiza o display de HP do inimigo na HUD.
+    /// </summary>
+    public void UpdateEnemyHPDisplay(int currentHP, int maxHP)
+    {
+        if (hudView != null)
+            hudView.UpdateEnemyHP(currentHP, maxHP);
+    }
+
+    /// <summary>
+    /// Mostra feedback de dano recebido com animação.
+    /// </summary>
+    public void ShowDamagePopup(int damageAmount)
+    {
+        if (hudView != null)
+            hudView.ShowDamagePopup(damageAmount);
+    }
+
+    /// <summary>
+    /// Mostra feedback de cura com animação.
+    /// </summary>
+    public void ShowHealingPopup(int healAmount)
+    {
+        if (hudView != null)
+            hudView.ShowHealingPopup(healAmount);
+    }
+
+    /// <summary>
+    /// Anima um shake de câmera ao receber dano.
+    /// </summary>
+    public void PlayDamageShake()
+    {
+        if (hudView != null)
+            hudView.PlayDamageShake();
+    }
+
+    /// <summary>
+    /// Mostra feedback de ação executada.
+    /// </summary>
+    public void ShowActionFeedback(string actionName)
+    {
+        if (hudView != null)
+            hudView.ShowActionFeedback(actionName);
     }
 }

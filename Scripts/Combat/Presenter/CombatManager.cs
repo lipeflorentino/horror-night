@@ -20,6 +20,7 @@ public class CombatManager : MonoBehaviour
     private CombatEndService combatEndService;
     private CombatModelFactory combatModelFactory;
     private InputView inputView;
+    private HudView hudView;
 
     private Coroutine combatLoopCoroutine;
 
@@ -65,6 +66,17 @@ public class CombatManager : MonoBehaviour
         if (inputView != null)
         {
             combatPresenter.SetInputView(inputView);
+        }
+
+        // Encontrar HudView e conectar ao presenter
+        hudView = FindObjectOfType<HudView>();
+        if (hudView != null)
+        {
+            combatPresenter.SetHudView(hudView);
+            // Atualizar displays iniciais
+            hudView.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
+            hudView.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
+            hudView.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
         }
 
         // Subscribir aos eventos de ação primária
@@ -158,7 +170,7 @@ public class CombatManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolve a ação do inimigo e aplica dano ao jogador.
+    /// Resolve a ação do inimigo e aplica dano ao jogador com feedback visual.
     /// </summary>
     private void ResolveEnemyAction()
     {
@@ -167,6 +179,13 @@ public class CombatManager : MonoBehaviour
             int damage = enemyModel.attack;
             playerModel.TakeDamage(damage);
             combatUI.AddLog($"Inimigo atacou! Dano: {damage}", CombatLogStyle.Negative);
+            
+            // Feedback visual de dano
+            combatPresenter.ShowDamagePopup(damage);
+            combatPresenter.PlayDamageShake();
+
+            // Atualizar HUD com novo HP
+            combatPresenter.UpdatePlayerHPDisplay(playerModel.hp, playerModel.maxHp);
         }
         else if (combatTurnService.lastEnemyAction == EnemyTurnAction.Defend)
         {
