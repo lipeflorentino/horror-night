@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,12 @@ public class CombatTurnService
     private readonly DiceService dice;
 
     public EnemyTurnAction lastEnemyAction;
+    
+    /// <summary>
+    /// Event disparado quando a ação do inimigo é determinada.
+    /// Dispara durante o delay, permitindo UI feedback.
+    /// </summary>
+    public event Action<EnemyTurnAction> OnEnemyActionDetermined;
 
     public CombatTurnService(CombatStateModel combatStateModel, TurnManager turnManager, DiceService dice)
     {
@@ -68,14 +75,14 @@ public class CombatTurnService
 
     /// <summary>
     /// Executa o turno do inimigo com delay e feedback visual.
-    /// Aguarda 1 segundo, mostra feedback, aguarda mais 1 segundo após execução.
+    /// Sequência: aguarda 0.5s, dispara evento de ação, aguarda 1.5s antes de resolver.
     /// </summary>
     public IEnumerator ExecuteEnemyTurn(CombatBattlerModel enemy)
     {
         combatStateModel.SetEnemyTurn();
         
-        // Aguardar feedback inicial
-        yield return _waitForSeconds1;
+        // Pequeno delay antes de revelar ação
+        yield return new WaitForSeconds(0.5f);
 
         // Gerar ação do inimigo
         var enemyActions = GenerateEnemyActions();
@@ -84,10 +91,13 @@ public class CombatTurnService
             lastEnemyAction = enemyActions[0].definition.type == PlayerActionType.Attack 
                 ? EnemyTurnAction.Attack 
                 : EnemyTurnAction.Defend;
+            
+            // Disparar evento para feedback visual
+            OnEnemyActionDetermined?.Invoke(lastEnemyAction);
         }
 
         // Aguardar antes de resolver a ação
-        yield return _waitForSeconds1;
+        yield return new WaitForSeconds(1.5f);
     }
 
     /// <summary>

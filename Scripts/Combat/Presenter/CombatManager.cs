@@ -91,6 +91,9 @@ public class CombatManager : MonoBehaviour
         turnTransitionManager.OnPlayerTurnReady += HandlePlayerTurnReady;
         turnTransitionManager.OnEnemyTurnStarting += HandleEnemyTurnStarting;
 
+        // Subscribir ao evento de ação do inimigo determinada
+        combatTurnService.OnEnemyActionDetermined += HandleEnemyActionDetermined;
+
         // Iniciar o combate
         bool isPlayerTurn = combatTurnService.StartFirstTurn(playerModel, enemyModel);
         combatUI.SetTurnText($"Turno do {(isPlayerTurn ? "Jogador" : "Inimigo")}");
@@ -159,6 +162,15 @@ public class CombatManager : MonoBehaviour
         combatUI.AddLog("Inimigo executando ação...", CombatLogStyle.Action);
     }
 
+    private void HandleEnemyActionDetermined(EnemyTurnAction action)
+    {
+        string actionText = action == EnemyTurnAction.Attack ? "Ataque!" : "Defesa!";
+        combatUI.AddLog($"Inimigo: {actionText}", CombatLogStyle.Action);
+        
+        // Mostrar feedback na HUD
+        combatPresenter.ShowActionFeedback($"Enemy {actionText}");
+    }
+
     private void HandleCombatEnded(CombatOutcome outcome)
     {
         combatUI.AddLog($"Combate terminou: {outcome}!", CombatLogStyle.Info);
@@ -171,14 +183,18 @@ public class CombatManager : MonoBehaviour
 
     /// <summary>
     /// Resolve a ação do inimigo e aplica dano ao jogador com feedback visual.
+    /// Considera defesa do jogador para reduzir dano.
     /// </summary>
     private void ResolveEnemyAction()
     {
         if (combatTurnService.lastEnemyAction == EnemyTurnAction.Attack)
         {
-            int damage = enemyModel.attack;
+            // Calcular dano com redução de defesa do jogador
+            int baseDamage = enemyModel.attack;
+            int damage = Mathf.Max(1, baseDamage - playerModel.defense); // Mínimo 1 de dano
+            
             playerModel.TakeDamage(damage);
-            combatUI.AddLog($"Inimigo atacou! Dano: {damage}", CombatLogStyle.Negative);
+            combatUI.AddLog($"Inimigo atacou! Dano recebido: {damage} (ataque: {baseDamage}, defesa: {playerModel.defense})", CombatLogStyle.Negative);
             
             // Feedback visual de dano
             combatPresenter.ShowDamagePopup(damage);
@@ -189,7 +205,9 @@ public class CombatManager : MonoBehaviour
         }
         else if (combatTurnService.lastEnemyAction == EnemyTurnAction.Defend)
         {
-            combatUI.AddLog("Inimigo se defendeu.", CombatLogStyle.Neutral);
+            combatUI.AddLog("Inimigo se defendeu, aumentando defesa!", CombatLogStyle.Neutral);
+            // Aqui você pode adicionar lógica de defesa permanente ou temporal
+            // Por enquanto, apenas registra no log
         }
     }
 
@@ -360,6 +378,11 @@ public class CombatManager : MonoBehaviour
         {
             turnTransitionManager.OnPlayerTurnReady -= HandlePlayerTurnReady;
             turnTransitionManager.OnEnemyTurnStarting -= HandleEnemyTurnStarting;
+        }
+
+        if (combatTurnService != null)
+        {
+            combatTurnService.OnEnemyActionDetermined -= HandleEnemyActionDetermined;
         }
 
         if (turnManager != null)
