@@ -66,7 +66,7 @@ public class CombatManager : MonoBehaviour
 
     public ActionResult PlayerInvestigate()
     {
-        ActionResult result = combatPresenter.OnAddInvestigateDice(playerModel, 1);
+        ActionResult result = combatPresenter.OnInvestigate(playerModel);
         ResolveCombatEnd();
         return result;
     }
@@ -85,7 +85,14 @@ public class CombatManager : MonoBehaviour
 
     public ActionResult PlayerAttack()
     {
-        ActionResult result = combatPresenter.OnAddAttackDice(playerModel, 1);
+        ActionResult result = combatPresenter.OnAttack(playerModel);
+        ResolveCombatEnd();
+        return result;
+    }
+
+    public ActionResult PlayerDefend()
+    {
+        ActionResult result = combatPresenter.OnDefend(playerModel);
         ResolveCombatEnd();
         return result;
     }
@@ -94,6 +101,11 @@ public class CombatManager : MonoBehaviour
     {
         ActionResult result = combatPresenter.OnAddAttackDice(playerModel, dice);
         return result;
+    }
+
+    public ActionResult PlayerAddDefendDice(int dice)
+    {
+        return combatPresenter.OnAddDefendDice(playerModel, dice);
     }
 
     public ActionResult PlayerUseItem()
@@ -114,6 +126,11 @@ public class CombatManager : MonoBehaviour
     public ActionResult PlayerSelectSkill(int skillId)
     {
         return combatPresenter.OnSkillSelected(playerModel, skillId);
+    }
+
+    public ActionResult PlayerUseSkill()
+    {
+        return combatPresenter.OnUseSkill(playerModel, 1);
     }
 
     public void PlayerInfo()

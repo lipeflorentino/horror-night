@@ -6,57 +6,70 @@ using UnityEngine.UI;
 public class InputView : MonoBehaviour
 {
     [Header("Buttons")]
-    [SerializeField] private Button rechargeButton;
-    [SerializeField] private Button rechargeBoostedButton;
-    [SerializeField] private Button investigateButton;
-    [SerializeField] private Button fleeButton;
     [SerializeField] private Button attackButton;
-    [SerializeField] private Button endTurnButton;
-    [SerializeField] private Button useItemButton;
-    [SerializeField] private Button skillsButton;
+    [SerializeField] private Button investigateButton;
+    [SerializeField] private Button defendButton;
     [SerializeField] private Button infoButton;
+    [SerializeField] private Button itemButton;
+    [SerializeField] private Button skillButton;
+    [SerializeField] private Button addAttackDiceButton;
+    [SerializeField] private Button addInvestigateDiceButton;
+    [SerializeField] private Button addDefendDiceButton;
+    [SerializeField] private Button useItemButton;
+    [SerializeField] private Button useSkillButton;
+    [SerializeField] private Button endTurnButton;
 
-    [Header("Flee")]
-    [SerializeField] private int fleeDiceAmount = 1;
-
-    public event Action OnRecharge;
-    public event Action OnRechargeBoosted;
-    public event Action<int> OnAddInvestigateDice;
+    public event Action OnAttack;
+    public event Action OnInvestigate;
+    public event Action OnDefend;
+    public event Action OnItem;
+    public event Action OnSkill;
     public event Action<int> OnAddAttackDice;
-    public event Action OnEndTurn;
-    public event Action<int> OnFlee;
+    public event Action<int> OnAddInvestigateDice;
+    public event Action<int> OnAddDefendDice;
     public event Action OnUseItem;
-    public event Action OnSkills;
+    public event Action OnUseSkill;
     public event Action OnInfo;
+    public event Action OnEndTurn;
 
-    private int attackDiceAllocation;
-    private int investigateDiceAllocation;
+    private int attackBonusDice;
+    private int investigateBonusDice;
+    private int defendBonusDice;
 
     private void Awake()
     {
-        if (rechargeButton != null)
-            rechargeButton.onClick.AddListener(RaiseRecharge);
-
-        if (rechargeBoostedButton != null)
-            rechargeBoostedButton.onClick.AddListener(RaiseRechargeBoosted);
+        if (attackButton != null)
+            attackButton.onClick.AddListener(RaiseAttack);
 
         if (investigateButton != null)
-            investigateButton.onClick.AddListener(RaiseAddInvestigateDice);
+            investigateButton.onClick.AddListener(RaiseInvestigate);
 
-        if (fleeButton != null)
-            fleeButton.onClick.AddListener(RaiseFlee);
+        if (defendButton != null)
+            defendButton.onClick.AddListener(RaiseDefend);
 
-        if (attackButton != null)
-            attackButton.onClick.AddListener(RaiseAddAttackDice);
+        if (addAttackDiceButton != null)
+            addAttackDiceButton.onClick.AddListener(RaiseAddAttackDice);
+
+        if (addInvestigateDiceButton != null)
+            addInvestigateDiceButton.onClick.AddListener(RaiseAddInvestigateDice);
+
+        if (addDefendDiceButton != null)
+            addDefendDiceButton.onClick.AddListener(RaiseAddDefendDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.AddListener(RaiseEndTurn);
 
+        if (itemButton != null)
+            itemButton.onClick.AddListener(RaiseItem);
+
+        if (skillButton != null)
+            skillButton.onClick.AddListener(RaiseSkill);
+
         if (useItemButton != null)
             useItemButton.onClick.AddListener(RaiseUseItem);
 
-        if (skillsButton != null)
-            skillsButton.onClick.AddListener(RaiseSkills);
+        if (useSkillButton != null)
+            useSkillButton.onClick.AddListener(RaiseUseSkill);
 
         if (infoButton != null)
             infoButton.onClick.AddListener(RaiseInfo);
@@ -64,57 +77,88 @@ public class InputView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (rechargeButton != null)
-            rechargeButton.onClick.RemoveListener(RaiseRecharge);
-
-        if (rechargeBoostedButton != null)
-            rechargeBoostedButton.onClick.RemoveListener(RaiseRechargeBoosted);
+        if (attackButton != null)
+            attackButton.onClick.RemoveListener(RaiseAttack);
 
         if (investigateButton != null)
-            investigateButton.onClick.RemoveListener(RaiseAddInvestigateDice);
+            investigateButton.onClick.RemoveListener(RaiseInvestigate);
 
-        if (fleeButton != null)
-            fleeButton.onClick.RemoveListener(RaiseFlee);
+        if (defendButton != null)
+            defendButton.onClick.RemoveListener(RaiseDefend);
 
-        if (attackButton != null)
-            attackButton.onClick.RemoveListener(RaiseAddAttackDice);
+        if (addAttackDiceButton != null)
+            addAttackDiceButton.onClick.RemoveListener(RaiseAddAttackDice);
+
+        if (addInvestigateDiceButton != null)
+            addInvestigateDiceButton.onClick.RemoveListener(RaiseAddInvestigateDice);
+
+        if (addDefendDiceButton != null)
+            addDefendDiceButton.onClick.RemoveListener(RaiseAddDefendDice);
 
         if (endTurnButton != null)
             endTurnButton.onClick.RemoveListener(RaiseEndTurn);
 
+        if (itemButton != null)
+            itemButton.onClick.RemoveListener(RaiseItem);
+
+        if (skillButton != null)
+            skillButton.onClick.RemoveListener(RaiseSkill);
+
         if (useItemButton != null)
             useItemButton.onClick.RemoveListener(RaiseUseItem);
 
-        if (skillsButton != null)
-            skillsButton.onClick.RemoveListener(RaiseSkills);
+        if (useSkillButton != null)
+            useSkillButton.onClick.RemoveListener(RaiseUseSkill);
 
         if (infoButton != null)
             infoButton.onClick.RemoveListener(RaiseInfo);
     }
 
-    private void RaiseRecharge() => OnRecharge?.Invoke();
-
-    private void RaiseRechargeBoosted() => OnRechargeBoosted?.Invoke();
-
-    private void RaiseAddInvestigateDice()
+    private void RaiseAttack()
     {
-        investigateDiceAllocation++;
-        OnAddInvestigateDice?.Invoke(investigateDiceAllocation);
+        attackBonusDice = 0;
+        OnAttack?.Invoke();
     }
 
-    private void RaiseFlee() => OnFlee?.Invoke(fleeDiceAmount);
+    private void RaiseInvestigate()
+    {
+        investigateBonusDice = 0;
+        OnInvestigate?.Invoke();
+    }
+
+    private void RaiseDefend()
+    {
+        defendBonusDice = 0;
+        OnDefend?.Invoke();
+    }
 
     private void RaiseAddAttackDice()
     {
-        attackDiceAllocation++;
-        OnAddAttackDice?.Invoke(attackDiceAllocation);
+        attackBonusDice++;
+        OnAddAttackDice?.Invoke(1 + attackBonusDice);
+    }
+
+    private void RaiseAddInvestigateDice()
+    {
+        investigateBonusDice++;
+        OnAddInvestigateDice?.Invoke(1 + investigateBonusDice);
+    }
+
+    private void RaiseAddDefendDice()
+    {
+        defendBonusDice++;
+        OnAddDefendDice?.Invoke(1 + defendBonusDice);
     }
 
     private void RaiseEndTurn() => OnEndTurn?.Invoke();
 
+    private void RaiseItem() => OnItem?.Invoke();
+
+    private void RaiseSkill() => OnSkill?.Invoke();
+
     private void RaiseUseItem() => OnUseItem?.Invoke();
 
-    private void RaiseSkills() => OnSkills?.Invoke();
-    
+    private void RaiseUseSkill() => OnUseSkill?.Invoke();
+
     private void RaiseInfo() => OnInfo?.Invoke();
 }

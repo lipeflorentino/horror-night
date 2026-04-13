@@ -45,6 +45,22 @@ public class CombatInputHandler
         return TryQueueAction(player, action, "Investigate queued.");
     }
 
+    public ActionResult QueueDefend(CombatBattlerModel player, int diceAmount)
+    {
+        int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
+
+        ActionInstance action = new ActionInstance
+        {
+            definition = actionDefinitionFactory.CreateDefend(),
+            allocatedDice = allocatedDice - 1,
+            allocatedHeart = 0,
+            allocatedBody = 0,
+            allocatedMind = 0
+        };
+
+        return TryQueueAction(player, action, "Defend queued.");
+    }
+
     public ActionResult HandleFlee(CombatBattlerModel player, int dice)
     {
         ActionInstance action = new ActionInstance
