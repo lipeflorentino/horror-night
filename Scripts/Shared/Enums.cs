@@ -39,6 +39,16 @@ public enum CombatOutcome
     Fled
 }
 
+public enum PlayerActionType
+{
+    Attack,
+    Defend,
+    Investigate,
+    UseItem,
+    UseSkill,
+    EndTurn
+}
+
 public enum EnemyTurnAction
 {
     None,

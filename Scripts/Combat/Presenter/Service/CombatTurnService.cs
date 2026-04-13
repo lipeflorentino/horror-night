@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatTurnService
@@ -36,9 +37,28 @@ public class CombatTurnService
     public void StartPlayerTurn(CombatBattlerModel player)
     {
         combatStateModel.SetPlayerTurn();
-        turnManager.StartTurn(3);
         player.RecoverResources(1);
+        turnManager.StartTurn(3, player.heart, player.body, player.mind);
         lastEnemyAction = EnemyTurnAction.None;
+    }
+
+    public List<ActionInstance> GenerateEnemyActions()
+    {
+        ActionDefinitionFactory factory = new ActionDefinitionFactory();
+        int roll = dice.RollD6();
+        ActionDefinition definition = roll <= 3 ? factory.CreateDefend() : factory.CreateAttack();
+
+        return new List<ActionInstance>
+        {
+            new ActionInstance
+            {
+                definition = definition,
+                allocatedDice = 0,
+                allocatedHeart = 0,
+                allocatedBody = 0,
+                allocatedMind = 0
+            }
+        };
     }
 
     public IEnumerator StartEnemyTurn()

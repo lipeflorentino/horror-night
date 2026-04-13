@@ -23,9 +23,9 @@ public class CombatUIBinder : MonoBehaviour
 
         inputView.OnRecharge += HandleRecharge;
         inputView.OnRechargeBoosted += HandleRechargeBoosted;
-        inputView.OnInvestigate += HandleInvestigate;
+        inputView.OnAddInvestigateDice += HandleAddInvestigateDice;
         inputView.OnFlee += HandleFlee;
-        inputView.OnAttack += HandleAttack;
+        inputView.OnAddAttackDice += HandleAddAttackDice;
         inputView.OnEndTurn += HandleEndTurn;
         inputView.OnUseItem += HandleUseItem;
         inputView.OnSkills += HandleSkills;
@@ -39,9 +39,9 @@ public class CombatUIBinder : MonoBehaviour
 
         inputView.OnRecharge -= HandleRecharge;
         inputView.OnRechargeBoosted -= HandleRechargeBoosted;
-        inputView.OnInvestigate -= HandleInvestigate;
+        inputView.OnAddInvestigateDice -= HandleAddInvestigateDice;
         inputView.OnFlee -= HandleFlee;
-        inputView.OnAttack -= HandleAttack;
+        inputView.OnAddAttackDice -= HandleAddAttackDice;
         inputView.OnEndTurn -= HandleEndTurn;
         inputView.OnUseItem -= HandleUseItem;
         inputView.OnSkills -= HandleSkills;
@@ -60,10 +60,10 @@ public class CombatUIBinder : MonoBehaviour
             combatManager.PlayerRecharge(true);
     }
 
-    private void HandleInvestigate()
+    private void HandleAddInvestigateDice(int diceAmount)
     {
         if (combatManager != null)
-            combatManager.PlayerInvestigate();
+            combatManager.PlayerAddInvestigateDice(diceAmount);
     }
 
     private void HandleFlee(int diceAmount)
@@ -72,10 +72,10 @@ public class CombatUIBinder : MonoBehaviour
             combatManager.PlayerFlee(diceAmount);
     }
 
-    private void HandleAttack()
+    private void HandleAddAttackDice(int diceAmount)
     {
         if (combatManager != null)
-            combatManager.PlayerAttack();
+            combatManager.PlayerAddAttackDice(diceAmount);
     }
 
     private void HandleEndTurn()
