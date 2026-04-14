@@ -16,113 +16,43 @@ public class CombatInputHandler
         actionDefinitionFactory = new ActionDefinitionFactory();
         actionValidator = new ActionValidator(turnManager, combatStateModel);
     }
-    public ActionResult TryAddAttackDice(int diceToAdd)
+
+    private ActionResult TryModifyActionDice(PlayerActionType actionType, int amount, bool isAdding)
     {
-        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Attack, diceToAdd);
-        if (!string.IsNullOrEmpty(diceError))
-            return Fail(diceError);
+        var validationError = isAdding
+            ? actionValidator.ValidateDiceAllocation(actionType, amount)
+            : actionValidator.ValidateDiceRemoval(actionType, amount);
 
-        if (!turnManager.TryAddDiceToAction(PlayerActionType.Attack, diceToAdd))
-            return Fail("Failed to allocate dice to attack.");
+        if (!string.IsNullOrEmpty(validationError))
+            return Fail(validationError);
 
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack);
+        var success = isAdding
+            ? turnManager.TryAddDiceToAction(actionType, amount)
+            : turnManager.TryRemoveDiceFromAction(actionType, amount);
+
+        if (!success)
+        {
+            string operation = isAdding ? "allocate" : "remove";
+            return Fail($"Failed to {operation} dice from {actionType}.");
+        }
+
+        int allocated = turnManager.GetAllocatedDiceForAction(actionType);
+        string verb = isAdding ? "Added" : "Removed";
+
         return new ActionResult
         {
             success = true,
-            message = $"Added {diceToAdd} to Attack. Total: {allocated}",
+            message = $"{verb} {amount} to {actionType}. Total: {allocated}",
             diceSpent = 0
         };
     }
 
-    public ActionResult TryRemoveAttackDice(int diceToRemove)
-    {
-        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Attack, diceToRemove);
-        if (!string.IsNullOrEmpty(removalError))
-            return Fail(removalError);
-
-        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Attack, diceToRemove))
-            return Fail("Failed to remove dice from attack.");
-
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack);
-        return new ActionResult
-        {
-            success = true,
-            message = $"Removed {diceToRemove} from Attack. Total: {allocated}",
-            diceSpent = 0
-        };
-    }
-
-    public ActionResult TryAddInvestigateDice(int diceToAdd)
-    {
-        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Investigate, diceToAdd);
-        if (!string.IsNullOrEmpty(diceError))
-            return Fail(diceError);
-
-        if (!turnManager.TryAddDiceToAction(PlayerActionType.Investigate, diceToAdd))
-            return Fail("Failed to allocate dice to investigate.");
-
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate);
-        return new ActionResult
-        {
-            success = true,
-            message = $"Added {diceToAdd} to Investigate. Total: {allocated}",
-            diceSpent = 0
-        };
-    }
-
-    public ActionResult TryRemoveInvestigateDice(int diceToRemove)
-    {
-        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Investigate, diceToRemove);
-        if (!string.IsNullOrEmpty(removalError))
-            return Fail(removalError);
-
-        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Investigate, diceToRemove))
-            return Fail("Failed to remove dice from investigate.");
-
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate);
-        return new ActionResult
-        {
-            success = true,
-            message = $"Removed {diceToRemove} from Investigate. Total: {allocated}",
-            diceSpent = 0
-        };
-    }
-
-    public ActionResult TryAddDefendDice(int diceToAdd)
-    {
-        string diceError = actionValidator.ValidateDiceAllocation(PlayerActionType.Defend, diceToAdd);
-        if (!string.IsNullOrEmpty(diceError))
-            return Fail(diceError);
-
-        if (!turnManager.TryAddDiceToAction(PlayerActionType.Defend, diceToAdd))
-            return Fail("Failed to allocate dice to defend.");
-
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend);
-        return new ActionResult
-        {
-            success = true,
-            message = $"Added {diceToAdd} to Defend. Total: {allocated}",
-            diceSpent = 0
-        };
-    }
-
-    public ActionResult TryRemoveDefendDice(int diceToRemove)
-    {
-        string removalError = actionValidator.ValidateDiceRemoval(PlayerActionType.Defend, diceToRemove);
-        if (!string.IsNullOrEmpty(removalError))
-            return Fail(removalError);
-
-        if (!turnManager.TryRemoveDiceFromAction(PlayerActionType.Defend, diceToRemove))
-            return Fail("Failed to remove dice from defend.");
-
-        int allocated = turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend);
-        return new ActionResult
-        {
-            success = true,
-            message = $"Removed {diceToRemove} from Defend. Total: {allocated}",
-            diceSpent = 0
-        };
-    }
+    public ActionResult TryAddAttackDice(int diceToAdd) => TryModifyActionDice(PlayerActionType.Attack, diceToAdd, true);
+    public ActionResult TryRemoveAttackDice(int diceToRemove) => TryModifyActionDice(PlayerActionType.Attack, diceToRemove, false);
+    public ActionResult TryAddInvestigateDice(int diceToAdd) => TryModifyActionDice(PlayerActionType.Investigate, diceToAdd, true);
+    public ActionResult TryRemoveInvestigateDice(int diceToRemove) => TryModifyActionDice(PlayerActionType.Investigate, diceToRemove, false);
+    public ActionResult TryAddDefendDice(int diceToAdd) => TryModifyActionDice(PlayerActionType.Defend, diceToAdd, true);
+    public ActionResult TryRemoveDefendDice(int diceToRemove) => TryModifyActionDice(PlayerActionType.Defend, diceToRemove, false);
 
     public ActionResult HandleRecharge(CombatBattlerModel player, bool boosted)
     {

@@ -6,27 +6,21 @@ public class CombatPresenter
     private readonly CombatUI combatUI;
     private readonly CombatInputHandler combatInputHandler;
     private readonly CombatTurnService combatTurnService;
-    private readonly CombatTurnResolver combatTurnResolver;
     private readonly TurnManager turnManager;
     private InputView inputView;
-    private HudView hudView;
 
     public CombatPresenter(
         CombatUI combatUI,
         CombatInputHandler combatInputHandler,
         CombatTurnService combatTurnService,
-        CombatTurnResolver combatTurnResolver,
         TurnManager turnManager,
-        InputView inputView = null,
-        HudView hudView = null)
+        InputView inputView = null)
     {
         this.combatUI = combatUI;
         this.combatInputHandler = combatInputHandler;
         this.combatTurnService = combatTurnService;
-        this.combatTurnResolver = combatTurnResolver;
         this.turnManager = turnManager;
         this.inputView = inputView;
-        this.hudView = hudView;
     }
 
     public void OnTurnStart(CombatBattlerModel player, CombatBattlerModel enemy)
@@ -238,63 +232,6 @@ public class CombatPresenter
     {
         inputView = view;
     }
-    
-    public void SetHudView(HudView view)
-    {
-        hudView = view;
-    }
-    
-    public void UpdatePlayerHPDisplay(int currentHP, int maxHP)
-    {
-        if (hudView != null)
-            hudView.UpdatePlayerHP(currentHP, maxHP);
-    }
-    
-    public void UpdatePlayerResourcesDisplay(int heart, int body, int mind)
-    {
-        if (hudView != null)
-            hudView.UpdatePlayerResources(heart, body, mind);
-    }
-    
-    public void UpdateEnemyHPDisplay(int currentHP, int maxHP)
-    {
-        if (hudView != null)
-            hudView.UpdateEnemyHP(currentHP, maxHP);
-    }
-    
-    public void ShowDamagePopup(int damageAmount)
-    {
-        if (hudView != null)
-            hudView.ShowDamagePopup(damageAmount);
-    }
-    
-    public void ShowHealingPopup(int healAmount)
-    {
-        if (hudView != null)
-            hudView.ShowHealingPopup(healAmount);
-    }
-    
-    public void PlayDamageShake()
-    {
-        if (hudView != null)
-            hudView.PlayDamageShake();
-    }
-    public void ShowActionFeedback(string actionName)
-    {
-        if (hudView != null)
-            hudView.ShowActionFeedback(actionName);
-    }
-    
-    public void PublishPlayerActionResults(List<ActionResult> results)
-    {
-        PublishResolvedActions("Player", results);
-    }
-    
-    public void UpdateAvailableDiceDisplay(int availableDiceCount)
-    {
-        if (hudView != null)
-            hudView.UpdateAvailableDice(availableDiceCount);
-    }
 
     public void UpdateAllActionDiceCounters(int attackDice, int investigateDice, int defendDice)
     {
@@ -304,17 +241,5 @@ public class CombatPresenter
             inputView.UpdateInvestigateDiceCount(investigateDice);
             inputView.UpdateDefendDiceCount(defendDice);
         }
-    }
-
-    public void PlaySingleDiceRollAnimation(int finalValue)
-    {
-        if (hudView != null)
-            hudView.PlaySingleDiceRoll(finalValue);
-    }
-
-    public void PlayMultipleDiceRollAnimation(int[] finalValues)
-    {
-        if (hudView != null)
-            hudView.PlayMultipleDiceRoll(finalValues);
     }
 }

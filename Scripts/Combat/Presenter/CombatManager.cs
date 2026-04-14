@@ -15,7 +15,6 @@ public class CombatManager : MonoBehaviour
     private TurnTransitionManager turnTransitionManager;
     private ActionResolverService actionResolverService;
     private CombatResolutionService combatResolutionService;
-    private CombatTurnResolver combatTurnResolver;
     private CombatInputHandler combatInputHandler;
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
@@ -57,9 +56,8 @@ public class CombatManager : MonoBehaviour
         turnTransitionManager = new TurnTransitionManager(combatStateModel, turnManager, combatTurnService);
         actionResolverService = new ActionResolverService(diceService);
         combatResolutionService = new CombatResolutionService();
-        combatTurnResolver = new CombatTurnResolver(combatResolutionService, diceService);
         combatInputHandler = new CombatInputHandler(turnManager, actionResolverService, combatResolutionService, combatStateModel);
-        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, combatTurnResolver, turnManager);
+        combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, turnManager);
         combatEndService = new CombatEndService();
 
         inputView = FindObjectOfType<InputView>();
@@ -71,7 +69,6 @@ public class CombatManager : MonoBehaviour
         hudView = FindObjectOfType<HudView>();
         if (hudView != null)
         {
-            combatPresenter.SetHudView(hudView);
             hudView.SetTurnManager(turnManager);
             hudView.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
             hudView.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
@@ -155,7 +152,6 @@ public class CombatManager : MonoBehaviour
     {
         string actionText = action == EnemyTurnAction.Attack ? "Ataque!" : "Defesa!";
         combatUI.AddLog($"Inimigo: {actionText}", CombatLogStyle.Action);
-        combatPresenter.ShowActionFeedback($"Enemy {actionText}");
     }
 
     private void HandleCombatEnded(CombatOutcome outcome)
@@ -178,16 +174,13 @@ public class CombatManager : MonoBehaviour
             playerModel.TakeDamage(damage);
             combatUI.AddLog($"Inimigo atacou! Dano recebido: {damage} (ataque: {baseDamage}, defesa: {playerModel.defense})", CombatLogStyle.Negative);
             
-            combatPresenter.ShowDamagePopup(damage);
-            combatPresenter.PlayDamageShake();
-
-            combatPresenter.UpdatePlayerHPDisplay(playerModel.hp, playerModel.maxHp);
+            hudView?.ShowDamagePopup(damage);
+            hudView?.PlayDamageShake();
+            hudView?.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
         }
         else if (combatTurnService.lastEnemyAction == EnemyTurnAction.Defend)
         {
             combatUI.AddLog("Inimigo se defendeu, aumentando defesa!", CombatLogStyle.Neutral);
-            // Aqui você pode adicionar lógica de defesa permanente ou temporal
-            // Por enquanto, apenas registra no log
         }
     }
     
@@ -209,119 +202,41 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        switch (action.definition.type)
+        var context = new CombatContext { Actor = playerModel, Target = enemyModel };
+        var result = actionResolverService.Resolve(action, context);
+        
+        if (result.success)
         {
-            case PlayerActionType.Attack:
-                ResolvePlayerAttack(action);
-                break;
-
-            case PlayerActionType.Defend:
-                ResolvePlayerDefend(action);
-                break;
-
-            case PlayerActionType.Investigate:
-                ResolvePlayerInvestigate(action);
-                break;
-
-            case PlayerActionType.UseItem:
-                ResolvePlayerUseItem(action);
-                break;
-
-            case PlayerActionType.UseSkill:
-                ResolvePlayerUseSkill(action);
-                break;
-
-            default:
-                combatUI.AddLog($"Ação desconhecida: {action.definition.type}", CombatLogStyle.Negative);
-                break;
-        }
-
-        combatPresenter.ClearActionQueue();
-    }
-    
-    private void ResolvePlayerAttack(ActionInstance action)
-    {
-        int roll = diceService.RollD6();
-        int baseDamage = playerModel.attack + roll + action.allocatedDice;
-        int damage = Mathf.Max(1, baseDamage - enemyModel.defense); 
-
-        enemyModel.TakeDamage(damage);
-        
-        combatUI.AddLog($"Você atacou! Dano aplicado: {damage} (ataque: {baseDamage}, defesa: {enemyModel.defense})", CombatLogStyle.Action);
-        
-        combatPresenter.ShowActionFeedback("Ataque!");
-        
-        // Animar rolagem de dado
-        combatPresenter.PlaySingleDiceRollAnimation(roll);
-        
-        combatPresenter.ShowDamagePopup(damage);
-        
-        combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
-    }
-
-    private void ResolvePlayerDefend(ActionInstance action)
-    {
-        int recovery = 1 + action.allocatedDice;
-        playerModel.RecoverResources(recovery);
-        
-        combatUI.AddLog($"Você se defendeu e recuperou {recovery} recurso(s).", CombatLogStyle.Action);
-        combatPresenter.ShowActionFeedback("Defesa!");
-        
-        combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
-    }
-
-    private void ResolvePlayerInvestigate(ActionInstance action)
-    {
-        int roll = diceService.RollD6();
-        int investigateValue = roll + action.allocatedDice;
-        
-        if (investigateValue >= 5)
-        {
-            combatUI.AddLog($"Investigação bem-sucedida! Você obtém informação completa.", CombatLogStyle.Action);
-        }
-        else if (investigateValue >= 3)
-        {
-            combatUI.AddLog($"Investigação parcial. Você descobre algo útil.", CombatLogStyle.Action);
+            combatUI.AddLog(result.message, CombatLogStyle.Action);
+            
+            if (action.definition.type == PlayerActionType.Attack || action.definition.type == PlayerActionType.UseSkill)
+            {
+                hudView?.ShowDamagePopup(result.damage);
+                hudView?.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
+                if (result.roll > 0)
+                    hudView?.PlaySingleDiceRoll(result.roll);
+            }
+            else if (action.definition.type == PlayerActionType.Defend)
+            {
+                hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
+            }
+            else if (action.definition.type == PlayerActionType.UseItem)
+            {
+                hudView?.ShowHealingPopup(result.damage);
+                hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
+            }
+            else if (action.definition.type == PlayerActionType.Investigate)
+            {
+                if (result.roll > 0)
+                    hudView?.PlaySingleDiceRoll(result.roll);
+            }
         }
         else
         {
-            combatUI.AddLog($"Investigação falhou. Nenhuma informação útil.", CombatLogStyle.Negative);
+            combatUI.AddLog(result.message, CombatLogStyle.Negative);
         }
-        
-        combatPresenter.ShowActionFeedback("Investigando...");
-        
-        // Animar rolagem de dado
-        combatPresenter.PlaySingleDiceRollAnimation(roll);
-    }
-    
-    private void ResolvePlayerUseItem(ActionInstance action)
-    {
-        int healAmount = 2;
-        playerModel.RecoverResources(healAmount);
-        
-        combatUI.AddLog($"Item #{action.itemId} usado! Recuperou {healAmount} recursos.", CombatLogStyle.Action);
-        combatPresenter.ShowActionFeedback($"Item #{action.itemId}");
-        combatPresenter.ShowHealingPopup(healAmount);
-        
-        combatPresenter.UpdatePlayerResourcesDisplay(playerModel.heart, playerModel.body, playerModel.mind);
-    }
-    
-    private void ResolvePlayerUseSkill(ActionInstance action)
-    {
-        int roll = diceService.RollD6();
-        int skillDamage = Mathf.Max(1, playerModel.attack + 2 + roll - enemyModel.defense);
-        
-        enemyModel.TakeDamage(skillDamage);
-        
-        combatUI.AddLog($"Skill #{action.skillId} usada! Dano: {skillDamage}", CombatLogStyle.Action);
-        combatPresenter.ShowActionFeedback($"Skill #{action.skillId}!");
-        
-        // Animar rolagem de dado
-        combatPresenter.PlaySingleDiceRollAnimation(roll);
-        
-        combatPresenter.ShowDamagePopup(skillDamage);
-        
-        combatPresenter.UpdateEnemyHPDisplay(enemyModel.hp, enemyModel.maxHp);
+
+        combatPresenter.ClearActionQueue();
     }
 
     public ActionResult PlayerRecharge(bool boosted)
@@ -369,12 +284,7 @@ public class CombatManager : MonoBehaviour
         ActionResult result = combatPresenter.OnAddAttackDice(playerModel, dice);
         if (result.success)
         {
-            combatPresenter.UpdateAvailableDiceDisplay(turnManager.availableDice);
-            combatPresenter.UpdateAllActionDiceCounters(
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
-            );
+            UpdateDiceUI();
         }
         return result;
     }
@@ -384,12 +294,7 @@ public class CombatManager : MonoBehaviour
         ActionResult result = combatPresenter.OnAddDefendDice(playerModel, dice);
         if (result.success)
         {
-            combatPresenter.UpdateAvailableDiceDisplay(turnManager.availableDice);
-            combatPresenter.UpdateAllActionDiceCounters(
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
-            );
+            UpdateDiceUI();
         }
         return result;
     }
@@ -399,13 +304,7 @@ public class CombatManager : MonoBehaviour
         ActionResult result = combatPresenter.OnSubtractAttackDice();
         if (result.success)
         {
-            combatUI.UpdateHud(turnManager.availableDice);
-            combatPresenter.UpdateAvailableDiceDisplay(turnManager.availableDice);
-            combatPresenter.UpdateAllActionDiceCounters(
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
-            );
+            UpdateDiceUI();
         }
         return result;
     }
@@ -415,13 +314,7 @@ public class CombatManager : MonoBehaviour
         ActionResult result = combatPresenter.OnSubtractInvestigateDice();
         if (result.success)
         {
-            combatUI.UpdateHud(turnManager.availableDice);
-            combatPresenter.UpdateAvailableDiceDisplay(turnManager.availableDice);
-            combatPresenter.UpdateAllActionDiceCounters(
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
-            );
+            UpdateDiceUI();
         }
         return result;
     }
@@ -431,15 +324,19 @@ public class CombatManager : MonoBehaviour
         ActionResult result = combatPresenter.OnSubtractDefendDice();
         if (result.success)
         {
-            combatUI.UpdateHud(turnManager.availableDice);
-            combatPresenter.UpdateAvailableDiceDisplay(turnManager.availableDice);
-            combatPresenter.UpdateAllActionDiceCounters(
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
-                turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
-            );
+            UpdateDiceUI();
         }
         return result;
+    }
+
+    private void UpdateDiceUI()
+    {
+        combatUI.UpdateHud(turnManager.availableDice);
+        combatPresenter.UpdateAllActionDiceCounters(
+            turnManager.GetAllocatedDiceForAction(PlayerActionType.Attack),
+            turnManager.GetAllocatedDiceForAction(PlayerActionType.Investigate),
+            turnManager.GetAllocatedDiceForAction(PlayerActionType.Defend)
+        );
     }
 
     public ActionResult PlayerUseItem()
