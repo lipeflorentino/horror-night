@@ -289,19 +289,13 @@ public class CombatPresenter
     {
         PublishResolvedActions("Player", results);
     }
-
-    /// <summary>
-    /// Atualiza o display de dados disponíveis na HUD.
-    /// </summary>
+    
     public void UpdateAvailableDiceDisplay(int availableDiceCount)
     {
         if (hudView != null)
             hudView.UpdateAvailableDice(availableDiceCount);
     }
 
-    /// <summary>
-    /// Atualiza todos os contadores de dados das ações no InputView.
-    /// </summary>
     public void UpdateAllActionDiceCounters(int attackDice, int investigateDice, int defendDice)
     {
         if (inputView != null)
@@ -312,18 +306,12 @@ public class CombatPresenter
         }
     }
 
-    /// <summary>
-    /// Toca animação de rolagem de um dado.
-    /// </summary>
     public void PlaySingleDiceRollAnimation(int finalValue)
     {
         if (hudView != null)
             hudView.PlaySingleDiceRoll(finalValue);
     }
 
-    /// <summary>
-    /// Toca animação de rolagem de múltiplos dados.
-    /// </summary>
     public void PlayMultipleDiceRollAnimation(int[] finalValues)
     {
         if (hudView != null)

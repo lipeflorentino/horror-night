@@ -118,38 +118,26 @@ public class HudView : MonoBehaviour
     {
         StartCoroutine(hudAnimator.AnimateShake(transform, 0.2f, 5f));
     }
-
-    /// <summary>
-    /// Define a referência do TurnManager para sincronizar dados disponíveis.
-    /// </summary>
+    
     public void SetTurnManager(TurnManager turnManager)
     {
         this.turnManager = turnManager;
         if (turnManager != null)
             UpdateAvailableDice(turnManager.availableDice);
     }
-
-    /// <summary>
-    /// Atualiza o display de dados disponíveis no HUD.
-    /// </summary>
+    
     public void UpdateAvailableDice(int availableDiceCount)
     {
         if (diceText != null)
             diceText.text = availableDiceCount.ToString();
     }
-
-    /// <summary>
-    /// Toca animação de um dado sendo rolado.
-    /// </summary>
+    
     public void PlaySingleDiceRoll(int finalValue)
     {
         if (diceRollUI != null)
             StartCoroutine  (diceRollUI.PlaySingleDiceRoll(finalValue));
     }
-
-    /// <summary>
-    /// Toca animação de múltiplos dados sendo rolados simultaneamente.
-    /// </summary>
+    
     public void PlayMultipleDiceRoll(int[] finalValues)
     {
         if (diceRollUI != null)

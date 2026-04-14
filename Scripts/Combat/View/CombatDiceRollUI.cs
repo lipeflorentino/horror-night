@@ -3,10 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Gerencia animações de rolagem de dados para o combate.
-/// Suporta rolagem simples e múltiplos dados com duplicação visual.
-/// </summary>
 [DisallowMultipleComponent]
 public class CombatDiceRollUI : MonoBehaviour
 {
@@ -31,10 +27,6 @@ public class CombatDiceRollUI : MonoBehaviour
         canvasGroup.alpha = 0f;
     }
 
-    /// <summary>
-    /// Toca animação de um dado sendo rolado.
-    /// Exibe container, roda o dado, mostra o resultado final.
-    /// </summary>
     public IEnumerator PlaySingleDiceRoll(int finalValue)
     {
         ClearDiceContainer();
@@ -49,10 +41,6 @@ public class CombatDiceRollUI : MonoBehaviour
         yield return StartCoroutine(AnimateDiceRoll(dice, diceText, diceTextTMP, finalValue));
     }
 
-    /// <summary>
-    /// Toca animação de múltiplos dados sendo rolados simultaneamente.
-    /// Cada dado é duplicado e animado.
-    /// </summary>
     public IEnumerator PlayMultipleDiceRoll(int[] finalValues)
     {
         ClearDiceContainer();
@@ -60,7 +48,6 @@ public class CombatDiceRollUI : MonoBehaviour
         if (finalValues == null || finalValues.Length == 0)
             yield break;
 
-        // Criar dados
         Image[] diceImages = new Image[finalValues.Length];
         Text[] diceTexts = new Text[finalValues.Length];
         TMP_Text[] diceTextsTMP = new TMP_Text[finalValues.Length];
@@ -69,7 +56,6 @@ public class CombatDiceRollUI : MonoBehaviour
         {
             diceImages[i] = Instantiate(dicePrefab, diceContainer);
             
-            // Posicionar horizontalmente
             RectTransform rectTransform = diceImages[i].GetComponent<RectTransform>();
             if (rectTransform != null)
             {
@@ -81,7 +67,6 @@ public class CombatDiceRollUI : MonoBehaviour
             diceTextsTMP[i] = diceImages[i].GetComponentInChildren<TMP_Text>();
         }
 
-        // Animar todos simultaneamente
         yield return StartCoroutine(AnimateMultipleDice(diceImages, diceTexts, diceTextsTMP, finalValues));
     }
 
@@ -96,11 +81,9 @@ public class CombatDiceRollUI : MonoBehaviour
         {
             elapsed += Time.deltaTime;
 
-            // Rodar imagem
             if (diceImage != null)
                 diceImage.transform.Rotate(0f, 0f, -spinSpeed * Time.deltaTime);
 
-            // Atualizar texto com valores aleatórios
             if (elapsed >= nextValueUpdate)
             {
                 int randomValue = Random.Range(1, 7);
@@ -115,7 +98,6 @@ public class CombatDiceRollUI : MonoBehaviour
             yield return null;
         }
 
-        // Resetar rotação e mostrar valor final
         if (diceImage != null)
             diceImage.transform.rotation = Quaternion.identity;
 
@@ -124,10 +106,8 @@ public class CombatDiceRollUI : MonoBehaviour
         if (diceTextTMP != null)
             diceTextTMP.text = finalValue.ToString();
 
-        // Manter visível por um tempo antes de desaparecer
         yield return new WaitForSeconds(0.5f);
 
-        // Fade out
         yield return StartCoroutine(FadeOut());
     }
 
@@ -142,14 +122,12 @@ public class CombatDiceRollUI : MonoBehaviour
         {
             elapsed += Time.deltaTime;
 
-            // Rodar todas as imagens
             for (int i = 0; i < diceImages.Length; i++)
             {
                 if (diceImages[i] != null)
                     diceImages[i].transform.Rotate(0f, 0f, -spinSpeed * Time.deltaTime);
             }
 
-            // Atualizar textos com valores aleatórios
             if (elapsed >= nextValueUpdate)
             {
                 for (int i = 0; i < diceTexts.Length; i++)
@@ -167,7 +145,6 @@ public class CombatDiceRollUI : MonoBehaviour
             yield return null;
         }
 
-        // Resetar rotações e mostrar valores finais
         for (int i = 0; i < diceImages.Length; i++)
         {
             if (diceImages[i] != null)
@@ -179,10 +156,8 @@ public class CombatDiceRollUI : MonoBehaviour
                 diceTextsTMP[i].text = finalValues[i].ToString();
         }
 
-        // Manter visível por um tempo antes de desaparecer
         yield return new WaitForSeconds(0.5f);
-
-        // Fade out
+        
         yield return StartCoroutine(FadeOut());
     }
 

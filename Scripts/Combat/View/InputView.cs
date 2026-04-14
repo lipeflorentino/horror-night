@@ -334,22 +334,14 @@ public class InputView : MonoBehaviour
         if (subtractDefendDiceButton != null)
             subtractDefendDiceButton.interactable = enabled;
     }
-
-    /// <summary>
-    /// Atualiza o contador de dados do Attack.
-    /// Chamado quando dados são adicionados/removidos do TurnManager.
-    /// </summary>
+    
     public void UpdateAttackDiceCount(int count)
     {
         attackBonusDice = Mathf.Max(0, count);
         if (attackDiceCountText != null)
             attackDiceCountText.text = attackBonusDice.ToString();
     }
-
-    /// <summary>
-    /// Atualiza o contador de dados do Investigate.
-    /// Chamado quando dados são adicionados/removidos do TurnManager.
-    /// </summary>
+    
     public void UpdateInvestigateDiceCount(int count)
     {
         investigateBonusDice = Mathf.Max(0, count);
@@ -357,10 +349,6 @@ public class InputView : MonoBehaviour
             investigateDiceCountText.text = investigateBonusDice.ToString();
     }
 
-    /// <summary>
-    /// Atualiza o contador de dados do Defend.
-    /// Chamado quando dados são adicionados/removidos do TurnManager.
-    /// </summary>
     public void UpdateDefendDiceCount(int count)
     {
         defendBonusDice = Mathf.Max(0, count);
