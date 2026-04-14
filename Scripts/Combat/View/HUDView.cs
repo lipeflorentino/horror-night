@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,17 +8,18 @@ public class HudView : MonoBehaviour
 {
     [Header("Dice & Resources")]
     [SerializeField] private TMP_Text diceText;
+    [SerializeField] private CombatDiceRollUI diceRollUI;
     
     [Header("Player Status")]
     [SerializeField] private TMP_Text playerHpText;
-    [SerializeField] private Slider playerHpSlider;
+    [SerializeField] private Image playerHpSlider;
     [SerializeField] private TMP_Text playerHeartText;
     [SerializeField] private TMP_Text playerBodyText;
     [SerializeField] private TMP_Text playerMindText;
     
     [Header("Enemy Status")]
     [SerializeField] private TMP_Text enemyHpText;
-    [SerializeField] private Slider enemyHpSlider;
+    [SerializeField] private Image enemyHpSlider;
     
     [Header("Feedback")]
     [SerializeField] private TMP_Text damagePopupText;
@@ -25,6 +27,7 @@ public class HudView : MonoBehaviour
     [SerializeField] private CanvasGroup damagePopupCanvasGroup;
 
     private HUDAnimator hudAnimator;
+    private TurnManager turnManager;
 
     private void Awake()
     {
@@ -46,8 +49,7 @@ public class HudView : MonoBehaviour
 
         if (playerHpSlider != null)
         {
-            playerHpSlider.maxValue = maxHP;
-            playerHpSlider.value = currentHP;
+            playerHpSlider.fillAmount = maxHP <= 0f ? 0f : Mathf.Clamp01((float)currentHP / maxHP);
         }
     }
     
@@ -69,8 +71,7 @@ public class HudView : MonoBehaviour
 
         if (enemyHpSlider != null)
         {
-            enemyHpSlider.maxValue = maxHP;
-            enemyHpSlider.value = currentHP;
+            enemyHpSlider.fillAmount = maxHP <= 0f ? 0f : Mathf.Clamp01((float)currentHP / maxHP);
         }
     }
     
@@ -116,6 +117,43 @@ public class HudView : MonoBehaviour
     public void PlayDamageShake()
     {
         StartCoroutine(hudAnimator.AnimateShake(transform, 0.2f, 5f));
+    }
+
+    /// <summary>
+    /// Define a referência do TurnManager para sincronizar dados disponíveis.
+    /// </summary>
+    public void SetTurnManager(TurnManager turnManager)
+    {
+        this.turnManager = turnManager;
+        if (turnManager != null)
+            UpdateAvailableDice(turnManager.availableDice);
+    }
+
+    /// <summary>
+    /// Atualiza o display de dados disponíveis no HUD.
+    /// </summary>
+    public void UpdateAvailableDice(int availableDiceCount)
+    {
+        if (diceText != null)
+            diceText.text = availableDiceCount.ToString();
+    }
+
+    /// <summary>
+    /// Toca animação de um dado sendo rolado.
+    /// </summary>
+    public void PlaySingleDiceRoll(int finalValue)
+    {
+        if (diceRollUI != null)
+            StartCoroutine  (diceRollUI.PlaySingleDiceRoll(finalValue));
+    }
+
+    /// <summary>
+    /// Toca animação de múltiplos dados sendo rolados simultaneamente.
+    /// </summary>
+    public void PlayMultipleDiceRoll(int[] finalValues)
+    {
+        if (diceRollUI != null)
+            StartCoroutine(diceRollUI.PlayMultipleDiceRoll(finalValues));
     }
 }
 

@@ -190,7 +190,7 @@ public class TurnManager
 
     public void ResetDice()
     {
-        availableDice = 0;
+        availableDice = 3;
         availableHeart = 0;
         availableBody = 0;
         availableMind = 0;
