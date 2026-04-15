@@ -79,4 +79,20 @@ public class ActionDefinitionFactory
             isDefensive = false
         };
     }
+
+    public ActionDefinition CreateFlee()
+    {
+        return new ActionDefinition
+        {
+            type = PlayerActionType.Flee,
+            displayName = "Flee",
+            baseDiceCost = 1,
+            heartCost = 0,
+            bodyCost = 0,
+            mindCost = 0,
+            requiresTarget = false,
+            consumesItem = false,
+            isDefensive = true
+        };
+    }
 }

@@ -172,6 +172,7 @@ public class ActionResolverService
             PlayerActionType.Investigate => ResolvePlayerInvestigate(action, context),
             PlayerActionType.UseItem => ResolveUseItem(action, context),
             PlayerActionType.UseSkill => ResolveUseSkill(action, context),
+            PlayerActionType.Flee => ResolveFlee(action, context),
             PlayerActionType.EndTurn => new ActionResult { success = true, message = "Turn ended." },
             _ => new ActionResult { success = false, message = "Unknown action type." }
         };
@@ -266,6 +267,24 @@ public class ActionResolverService
             damage = finalDamage,
             diceSpent = 1,
             message = $"Skill #{action.skillId} dealt {finalDamage} damage."
+        };
+    }
+
+    private ActionResult ResolveFlee(ActionInstance action, CombatContext context)
+    {
+        int roll = diceService.RollD6();
+        int fleeChance = 50 + (action.allocatedDice * 10) + roll;
+
+        bool successfulFlee = fleeChance > 75;
+
+        return new ActionResult
+        {
+            success = successfulFlee,
+            roll = roll,
+            damage = 0,
+            diceSpent = 1,
+            message = successfulFlee ? "Escaped from combat!" : $"Failed to flee! (Chance: {fleeChance}%)",
+            defenseBonus = fleeChance
         };
     }
 

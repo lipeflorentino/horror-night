@@ -121,18 +121,23 @@ public class CombatInputHandler
         return TryQueueAction(player, action, "Defend queued.");
     }
 
-    public ActionResult HandleFlee(CombatBattlerModel player, int dice)
+    public ActionResult QueueFlee(CombatBattlerModel player, int diceAmount)
     {
+        if (!combatStateModel.IsPlayerDefending())
+            return Fail("Can only flee during defense phase.");
+
+        int allocatedDice = diceAmount < 1 ? 1 : diceAmount;
+
         ActionInstance action = new ActionInstance
         {
-            definition = actionDefinitionFactory.CreateDefend(),
-            allocatedDice = dice < 1 ? 0 : dice - 1,
+            definition = actionDefinitionFactory.CreateFlee(),
+            allocatedDice = allocatedDice - 1,
             allocatedHeart = 0,
             allocatedBody = 0,
             allocatedMind = 0
         };
 
-        return TryQueueAction(player, action, "Defend queued.");
+        return TryQueueAction(player, action, "Flee queued.");
     }
 
     public ActionResult QueueAttack(CombatBattlerModel player, int diceAmount)

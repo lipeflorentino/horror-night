@@ -10,6 +10,7 @@ public class InputView : MonoBehaviour
     [SerializeField] private Button attackButton;
     [SerializeField] private Button investigateButton;
     [SerializeField] private Button defendButton;
+    [SerializeField] private Button fleeButton;
     [SerializeField] private Button infoButton;
     [SerializeField] private Button itemButton;
     [SerializeField] private Button skillButton;
@@ -31,6 +32,7 @@ public class InputView : MonoBehaviour
     public event Action OnAttack;
     public event Action OnInvestigate;
     public event Action OnDefend;
+    public event Action OnFlee;
     public event Action OnItem;
     public event Action OnSkill;
     public event Action<int> OnAddAttackDice;
@@ -58,6 +60,9 @@ public class InputView : MonoBehaviour
 
         if (defendButton != null)
             defendButton.onClick.AddListener(RaiseDefend);
+
+        if (fleeButton != null)
+            fleeButton.onClick.AddListener(RaiseFlee);
 
         if (addAttackDiceButton != null)
             addAttackDiceButton.onClick.AddListener(RaiseAddAttackDice);
@@ -106,6 +111,9 @@ public class InputView : MonoBehaviour
 
         if (defendButton != null)
             defendButton.onClick.RemoveListener(RaiseDefend);
+
+        if (fleeButton != null)
+            fleeButton.onClick.RemoveListener(RaiseFlee);
 
         if (addAttackDiceButton != null)
             addAttackDiceButton.onClick.RemoveListener(RaiseAddAttackDice);
@@ -160,6 +168,11 @@ public class InputView : MonoBehaviour
     {
         defendBonusDice = 0;
         OnDefend?.Invoke();
+    }
+
+    private void RaiseFlee()
+    {
+        OnFlee?.Invoke();
     }
 
     private void RaiseAddAttackDice()
@@ -354,5 +367,45 @@ public class InputView : MonoBehaviour
         defendBonusDice = Mathf.Max(0, count);
         if (defendDiceCountText != null)
             defendDiceCountText.text = defendBonusDice.ToString();
+    }
+
+    public void ShowAttackPhaseUI()
+    {
+        if (attackButton != null)
+            attackButton.interactable = true;
+
+        if (investigateButton != null)
+            investigateButton.interactable = true;
+
+        if (defendButton != null)
+            defendButton.interactable = false;
+
+        SetSecondaryActionsEnabled(true);
+        SetDiceManipulationEnabled(true);
+
+        if (endTurnButton != null)
+            endTurnButton.interactable = true;
+
+        ResetPrimaryActions();
+    }
+
+    public void ShowDefensePhaseUI()
+    {
+        if (attackButton != null)
+            attackButton.interactable = false;
+
+        if (investigateButton != null)
+            investigateButton.interactable = false;
+
+        if (defendButton != null)
+            defendButton.interactable = true;
+
+        SetSecondaryActionsEnabled(true);
+        SetDiceManipulationEnabled(true);
+
+        if (endTurnButton != null)
+            endTurnButton.interactable = true;
+
+        ResetPrimaryActions();
     }
 }

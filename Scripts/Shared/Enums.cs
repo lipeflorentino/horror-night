@@ -55,6 +55,7 @@ public enum PlayerActionType
     Investigate,
     UseItem,
     UseSkill,
+    Flee,
     EndTurn
 }
 

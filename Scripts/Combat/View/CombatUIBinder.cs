@@ -24,6 +24,7 @@ public class CombatUIBinder : MonoBehaviour
         inputView.OnAttack += HandleAttack;
         inputView.OnInvestigate += HandleInvestigate;
         inputView.OnDefend += HandleDefend;
+        inputView.OnFlee += HandleFlee;
         inputView.OnAddAttackDice += HandleAddAttackDice;
         inputView.OnAddInvestigateDice += HandleAddInvestigateDice;
         inputView.OnAddDefendDice += HandleAddDefendDice;
@@ -46,6 +47,7 @@ public class CombatUIBinder : MonoBehaviour
         inputView.OnAttack -= HandleAttack;
         inputView.OnInvestigate -= HandleInvestigate;
         inputView.OnDefend -= HandleDefend;
+        inputView.OnFlee -= HandleFlee;
         inputView.OnAddAttackDice -= HandleAddAttackDice;
         inputView.OnAddInvestigateDice -= HandleAddInvestigateDice;
         inputView.OnAddDefendDice -= HandleAddDefendDice;
@@ -76,6 +78,12 @@ public class CombatUIBinder : MonoBehaviour
     {
         if (combatManager != null)
             combatManager.PlayerDefend();
+    }
+
+    private void HandleFlee()
+    {
+        if (combatManager != null)
+            combatManager.PlayerFlee();
     }
 
     private void HandleAddAttackDice(int diceAmount)

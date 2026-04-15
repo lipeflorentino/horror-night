@@ -12,13 +12,13 @@ public class CombatManager : MonoBehaviour
     private TurnManager turnManager;
     private DiceService diceService;
     private CombatTurnService combatTurnService;
-    private TurnTransitionManager turnTransitionManager;
     private ActionResolverService actionResolverService;
     private CombatResolutionService combatResolutionService;
     private CombatInputHandler combatInputHandler;
     private CombatPresenter combatPresenter;
     private CombatEndService combatEndService;
     private CombatModelFactory combatModelFactory;
+    private CombatRoundResolver combatRoundResolver;
     private InputView inputView;
     private HudView hudView;
 
@@ -53,8 +53,8 @@ public class CombatManager : MonoBehaviour
         turnManager = new TurnManager();
         diceService = new DiceService();
         combatTurnService = new CombatTurnService(combatStateModel, turnManager, diceService);
-        turnTransitionManager = new TurnTransitionManager(combatStateModel, turnManager, combatTurnService);
         actionResolverService = new ActionResolverService(diceService);
+        combatRoundResolver = new CombatRoundResolver(diceService);
         combatResolutionService = new CombatResolutionService();
         combatInputHandler = new CombatInputHandler(turnManager, actionResolverService, combatResolutionService, combatStateModel);
         combatPresenter = new CombatPresenter(combatUI, combatInputHandler, combatTurnService, turnManager);
@@ -156,6 +156,11 @@ public class CombatManager : MonoBehaviour
         turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
         turnManager.actionQueue = new CombatActionQueue();
         
+        if (inputView != null)
+            inputView.ShowAttackPhaseUI();
+
+        combatUI.AddLog("Escolha sua ação de ataque!", CombatLogStyle.Neutral);
+        
         yield return new WaitUntil(() => combatStateModel.currentState != CombatFlowState.PlayerDecidingAttack || combatStateModel.IsCombatFinished());
     }
 
@@ -195,6 +200,11 @@ public class CombatManager : MonoBehaviour
         combatStateModel.SetPlayerDecidingDefense();
         turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
         turnManager.actionQueue = new CombatActionQueue();
+        
+        if (inputView != null)
+            inputView.ShowDefensePhaseUI();
+
+        combatUI.AddLog("Inimigo está atacando! Escolha sua defesa!", CombatLogStyle.Negative);
         
         yield return new WaitUntil(() => combatStateModel.currentState != CombatFlowState.PlayerDecidingDefense || combatStateModel.IsCombatFinished());
     }
@@ -343,6 +353,14 @@ public class CombatManager : MonoBehaviour
     public ActionResult PlayerDefend()
     {
         ActionResult result = combatPresenter.OnDefend(playerModel);
+        ResolveCombatEnd();
+        return result;
+    }
+
+    public ActionResult PlayerFlee()
+    {
+        int availableDice = turnManager.availableDice;
+        ActionResult result = combatPresenter.OnFlee(playerModel, availableDice);
         ResolveCombatEnd();
         return result;
     }

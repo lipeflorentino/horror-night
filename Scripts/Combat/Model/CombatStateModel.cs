@@ -118,4 +118,14 @@ public class CombatStateModel
     {
         return enemyRole == CombatRole.Attacker;
     }
+
+    public bool IsPlayerDefending()
+    {
+        return currentState == CombatFlowState.PlayerDecidingDefense;
+    }
+
+    public bool IsPlayerAttacking_Phase()
+    {
+        return currentState == CombatFlowState.PlayerDecidingAttack;
+    }
 }

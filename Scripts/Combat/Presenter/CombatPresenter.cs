@@ -68,8 +68,8 @@ public class CombatPresenter
 
     public ActionResult OnFlee(CombatBattlerModel player, int dice)
     {
-        ActionResult result = combatInputHandler.HandleFlee(player, dice);
-        PublishResult("Defend", result);
+        ActionResult result = combatInputHandler.QueueFlee(player, dice);
+        PublishResult("Flee", result);
         return result;
     }
 

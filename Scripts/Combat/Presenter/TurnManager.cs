@@ -33,7 +33,8 @@ public class TurnManager
     {
         if (actionType != PlayerActionType.Attack && 
             actionType != PlayerActionType.Investigate && 
-            actionType != PlayerActionType.Defend)
+            actionType != PlayerActionType.Defend &&
+            actionType != PlayerActionType.Flee)
         {
             return false;
         }
