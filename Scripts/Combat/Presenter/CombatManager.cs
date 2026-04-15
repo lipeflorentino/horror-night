@@ -172,6 +172,10 @@ public class CombatManager : MonoBehaviour
         if (enemyActions.Count > 0)
         {
             var mainAction = enemyActions[0];
+            combatTurnService.lastEnemyActionInstance = mainAction;
+            combatTurnService.lastEnemyAction = mainAction.definition.type == PlayerActionType.Attack 
+                ? EnemyTurnAction.Attack 
+                : EnemyTurnAction.Defend;
             combatUI.AddLog($"Inimigo escolheu: {mainAction.definition.type}", CombatLogStyle.Action);
         }
 
@@ -186,6 +190,7 @@ public class CombatManager : MonoBehaviour
         if (enemyActions.Count > 0)
         {
             var mainAction = enemyActions[0];
+            combatTurnService.lastEnemyActionInstance = mainAction;
             combatTurnService.lastEnemyAction = mainAction.definition.type == PlayerActionType.Attack 
                 ? EnemyTurnAction.Attack 
                 : EnemyTurnAction.Defend;
@@ -214,11 +219,88 @@ public class CombatManager : MonoBehaviour
         combatStateModel.SetResolvingRound();
         
         var playerActions = turnManager.actionQueue?.GetAll() ?? new List<ActionInstance>();
+        
+        ActionInstance playerAttackAction = null;
+        ActionInstance playerDefenseAction = null;
+
+        foreach (var action in playerActions)
+        {
+            if (action?.definition == null)
+                continue;
+
+            if (action.definition.type == PlayerActionType.Attack || 
+                action.definition.type == PlayerActionType.Flee ||
+                action.definition.type == PlayerActionType.UseSkill)
+                playerAttackAction = action;
+            else if (action.definition.type == PlayerActionType.Defend)
+                playerDefenseAction = action;
+        }
+
+        if (playerAttackAction != null && playerDefenseAction == null)
+        {
+            var factory = new ActionDefinitionFactory();
+            playerDefenseAction = new ActionInstance
+            {
+                definition = factory.CreateDefend(),
+                allocatedDice = 1,
+                allocatedHeart = 0,
+                allocatedBody = 0,
+                allocatedMind = 0
+            };
+            combatUI.AddLog("Nenhuma defesa foi escolhida. Defend automático foi adicionado!", CombatLogStyle.Neutral);
+        }
+
         ResolvePlayerActions(playerActions);
 
-        ResolveEnemyAction();
+        if (playerAttackAction != null && playerDefenseAction != null && combatTurnService.lastEnemyActionInstance != null)
+        {
+            if (combatStateModel.IsPlayerAttacking())
+                ResolveAttackVsDefense(playerAttackAction, combatTurnService.lastEnemyActionInstance);
+            else if (combatStateModel.IsPlayerDefending())
+                ResolveAttackVsDefense(combatTurnService.lastEnemyActionInstance, playerDefenseAction);
+        }
 
         yield return new WaitForSeconds(0.5f);
+    }
+
+    private void ResolveAttackVsDefense(ActionInstance attackAction, ActionInstance defenseAction)
+    {
+        var attacker = combatStateModel.IsPlayerAttacking() ? playerModel : enemyModel;
+        var defender = combatStateModel.IsPlayerAttacking() ? enemyModel : playerModel;
+
+        var result = combatRoundResolver.ResolveAttackVsDefense(attackAction, defenseAction, attacker, defender);
+
+        if (result.attackSucceeded)
+        {
+            defender.TakeDamage(result.finalDamage);
+            
+            if (combatStateModel.IsPlayerAttacking())
+            {
+                combatUI.AddLog($"Ataque conectou! {result.finalDamage} de dano (defesa bloqueou {result.damageReduced})", CombatLogStyle.Action);
+                hudView?.ShowDamagePopup(result.finalDamage);
+                hudView?.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
+                if (result.damageReduced > 0)
+                    hudView?.ShowBlockedDamagePopup(result.damageReduced);
+            }
+            else
+            {
+                combatUI.AddLog($"Inimigo atacou! {result.finalDamage} de dano (você bloqueou {result.damageReduced})", CombatLogStyle.Negative);
+                hudView?.ShowDamagePopup(result.finalDamage);
+                hudView?.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
+                hudView?.PlayDamageShake();
+                if (result.damageReduced > 0)
+                    hudView?.ShowBlockedDamagePopup(result.damageReduced);
+            }
+        }
+        else
+        {
+            if (combatStateModel.IsPlayerAttacking())
+                combatUI.AddLog($"Ataque foi completamente bloqueado! Dano evitado: {result.damageReduced}", CombatLogStyle.Neutral);
+            else
+                combatUI.AddLog($"Defesa bloqueou completamente o ataque! Dano evitado: {result.damageReduced}", CombatLogStyle.Positive);
+            
+            hudView?.ShowBlockedDamagePopup(result.damageReduced);
+        }
     }
 
     private void ResolvePlayerActions(IReadOnlyList<ActionInstance> playerActions)
@@ -295,26 +377,6 @@ public class CombatManager : MonoBehaviour
             playerSnapshot = CreatePlayerSnapshot(),
             outcome = outcome
         });
-    }
-    
-    private void ResolveEnemyAction()
-    {
-        if (combatTurnService.lastEnemyAction == EnemyTurnAction.Attack)
-        {
-            int baseDamage = enemyModel.attack;
-            int damage = Mathf.Max(1, baseDamage - playerModel.defense);
-            
-            playerModel.TakeDamage(damage);
-            combatUI.AddLog($"Inimigo atacou! Dano recebido: {damage} (ataque: {baseDamage}, defesa: {playerModel.defense})", CombatLogStyle.Negative);
-            
-            hudView?.ShowDamagePopup(damage);
-            hudView?.PlayDamageShake();
-            hudView?.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
-        }
-        else if (combatTurnService.lastEnemyAction == EnemyTurnAction.Defend)
-        {
-            combatUI.AddLog("Inimigo se defendeu, aumentando defesa!", CombatLogStyle.Neutral);
-        }
     }
 
     public ActionResult PlayerRecharge(bool boosted)

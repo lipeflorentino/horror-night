@@ -94,6 +94,16 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.5f));
         }
     }
+
+    public void ShowBlockedDamagePopup(int blockedAmount)
+    {
+        if (damagePopupText != null && damagePopupCanvasGroup != null)
+        {
+            damagePopupText.text = $"Bloqueado {blockedAmount}!";
+            damagePopupText.color = Color.cyan;
+            StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.5f));
+        }
+    }
     
     public void ShowResourceSpent(int amount, Color resourceColor)
     {

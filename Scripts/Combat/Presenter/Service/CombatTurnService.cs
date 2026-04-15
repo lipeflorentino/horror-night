@@ -15,6 +15,7 @@ public class CombatTurnService
     private readonly DiceService dice;
 
     public EnemyTurnAction lastEnemyAction;
+    public ActionInstance lastEnemyActionInstance;
     public event Action<EnemyTurnAction> OnEnemyActionDetermined;
 
     public CombatTurnService(CombatStateModel combatStateModel, TurnManager turnManager, DiceService dice)
