@@ -82,11 +82,6 @@ public class CombatManager : MonoBehaviour
         combatStateModel.OnEnemyTurnStart += HandleEnemyTurnStart;
         combatStateModel.OnCombatEnded += HandleCombatEnded;
 
-        turnTransitionManager.OnPlayerTurnReady += HandlePlayerTurnReady;
-        turnTransitionManager.OnEnemyTurnStarting += HandleEnemyTurnStarting;
-
-        combatTurnService.OnEnemyActionDetermined += HandleEnemyActionDetermined;
-
         bool isPlayerTurn = combatTurnService.StartFirstTurn(playerModel, enemyModel);
 
         combatUI.SetTurnText($"Turno do {(isPlayerTurn ? "Jogador" : "Inimigo")}");
@@ -94,43 +89,6 @@ public class CombatManager : MonoBehaviour
         combatUI.AddLog("Combate iniciado!", CombatLogStyle.Neutral);
 
         combatLoopCoroutine = StartCoroutine(CombatLoop());
-    }
-
-    private IEnumerator CombatLoop()
-    {
-        while (!combatStateModel.IsCombatFinished())
-        {
-            if (combatStateModel.IsPlayerTurn())
-            {
-                yield return StartCoroutine(turnTransitionManager.PlayPlayerTurn(playerModel));
-            }
-            else if (combatStateModel.IsEnemyTurn())
-            {
-                yield return StartCoroutine(turnTransitionManager.PlayEnemyTurn(enemyModel));
-                ResolveEnemyAction();
-                turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
-                combatStateModel.SetPlayerTurn();
-            }
-
-            ResolveCombatEnd();
-            yield return null;
-        }
-
-        yield break;
-    }
-
-    private void HandlePlayerTurnStart()
-    {
-        combatUI.SetTurnText("Seu turno!");
-        combatUI.AddLog("Seu turno começou.", CombatLogStyle.Neutral);
-        combatPresenter.OnPlayerTurnUIUpdate();
-    }
-
-    private void HandleEnemyTurnStart()
-    {
-        combatUI.SetTurnText("Turno do inimigo...");
-        combatUI.AddLog("O inimigo está atacando!", CombatLogStyle.Negative);
-        combatPresenter.OnEnemyTurnUIUpdate();
     }
 
     private void HandlePrimaryActionSelected(PlayerActionType actionType)
@@ -152,6 +110,171 @@ public class CombatManager : MonoBehaviour
     {
         string actionText = action == EnemyTurnAction.Attack ? "Ataque!" : "Defesa!";
         combatUI.AddLog($"Inimigo: {actionText}", CombatLogStyle.Action);
+    }
+
+    private IEnumerator CombatLoop()
+    {
+        bool isFirstRound = true;
+
+        while (!combatStateModel.IsCombatFinished())
+        {
+            if (isFirstRound)
+            {
+                bool playerAttacksFirst = combatTurnService.StartFirstTurn(playerModel, enemyModel);
+                if (!playerAttacksFirst)
+                {
+                    yield return StartCoroutine(HandleEnemyAttackPhase());
+                    yield return StartCoroutine(HandlePlayerDefensePhase());
+                }
+                isFirstRound = false;
+            }
+
+            yield return StartCoroutine(HandlePlayerAttackPhase());
+            yield return StartCoroutine(HandleEnemyDefensePhase());
+            yield return StartCoroutine(ResolveRoundPhase());
+
+            ResolveCombatEnd();
+
+            if (!combatStateModel.IsCombatFinished())
+            {
+                yield return StartCoroutine(HandleEnemyAttackPhase());
+                yield return StartCoroutine(HandlePlayerDefensePhase());
+                yield return StartCoroutine(ResolveRoundPhase());
+
+                ResolveCombatEnd();
+            }
+
+            yield return null;
+        }
+
+        yield break;
+    }
+
+    private IEnumerator HandlePlayerAttackPhase()
+    {
+        combatStateModel.SetPlayerDecidingAttack();
+        turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
+        turnManager.actionQueue = new CombatActionQueue();
+        
+        yield return new WaitUntil(() => combatStateModel.currentState != CombatFlowState.PlayerDecidingAttack || combatStateModel.IsCombatFinished());
+    }
+
+    private IEnumerator HandleEnemyDefensePhase()
+    {
+        combatStateModel.SetEnemyDecidingDefense();
+        var enemyActions = combatTurnService.GenerateEnemyActionsForDefense(enemyModel);
+        
+        if (enemyActions.Count > 0)
+        {
+            var mainAction = enemyActions[0];
+            combatUI.AddLog($"Inimigo escolheu: {mainAction.definition.type}", CombatLogStyle.Action);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    private IEnumerator HandleEnemyAttackPhase()
+    {
+        combatStateModel.SetEnemyDecidingAttack();
+        var enemyActions = combatTurnService.GenerateEnemyActionsForAttack(enemyModel);
+        
+        if (enemyActions.Count > 0)
+        {
+            var mainAction = enemyActions[0];
+            combatTurnService.lastEnemyAction = mainAction.definition.type == PlayerActionType.Attack 
+                ? EnemyTurnAction.Attack 
+                : EnemyTurnAction.Defend;
+            combatUI.AddLog($"Inimigo escolheu: {mainAction.definition.type}", CombatLogStyle.Action);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    private IEnumerator HandlePlayerDefensePhase()
+    {
+        combatStateModel.SetPlayerDecidingDefense();
+        turnManager.StartTurn(3, playerModel.heart, playerModel.body, playerModel.mind);
+        turnManager.actionQueue = new CombatActionQueue();
+        
+        yield return new WaitUntil(() => combatStateModel.currentState != CombatFlowState.PlayerDecidingDefense || combatStateModel.IsCombatFinished());
+    }
+
+    private IEnumerator ResolveRoundPhase()
+    {
+        combatStateModel.SetResolvingRound();
+        
+        var playerActions = turnManager.actionQueue?.GetAll() ?? new List<ActionInstance>();
+        ResolvePlayerActions(playerActions);
+
+        ResolveEnemyAction();
+
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    private void ResolvePlayerActions(IReadOnlyList<ActionInstance> playerActions)
+    {
+        if (playerActions == null || playerActions.Count == 0)
+        {
+            combatUI.AddLog("Nenhuma ação foi executada.", CombatLogStyle.Neutral);
+            return;
+        }
+
+        foreach (var action in playerActions)
+        {
+            if (action == null || action.definition == null)
+            {
+                combatUI.AddLog("Ação inválida.", CombatLogStyle.Negative);
+                continue;
+            }
+
+            var context = new CombatContext { Actor = playerModel, Target = enemyModel };
+            var result = actionResolverService.Resolve(action, context);
+            
+            if (result.success)
+            {
+                combatUI.AddLog(result.message, CombatLogStyle.Action);
+                
+                if (action.definition.type == PlayerActionType.Attack || action.definition.type == PlayerActionType.UseSkill)
+                {
+                    hudView?.ShowDamagePopup(result.damage);
+                    hudView?.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
+                    if (result.roll > 0)
+                        hudView?.PlaySingleDiceRoll(result.roll);
+                }
+                else if (action.definition.type == PlayerActionType.Defend)
+                {
+                    hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
+                }
+                else if (action.definition.type == PlayerActionType.UseItem)
+                {
+                    hudView?.ShowHealingPopup(result.damage);
+                    hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
+                }
+                else if (action.definition.type == PlayerActionType.Investigate)
+                {
+                    if (result.roll > 0)
+                        hudView?.PlaySingleDiceRoll(result.roll);
+                }
+            }
+            else
+            {
+                combatUI.AddLog(result.message, CombatLogStyle.Negative);
+            }
+        }
+    }
+
+    private void HandlePlayerTurnStart()
+    {
+        combatUI.SetTurnText("Seu turno!");
+        combatUI.AddLog("Seu turno começou.", CombatLogStyle.Neutral);
+        combatPresenter.OnPlayerTurnUIUpdate();
+    }
+
+    private void HandleEnemyTurnStart()
+    {
+        combatUI.SetTurnText("Turno do inimigo...");
+        combatUI.AddLog("O inimigo está atacando!", CombatLogStyle.Negative);
+        combatPresenter.OnEnemyTurnUIUpdate();
     }
 
     private void HandleCombatEnded(CombatOutcome outcome)
@@ -182,61 +305,6 @@ public class CombatManager : MonoBehaviour
         {
             combatUI.AddLog("Inimigo se defendeu, aumentando defesa!", CombatLogStyle.Neutral);
         }
-    }
-    
-    private void ResolvePlayerAction()
-    {
-        IReadOnlyList<ActionInstance> queuedActions = combatPresenter.GetQueuedPlayerActions();
-        if (queuedActions == null || queuedActions.Count == 0)
-        {
-            combatUI.AddLog("Nenhuma ação foi executada.", CombatLogStyle.Neutral);
-            combatPresenter.ClearActionQueue();
-            return;
-        }
-
-        ActionInstance action = queuedActions[0];
-        if (action == null || action.definition == null)
-        {
-            combatUI.AddLog("Ação inválida.", CombatLogStyle.Negative);
-            combatPresenter.ClearActionQueue();
-            return;
-        }
-
-        var context = new CombatContext { Actor = playerModel, Target = enemyModel };
-        var result = actionResolverService.Resolve(action, context);
-        
-        if (result.success)
-        {
-            combatUI.AddLog(result.message, CombatLogStyle.Action);
-            
-            if (action.definition.type == PlayerActionType.Attack || action.definition.type == PlayerActionType.UseSkill)
-            {
-                hudView?.ShowDamagePopup(result.damage);
-                hudView?.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
-                if (result.roll > 0)
-                    hudView?.PlaySingleDiceRoll(result.roll);
-            }
-            else if (action.definition.type == PlayerActionType.Defend)
-            {
-                hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
-            }
-            else if (action.definition.type == PlayerActionType.UseItem)
-            {
-                hudView?.ShowHealingPopup(result.damage);
-                hudView?.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
-            }
-            else if (action.definition.type == PlayerActionType.Investigate)
-            {
-                if (result.roll > 0)
-                    hudView?.PlaySingleDiceRoll(result.roll);
-            }
-        }
-        else
-        {
-            combatUI.AddLog(result.message, CombatLogStyle.Negative);
-        }
-
-        combatPresenter.ClearActionQueue();
     }
 
     public ActionResult PlayerRecharge(bool boosted)
@@ -375,8 +443,7 @@ public class CombatManager : MonoBehaviour
         
         if (result.success)
         {
-            ResolvePlayerAction();
-            combatStateModel.SetEnemyTurn();
+            combatStateModel.SetEnemyDecidingDefense();
         }
 
         ResolveCombatEnd();
@@ -425,17 +492,6 @@ public class CombatManager : MonoBehaviour
             combatStateModel.OnPlayerTurnStart -= HandlePlayerTurnStart;
             combatStateModel.OnEnemyTurnStart -= HandleEnemyTurnStart;
             combatStateModel.OnCombatEnded -= HandleCombatEnded;
-        }
-
-        if (turnTransitionManager != null)
-        {
-            turnTransitionManager.OnPlayerTurnReady -= HandlePlayerTurnReady;
-            turnTransitionManager.OnEnemyTurnStarting -= HandleEnemyTurnStarting;
-        }
-
-        if (combatTurnService != null)
-        {
-            combatTurnService.OnEnemyActionDetermined -= HandleEnemyActionDetermined;
         }
 
         if (turnManager != null)

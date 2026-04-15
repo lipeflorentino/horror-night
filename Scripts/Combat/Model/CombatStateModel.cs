@@ -4,31 +4,83 @@ public class CombatStateModel
 {
     public CombatFlowState currentState;
     public CombatOutcome? outcome;
+    public CombatRole playerRole;
+    public CombatRole enemyRole;
 
     public event Action<CombatFlowState> OnStateChanged;
     public event Action OnPlayerTurnStart;
     public event Action OnEnemyTurnStart;
     public event Action<CombatOutcome> OnCombatEnded;
 
-    public void SetPlayerTurn()
+    public CombatStateModel()
     {
-        if (currentState == CombatFlowState.PlayerTurn)
+        playerRole = CombatRole.Attacker;
+        enemyRole = CombatRole.Defender;
+    }
+
+    public void SetPlayerDecidingAttack()
+    {
+        if (currentState == CombatFlowState.PlayerDecidingAttack)
             return;
 
-        currentState = CombatFlowState.PlayerTurn;
+        currentState = CombatFlowState.PlayerDecidingAttack;
+        playerRole = CombatRole.Attacker;
+        enemyRole = CombatRole.Defender;
         outcome = null;
         OnStateChanged?.Invoke(currentState);
+    }
+
+    public void SetEnemyDecidingDefense()
+    {
+        if (currentState == CombatFlowState.EnemyDecidingDefense)
+            return;
+
+        currentState = CombatFlowState.EnemyDecidingDefense;
+        outcome = null;
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    public void SetResolvingRound()
+    {
+        if (currentState == CombatFlowState.ResolvingRound)
+            return;
+
+        currentState = CombatFlowState.ResolvingRound;
+        outcome = null;
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    public void SetPlayerDecidingDefense()
+    {
+        if (currentState == CombatFlowState.PlayerDecidingDefense)
+            return;
+
+        currentState = CombatFlowState.PlayerDecidingDefense;
+        playerRole = CombatRole.Defender;
+        enemyRole = CombatRole.Attacker;
+        outcome = null;
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    public void SetEnemyDecidingAttack()
+    {
+        if (currentState == CombatFlowState.EnemyDecidingAttack)
+            return;
+
+        currentState = CombatFlowState.EnemyDecidingAttack;
+        outcome = null;
+        OnStateChanged?.Invoke(currentState);
+    }
+
+    public void SetPlayerTurn()
+    {
+        SetPlayerDecidingAttack();
         OnPlayerTurnStart?.Invoke();
     }
 
     public void SetEnemyTurn()
     {
-        if (currentState == CombatFlowState.EnemyTurn)
-            return;
-
-        currentState = CombatFlowState.EnemyTurn;
-        outcome = null;
-        OnStateChanged?.Invoke(currentState);
+        SetEnemyDecidingDefense();
         OnEnemyTurnStart?.Invoke();
     }
 
@@ -42,16 +94,28 @@ public class CombatStateModel
 
     public bool IsPlayerTurn()
     {
-        return currentState == CombatFlowState.PlayerTurn;
+        return currentState == CombatFlowState.PlayerDecidingAttack || 
+               currentState == CombatFlowState.PlayerDecidingDefense;
     }
 
     public bool IsEnemyTurn()
     {
-        return currentState == CombatFlowState.EnemyTurn;
+        return currentState == CombatFlowState.EnemyDecidingDefense || 
+               currentState == CombatFlowState.EnemyDecidingAttack;
     }
 
     public bool IsCombatFinished()
     {
         return currentState == CombatFlowState.Finished;
+    }
+
+    public bool IsPlayerAttacking()
+    {
+        return playerRole == CombatRole.Attacker;
+    }
+
+    public bool IsEnemyAttacking()
+    {
+        return enemyRole == CombatRole.Attacker;
     }
 }

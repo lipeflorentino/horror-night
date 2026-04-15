@@ -51,7 +51,26 @@ public class CombatTurnService
         lastEnemyAction = EnemyTurnAction.None;
     }
 
-    public List<ActionInstance> GenerateEnemyActions()
+    public List<ActionInstance> GenerateEnemyActionsForDefense(CombatBattlerModel enemy)
+    {
+        ActionDefinitionFactory factory = new();
+        int roll = dice.RollD6();
+        ActionDefinition definition = roll <= 3 ? factory.CreateDefend() : factory.CreateDefend();
+
+        return new List<ActionInstance>
+        {
+            new ActionInstance
+            {
+                definition = definition,
+                allocatedDice = 0,
+                allocatedHeart = 0,
+                allocatedBody = 0,
+                allocatedMind = 0
+            }
+        };
+    }
+
+    public List<ActionInstance> GenerateEnemyActionsForAttack(CombatBattlerModel enemy)
     {
         ActionDefinitionFactory factory = new();
         int roll = dice.RollD6();
@@ -68,6 +87,11 @@ public class CombatTurnService
                 allocatedMind = 0
             }
         };
+    }
+
+    public List<ActionInstance> GenerateEnemyActions()
+    {
+        return GenerateEnemyActionsForAttack(null);
     }
     
     public IEnumerator ExecuteEnemyTurn(CombatBattlerModel enemy)

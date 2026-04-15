@@ -27,9 +27,18 @@ public enum CombatLogStyle
 }
 public enum CombatFlowState
 {
-    PlayerTurn,
-    EnemyTurn,
+    PlayerDecidingAttack,
+    EnemyDecidingDefense,
+    ResolvingRound,
+    PlayerDecidingDefense,
+    EnemyDecidingAttack,
     Finished
+}
+
+public enum CombatRole
+{
+    Attacker,
+    Defender
 }
 
 public enum CombatOutcome
