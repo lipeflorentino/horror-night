@@ -172,7 +172,6 @@ public class ActionResolverService
             PlayerActionType.Investigate => ResolvePlayerInvestigate(action, context),
             PlayerActionType.UseItem => ResolveUseItem(action, context),
             PlayerActionType.UseSkill => ResolveUseSkill(action, context),
-            PlayerActionType.Flee => ResolveFlee(action.allocatedDice),
             PlayerActionType.EndTurn => new ActionResult { success = true, message = "Turn ended." },
             _ => new ActionResult { success = false, message = "Unknown action type." }
         };
