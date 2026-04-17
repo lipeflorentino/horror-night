@@ -23,7 +23,6 @@ public class HudView : MonoBehaviour
     
     [Header("Feedback")]
     [SerializeField] private TMP_Text damagePopupText;
-    [SerializeField] private TMP_Text actionFeedbackText;
     [SerializeField] private CanvasGroup damagePopupCanvasGroup;
 
     private HUDAnimator hudAnimator;
@@ -34,14 +33,6 @@ public class HudView : MonoBehaviour
         hudAnimator = new HUDAnimator();
     }
 
-    public void UpdateDice(int value)
-    {
-        if (diceText == null)
-            return;
-
-        diceText.text = value.ToString();
-    }
-    
     public void UpdatePlayerHP(int currentHP, int maxHP)
     {
         if (playerHpText != null)
@@ -104,26 +95,7 @@ public class HudView : MonoBehaviour
             StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.5f));
         }
     }
-    
-    public void ShowResourceSpent(int amount, Color resourceColor)
-    {
-        if (damagePopupText != null && damagePopupCanvasGroup != null)
-        {
-            damagePopupText.text = $"- {amount}";
-            damagePopupText.color = resourceColor;
-            StartCoroutine(hudAnimator.AnimateDamagePopup(damagePopupCanvasGroup, 0.4f));
-        }
-    }
-    
-    public void ShowActionFeedback(string actionName)
-    {
-        if (actionFeedbackText != null)
-        {
-            actionFeedbackText.text = actionName;
-            StartCoroutine(hudAnimator.AnimateActionFeedback(actionFeedbackText, 1f));
-        }
-    }
-    
+
     public void PlayDamageShake()
     {
         StartCoroutine(hudAnimator.AnimateShake(transform, 0.2f, 5f));
@@ -145,13 +117,7 @@ public class HudView : MonoBehaviour
     public void PlaySingleDiceRoll(int finalValue)
     {
         if (diceRollUI != null)
-            StartCoroutine  (diceRollUI.PlaySingleDiceRoll(finalValue));
-    }
-    
-    public void PlayMultipleDiceRoll(int[] finalValues)
-    {
-        if (diceRollUI != null)
-            StartCoroutine(diceRollUI.PlayMultipleDiceRoll(finalValues));
+            StartCoroutine(diceRollUI.PlaySingleDiceRoll(finalValue));
     }
 }
 

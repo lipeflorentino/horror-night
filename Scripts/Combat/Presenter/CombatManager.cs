@@ -73,7 +73,6 @@ public class CombatManager : MonoBehaviour
             hudView.UpdatePlayerHP(playerModel.hp, playerModel.maxHp);
             hudView.UpdatePlayerResources(playerModel.heart, playerModel.body, playerModel.mind);
             hudView.UpdateEnemyHP(enemyModel.hp, enemyModel.maxHp);
-            hudView.UpdateAvailableDice(turnManager.availableDice);
         }
 
         turnManager.OnPrimaryActionSet += HandlePrimaryActionSelected;

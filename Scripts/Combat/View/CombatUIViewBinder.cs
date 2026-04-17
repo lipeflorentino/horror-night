@@ -50,7 +50,7 @@ public class CombatUIViewBinder : MonoBehaviour
     private void HandleHud(int value)
     {
         if (hudView != null)
-            hudView.UpdateDice(value);
+            hudView.UpdateAvailableDice(value);
     }
 
     private void HandleTurnText(string text)

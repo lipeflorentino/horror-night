@@ -23,14 +23,6 @@ public class CombatPresenter
         this.inputView = inputView;
     }
 
-    public void OnTurnStart(CombatBattlerModel player, CombatBattlerModel enemy)
-    {
-        bool isPlayerTurn = combatTurnService.StartFirstTurn(player, enemy);
-        combatUI.SetTurnText($"Turno do {(isPlayerTurn ? "Jogador" : "Inimigo")}");
-        combatUI.UpdateHud(turnManager.availableDice);
-        combatUI.AddLog("Turn started.", CombatLogStyle.Neutral);
-    }
-
     public ActionResult OnRecharge(CombatBattlerModel player, bool boosted)
     {
         ActionResult result = combatInputHandler.HandleRecharge(player, boosted);
@@ -156,31 +148,6 @@ public class CombatPresenter
 
         PublishResult("End Turn", endTurnResult);
         return endTurnResult;
-    }
-
-    public IReadOnlyList<ActionInstance> GetQueuedPlayerActions()
-    {
-        return turnManager.actionQueue?.GetAll() ?? new List<ActionInstance>();
-    }
-
-    public void ClearActionQueue()
-    {
-        turnManager.actionQueue?.Clear();
-    }
-
-    private void PublishResolvedActions(string owner, List<ActionResult> results)
-    {
-        if (results == null)
-        {
-            return;
-        }
-
-        for (int i = 0; i < results.Count; i++)
-        {
-            ActionResult result = results[i];
-            CombatLogStyle style = result.success ? CombatLogStyle.Action : CombatLogStyle.Negative;
-            combatUI.AddLog($"{owner} action {i + 1}: {result.message}", style);
-        }
     }
 
     private void PublishResult(string action, ActionResult result)
