@@ -59,7 +59,8 @@ public class EncounterSystem : MonoBehaviour
         if (selectedEnemy == null || playerStatusManager == null)
             return;
 
-        PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
+        // TODO: implement combat session data store to pass this info to combat scene 
+        /* PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
         CombatSessionData sessionData = new CombatSessionData
         {
             playerSnapshot = snapshot,
@@ -67,7 +68,7 @@ public class EncounterSystem : MonoBehaviour
             riskModifier = modifier
         };
 
-        CombatSessionStore.SetSession(sessionData);
+        CombatSessionStore.SetSession(sessionData); */
         SceneManager.LoadScene(combatSceneName);
     }
 
