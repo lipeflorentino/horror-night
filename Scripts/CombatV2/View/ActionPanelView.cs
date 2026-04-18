@@ -10,4 +10,13 @@ public class ActionPanelView : MonoBehaviour
     public Button addDiceDefenseButton;
 
     public Button endTurnButton;
+
+    public void SetPlayerRoleButtons(bool isPlayerAttacker)
+    {
+        attackButton.gameObject.SetActive(isPlayerAttacker);
+        addDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
+
+        defendButton.gameObject.SetActive(!isPlayerAttacker);
+        addDiceDefenseButton.gameObject.SetActive(!isPlayerAttacker);
+    }
 }
