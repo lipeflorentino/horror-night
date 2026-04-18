@@ -5,7 +5,6 @@ using TMPro;
 public class BattlerPanelView : MonoBehaviour
 {
     public TMP_Text nameText;
-
     public TMP_Text mindText;
     public TMP_Text heartText;
     public TMP_Text bodyText;
@@ -17,15 +16,22 @@ public class BattlerPanelView : MonoBehaviour
 
     public void Bind(Battler battler)
     {
-        nameText.text = battler.Name;
+        if (nameText != null)
+            nameText.text = battler.Name;
 
-        mindText.text = battler.Mind.ToString();
-        heartText.text = battler.Heart.ToString();
-        bodyText.text = battler.Body.ToString();
+        if (mindText != null)
+            mindText.text = battler.Mind.ToString();
+        if (heartText != null)
+            heartText.text = battler.Heart.ToString();
+        if (bodyText != null)
+            bodyText.text = battler.Body.ToString();
 
-        hpText.text = battler.HP.ToString();
-        hpFill.fillAmount = battler.HP / 100f;
+        if (hpText != null)
+            hpText.text = battler.HP.ToString();
+        if (hpFill != null)
+            hpFill.fillAmount = battler.HP / 100f;
 
-        diceText.text = battler.CurrentDices.ToString();
+        if (diceText != null)
+            diceText.text = battler.CurrentDices.ToString();
     }
 }

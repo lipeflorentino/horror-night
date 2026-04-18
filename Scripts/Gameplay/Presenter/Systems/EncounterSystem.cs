@@ -58,17 +58,16 @@ public class EncounterSystem : MonoBehaviour
 
         if (selectedEnemy == null || playerStatusManager == null)
             return;
-
-        // TODO: implement combat session data store to pass this info to combat scene 
-        /* PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
-        CombatSessionData sessionData = new CombatSessionData
+            
+        PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
+        CombatSessionData sessionData = new()
         {
             playerSnapshot = snapshot,
             enemyInstance = selectedEnemy,
             riskModifier = modifier
         };
 
-        CombatSessionStore.SetSession(sessionData); */
+        CombatSessionStore.SetSession(sessionData);
         SceneManager.LoadScene(combatSceneName);
     }
 

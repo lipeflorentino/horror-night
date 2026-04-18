@@ -54,12 +54,12 @@ public class PlayerStatusManager : MonoBehaviour
 
     private void Start()
     {
-        // TODO: implement combat result data store to pass this info from combat scene
-        /* CombatResultSnapshot result = CombatResultStore.Consume();
+        CombatResultSnapshot result = CombatResultStore.Consume();
+
         if (result == null)
             return;
 
-        RestoreSnapshot(result.playerSnapshot); */
+        RestoreSnapshot(result.playerSnapshot);
     }
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;
@@ -204,6 +204,7 @@ public class PlayerStatusManager : MonoBehaviour
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
+        
         if (playerInventory != null)
             playerInventory.RestoreSnapshot(snapshot.inventory);
         

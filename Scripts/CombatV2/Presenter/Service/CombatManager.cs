@@ -4,6 +4,7 @@ using UnityEngine;
 public class CombatManager : MonoBehaviour
 {
     private static WaitForSeconds _waitForSeconds0_5 = new WaitForSeconds(0.5f);
+    private const int DefaultDiceCount = 3;
     public CombatView view;
     public CombatInputHandler input;
 
@@ -29,8 +30,8 @@ public class CombatManager : MonoBehaviour
         _resolver = new ActionResolverService();
         _enemyActionSelector = new EnemyActionSelector();
 
-        Player = new Battler("Player", 100, 10, 10, 10, 3);
-        Enemy = new Battler("Enemy", 100, 10, 10, 10, 3);
+        CombatSessionData sessionData = CombatSessionStore.Consume();
+        InitializeBattlers(sessionData);
 
         _attackDef = new ActionDefinition("attack", ActionType.Attack, 10);
         _defenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
@@ -39,6 +40,49 @@ public class CombatManager : MonoBehaviour
 
         view.UpdateView(Player, Enemy);
         UpdateTurnRoleUI();
+    }
+
+    private void InitializeBattlers(CombatSessionData sessionData)
+    {
+        if (sessionData == null)
+        {
+            Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
+            Player = new Battler("Player", 100, 10, 10, 10, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, DefaultDiceCount);
+            return;
+        }
+
+        PlayerStatusSnapshot playerSnapshot = sessionData.playerSnapshot;
+        EnemyInstance enemySnapshot = sessionData.enemyInstance;
+
+        Player = new Battler(
+            "Player",
+            Mathf.RoundToInt(playerSnapshot.hp),
+            Mathf.RoundToInt(playerSnapshot.heart),
+            Mathf.RoundToInt(playerSnapshot.mind),
+            Mathf.RoundToInt(playerSnapshot.body),
+            DefaultDiceCount
+        );
+
+        if (enemySnapshot != null)
+        {
+            string enemyName = enemySnapshot.source != null ? enemySnapshot.source.enemyName : "Enemy";
+            Enemy = new Battler(
+                enemyName,
+                enemySnapshot.hp,
+                enemySnapshot.heart,
+                enemySnapshot.mind,
+                enemySnapshot.body,
+                DefaultDiceCount
+            );
+        }
+        else
+        {
+            Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, DefaultDiceCount);
+        }
+
+        Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
     }
 
     public void ReceivePlayerInput(ActionType type, int attackDice, int defenseDice)
