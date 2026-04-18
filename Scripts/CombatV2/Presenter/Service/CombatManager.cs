@@ -26,8 +26,8 @@ public class CombatManager : MonoBehaviour
         _diceService = new DiceService();
         _resolver = new ActionResolverService();
 
-        Player = new Battler("Player", 100, 5, 5, 5, 3);
-        Enemy = new Battler("Enemy", 100, 5, 5, 5, 3);
+        Player = new Battler("Player", 100, 10, 10, 10, 3);
+        Enemy = new Battler("Enemy", 100, 10, 10, 10, 3);
 
         _attackDef = new ActionDefinition("attack", ActionType.Attack, 10);
         _defenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
