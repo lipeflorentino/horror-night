@@ -23,12 +23,12 @@ public class ActionResolverService
 
     private float GetMultiplier(DiceTier tier)
     {
-        switch (tier)
+        return tier switch
         {
-            case DiceTier.Low: return 0.5f;
-            case DiceTier.Medium: return 1f;
-            case DiceTier.High: return 1.5f;
-        }
-        return 1f;
+            DiceTier.Low => 0.5f,
+            DiceTier.Medium => 1f,
+            DiceTier.High => 1.5f,
+            _ => 1f,
+        };
     }
 }
