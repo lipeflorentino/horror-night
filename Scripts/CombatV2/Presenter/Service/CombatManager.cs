@@ -9,9 +9,11 @@ public class CombatManager : MonoBehaviour
 
     public Battler Player { get; private set; }
     public Battler Enemy { get; private set; }
+    public bool IsPlayerAttacker => _playerIsAttacker;
 
     private DiceService _diceService;
     private ActionResolverService _resolver;
+    private EnemyActionSelector _enemyActionSelector;
 
     private ActionDefinition _attackDef;
     private ActionDefinition _defenseDef;
@@ -25,6 +27,7 @@ public class CombatManager : MonoBehaviour
     {
         _diceService = new DiceService();
         _resolver = new ActionResolverService();
+        _enemyActionSelector = new EnemyActionSelector();
 
         Player = new Battler("Player", 100, 10, 10, 10, 3);
         Enemy = new Battler("Enemy", 100, 10, 10, 10, 3);
@@ -35,10 +38,18 @@ public class CombatManager : MonoBehaviour
         input.Init(this);
 
         view.UpdateView(Player, Enemy);
+        UpdateTurnRoleUI();
     }
 
     public void ReceivePlayerInput(ActionType type, int attackDice, int defenseDice)
     {
+        ActionType expectedType = _playerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        if (type != expectedType)
+        {
+            Debug.Log($"[Input] Ignored invalid action for current role. Expected {expectedType} and received {type}");
+            return;
+        }
+
         StartCoroutine(ResolveTurnRoutine(type, attackDice, defenseDice));
     }
 
@@ -65,12 +76,8 @@ public class CombatManager : MonoBehaviour
 
     private void GenerateEnemyAction()
     {
-        ActionType type = Random.value > 0.5f ? ActionType.Attack : ActionType.Defense;
-        ActionDefinition def = type == ActionType.Attack ? _attackDef : _defenseDef;
-
-        _pendingEnemyAction = new ActionInstance(def, null);
-
-        Debug.Log($"[AI] Enemy selected {type}");
+        _pendingEnemyAction = _enemyActionSelector.Select(_attackDef, _defenseDef);
+        Debug.Log($"[AI] Enemy selected {_pendingEnemyAction.Definition.Type}");
     }
 
     private void RollActions(ActionType playerType, int attackDice, int defenseDice)
@@ -122,6 +129,16 @@ public class CombatManager : MonoBehaviour
 
         _playerIsAttacker = !_playerIsAttacker;
 
+        UpdateTurnRoleUI();
+
         Debug.Log("[Flow] Turn End");
+    }
+
+    private void UpdateTurnRoleUI()
+    {
+        ActionType allowedAction = _playerIsAttacker ? ActionType.Attack : ActionType.Defense;
+
+        input.SetAllowedAction(allowedAction);
+        view.actionPanel.SetPlayerRoleButtons(_playerIsAttacker);
     }
 }
