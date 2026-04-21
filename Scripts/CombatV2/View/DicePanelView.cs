@@ -12,6 +12,8 @@ public class DicePanelView : MonoBehaviour
     [SerializeField, Min(1)] private int maxSlotsPerSide = 3;
     [SerializeField] private float postRollDelay = 0.4f;
     [SerializeField] private GameObject diceResolutionPanel;
+    [SerializeField] private Color playerColor = new(0.4f, 0.6f, 1f);
+    [SerializeField] private Color enemyColor = new(1f, 0.4f, 0.4f);
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
@@ -94,6 +96,7 @@ public class DicePanelView : MonoBehaviour
         {
             DiceRollUI slot = Instantiate(diceRollSlotPrefab, container);
             slot.gameObject.SetActive(false);
+            slot.SetDiceColor(GetDiceColor(container == playerSlotsContainer));
             slotBuffer.Add(slot);
         }
     }
@@ -113,5 +116,11 @@ public class DicePanelView : MonoBehaviour
     public void HidePanel()
     {
         ShowDiceResolution(false);
+    }
+
+    public Color GetDiceColor(bool isPlayer)
+    {
+        Color diceColor = isPlayer ? playerColor : enemyColor;
+        return diceColor;
     }
 }

@@ -50,4 +50,10 @@ public class DiceRollUI : MonoBehaviour
         if (diceValueText != null)
             diceValueText.text = finalValue.ToString();
     }
+
+    public void SetDiceColor(Color color)
+    {
+        if (diceImage != null)
+            diceImage.color = color;
+    }
 }
