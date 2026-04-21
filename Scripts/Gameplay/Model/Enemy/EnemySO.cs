@@ -50,8 +50,6 @@ public class EnemySO : ScriptableObject
     public StatRange defense;
     public StatRange criticalHitChance;
     public StatRange parryChance;
-    public StatRange fleeChance;
-    public StatRange instantKillChance;
     public StatRange learnChance;
 
     [Header("Optional")]
@@ -80,11 +78,6 @@ public class EnemySO : ScriptableObject
 
         int rolledAttack = attack.Roll(difficulty);
         int rolledDefense = defense.Roll(difficulty);
-        int rolledCritChance = criticalHitChance.Roll(1f);
-        int rolledParryChance = parryChance.Roll(1f);
-        int rolledFleeChance = fleeChance.Roll(1f);
-        int rolledInstantKillChance = instantKillChance.Roll(1f);
-        int rolledLearnChance = learnChance.Roll(1f);
 
         return new EnemyInstance
         {

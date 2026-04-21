@@ -5662,13 +5662,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7340bde8bbb3694c89d7a4be427d334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackButton: {fileID: 963885090}
-  defendButton: {fileID: 402726305}
-  addDiceAttackButton: {fileID: 1155670348}
-  addDiceAttackCountText: {fileID: 1419719086}
-  addDiceDefenseButton: {fileID: 97824910}
-  addDiceDefenseCountText: {fileID: 1025114859}
-  endTurnButton: {fileID: 144055325}
+  AttackButton: {fileID: 963885090}
+  DefendButton: {fileID: 402726305}
+  AddDiceAttackButton: {fileID: 1155670348}
+  AddDiceAttackCountText: {fileID: 1419719086}
+  AddDiceDefenseButton: {fileID: 97824910}
+  AddDiceDefenseCountText: {fileID: 1025114859}
+  EndTurnButton: {fileID: 144055325}
 --- !u!1 &892106026
 GameObject:
   m_ObjectHideFlags: 0

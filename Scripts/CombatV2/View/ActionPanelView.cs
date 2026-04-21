@@ -5,62 +5,83 @@ using UnityEngine.UI;
 
 public class ActionPanelView : MonoBehaviour
 {
-    public Button attackButton;
-    public Button defendButton;
-    public Button addDiceAttackButton;
-    public TMP_Text addDiceAttackCountText;
-    public Button addDiceDefenseButton;
-    public TMP_Text addDiceDefenseCountText;
-    public Button endTurnButton;
+    public Button AttackButton;
+    public Button DefendButton;
+    public Button AddDiceAttackButton;
+    public TMP_Text AddDiceAttackCountText;
+    public Button AddDiceDefenseButton;
+    public TMP_Text AddDiceDefenseCountText;
+    public Button EndTurnButton;
     public event Action AttackClicked;
     public event Action DefendClicked;
     public event Action AddDiceToAttackClicked;
     public event Action AddDiceToDefenseClicked;
     public event Action EndTurnClicked;
+    private CombatInputHandler BoundInputHandler;
 
     private void Awake()
     {
-        if (attackButton != null)
-            attackButton.onClick.AddListener(HandleAttackClick);
+        if (AttackButton != null)
+            AttackButton.onClick.AddListener(HandleAttackClick);
 
-        if (defendButton != null)
-            defendButton.onClick.AddListener(HandleDefendClick);
+        if (DefendButton != null)
+            DefendButton.onClick.AddListener(HandleDefendClick);
 
-        if (addDiceAttackButton != null)
-            addDiceAttackButton.onClick.AddListener(HandleAddDiceToAttackClick);
+        if (AddDiceAttackButton != null)
+            AddDiceAttackButton.onClick.AddListener(HandleAddDiceToAttackClick);
 
-        if (addDiceDefenseButton != null)
-            addDiceDefenseButton.onClick.AddListener(HandleAddDiceToDefenseClick);
+        if (AddDiceDefenseButton != null)
+            AddDiceDefenseButton.onClick.AddListener(HandleAddDiceToDefenseClick);
 
-        if (endTurnButton != null)
-            endTurnButton.onClick.AddListener(HandleEndTurnClick);
+        if (EndTurnButton != null)
+            EndTurnButton.onClick.AddListener(HandleEndTurnClick);
+
+        if (BoundInputHandler != null)
+            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
     }
 
     private void OnDestroy()
     {
-        if (attackButton != null)
-            attackButton.onClick.RemoveListener(HandleAttackClick);
+        if (AttackButton != null)
+            AttackButton.onClick.RemoveListener(HandleAttackClick);
 
-        if (defendButton != null)
-            defendButton.onClick.RemoveListener(HandleDefendClick);
+        if (DefendButton != null)
+            DefendButton.onClick.RemoveListener(HandleDefendClick);
 
-        if (addDiceAttackButton != null)
-            addDiceAttackButton.onClick.RemoveListener(HandleAddDiceToAttackClick);
+        if (AddDiceAttackButton != null)
+            AddDiceAttackButton.onClick.RemoveListener(HandleAddDiceToAttackClick);
 
-        if (addDiceDefenseButton != null)
-            addDiceDefenseButton.onClick.RemoveListener(HandleAddDiceToDefenseClick);
+        if (AddDiceDefenseButton != null)
+            AddDiceDefenseButton.onClick.RemoveListener(HandleAddDiceToDefenseClick);
 
-        if (endTurnButton != null)
-            endTurnButton.onClick.RemoveListener(HandleEndTurnClick);
+        if (EndTurnButton != null)
+            EndTurnButton.onClick.RemoveListener(HandleEndTurnClick);
+
+        if (BoundInputHandler != null)
+            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
     }
 
     public void BindInput(CombatInputHandler inputHandler)
     {
+        if (BoundInputHandler != null)
+            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
+
+        BoundInputHandler = inputHandler;
         AttackClicked += inputHandler.OnAttack;
         DefendClicked += inputHandler.OnDefend;
         AddDiceToAttackClicked += inputHandler.OnAddDiceToAttack;
         AddDiceToDefenseClicked += inputHandler.OnAddDiceToDefense;
         EndTurnClicked += inputHandler.OnEndTurn;
+        inputHandler.EndTurnAvailabilityChanged += SetEndTurnInteractable;
+        SetEndTurnInteractable(false);
+    }
+
+    public void SetEndTurnInteractable(bool isInteractable)
+    {
+        if (EndTurnButton != null)
+        {
+            EndTurnButton.interactable = isInteractable;
+        }
     }
 
     private void HandleAttackClick()
@@ -91,20 +112,20 @@ public class ActionPanelView : MonoBehaviour
     public void SetPlayerRoleButtons(bool isPlayerAttacker)
     {
         Debug.Log("Setting button states. Is Player Attacker: " + isPlayerAttacker);
-        attackButton.gameObject.SetActive(isPlayerAttacker);
-        addDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
+        AttackButton.gameObject.SetActive(isPlayerAttacker);
+        AddDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
 
-        defendButton.gameObject.SetActive(!isPlayerAttacker);
-        addDiceDefenseButton.gameObject.SetActive(!isPlayerAttacker);
+        DefendButton.gameObject.SetActive(!isPlayerAttacker);
+        AddDiceDefenseButton.gameObject.SetActive(!isPlayerAttacker);
     }
 
     public void UpdateAddDiceAttackCount(int count)
     {
-        addDiceAttackCountText.text = count.ToString();
+        AddDiceAttackCountText.text = count.ToString();
     }
 
     public void UpdateAddDiceDefenseCount(int count)
     {
-        addDiceDefenseCountText.text = count.ToString();
+        AddDiceDefenseCountText.text = count.ToString();
     }
 }
