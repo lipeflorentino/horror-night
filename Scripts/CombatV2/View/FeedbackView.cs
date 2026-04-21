@@ -6,10 +6,6 @@ using UnityEngine;
 public class FeedbackView : MonoBehaviour
 {
     public TMP_Text TurnOwnerText;
-    public GameObject DiceResolutionPanel;
-    [SerializeField] private DiceRollUI[] playerDiceRollSlots;
-    [SerializeField] private DiceRollUI[] enemyDiceRollSlots;
-    [SerializeField] private float postRollDelay = 0.4f;
     public void ShowDamageFeedback(int damage)
     {
         // Implement visual feedback for damage (e.g., floating text, screen shake)
@@ -34,52 +30,5 @@ public class FeedbackView : MonoBehaviour
 
         if (TurnOwnerText != null)
             TurnOwnerText.text = turnOwner;
-    }
-
-    public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
-    {
-        ShowDiceResolution(true);
-        List<Coroutine> runningCoroutines = new();
-        PrepareSlots(playerDiceRollSlots, playerRolls.Count);
-        PrepareSlots(enemyDiceRollSlots, enemyRolls.Count);
-
-        if (playerDiceRollSlots != null)
-            for (int i = 0; i < playerRolls.Count && i < playerDiceRollSlots.Length; i++)
-                runningCoroutines.Add(StartCoroutine(playerDiceRollSlots[i].PlayRollAnimation(playerRolls[i].Value)));
-
-        if (enemyDiceRollSlots != null)
-            for (int i = 0; i < enemyRolls.Count && i < enemyDiceRollSlots.Length; i++)
-                runningCoroutines.Add(StartCoroutine(enemyDiceRollSlots[i].PlayRollAnimation(enemyRolls[i].Value)));
-
-        for (int i = 0; i < runningCoroutines.Count; i++)
-            yield return runningCoroutines[i];
-
-        Debug.Log($"{playerDiceRollSlots} / {enemyDiceRollSlots}");
-
-        yield return new WaitForSeconds(postRollDelay);
-        ShowDiceResolution(false);
-    }
-
-    public void ShowDiceResolution(bool status)
-    {
-        DiceResolutionPanel.SetActive(status);
-    }
-
-    private void PrepareSlots(DiceRollUI[] slots, int usedCount)
-    {
-        if (slots == null)
-            return;
-
-        for (int i = 0; i < slots.Length; i++)
-        {
-            if (slots[i] == null)
-                continue;
-
-            bool isActive = i < usedCount;
-            slots[i].gameObject.SetActive(isActive);
-
-            if (isActive)
-                slots[i].ClearValue();
-        }
     }
 }

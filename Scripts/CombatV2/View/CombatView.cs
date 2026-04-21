@@ -8,6 +8,7 @@ public class CombatView : MonoBehaviour
     public BattlerPanelView EnemyPanel;
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
+    public DicePanelView DicePanelView;
 
     public void Init()
     {
@@ -30,11 +31,14 @@ public class CombatView : MonoBehaviour
 
         if (PlayerPanel == null && panels.Length > 0)
             PlayerPanel = panels[0];
+
         if (EnemyPanel == null && panels.Length > 1)
             EnemyPanel = panels[1];
 
         ActionPanel = FindObjectOfType<ActionPanelView>();
         FeedbackView = FindObjectOfType<FeedbackView>();
+        DicePanelView = FindObjectOfType<DicePanelView>();
+        DicePanelView.HidePanel();
     }
 
     public void BindInput(CombatInputHandler inputHandler)
@@ -65,9 +69,9 @@ public class CombatView : MonoBehaviour
 
     public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
     {
-        if (FeedbackView == null)
+        if (DicePanelView  == null)
             yield break;
 
-        yield return FeedbackView.PlayDiceResolution(playerRolls, enemyRolls);
+        yield return DicePanelView.PlayDiceResolution(playerRolls, enemyRolls);
     }
 }
