@@ -6,6 +6,7 @@ using UnityEngine;
 public class FeedbackView : MonoBehaviour
 {
     public TMP_Text TurnOwnerText;
+    public GameObject DiceResolutionPanel;
     [SerializeField] private DiceRollUI[] playerDiceRollSlots;
     [SerializeField] private DiceRollUI[] enemyDiceRollSlots;
     [SerializeField] private float postRollDelay = 0.4f;
@@ -37,6 +38,7 @@ public class FeedbackView : MonoBehaviour
 
     public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
     {
+        ShowDiceResolution(true);
         List<Coroutine> runningCoroutines = new();
         PrepareSlots(playerDiceRollSlots, playerRolls.Count);
         PrepareSlots(enemyDiceRollSlots, enemyRolls.Count);
@@ -52,7 +54,15 @@ public class FeedbackView : MonoBehaviour
         for (int i = 0; i < runningCoroutines.Count; i++)
             yield return runningCoroutines[i];
 
+        Debug.Log($"{playerDiceRollSlots} / {enemyDiceRollSlots}");
+
         yield return new WaitForSeconds(postRollDelay);
+        ShowDiceResolution(false);
+    }
+
+    public void ShowDiceResolution(bool status)
+    {
+        DiceResolutionPanel.SetActive(status);
     }
 
     private void PrepareSlots(DiceRollUI[] slots, int usedCount)
