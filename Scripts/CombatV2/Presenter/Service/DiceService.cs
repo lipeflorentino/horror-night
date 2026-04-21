@@ -15,11 +15,9 @@ public class DiceService
         return new DiceResult(value, tier);
     }
 
-    public DiceResult RollBestOf(int diceCount)
+    public DiceResult GetBestResult(List<DiceResult> rolls)
     {
         DiceResult best = null;
-        List<DiceResult> rolls = RollMany(diceCount);
-
         for (int i = 0; i < rolls.Count; i++)
             if (best == null || rolls[i].Value > best.Value)
                 best = rolls[i];

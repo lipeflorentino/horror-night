@@ -10067,7 +10067,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1204962492}
-  - component: {fileID: 1204962493}
   m_Layer: 0
   m_Name: HudView
   m_TagString: Untagged
@@ -10090,18 +10089,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1684893445}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1204962493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204962491}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1182894211d056d4d9452f2dd86fd355, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1212511235
 GameObject:
   m_ObjectHideFlags: 0
@@ -11760,7 +11747,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1515444164}
-  - component: {fileID: 1515444165}
   m_Layer: 0
   m_Name: LogView
   m_TagString: Untagged
@@ -11783,18 +11769,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1684893445}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1515444165
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1515444163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6bbde5bb4ac62c4789950271d0c54b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1517432024
 GameObject:
   m_ObjectHideFlags: 0
@@ -14071,7 +14045,7 @@ MonoBehaviour:
   - {fileID: 899359963}
   - {fileID: 327160054}
   - {fileID: 1597904601}
-  postRollDelay: 0.4
+  postRollDelay: 1
 --- !u!1 &1929508122
 GameObject:
   m_ObjectHideFlags: 0

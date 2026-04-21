@@ -147,24 +147,14 @@ public class CombatManager : MonoBehaviour
         PendingPlayerRolls = DiceService.RollMany(safePlayerAllocatedDice);
         PendingEnemyRolls = DiceService.RollMany(PendingEnemyAllocatedDice);
 
-        DiceResult playerDice = GetBestResult(PendingPlayerRolls);
-        DiceResult enemyDice = GetBestResult(PendingEnemyRolls);
+        DiceResult playerDice = DiceService.GetBestResult(PendingPlayerRolls);
+        DiceResult enemyDice = DiceService.GetBestResult(PendingEnemyRolls);
 
         PendingPlayerAction = new ActionInstance(playerAction, playerDice);
         PendingEnemyAction.Dice = enemyDice;
 
         Debug.Log($"[Flow] Player rolled best of {safePlayerAllocatedDice} dice → {playerDice.Value}");
         Debug.Log($"[Flow] Enemy rolled best of {PendingEnemyAllocatedDice} dice → {enemyDice.Value}");
-    }
-
-    private DiceResult GetBestResult(List<DiceResult> rolls)
-    {
-        DiceResult best = null;
-        for (int i = 0; i < rolls.Count; i++)
-            if (best == null || rolls[i].Value > best.Value)
-                best = rolls[i];
-
-        return best;
     }
 
     private void Resolve()
