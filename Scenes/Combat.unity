@@ -21986,7 +21986,7 @@ GameObject:
   - component: {fileID: 7029179520040926187}
   - component: {fileID: 7193410123719029634}
   m_Layer: 0
-  m_Name: Demon
+  m_Name: EnemyVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

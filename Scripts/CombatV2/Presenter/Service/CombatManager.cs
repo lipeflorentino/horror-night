@@ -60,6 +60,8 @@ public class CombatManager : MonoBehaviour
         PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
         EnemyInstance enemySnapshot = sessionData.EnemyInstance;
 
+        SetEnemyVisual(enemySnapshot ?? null);
+
         Player = new Battler(
             "Player",
             Mathf.RoundToInt(playerSnapshot.hp),
@@ -189,5 +191,24 @@ public class CombatManager : MonoBehaviour
         View.UpdateTurnOwner(PlayerIsAttacker);
         Input.SetAllowedAction(allowedAction);
         View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
+    }
+
+    public void SetEnemyVisual(EnemyInstance enemySnapshot = null)
+    {
+        Sprite enemySprite = enemySnapshot != null && enemySnapshot.source != null
+            ? enemySnapshot.source.image
+            : null;
+
+        GameObject enemyBattler = GameObject.Find("EnemyBattler");
+        Transform demonTransform = enemyBattler.transform.Find("EnemyVisual");
+        
+        if (demonTransform.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
+        {
+            spriteRenderer.sprite = enemySprite;
+        }
+        else
+        {
+            Debug.LogWarning("[Combat] Could not find SpriteRenderer to set enemy image.");
+        }
     }
 }
