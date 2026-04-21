@@ -7,6 +7,14 @@ public class CombatView : MonoBehaviour
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
 
+    public void Init()
+    {
+        PlayerPanel = FindObjectOfType<BattlerPanelView>();
+        EnemyPanel = FindObjectOfType<BattlerPanelView>();
+        ActionPanel = FindObjectOfType<ActionPanelView>();
+        FeedbackView = FindObjectOfType<FeedbackView>();
+    }
+
     public void BindInput(CombatInputHandler inputHandler)
     {
         ActionPanel.BindInput(inputHandler);

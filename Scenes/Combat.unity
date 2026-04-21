@@ -465,50 +465,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25958832}
   m_CullTransparentMesh: 1
---- !u!1 &53091790
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 53091791}
-  - component: {fileID: 53091792}
-  m_Layer: 0
-  m_Name: CombatInputHandler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &53091791
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 53091790}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 673971347}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &53091792
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 53091790}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2af7167b839d0d4ebc883d3f84b8a20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &65989984
 GameObject:
   m_ObjectHideFlags: 0
@@ -4538,7 +4494,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1568449879}
-  - {fileID: 53091791}
+  - {fileID: 2073077305}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &680874706
@@ -6615,13 +6571,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33cf17521dde4b249bec15dd1c0aba93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nameText: {fileID: 710608301}
-  mindText: {fileID: 1979483478}
-  heartText: {fileID: 1090789125}
-  bodyText: {fileID: 13349622}
-  hpFill: {fileID: 523073096}
-  hpText: {fileID: 798672062}
-  diceText: {fileID: 65989986}
+  NameText: {fileID: 0}
+  MindText: {fileID: 0}
+  HeartText: {fileID: 0}
+  BodyText: {fileID: 0}
+  HpFill: {fileID: 0}
+  HpText: {fileID: 0}
+  DiceText: {fileID: 0}
 --- !u!1 &1018588276
 GameObject:
   m_ObjectHideFlags: 0
@@ -10332,8 +10288,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b891e405a8552474b81084219bdd0b3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  view: {fileID: 1793599952}
-  input: {fileID: 53091792}
+  View: {fileID: 0}
+  Input: {fileID: 0}
 --- !u!1 &1608980039
 GameObject:
   m_ObjectHideFlags: 0
@@ -11067,10 +11023,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 115f128e302893f4b9164fd831893681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPanel: {fileID: 3762990097455698092}
-  enemyPanel: {fileID: 1006150222}
-  actionPanel: {fileID: 879936859}
-  feedbackView: {fileID: 1917331917}
+  PlayerPanel: {fileID: 0}
+  EnemyPanel: {fileID: 0}
+  ActionPanel: {fileID: 0}
+  FeedbackView: {fileID: 0}
 --- !u!1 &1800468683
 GameObject:
   m_ObjectHideFlags: 0
@@ -11916,7 +11872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3a78088d477bb4383244f519fae0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnOwnerText: {fileID: 1094857131}
+  TurnOwnerText: {fileID: 1094857131}
 --- !u!1 &1929508122
 GameObject:
   m_ObjectHideFlags: 0
@@ -13249,6 +13205,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2068638567}
   m_CullTransparentMesh: 1
+--- !u!1 &2073077304
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2073077305}
+  - component: {fileID: 2073077306}
+  m_Layer: 0
+  m_Name: CombatInputHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2073077305
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073077304}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673971347}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2073077306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073077304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2af7167b839d0d4ebc883d3f84b8a20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2082630697
 GameObject:
   m_ObjectHideFlags: 0
@@ -15113,13 +15113,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33cf17521dde4b249bec15dd1c0aba93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nameText: {fileID: 1297798116}
-  mindText: {fileID: 3131412777073127546}
-  heartText: {fileID: 4873588935580307520}
-  bodyText: {fileID: 5060614518539116081}
-  hpFill: {fileID: 1251335792}
-  hpText: {fileID: 124400252}
-  diceText: {fileID: 671282751}
+  NameText: {fileID: 0}
+  MindText: {fileID: 0}
+  HeartText: {fileID: 0}
+  BodyText: {fileID: 0}
+  HpFill: {fileID: 0}
+  HpText: {fileID: 0}
+  DiceText: {fileID: 0}
 --- !u!1 &3794427364033067254
 GameObject:
   m_ObjectHideFlags: 0

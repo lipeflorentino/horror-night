@@ -25,7 +25,7 @@ public class FeedbackView : MonoBehaviour
     public void ShowTurnStartFeedback(bool isPlayerTurn)
     {
         string turnOwner = isPlayerTurn ? "Player's Turn" : "Enemy's Turn";
-        Debug.Log(turnOwner);
+
         if (TurnOwnerText != null)
             TurnOwnerText.text = turnOwner;
     }

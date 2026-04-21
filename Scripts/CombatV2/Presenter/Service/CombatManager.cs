@@ -36,7 +36,11 @@ public class CombatManager : MonoBehaviour
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 10);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
 
+        Input = FindObjectOfType<CombatInputHandler>();
+        View = FindObjectOfType<CombatView>();
+
         Input.Init(this);
+        View.Init();
         View.BindInput(Input);
 
         View.UpdateView(Player, Enemy);
