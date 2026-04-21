@@ -133,8 +133,7 @@ public class CombatInputHandler : MonoBehaviour
 
         Combat.ReceivePlayerInput(
             SelectedAction.Value,
-            AttackDiceAllocated,
-            DefenseDiceAllocated
+            SelectedAction.Value == ActionType.Attack ? AttackDiceAllocated : DefenseDiceAllocated
         );
 
         SelectedAction = null;

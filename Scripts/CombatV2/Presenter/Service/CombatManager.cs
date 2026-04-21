@@ -29,12 +29,11 @@ public class CombatManager : MonoBehaviour
         DiceService = new DiceService();
         Resolver = new ActionResolverService();
         EnemyActionSelector = new EnemyActionSelector();
+        AttackDef = new ActionDefinition("attack", ActionType.Attack, 10);
+        DefenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
 
         CombatSessionData sessionData = CombatSessionStore.Consume();
         InitializeBattlers(sessionData);
-
-        AttackDef = new ActionDefinition("attack", ActionType.Attack, 10);
-        DefenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
 
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
@@ -42,8 +41,8 @@ public class CombatManager : MonoBehaviour
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
-
         View.UpdateView(Player, Enemy);
+
         UpdateTurnRoleUI();
     }
 
@@ -92,7 +91,7 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
     }
 
-    public void ReceivePlayerInput(ActionType type, int attackDice, int defenseDice)
+    public void ReceivePlayerInput(ActionType type, int allocatedDice)
     {
         ActionType expectedType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
         if (type != expectedType)
@@ -101,10 +100,10 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(ResolveTurnRoutine(type, attackDice, defenseDice));
+        StartCoroutine(ResolveTurnRoutine(type, allocatedDice));
     }
 
-    private IEnumerator ResolveTurnRoutine(ActionType playerType, int attackDice, int defenseDice)
+    private IEnumerator ResolveTurnRoutine(ActionType playerType, int allocatedDice)
     {
         Debug.Log("[Flow] Player ended turn");
 
@@ -114,7 +113,7 @@ public class CombatManager : MonoBehaviour
 
         yield return WaitForSeconds0_5;
 
-        RollActions(playerType, attackDice, defenseDice);
+        RollActions(playerType, allocatedDice);
 
         yield return WaitForSeconds0_5;
 
@@ -131,18 +130,17 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
-    private void RollActions(ActionType playerType, int attackDice, int defenseDice)
+    private void RollActions(ActionType playerType, int allocatedDice)
     {
-        ActionDefinition playerDef = playerType == ActionType.Attack ? AttackDef : DefenseDef;
+        ActionDefinition playerAction = playerType == ActionType.Attack ? AttackDef : DefenseDef;
 
-        DiceResult playerDice = DiceService.Roll();
-        DiceResult enemyDice = DiceService.Roll();
+        DiceResult playerDice = DiceService.RollBestOf(allocatedDice);
+        DiceResult enemyDice = DiceService.Roll(); // TODO: evoluir depois para IA usar múltiplos dados também
 
-        PendingPlayerAction = new ActionInstance(playerDef, playerDice);
-
+        PendingPlayerAction = new ActionInstance(playerAction, playerDice);
         PendingEnemyAction.Dice = enemyDice;
 
-        Debug.Log("[Flow] Both rolled dice");
+        Debug.Log($"[Flow] Player rolled best of {allocatedDice} dice → {playerDice.Value}");
     }
 
     private void Resolve()

@@ -2,7 +2,7 @@ using System;
 
 public class DiceService
 {
-    private Random random = new Random();
+    private readonly Random random = new();
 
     public DiceResult Roll()
     {
@@ -12,6 +12,23 @@ public class DiceService
         Console.WriteLine($"[Dice] Rolled: {value} → {tier}");
 
         return new DiceResult(value, tier);
+    }
+
+    public DiceResult RollBestOf(int diceCount)
+    {
+        DiceResult best = null;
+
+        for (int i = 0; i < diceCount; i++)
+        {
+            var roll = Roll();
+
+            if (best == null || roll.Value > best.Value)
+            {
+                best = roll;
+            }
+        }
+
+        return best;
     }
 
     private DiceTier GetTier(int value)
