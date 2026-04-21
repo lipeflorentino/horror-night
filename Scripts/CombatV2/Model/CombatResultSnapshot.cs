@@ -4,9 +4,9 @@ using UnityEngine;
 [Serializable]
 public class CombatResultSnapshot
 {
-    [SerializeField] public PlayerStatusSnapshot playerSnapshot;
-    [SerializeField] public EnemyInstance enemyInstance;
-    [SerializeField] public bool playerWon;
+    [SerializeField] public PlayerStatusSnapshot PlayerSnapshot;
+    [SerializeField] public EnemyInstance EnemyInstance;
+    [SerializeField] public bool PlayerWon;
 }
 
 public static class CombatResultStore

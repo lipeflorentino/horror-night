@@ -2,11 +2,11 @@ using System;
 
 public class DiceService
 {
-    private Random _random = new Random();
+    private Random random = new Random();
 
     public DiceResult Roll()
     {
-        int value = _random.Next(1, 7);
+        int value = random.Next(1, 7);
         DiceTier tier = GetTier(value);
 
         Console.WriteLine($"[Dice] Rolled: {value} → {tier}");

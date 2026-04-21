@@ -4,34 +4,34 @@ using TMPro;
 
 public class BattlerPanelView : MonoBehaviour
 {
-    public TMP_Text nameText;
-    public TMP_Text mindText;
-    public TMP_Text heartText;
-    public TMP_Text bodyText;
+    public TMP_Text NameText;
+    public TMP_Text MindText;
+    public TMP_Text HeartText;
+    public TMP_Text BodyText;
 
-    public Image hpFill;
-    public TMP_Text hpText;
+    public Image HpFill;
+    public TMP_Text HpText;
 
-    public TMP_Text diceText;
+    public TMP_Text DiceText;
 
     public void Bind(Battler battler)
     {
-        if (nameText != null)
-            nameText.text = battler.Name;
+        if (NameText != null)
+            NameText.text = battler.Name;
 
-        if (mindText != null)
-            mindText.text = battler.Mind.ToString();
-        if (heartText != null)
-            heartText.text = battler.Heart.ToString();
-        if (bodyText != null)
-            bodyText.text = battler.Body.ToString();
+        if (MindText != null)
+            MindText.text = battler.Mind.ToString();
+        if (HeartText != null)
+            HeartText.text = battler.Heart.ToString();
+        if (BodyText != null)
+            BodyText.text = battler.Body.ToString();
 
-        if (hpText != null)
-            hpText.text = battler.HP.ToString();
-        if (hpFill != null)
-            hpFill.fillAmount = battler.HP / 100f;
+        if (HpText != null)
+            HpText.text = battler.HP.ToString();
+        if (HpFill != null)
+            HpFill.fillAmount = battler.HP / 100f;
 
-        if (diceText != null)
-            diceText.text = battler.CurrentDices.ToString();
+        if (DiceText != null)
+            DiceText.text = battler.CurrentDices.ToString();
     }
 }

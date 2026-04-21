@@ -62,9 +62,9 @@ public class EncounterSystem : MonoBehaviour
         PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
         CombatSessionData sessionData = new()
         {
-            playerSnapshot = snapshot,
-            enemyInstance = selectedEnemy,
-            riskModifier = modifier
+            PlayerSnapshot = snapshot,
+            EnemyInstance = selectedEnemy,
+            RiskModifier = modifier
         };
 
         CombatSessionStore.SetSession(sessionData);

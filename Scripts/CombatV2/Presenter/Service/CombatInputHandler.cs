@@ -2,96 +2,105 @@ using UnityEngine;
 
 public class CombatInputHandler : MonoBehaviour
 {
-    private CombatManager _combat;
-    private int _attackDiceAllocated = 0;
-    private int _defenseDiceAllocated = 0;
-    private ActionType? _selectedAction = null;
-    private ActionType _allowedAction = ActionType.Attack;
+    private CombatManager Combat;
+    private int AttackDiceAllocated = 0;
+    private int DefenseDiceAllocated = 0;
+    private ActionType? SelectedAction = null;
+    private ActionType AllowedAction = ActionType.Attack;
 
-    public void Init(CombatManager combat)
+    public void Init(CombatManager cm)
     {
-        _combat = combat;
+        Combat = cm;
+    }
+
+    public void UpdateCombatView()
+    {
+        Combat.View.UpdateView(Combat.Player, Combat.Enemy);
     }
 
     public void SetAllowedAction(ActionType allowedAction)
     {
-        _allowedAction = allowedAction;
-        _selectedAction = allowedAction;
+        AllowedAction = allowedAction;
+        SelectedAction = allowedAction;
 
         if (allowedAction == ActionType.Attack)
         {
-            _defenseDiceAllocated = 0;
+            DefenseDiceAllocated = 0;
         }
         else
         {
-            _attackDiceAllocated = 0;
+            AttackDiceAllocated = 0;
         }
 
-        Debug.Log($"[Input] Turn role updated. Allowed action: {_allowedAction}");
+        Debug.Log($"[Input] Turn role updated. Allowed action: {AllowedAction}");
     }
 
     public void OnAttack()
     {
-        if (_allowedAction != ActionType.Attack)
+        if (AllowedAction != ActionType.Attack)
         {
             Debug.Log("[Input] Attack is disabled for this turn role");
             return;
         }
 
-        _selectedAction = ActionType.Attack;
+        SelectedAction = ActionType.Attack;
         Debug.Log("[Input] Selected ATTACK");
     }
 
     public void OnDefend()
     {
-        if (_allowedAction != ActionType.Defense)
+        if (AllowedAction != ActionType.Defense)
         {
             Debug.Log("[Input] Defense is disabled for this turn role");
             return;
         }
 
-        _selectedAction = ActionType.Defense;
+        SelectedAction = ActionType.Defense;
         Debug.Log("[Input] Selected DEFENSE");
     }
 
     public void OnAddDiceToAttack()
     {
-        if (_allowedAction != ActionType.Attack) return;
-        if (_combat.Player.CurrentDices <= 0) return;
+        if (AllowedAction != ActionType.Attack) return;
+        if (Combat.Player.CurrentDices <= 0) return;
 
-        _attackDiceAllocated++;
-        _combat.Player.CurrentDices--;
+        AttackDiceAllocated++;
+        Combat.Player.CurrentDices--;
+        Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
+        UpdateCombatView();
 
-        Debug.Log($"[Input] Added dice to ATTACK: {_attackDiceAllocated}");
+        Debug.Log($"[Input] Added dice to ATTACK: {AttackDiceAllocated}");
     }
 
     public void OnAddDiceToDefense()
     {
-        if (_allowedAction != ActionType.Defense) return;
-        if (_combat.Player.CurrentDices <= 0) return;
+        if (AllowedAction != ActionType.Defense) return;
+        if (Combat.Player.CurrentDices <= 0) return;
 
-        _defenseDiceAllocated++;
-        _combat.Player.CurrentDices--;
+        DefenseDiceAllocated++;
+        Combat.Player.CurrentDices--;
+        Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        UpdateCombatView();
 
-        Debug.Log($"[Input] Added dice to DEFENSE: {_defenseDiceAllocated}");
+        Debug.Log($"[Input] Added dice to DEFENSE: {DefenseDiceAllocated}");
     }
 
     public void OnEndTurn()
     {
-        if (_selectedAction == null)
+        if (SelectedAction == null)
         {
             Debug.Log("[Input] No action selected");
             return;
         }
 
-        _combat.ReceivePlayerInput(
-            _selectedAction.Value,
-            _attackDiceAllocated,
-            _defenseDiceAllocated
+        Combat.ReceivePlayerInput(
+            SelectedAction.Value,
+            AttackDiceAllocated,
+            DefenseDiceAllocated
         );
 
-        _attackDiceAllocated = 0;
-        _defenseDiceAllocated = 0;
-        _selectedAction = _allowedAction;
+        AttackDiceAllocated = 0;
+        DefenseDiceAllocated = 0;
+        SelectedAction = AllowedAction;
     }
 }

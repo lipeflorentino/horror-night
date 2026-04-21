@@ -3,42 +3,43 @@ using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
-    private static WaitForSeconds _waitForSeconds0_5 = new WaitForSeconds(0.5f);
+    private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
     private const int DefaultDiceCount = 3;
-    public CombatView view;
-    public CombatInputHandler input;
+    public CombatView View;
+    public CombatInputHandler Input;
 
     public Battler Player { get; private set; }
     public Battler Enemy { get; private set; }
-    public bool IsPlayerAttacker => _playerIsAttacker;
+    public bool IsPlayerAttacker => PlayerIsAttacker;
 
-    private DiceService _diceService;
-    private ActionResolverService _resolver;
-    private EnemyActionSelector _enemyActionSelector;
+    private DiceService DiceService;
+    private ActionResolverService Resolver;
+    private EnemyActionSelector EnemyActionSelector;
 
-    private ActionDefinition _attackDef;
-    private ActionDefinition _defenseDef;
+    private ActionDefinition AttackDef;
+    private ActionDefinition DefenseDef;
 
-    private bool _playerIsAttacker = true;
+    private bool PlayerIsAttacker = true;
 
-    private ActionInstance _pendingPlayerAction;
-    private ActionInstance _pendingEnemyAction;
+    private ActionInstance PendingPlayerAction;
+    private ActionInstance PendingEnemyAction;
 
     void Start()
     {
-        _diceService = new DiceService();
-        _resolver = new ActionResolverService();
-        _enemyActionSelector = new EnemyActionSelector();
+        DiceService = new DiceService();
+        Resolver = new ActionResolverService();
+        EnemyActionSelector = new EnemyActionSelector();
 
         CombatSessionData sessionData = CombatSessionStore.Consume();
         InitializeBattlers(sessionData);
 
-        _attackDef = new ActionDefinition("attack", ActionType.Attack, 10);
-        _defenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
+        AttackDef = new ActionDefinition("attack", ActionType.Attack, 10);
+        DefenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
 
-        input.Init(this);
+        Input.Init(this);
+        View.BindInput(Input);
 
-        view.UpdateView(Player, Enemy);
+        View.UpdateView(Player, Enemy);
         UpdateTurnRoleUI();
     }
 
@@ -52,8 +53,8 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        PlayerStatusSnapshot playerSnapshot = sessionData.playerSnapshot;
-        EnemyInstance enemySnapshot = sessionData.enemyInstance;
+        PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
+        EnemyInstance enemySnapshot = sessionData.EnemyInstance;
 
         Player = new Battler(
             "Player",
@@ -87,7 +88,7 @@ public class CombatManager : MonoBehaviour
 
     public void ReceivePlayerInput(ActionType type, int attackDice, int defenseDice)
     {
-        ActionType expectedType = _playerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        ActionType expectedType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
         if (type != expectedType)
         {
             Debug.Log($"[Input] Ignored invalid action for current role. Expected {expectedType} and received {type}");
@@ -101,39 +102,39 @@ public class CombatManager : MonoBehaviour
     {
         Debug.Log("[Flow] Player ended turn");
 
-        yield return _waitForSeconds0_5;
+        yield return WaitForSeconds0_5;
 
         GenerateEnemyAction();
 
-        yield return _waitForSeconds0_5;
+        yield return WaitForSeconds0_5;
 
         RollActions(playerType, attackDice, defenseDice);
 
-        yield return _waitForSeconds0_5;
+        yield return WaitForSeconds0_5;
 
         Resolve();
 
-        yield return _waitForSeconds0_5;
+        yield return WaitForSeconds0_5;
 
         EndTurn();
     }
 
     private void GenerateEnemyAction()
     {
-        _pendingEnemyAction = _enemyActionSelector.Select(_attackDef, _defenseDef);
-        Debug.Log($"[AI] Enemy selected {_pendingEnemyAction.Definition.Type}");
+        PendingEnemyAction = EnemyActionSelector.Select(AttackDef, DefenseDef);
+        Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
     private void RollActions(ActionType playerType, int attackDice, int defenseDice)
     {
-        ActionDefinition playerDef = playerType == ActionType.Attack ? _attackDef : _defenseDef;
+        ActionDefinition playerDef = playerType == ActionType.Attack ? AttackDef : DefenseDef;
 
-        DiceResult playerDice = _diceService.Roll();
-        DiceResult enemyDice = _diceService.Roll();
+        DiceResult playerDice = DiceService.Roll();
+        DiceResult enemyDice = DiceService.Roll();
 
-        _pendingPlayerAction = new ActionInstance(playerDef, playerDice);
+        PendingPlayerAction = new ActionInstance(playerDef, playerDice);
 
-        _pendingEnemyAction.Dice = enemyDice;
+        PendingEnemyAction.Dice = enemyDice;
 
         Debug.Log("[Flow] Both rolled dice");
     }
@@ -143,27 +144,27 @@ public class CombatManager : MonoBehaviour
         ActionInstance attack;
         ActionInstance defense;
 
-        if (_playerIsAttacker)
+        if (PlayerIsAttacker)
         {
-            attack = _pendingPlayerAction;
-            defense = _pendingEnemyAction;
+            attack = PendingPlayerAction;
+            defense = PendingEnemyAction;
         }
         else
         {
-            attack = _pendingEnemyAction;
-            defense = _pendingPlayerAction;
+            attack = PendingEnemyAction;
+            defense = PendingPlayerAction;
         }
 
-        int damage = _resolver.Resolve(attack, defense);
+        int damage = Resolver.Resolve(attack, defense);
 
-        if (_playerIsAttacker)
+        if (PlayerIsAttacker)
             Enemy.ReceiveDamage(damage);
         else
             Player.ReceiveDamage(damage);
 
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 
-        view.UpdateView(Player, Enemy);
+        View.UpdateView(Player, Enemy);
     }
 
     private void EndTurn()
@@ -171,7 +172,7 @@ public class CombatManager : MonoBehaviour
         Player.RecoverDice(1);
         Enemy.RecoverDice(1);
 
-        _playerIsAttacker = !_playerIsAttacker;
+        PlayerIsAttacker = !PlayerIsAttacker;
 
         UpdateTurnRoleUI();
 
@@ -180,9 +181,9 @@ public class CombatManager : MonoBehaviour
 
     private void UpdateTurnRoleUI()
     {
-        ActionType allowedAction = _playerIsAttacker ? ActionType.Attack : ActionType.Defense;
-
-        input.SetAllowedAction(allowedAction);
-        view.actionPanel.SetPlayerRoleButtons(_playerIsAttacker);
+        ActionType allowedAction = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        View.UpdateTurnOwner(PlayerIsAttacker);
+        Input.SetAllowedAction(allowedAction);
+        View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
     }
 }

@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class EnemyActionSelector
 {
-    private readonly List<IEnemyActionStrategy> _strategies;
+    private readonly List<IEnemyActionStrategy> Strategies;
 
     public EnemyActionSelector()
     {
-        _strategies = new List<IEnemyActionStrategy>
+        Strategies = new List<IEnemyActionStrategy>
         {
             new EnemyAttackActionStrategy(),
             new EnemyDefenseActionStrategy()
@@ -16,7 +16,7 @@ public class EnemyActionSelector
 
     public ActionInstance Select(ActionDefinition attackDefinition, ActionDefinition defenseDefinition)
     {
-        int index = Random.Range(0, _strategies.Count);
-        return _strategies[index].Build(attackDefinition, defenseDefinition);
+        int index = Random.Range(0, Strategies.Count);
+        return Strategies[index].Build(attackDefinition, defenseDefinition);
     }
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 [Serializable]
 public class CombatSessionData
 {
-    [SerializeField] public PlayerStatusSnapshot playerSnapshot;
-    [SerializeField] public EnemyInstance enemyInstance;
-    [SerializeField] public float riskModifier = 1f;
+    [SerializeField] public PlayerStatusSnapshot PlayerSnapshot;
+    [SerializeField] public EnemyInstance EnemyInstance;
+    [SerializeField] public float RiskModifier = 1f;
 }
 
 public static class CombatSessionStore

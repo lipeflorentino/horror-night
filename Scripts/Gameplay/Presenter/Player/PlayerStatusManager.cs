@@ -59,7 +59,7 @@ public class PlayerStatusManager : MonoBehaviour
         if (result == null)
             return;
 
-        RestoreSnapshot(result.playerSnapshot);
+        RestoreSnapshot(result.PlayerSnapshot);
     }
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;
