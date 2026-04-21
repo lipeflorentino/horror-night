@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatView : MonoBehaviour
@@ -59,5 +61,13 @@ public class CombatView : MonoBehaviour
     public void UpdateTurnOwner(bool isPlayerAttacker)
     {
         FeedbackView.ShowTurnStartFeedback(isPlayerAttacker);
+    }
+
+    public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
+    {
+        if (FeedbackView == null)
+            yield break;
+
+        yield return FeedbackView.PlayDiceResolution(playerRolls, enemyRolls);
     }
 }

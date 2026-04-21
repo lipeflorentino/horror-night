@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatManager : MonoBehaviour
@@ -23,6 +24,9 @@ public class CombatManager : MonoBehaviour
 
     private ActionInstance PendingPlayerAction;
     private ActionInstance PendingEnemyAction;
+    private List<DiceResult> PendingPlayerRolls = new();
+    private List<DiceResult> PendingEnemyRolls = new();
+    private int PendingEnemyAllocatedDice = 1;
 
     void Start()
     {
@@ -115,6 +119,8 @@ public class CombatManager : MonoBehaviour
 
         RollActions(playerType, allocatedDice);
 
+        yield return View.PlayDiceResolution(PendingPlayerRolls, PendingEnemyRolls);
+
         yield return WaitForSeconds0_5;
 
         Resolve();
@@ -127,6 +133,8 @@ public class CombatManager : MonoBehaviour
     private void GenerateEnemyAction()
     {
         PendingEnemyAction = EnemyActionSelector.Select(AttackDef, DefenseDef);
+        PendingEnemyAllocatedDice = Mathf.Clamp(Random.Range(1, Enemy.CurrentDices + 1), 1, Mathf.Max(1, Enemy.CurrentDices));
+        Enemy.CurrentDices = Mathf.Max(Enemy.CurrentDices - PendingEnemyAllocatedDice, 0);
         Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
@@ -134,13 +142,29 @@ public class CombatManager : MonoBehaviour
     {
         ActionDefinition playerAction = playerType == ActionType.Attack ? AttackDef : DefenseDef;
 
-        DiceResult playerDice = DiceService.RollBestOf(allocatedDice);
-        DiceResult enemyDice = DiceService.Roll(); // TODO: evoluir depois para IA usar múltiplos dados também
+        int safePlayerAllocatedDice = Mathf.Max(1, allocatedDice);
+
+        PendingPlayerRolls = DiceService.RollMany(safePlayerAllocatedDice);
+        PendingEnemyRolls = DiceService.RollMany(PendingEnemyAllocatedDice);
+
+        DiceResult playerDice = GetBestResult(PendingPlayerRolls);
+        DiceResult enemyDice = GetBestResult(PendingEnemyRolls);
 
         PendingPlayerAction = new ActionInstance(playerAction, playerDice);
         PendingEnemyAction.Dice = enemyDice;
 
-        Debug.Log($"[Flow] Player rolled best of {allocatedDice} dice → {playerDice.Value}");
+        Debug.Log($"[Flow] Player rolled best of {safePlayerAllocatedDice} dice → {playerDice.Value}");
+        Debug.Log($"[Flow] Enemy rolled best of {PendingEnemyAllocatedDice} dice → {enemyDice.Value}");
+    }
+
+    private DiceResult GetBestResult(List<DiceResult> rolls)
+    {
+        DiceResult best = null;
+        for (int i = 0; i < rolls.Count; i++)
+            if (best == null || rolls[i].Value > best.Value)
+                best = rolls[i];
+
+        return best;
     }
 
     private void Resolve()

@@ -17,7 +17,7 @@ public class DiceRollUI : MonoBehaviour
             diceValueText.text = "0";
     }
 
-    public IEnumerator PlayRollAnimation(int finalValue)
+    public IEnumerator PlayRollAnimation(int finalValue, int maxRandomValue = 6)
     {
         if (diceImage == null && diceValueText == null)
             yield break;
@@ -37,7 +37,7 @@ public class DiceRollUI : MonoBehaviour
 
             if (diceValueText != null && elapsed >= nextValueUpdate)
             {
-                diceValueText.text = Random.Range(1, 21).ToString();
+                diceValueText.text = Random.Range(1, maxRandomValue + 1).ToString();
                 nextValueUpdate += updateInterval;
             }
 

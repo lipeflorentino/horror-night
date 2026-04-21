@@ -74,6 +74,7 @@ public class CombatInputHandler : MonoBehaviour
         Combat.Player.CurrentDices--;
         Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
         UpdateCombatView();
+        NotifyEndTurnAvailability();
 
         Debug.Log($"[Input] Added dice to ATTACK: {AttackDiceAllocated}");
     }
@@ -88,6 +89,7 @@ public class CombatInputHandler : MonoBehaviour
         Combat.Player.CurrentDices--;
         Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
         UpdateCombatView();
+        NotifyEndTurnAvailability();
 
         Debug.Log($"[Input] Added dice to DEFENSE: {DefenseDiceAllocated}");
     }
@@ -102,7 +104,7 @@ public class CombatInputHandler : MonoBehaviour
         Combat.Player.CurrentDices++;
         Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
         UpdateCombatView();
-
+        NotifyEndTurnAvailability();
         Debug.Log($"[Input] Removed dice from ATTACK: {AttackDiceAllocated}");
     }
 
@@ -116,6 +118,7 @@ public class CombatInputHandler : MonoBehaviour
         Combat.Player.CurrentDices++;
         Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
         UpdateCombatView();
+        NotifyEndTurnAvailability();
 
         Debug.Log($"[Input] Removed dice from DEFENSE: {DefenseDiceAllocated}");
     }
@@ -142,7 +145,14 @@ public class CombatInputHandler : MonoBehaviour
 
     private void NotifyEndTurnAvailability()
     {
-        bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null;
+        bool hasValidDiceAllocation = SelectedAction switch
+        {
+            ActionType.Attack => AttackDiceAllocated > 0,
+            ActionType.Defense => DefenseDiceAllocated > 0,
+            _ => false
+        };
+
+        bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null && hasValidDiceAllocation;
         EndTurnAvailabilityChanged?.Invoke(isAvailable);
     }
 }

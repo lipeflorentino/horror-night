@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class DiceService
 {
@@ -17,18 +18,24 @@ public class DiceService
     public DiceResult RollBestOf(int diceCount)
     {
         DiceResult best = null;
+        List<DiceResult> rolls = RollMany(diceCount);
 
-        for (int i = 0; i < diceCount; i++)
-        {
-            var roll = Roll();
-
-            if (best == null || roll.Value > best.Value)
-            {
-                best = roll;
-            }
-        }
+        for (int i = 0; i < rolls.Count; i++)
+            if (best == null || rolls[i].Value > best.Value)
+                best = rolls[i];
 
         return best;
+    }
+
+    public List<DiceResult> RollMany(int diceCount)
+    {
+        int safeDiceCount = Math.Max(1, diceCount);
+        List<DiceResult> results = new(safeDiceCount);
+
+        for (int i = 0; i < safeDiceCount; i++)
+            results.Add(Roll());
+
+        return results;
     }
 
     private DiceTier GetTier(int value)
