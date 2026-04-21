@@ -30,6 +30,7 @@ public class CombatInputHandler : MonoBehaviour
         DefenseDiceAllocated = 0;
         Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
         Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        UpdateCombatView();
         NotifyEndTurnAvailability();
 
         Debug.Log($"[Input] Turn role updated. Allowed action: {AllowedAction}");
@@ -89,6 +90,34 @@ public class CombatInputHandler : MonoBehaviour
         UpdateCombatView();
 
         Debug.Log($"[Input] Added dice to DEFENSE: {DefenseDiceAllocated}");
+    }
+
+    public void OnRemoveDiceFromAttack()
+    {
+        if (IsWaitingTurnResolution) return;
+        if (AllowedAction != ActionType.Attack) return;
+        if (AttackDiceAllocated <= 0) return;
+
+        AttackDiceAllocated--;
+        Combat.Player.CurrentDices++;
+        Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
+        UpdateCombatView();
+
+        Debug.Log($"[Input] Removed dice from ATTACK: {AttackDiceAllocated}");
+    }
+
+    public void OnRemoveDiceFromDefense()
+    {
+        if (IsWaitingTurnResolution) return;
+        if (AllowedAction != ActionType.Defense) return;
+        if (DefenseDiceAllocated <= 0) return;
+
+        DefenseDiceAllocated--;
+        Combat.Player.CurrentDices++;
+        Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        UpdateCombatView();
+
+        Debug.Log($"[Input] Removed dice from DEFENSE: {DefenseDiceAllocated}");
     }
 
     public void OnEndTurn()

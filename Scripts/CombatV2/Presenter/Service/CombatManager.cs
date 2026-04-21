@@ -177,6 +177,7 @@ public class CombatManager : MonoBehaviour
     {
         Player.RecoverDice(1);
         Enemy.RecoverDice(1);
+        View.UpdateView(Player, Enemy);
 
         PlayerIsAttacker = !PlayerIsAttacker;
 

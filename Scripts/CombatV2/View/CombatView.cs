@@ -9,8 +9,28 @@ public class CombatView : MonoBehaviour
 
     public void Init()
     {
-        PlayerPanel = FindObjectOfType<BattlerPanelView>();
-        EnemyPanel = FindObjectOfType<BattlerPanelView>();
+        BattlerPanelView[] panels = FindObjectsOfType<BattlerPanelView>();
+        
+        foreach (BattlerPanelView panel in panels)
+        {
+            string panelName = panel.gameObject.name.ToLowerInvariant();
+            if (PlayerPanel == null && panelName.Contains("player"))
+            {
+                PlayerPanel = panel;
+                continue;
+            }
+
+            if (EnemyPanel == null && panelName.Contains("enemy"))
+            {
+                EnemyPanel = panel;
+            }
+        }
+
+        if (PlayerPanel == null && panels.Length > 0)
+            PlayerPanel = panels[0];
+        if (EnemyPanel == null && panels.Length > 1)
+            EnemyPanel = panels[1];
+
         ActionPanel = FindObjectOfType<ActionPanelView>();
         FeedbackView = FindObjectOfType<FeedbackView>();
     }
