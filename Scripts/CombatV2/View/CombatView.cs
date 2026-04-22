@@ -67,18 +67,6 @@ public class CombatView : MonoBehaviour
         FeedbackView.ShowTurnStartFeedback(isPlayerAttacker);
     }
 
-    public void ShowDamageFeedback(int damage, bool targetIsPlayer)
-    {
-        if (FeedbackView != null)
-            FeedbackView.ShowDamageFeedback(damage, targetIsPlayer);
-    }
-
-    public void SetEnemyFeedbackAnchor(Transform enemyAnchor)
-    {
-        if (FeedbackView != null)
-            FeedbackView.SetEnemyPopupAnchor(enemyAnchor);
-    }
-
     public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
     {
         if (DicePanelView  == null)

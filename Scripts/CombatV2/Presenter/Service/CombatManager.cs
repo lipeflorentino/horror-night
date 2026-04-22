@@ -45,7 +45,6 @@ public class CombatManager : MonoBehaviour
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
-        View.SetEnemyFeedbackAnchor(GetEnemyVisualAnchor());
         View.UpdateView(Player, Enemy);
 
         UpdateTurnRoleUI();
@@ -176,14 +175,13 @@ public class CombatManager : MonoBehaviour
 
         int damage = Resolver.Resolve(attack, defense);
 
-        bool targetIsPlayer = !PlayerIsAttacker;
-
         if (PlayerIsAttacker)
             Enemy.ReceiveDamage(damage);
         else
             Player.ReceiveDamage(damage);
 
-        View.ShowDamageFeedback(damage, targetIsPlayer);
+        // TODO: Implement different feedback based on damage, healing, or dodge
+        // View.ShowDamageFeedback(damage, targetIsPlayer);
 
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 

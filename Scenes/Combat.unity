@@ -6442,7 +6442,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &932496530
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12846,6 +12846,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TurnOwnerText: {fileID: 1094857131}
+  enemyPopupAnchor: {fileID: 1517432025}
+  popupFont: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  popupFontSize: 14
+  popupColor: {r: 0.9811321, g: 0.6776525, b: 0.04998212, a: 1}
+  playerFlashColor: {r: 0.9, g: 0.1, b: 0.1, a: 0.45}
 --- !u!1 &1929508122
 GameObject:
   m_ObjectHideFlags: 0
