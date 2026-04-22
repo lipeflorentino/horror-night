@@ -45,6 +45,7 @@ public class CombatManager : MonoBehaviour
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
+        View.SetEnemyFeedbackAnchor(GetEnemyVisualAnchor());
         View.UpdateView(Player, Enemy);
 
         UpdateTurnRoleUI();
@@ -175,10 +176,14 @@ public class CombatManager : MonoBehaviour
 
         int damage = Resolver.Resolve(attack, defense);
 
+        bool targetIsPlayer = !PlayerIsAttacker;
+
         if (PlayerIsAttacker)
             Enemy.ReceiveDamage(damage);
         else
             Player.ReceiveDamage(damage);
+
+        View.ShowDamageFeedback(damage, targetIsPlayer);
 
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 
@@ -204,6 +209,17 @@ public class CombatManager : MonoBehaviour
         View.UpdateTurnOwner(PlayerIsAttacker);
         Input.SetAllowedAction(allowedAction);
         View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
+    }
+
+
+    private Transform GetEnemyVisualAnchor()
+    {
+        GameObject enemyBattler = GameObject.Find("EnemyBattler");
+        if (enemyBattler == null)
+            return null;
+
+        Transform enemyVisual = enemyBattler.transform.Find("EnemyVisual");
+        return enemyVisual != null ? enemyVisual : enemyBattler.transform;
     }
 
     public void SetEnemyVisual(EnemyInstance enemySnapshot = null)
