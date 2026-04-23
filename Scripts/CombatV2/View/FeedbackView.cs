@@ -1,5 +1,7 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FeedbackView : MonoBehaviour
 {
@@ -51,6 +53,15 @@ public class FeedbackView : MonoBehaviour
         }
 
         GameObject effect = Instantiate(attackEffectPrefab, anchor.position, Quaternion.identity, anchor);
+        CanvasGroup canvasGroup = effect.GetComponent<CanvasGroup>();
+        Image slashImage = effect.GetComponent<Image>();
+        slashImage.color = attackerIsPlayer 
+            ? new Color(1f, 1f, 1f, 1f) // branco
+            : new Color(1f, 0.3f, 0.3f, 1f); // vermelho
+        RectTransform rect = effect.GetComponent<RectTransform>();
+        rect.rotation = Quaternion.Euler(0, 0, Random.Range(-30f, 30f));
+        StartCoroutine(AnimateSlash(rect, canvasGroup));
+
         Destroy(effect, attackEffectDuration);
     }
 
@@ -83,5 +94,41 @@ public class FeedbackView : MonoBehaviour
 
         if (TurnOwnerText != null)
             TurnOwnerText.text = turnOwner;
+    }
+
+    private IEnumerator AnimateSlash(RectTransform rect, CanvasGroup cg)
+    {
+        float duration = 0.3f;
+        float time = 0f;
+
+        Vector3 startScale = Vector3.one * 1f;
+        Vector3 midScale = Vector3.one * 1.8f;
+        Vector3 endScale = Vector3.one * 2.3f;
+
+        rect.localScale = startScale;
+        cg.alpha = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            if (t < 0.3f)
+            {
+                float p = t / 0.3f;
+                rect.localScale = Vector3.Lerp(startScale, midScale, p);
+                cg.alpha = Mathf.Lerp(0, 1, p);
+            }
+            else
+            {
+                float p = (t - 0.3f) / 0.7f;
+                rect.localScale = Vector3.Lerp(midScale, endScale, p);
+                cg.alpha = Mathf.Lerp(1, 0, p);
+            }
+
+            yield return null;
+        }
+
+        Destroy(rect.gameObject);
     }
 }

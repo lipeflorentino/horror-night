@@ -4,16 +4,18 @@ public class ActionResolverService
 {
     public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
-        ActionResolutionResult result = new ActionResolutionResult();
-        result.Accuracy = CalculateAccuracy(attack);
-        result.HitQuality = CalculateHitQuality(attack);
+        ActionResolutionResult result = new()
+
+        {
+            Accuracy = CalculateAccuracy(attack),
+            HitQuality = CalculateHitQuality(attack)
+        };
 
         if (result.Accuracy == ActionAccuracy.Missed)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Missed;
             result.FeedbackText = "MISSED";
-            Console.WriteLine("[Resolve] Attack missed.");
             return result;
         }
 

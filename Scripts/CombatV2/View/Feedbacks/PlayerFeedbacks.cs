@@ -22,6 +22,8 @@ public class PlayerFeedbacks : MonoBehaviour
             Debug.LogError("PlayerFeedbacks: Screen flash canvas or image reference is missing.");
             return;
         }
+
+        playerStatusText.gameObject.SetActive(false);
     }
 
     public void ShowPlayerDamageFlash()
@@ -32,6 +34,7 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowStatusText(string text)
     {
+        playerStatusText.gameObject.SetActive(true);
         if (playerStatusText == null)
         {
             Debug.Log($"[Feedback] {text}");
