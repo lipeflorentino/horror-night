@@ -36,7 +36,6 @@ public class EnemyFeedbacks : MonoBehaviour
 
     public void ShowDamagePopup(int damage)
     {
-        Debug.Log($"[Feedback] Enemy damage popup triggered with damage: {damage}");
         popupObject.SetActive(true);
 
         RectTransform popupRect = popupObject.GetComponent<RectTransform>();

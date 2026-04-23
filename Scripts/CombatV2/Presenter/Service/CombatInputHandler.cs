@@ -32,8 +32,6 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
         UpdateCombatView();
         NotifyEndTurnAvailability();
-
-        Debug.Log($"[Input] Turn role updated. Allowed action: {AllowedAction}");
     }
 
     public void OnAttack()
@@ -75,8 +73,6 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
         UpdateCombatView();
         NotifyEndTurnAvailability();
-
-        Debug.Log($"[Input] Added dice to ATTACK: {AttackDiceAllocated}");
     }
 
     public void OnAddDiceToDefense()

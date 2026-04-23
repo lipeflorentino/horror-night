@@ -109,8 +109,6 @@ public class CombatManager : MonoBehaviour
 
     private IEnumerator ResolveTurnRoutine(ActionType playerType, int allocatedDice)
     {
-        Debug.Log("[Flow] Player ended turn");
-
         yield return WaitForSeconds0_5;
 
         GenerateEnemyAction();
@@ -192,12 +190,9 @@ public class CombatManager : MonoBehaviour
         Player.RecoverDice(1);
         Enemy.RecoverDice(1);
         View.UpdateView(Player, Enemy);
-
         PlayerIsAttacker = !PlayerIsAttacker;
 
         UpdateTurnRoleUI();
-
-        Debug.Log("[Flow] Turn End");
     }
 
     private void UpdateTurnRoleUI()
@@ -206,17 +201,6 @@ public class CombatManager : MonoBehaviour
         View.UpdateTurnOwner(PlayerIsAttacker);
         Input.SetAllowedAction(allowedAction);
         View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
-    }
-
-
-    private Transform GetEnemyVisualAnchor()
-    {
-        GameObject enemyBattler = GameObject.Find("EnemyBattler");
-        if (enemyBattler == null)
-            return null;
-
-        Transform enemyVisual = enemyBattler.transform.Find("EnemyVisual");
-        return enemyVisual != null ? enemyVisual : enemyBattler.transform;
     }
 
     public void SetEnemyVisual(EnemyInstance enemySnapshot = null)

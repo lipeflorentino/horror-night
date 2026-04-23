@@ -140,7 +140,6 @@ public class ActionPanelView : MonoBehaviour
 
     public void SetPlayerRoleButtons(bool isPlayerAttacker)
     {
-        Debug.Log("Setting button states. Is Player Attacker: " + isPlayerAttacker);
         AttackButton.gameObject.SetActive(isPlayerAttacker);
         AddDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
         AttackDiceCountContainer.SetActive(isPlayerAttacker);
