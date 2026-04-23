@@ -11,6 +11,9 @@ public class BattlerPanelView : MonoBehaviour
     public Image HpFill;
     public TMP_Text HpText;
     public TMP_Text DiceText;
+    public TMP_Text AttackText;
+    public TMP_Text DefenseText;
+    public TMP_Text InitiativeText;
 
     public void Bind(Battler battler)
     {
@@ -34,5 +37,14 @@ public class BattlerPanelView : MonoBehaviour
 
         if (DiceText != null)
             DiceText.text = battler.CurrentDices.ToString();
+
+        if (AttackText != null)
+            AttackText.text = battler.Attack.ToString();
+        
+        if (DefenseText != null)
+            DefenseText.text = battler.Defense.ToString();
+
+        if (InitiativeText != null)
+            InitiativeText.text = battler.Initiative.ToString();
     }
 }

@@ -2,26 +2,29 @@ using System;
 public class Battler
 {
     public string Name;
+    public string Level;
     public int HP;
-
     public int Heart;
     public int Mind;
     public int Body;
     public int Attack;
     public int Defense;
+    public int Initiative;
 
     public int CurrentDices;
     public int MaxDices;
 
-    public Battler(string name, int hp, int heart, int mind, int body, int attack, int defense, int dices)
+    public Battler(string name, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int dices)
     {
         Name = name;
+        Level = "Level 1"; // TODO: Placeholder, can be set dynamically later
         HP = hp;
         Heart = heart;
         Mind = mind;
         Body = body;
         Attack = attack;
         Defense = defense;
+        Initiative = initiative;
         CurrentDices = dices;
         MaxDices = dices;
     }

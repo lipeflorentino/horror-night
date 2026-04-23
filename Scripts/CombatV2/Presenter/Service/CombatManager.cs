@@ -59,8 +59,8 @@ public class CombatManager : MonoBehaviour
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
+            Player = new Battler("Player", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
             return;
         }
 
@@ -77,6 +77,7 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.body),
             Mathf.RoundToInt(playerSnapshot.attack),
             Mathf.RoundToInt(playerSnapshot.defense),
+            Mathf.RoundToInt(playerSnapshot.initiative),
             DefaultDiceCount
         );
 
@@ -91,13 +92,14 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.body,
                 enemySnapshot.attack,
                 enemySnapshot.defense,
+                enemySnapshot.initiative,
                 DefaultDiceCount
             );
         }
         else
         {
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
         }
 
         Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
@@ -298,16 +300,16 @@ public class CombatManager : MonoBehaviour
         CombatResultStore.SetResult(new CombatResultSnapshot
         {
             PlayerSnapshot = BuildResultPlayerSnapshot(),
-            EnemyInstance = SessionData != null ? SessionData.EnemyInstance : null,
+            EnemyInstance = SessionData?.EnemyInstance,
             PlayerWon = true
         });
 
         CombatReturnStore.Set(new CombatReturnSnapshot
         {
             SceneName = SessionData != null ? SessionData.ReturnSceneName : gameplaySceneName,
-            Level = SessionData != null ? SessionData.ReturnLevel : null,
+            Level = SessionData?.ReturnLevel,
             LevelIndex = SessionData != null ? SessionData.ReturnLevelIndex : 0,
-            ExploredNodes = SessionData != null ? SessionData.ReturnExploredNodes : null,
+            ExploredNodes = SessionData?.ReturnExploredNodes,
             PlayerPosition = SessionData != null ? SessionData.ReturnPlayerPosition : Vector3.zero
         });
 

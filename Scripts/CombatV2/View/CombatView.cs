@@ -40,9 +40,6 @@ public class CombatView : MonoBehaviour
         FeedbackView = FindObjectOfType<FeedbackView>();
         DicePanelView = FindObjectOfType<DicePanelView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
-        if (CombatEndView == null)
-            Debug.LogError("CombatEndView não encontrado na cena. Configure-o via Editor.");
-
         DicePanelView.HidePanel();
     }
 

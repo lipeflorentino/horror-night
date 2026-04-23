@@ -139,6 +139,12 @@ public class CombatInputHandler : MonoBehaviour
         NotifyEndTurnAvailability();
     }
 
+    public void OnOpenInfoPanel()
+    {
+        // TODO: Implement info panel opening logic
+        Debug.Log("[Input] Open Info Panel");
+    }
+
     private void NotifyEndTurnAvailability()
     {
         bool hasValidDiceAllocation = SelectedAction switch
