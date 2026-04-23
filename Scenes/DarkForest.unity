@@ -6615,6 +6615,22 @@ PrefabInstance:
       propertyPath: levelController
       value: 
       objectReference: {fileID: 1455491027}
+    - target: {fileID: 2987951144079921831, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: maxHp
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2987951144079921831, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: attack
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2987951144079921831, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: defense
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2987951144079921831, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
+      propertyPath: initiative
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4358587489585040219, guid: 123962170e46dc14ca0453ea3ef8f89d, type: 3}
       propertyPath: m_Name
       value: Player

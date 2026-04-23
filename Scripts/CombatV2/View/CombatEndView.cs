@@ -10,6 +10,8 @@ public class CombatEndView : MonoBehaviour
 
     [Header("Root")]
     [SerializeField] private GameObject root;
+    [SerializeField] private Sprite victoryIcon, gameoverIcon;
+    [SerializeField] private Image iconImage;
 
     [Header("Texts")]
     [SerializeField] private TMP_Text titleText;
@@ -29,6 +31,7 @@ public class CombatEndView : MonoBehaviour
 
     public void ShowGameOver(Action onRestart, Action onQuit)
     {
+        iconImage.sprite = gameoverIcon;
         ShowRoot();
         SetText("GAME OVER", "Você morreu. Deseja tentar novamente?", string.Empty);
         SetupButton(primaryButton, "Restart", onRestart, true);
@@ -37,9 +40,10 @@ public class CombatEndView : MonoBehaviour
 
     public void ShowVictory(Action onProceed)
     {
+        iconImage.sprite = victoryIcon;
         ShowRoot();
         SetText("Vitória!", "Placeholder de recompensas\n- XP\n- Loot\n- Evento", string.Empty);
-        SetupButton(primaryButton, "Prosseguir", onProceed, true);
+        SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(secondaryButton, string.Empty, null, false);
 
         if (countdownRoutine != null)
