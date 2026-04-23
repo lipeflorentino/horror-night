@@ -36,6 +36,17 @@ public class EnemyFeedbacks : MonoBehaviour
 
     public void ShowDamagePopup(int damage)
     {
+        ShowPopupText($"-{damage}");
+        StartCoroutine(AnimateEnemyFlash());
+    }
+
+    public void ShowStatusPopup(string text)
+    {
+        ShowPopupText(text);
+    }
+
+    private void ShowPopupText(string text)
+    {
         popupObject.SetActive(true);
 
         RectTransform popupRect = popupObject.GetComponent<RectTransform>();
@@ -47,10 +58,9 @@ public class EnemyFeedbacks : MonoBehaviour
             return;
         }
 
-        popupText.text = $"-{damage}";
+        popupText.text = text;
 
         StartCoroutine(AnimateEnemyPopup(popupRect, popupText));
-        StartCoroutine(AnimateEnemyFlash());
     }
 
     private IEnumerator AnimateEnemyPopup(RectTransform popupRect, TextMeshProUGUI popupText)

@@ -7,17 +7,21 @@ public class Battler
     public int Heart;
     public int Mind;
     public int Body;
+    public int Attack;
+    public int Defense;
 
     public int CurrentDices;
     public int MaxDices;
 
-    public Battler(string name, int hp, int heart, int mind, int body, int dices)
+    public Battler(string name, int hp, int heart, int mind, int body, int attack, int defense, int dices)
     {
         Name = name;
         HP = hp;
         Heart = heart;
         Mind = mind;
         Body = body;
+        Attack = attack;
+        Defense = defense;
         CurrentDices = dices;
         MaxDices = dices;
     }

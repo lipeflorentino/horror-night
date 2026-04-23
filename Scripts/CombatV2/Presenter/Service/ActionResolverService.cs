@@ -2,17 +2,58 @@ using System;
 
 public class ActionResolverService
 {
-    public int Resolve(ActionInstance attack, ActionInstance defense)
+    public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
+        ActionResolutionResult result = new ActionResolutionResult();
+        result.Accuracy = CalculateAccuracy(attack);
+        result.HitQuality = CalculateHitQuality(attack);
+
+        if (result.Accuracy == ActionAccuracy.Missed)
+        {
+            result.Damage = 0;
+            result.Outcome = ActionOutcome.Missed;
+            result.FeedbackText = "MISSED";
+            Console.WriteLine("[Resolve] Attack missed.");
+            return result;
+        }
+
         float attackPower = CalculatePower(attack);
         float defensePower = CalculatePower(defense);
 
         int damage = (int)(attackPower - defensePower);
         if (damage < 0) damage = 0;
 
-        Console.WriteLine($"[Resolve] AttackPower: {attackPower} | DefensePower: {defensePower} | Damage: {damage}");
+        if (damage <= target.Defense)
+        {
+            result.Damage = 0;
+            result.Outcome = ActionOutcome.Blocked;
+            result.FeedbackText = "BLOCKED";
+            Console.WriteLine($"[Resolve] Attack blocked. Damage: {damage} | TargetDefense: {target.Defense}");
+            return result;
+        }
 
-        return damage;
+        result.Damage = damage;
+        result.Outcome = result.HitQuality == HitQuality.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
+        result.FeedbackText = result.HitQuality == HitQuality.Critical ? "CRITICAL HIT!" : string.Empty;
+        Console.WriteLine($"[Resolve] Attacker: {attacker.Name} | AttackPower: {attackPower} | DefensePower: {defensePower} | Damage: {damage}");
+
+        return result;
+    }
+
+    private ActionAccuracy CalculateAccuracy(ActionInstance action)
+    {
+        return action.Dice.Tier switch
+        {
+            DiceTier.Low => ActionAccuracy.Missed,
+            DiceTier.Medium => ActionAccuracy.Hit,
+            DiceTier.High => ActionAccuracy.Hit,
+            _ => ActionAccuracy.Hit,
+        };
+    }
+
+    private HitQuality CalculateHitQuality(ActionInstance action)
+    {
+        return action.Dice.Tier == DiceTier.High ? HitQuality.Critical : HitQuality.Normal;
     }
 
     private float CalculatePower(ActionInstance action)

@@ -6,6 +6,11 @@ public class FeedbackView : MonoBehaviour
     public TMP_Text TurnOwnerText;
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
+    [Header("Attack Effect")]
+    [SerializeField] private GameObject attackEffectPrefab;
+    [SerializeField] private Transform playerAttackEffectAnchor;
+    [SerializeField] private Transform enemyAttackEffectAnchor;
+    [SerializeField] private float attackEffectDuration = 0.75f;
     void Start()
     {
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
@@ -17,10 +22,14 @@ public class FeedbackView : MonoBehaviour
         if (enemyFeedbacks == null)
             Debug.LogError("FeedbackView: EnemyFeedbacks component is missing.");
     }
-    public void ShowDamageFeedback(int damage, bool targetIsPlayer)
+    public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
     {
-        Debug.Log($"Damage Dealt: {damage}");
-        if (damage <= 0)
+        if (!string.IsNullOrWhiteSpace(result.FeedbackText))
+        {
+            ShowStatusText(result.FeedbackText, targetIsPlayer);
+        }
+
+        if (!result.AppliesDamage)
             return;
 
         if (targetIsPlayer)
@@ -29,7 +38,31 @@ public class FeedbackView : MonoBehaviour
             return;
         }
 
-        enemyFeedbacks.ShowDamagePopup(damage);
+        enemyFeedbacks.ShowDamagePopup(result.Damage);
+    }
+
+    public void ShowAttackEffect(bool attackerIsPlayer)
+    {
+        Transform anchor = attackerIsPlayer ? playerAttackEffectAnchor : enemyAttackEffectAnchor;
+        if (attackEffectPrefab == null || anchor == null)
+        {
+            Debug.Log("[Feedback] Attack effect prefab or anchor is missing.");
+            return;
+        }
+
+        GameObject effect = Instantiate(attackEffectPrefab, anchor.position, Quaternion.identity, anchor);
+        Destroy(effect, attackEffectDuration);
+    }
+
+    private void ShowStatusText(string text, bool targetIsPlayer)
+    {
+        if (targetIsPlayer)
+        {
+            playerFeedbacks.ShowStatusText(text);
+            return;
+        }
+
+        enemyFeedbacks.ShowStatusPopup(text);
     }
 
     public void ShowHealFeedback(int healAmount)
