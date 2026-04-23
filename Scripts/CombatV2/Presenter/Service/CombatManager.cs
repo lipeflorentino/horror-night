@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
     private const int DefaultDiceCount = 3;
+    [SerializeField] private string gameplaySceneName = "Gameplay";
     public CombatView View;
     public CombatInputHandler Input;
 
@@ -27,6 +29,8 @@ public class CombatManager : MonoBehaviour
     private List<DiceResult> PendingPlayerRolls = new();
     private List<DiceResult> PendingEnemyRolls = new();
     private int PendingEnemyAllocatedDice = 1;
+    private bool CombatEnded;
+    private CombatSessionData SessionData;
 
     void Start()
     {
@@ -36,8 +40,8 @@ public class CombatManager : MonoBehaviour
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
 
-        CombatSessionData sessionData = CombatSessionStore.Consume();
-        InitializeBattlers(sessionData);
+        SessionData = CombatSessionStore.Consume();
+        InitializeBattlers(SessionData);
 
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
@@ -101,6 +105,9 @@ public class CombatManager : MonoBehaviour
 
     public void ReceivePlayerInput(ActionType type, int allocatedDice)
     {
+        if (CombatEnded)
+            return;
+
         ActionType expectedType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
         if (type != expectedType)
         {
@@ -128,6 +135,9 @@ public class CombatManager : MonoBehaviour
         Resolve();
 
         yield return WaitForSeconds0_5;
+
+        if (TryHandleCombatEnd())
+            yield break;
 
         EndTurn();
     }
@@ -199,6 +209,9 @@ public class CombatManager : MonoBehaviour
 
     private void EndTurn()
     {
+        if (CombatEnded)
+            return;
+
         Player.RecoverDice(1);
         Enemy.RecoverDice(1);
         View.UpdateView(Player, Enemy);
@@ -239,5 +252,93 @@ public class CombatManager : MonoBehaviour
         int basePower = actionType == ActionType.Attack ? battler.Attack : battler.Defense;
         string id = actionType == ActionType.Attack ? "attack" : "defense";
         return new ActionDefinition(id, actionType, basePower);
+    }
+
+    private bool TryHandleCombatEnd()
+    {
+        if (Player.IsAlive() && Enemy.IsAlive())
+            return false;
+
+        CombatEnded = true;
+        View.SetCombatInputEnabled(false);
+
+        bool playerWon = Player.IsAlive() && !Enemy.IsAlive();
+        if (playerWon)
+        {
+            View.CombatEndView.ShowVictory(ProceedToGameplayScene);
+        }
+        else
+        {
+            View.CombatEndView.ShowGameOver(RestartCombat, QuitCombat);
+        }
+
+        return true;
+    }
+
+    private void RestartCombat()
+    {
+        if (SessionData != null)
+            CombatSessionStore.SetSession(SessionData);
+
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
+    }
+
+    private void QuitCombat()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    private void ProceedToGameplayScene()
+    {
+        CombatResultStore.SetResult(new CombatResultSnapshot
+        {
+            PlayerSnapshot = BuildResultPlayerSnapshot(),
+            EnemyInstance = SessionData != null ? SessionData.EnemyInstance : null,
+            PlayerWon = true
+        });
+
+        CombatReturnStore.Set(new CombatReturnSnapshot
+        {
+            SceneName = SessionData != null ? SessionData.ReturnSceneName : gameplaySceneName,
+            Level = SessionData != null ? SessionData.ReturnLevel : null,
+            LevelIndex = SessionData != null ? SessionData.ReturnLevelIndex : 0,
+            ExploredNodes = SessionData != null ? SessionData.ReturnExploredNodes : null,
+            PlayerPosition = SessionData != null ? SessionData.ReturnPlayerPosition : Vector3.zero
+        });
+
+        string targetScene = SessionData != null && !string.IsNullOrWhiteSpace(SessionData.ReturnSceneName)
+            ? SessionData.ReturnSceneName
+            : gameplaySceneName;
+        SceneManager.LoadScene(targetScene);
+    }
+
+    private PlayerStatusSnapshot BuildResultPlayerSnapshot()
+    {
+        if (SessionData == null)
+        {
+            return new PlayerStatusSnapshot
+            {
+                hp = Player.HP,
+                heart = Player.Heart,
+                mind = Player.Mind,
+                body = Player.Body,
+                attack = Player.Attack,
+                defense = Player.Defense
+            };
+        }
+
+        PlayerStatusSnapshot snapshot = SessionData.PlayerSnapshot;
+        snapshot.hp = Player.HP;
+        snapshot.heart = Player.Heart;
+        snapshot.mind = Player.Mind;
+        snapshot.body = Player.Body;
+        snapshot.attack = Player.Attack;
+        snapshot.defense = Player.Defense;
+        return snapshot;
     }
 }

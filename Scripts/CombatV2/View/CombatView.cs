@@ -9,6 +9,7 @@ public class CombatView : MonoBehaviour
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
     public DicePanelView DicePanelView;
+    public CombatEndView CombatEndView;
 
     public void Init()
     {
@@ -38,6 +39,10 @@ public class CombatView : MonoBehaviour
         ActionPanel = FindObjectOfType<ActionPanelView>();
         FeedbackView = FindObjectOfType<FeedbackView>();
         DicePanelView = FindObjectOfType<DicePanelView>();
+        CombatEndView = FindObjectOfType<CombatEndView>();
+        if (CombatEndView == null)
+            Debug.LogError("CombatEndView não encontrado na cena. Configure-o via Editor.");
+
         DicePanelView.HidePanel();
     }
 
@@ -88,5 +93,11 @@ public class CombatView : MonoBehaviour
     public void ShowAttackEffect(bool attackerIsPlayer)
     {
         FeedbackView.ShowAttackEffect(attackerIsPlayer);
+    }
+
+    public void SetCombatInputEnabled(bool isEnabled)
+    {
+        if (ActionPanel != null)
+            ActionPanel.SetAllInteractable(isEnabled);
     }
 }

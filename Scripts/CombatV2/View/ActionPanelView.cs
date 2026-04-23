@@ -103,6 +103,30 @@ public class ActionPanelView : MonoBehaviour
         }
     }
 
+    public void SetAllInteractable(bool isInteractable)
+    {
+        if (AttackButton != null)
+            AttackButton.interactable = isInteractable;
+
+        if (DefendButton != null)
+            DefendButton.interactable = isInteractable;
+
+        if (AddDiceAttackButton != null)
+            AddDiceAttackButton.interactable = isInteractable;
+
+        if (RemoveDiceAttackButton != null)
+            RemoveDiceAttackButton.interactable = isInteractable;
+
+        if (AddDiceDefenseButton != null)
+            AddDiceDefenseButton.interactable = isInteractable;
+
+        if (RemoveDiceDefenseButton != null)
+            RemoveDiceDefenseButton.interactable = isInteractable;
+
+        if (EndTurnButton != null)
+            EndTurnButton.interactable = isInteractable;
+    }
+
     private void HandleAttackClick()
     {
         AttackClicked?.Invoke();

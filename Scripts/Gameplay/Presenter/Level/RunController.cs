@@ -28,6 +28,16 @@ public class RunController : MonoBehaviour
 
     private void Start()
     {
+        CombatReturnSnapshot returnSnapshot = CombatReturnStore.Consume();
+        bool hasCombatReturn = returnSnapshot != null
+            && returnSnapshot.Level != null;
+
+        if (hasCombatReturn)
+        {
+            RestoreRunFromCombat(returnSnapshot);
+            return;
+        }
+
         currentLevel = startingLevel;
         StartRun();
     }
@@ -87,6 +97,18 @@ public class RunController : MonoBehaviour
         {
             Vector3 startPos = levelController.GetWorldPositionFromIndex(levelController.CurrentIndex);
             playerMovement.transform.position = startPos;
+            playerMovement.enabled = true;
+        }
+    }
+
+    private void RestoreRunFromCombat(CombatReturnSnapshot returnSnapshot)
+    {
+        currentLevel = returnSnapshot.Level;
+        levelController.RestoreProgress(returnSnapshot.Level, returnSnapshot.LevelIndex, returnSnapshot.ExploredNodes);
+
+        if (playerMovement != null)
+        {
+            playerMovement.transform.position = returnSnapshot.PlayerPosition;
             playerMovement.enabled = true;
         }
     }
