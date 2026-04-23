@@ -74,4 +74,14 @@ public class CombatView : MonoBehaviour
 
         yield return DicePanelView.PlayDiceResolution(playerRolls, enemyRolls);
     }
+
+    public void HighlightSelectedAction(ActionInstance action)
+    {
+        ActionPanel.HighlightSelectedAction(action);
+    }
+
+    public void ShowDamageFeedback(int damage, bool targetIsPlayer)
+    {
+        FeedbackView.ShowDamageFeedback(damage, targetIsPlayer);
+    }
 }

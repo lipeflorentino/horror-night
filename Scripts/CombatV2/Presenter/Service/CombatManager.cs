@@ -179,9 +179,8 @@ public class CombatManager : MonoBehaviour
             Enemy.ReceiveDamage(damage);
         else
             Player.ReceiveDamage(damage);
-
         // TODO: Implement different feedback based on damage, healing, or dodge
-        // View.ShowDamageFeedback(damage, targetIsPlayer);
+        View.ShowDamageFeedback(damage, PlayerIsAttacker == false);
 
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 

@@ -18,11 +18,6 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
     [SerializeField] private int initiative = 10;
-    [Range(0, 100)] [SerializeField] private int criticalHitChance = 10;
-    [Range(0, 100)] [SerializeField] private int parryChance = 25;
-    [Range(0, 100)] [SerializeField] private int fleeChance = 35;
-    [Range(0, 100)] [SerializeField] private int instantKillChance = 5;
-    [Range(0, 100)] [SerializeField] private int learnChance = 55;
 
     [Header("Heart")]
     [SerializeField] private float maxHeart = 100f;

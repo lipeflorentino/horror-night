@@ -165,4 +165,14 @@ public class ActionPanelView : MonoBehaviour
     {
         AddDiceDefenseCountText.text = count.ToString();
     }
+
+    public void HighlightSelectedAction(ActionInstance action)
+    {
+        //TODO: Implement visual highlight for the selected action button
+        if (action == null)
+        {
+            Debug.LogWarning("HighlightSelectedAction called with null action.");
+            return;
+        }
+    }
 }
