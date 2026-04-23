@@ -8,6 +8,7 @@ public class EncounterSystem : MonoBehaviour
     [SerializeField] private EnemyDatabase enemyDatabase;
     [SerializeField] private LevelController levelController;
     [SerializeField] private PlayerStatusManager playerStatusManager;
+    [SerializeField] private PlayerGridMovement playerMovement;
     [SerializeField] private string combatSceneName = "Combat";
 
     private float riskModifier = 1f;
@@ -24,6 +25,9 @@ public class EncounterSystem : MonoBehaviour
 
         if (playerStatusManager == null)
             playerStatusManager = FindObjectOfType<PlayerStatusManager>();
+
+        if (playerMovement == null)
+            playerMovement = FindObjectOfType<PlayerGridMovement>();
     }
 
     public void SetRiskModifier(float value)
@@ -64,7 +68,12 @@ public class EncounterSystem : MonoBehaviour
         {
             PlayerSnapshot = snapshot,
             EnemyInstance = selectedEnemy,
-            RiskModifier = modifier
+            RiskModifier = modifier,
+            ReturnSceneName = SceneManager.GetActiveScene().name,
+            ReturnLevel = levelController != null ? levelController.currentLevel : null,
+            ReturnLevelIndex = levelController != null ? levelController.CurrentIndex : 0,
+            ReturnExploredNodes = levelController != null ? levelController.CaptureExploredSnapshot() : null,
+            ReturnPlayerPosition = playerMovement != null ? playerMovement.transform.position : Vector3.zero
         };
 
         CombatSessionStore.SetSession(sessionData);
