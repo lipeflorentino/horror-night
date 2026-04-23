@@ -6,6 +6,8 @@ public struct PlayerStatusSnapshot
     [SerializeField] public float heart;
     [SerializeField] public float body;
     [SerializeField] public float mind;
+    [SerializeField] public float attack;
+    [SerializeField] public float defense;
     [SerializeField] public float hp;
     [SerializeField] public float maxHeart;
     [SerializeField] public float maxBody;

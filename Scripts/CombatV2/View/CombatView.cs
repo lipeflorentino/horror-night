@@ -80,8 +80,13 @@ public class CombatView : MonoBehaviour
         ActionPanel.HighlightSelectedAction(action);
     }
 
-    public void ShowDamageFeedback(int damage, bool targetIsPlayer)
+    public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
     {
-        FeedbackView.ShowDamageFeedback(damage, targetIsPlayer);
+        FeedbackView.ShowResolveFeedback(result, targetIsPlayer);
+    }
+
+    public void ShowAttackEffect(bool attackerIsPlayer)
+    {
+        FeedbackView.ShowAttackEffect(attackerIsPlayer);
     }
 }

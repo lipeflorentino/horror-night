@@ -33,8 +33,8 @@ public class CombatManager : MonoBehaviour
         DiceService = new DiceService();
         Resolver = new ActionResolverService();
         EnemyActionSelector = new EnemyActionSelector();
-        AttackDef = new ActionDefinition("attack", ActionType.Attack, 10);
-        DefenseDef = new ActionDefinition("defense", ActionType.Defense, 8);
+        AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
+        DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
 
         CombatSessionData sessionData = CombatSessionStore.Consume();
         InitializeBattlers(sessionData);
@@ -55,8 +55,8 @@ public class CombatManager : MonoBehaviour
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 100, 10, 10, 10, DefaultDiceCount);
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, DefaultDiceCount);
+            Player = new Battler("Player", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
             return;
         }
 
@@ -71,6 +71,8 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.heart),
             Mathf.RoundToInt(playerSnapshot.mind),
             Mathf.RoundToInt(playerSnapshot.body),
+            Mathf.RoundToInt(playerSnapshot.attack),
+            Mathf.RoundToInt(playerSnapshot.defense),
             DefaultDiceCount
         );
 
@@ -83,13 +85,15 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.heart,
                 enemySnapshot.mind,
                 enemySnapshot.body,
+                enemySnapshot.attack,
+                enemySnapshot.defense,
                 DefaultDiceCount
             );
         }
         else
         {
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, DefaultDiceCount);
         }
 
         Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
@@ -138,7 +142,7 @@ public class CombatManager : MonoBehaviour
 
     private void RollActions(ActionType playerType, int allocatedDice)
     {
-        ActionDefinition playerAction = playerType == ActionType.Attack ? AttackDef : DefenseDef;
+        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, playerType);
 
         int safePlayerAllocatedDice = Mathf.Max(1, allocatedDice);
 
@@ -149,6 +153,7 @@ public class CombatManager : MonoBehaviour
         DiceResult enemyDice = DiceService.GetBestResult(PendingEnemyRolls);
 
         PendingPlayerAction = new ActionInstance(playerAction, playerDice);
+        PendingEnemyAction.Definition = BuildDefinitionFromBattler(Enemy, PendingEnemyAction.Definition.Type);
         PendingEnemyAction.Dice = enemyDice;
 
         Debug.Log($"[Flow] Player rolled best of {safePlayerAllocatedDice} dice → {playerDice.Value}");
@@ -159,26 +164,33 @@ public class CombatManager : MonoBehaviour
     {
         ActionInstance attack;
         ActionInstance defense;
+        Battler attacker;
+        Battler target;
 
         if (PlayerIsAttacker)
         {
             attack = PendingPlayerAction;
             defense = PendingEnemyAction;
+            attacker = Player;
+            target = Enemy;
         }
         else
         {
             attack = PendingEnemyAction;
             defense = PendingPlayerAction;
+            attacker = Enemy;
+            target = Player;
         }
 
-        int damage = Resolver.Resolve(attack, defense);
+        ActionResolutionResult result = Resolver.Resolve(attack, defense, attacker, target);
+        View.ShowAttackEffect(PlayerIsAttacker);
 
-        if (PlayerIsAttacker)
-            Enemy.ReceiveDamage(damage);
-        else
-            Player.ReceiveDamage(damage);
-        // TODO: Implement different feedback based on damage, healing, or dodge
-        View.ShowDamageFeedback(damage, PlayerIsAttacker == false);
+        if (result.AppliesDamage)
+        {
+            target.ReceiveDamage(result.Damage);
+        }
+
+        View.ShowResolveFeedback(result, PlayerIsAttacker == false);
 
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 
@@ -220,5 +232,12 @@ public class CombatManager : MonoBehaviour
         {
             Debug.LogWarning("[Combat] Could not find SpriteRenderer to set enemy image.");
         }
+    }
+
+    private ActionDefinition BuildDefinitionFromBattler(Battler battler, ActionType actionType)
+    {
+        int basePower = actionType == ActionType.Attack ? battler.Attack : battler.Defense;
+        string id = actionType == ActionType.Attack ? "attack" : "defense";
+        return new ActionDefinition(id, actionType, basePower);
     }
 }

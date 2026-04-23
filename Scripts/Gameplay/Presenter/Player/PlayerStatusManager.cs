@@ -175,6 +175,8 @@ public class PlayerStatusManager : MonoBehaviour
             heart = currentHeart,
             body = currentBody,
             mind = currentMind,
+            attack = attack,
+            defense = defense,
             hp = currentHp,
             maxHeart = maxHeart,
             maxBody = maxBody,
@@ -196,6 +198,10 @@ public class PlayerStatusManager : MonoBehaviour
         currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
         currentBody = Mathf.Clamp(snapshot.body, 0f, maxBody);
         currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
+        if (snapshot.attack > 0f)
+            attack = Mathf.Max(0, Mathf.RoundToInt(snapshot.attack));
+        if (snapshot.defense > 0f)
+            defense = Mathf.Max(0, Mathf.RoundToInt(snapshot.defense));
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
