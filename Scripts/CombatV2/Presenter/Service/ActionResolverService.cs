@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 public class ActionResolverService
 {
@@ -21,10 +22,11 @@ public class ActionResolverService
 
         float attackPower = CalculatePower(attack);
         float defensePower = CalculatePower(defense);
-
         int damage = (int)(attackPower - defensePower);
-        if (damage < 0) damage = 0;
 
+        Console.WriteLine($"[Resolve] Calculated attack power: {attackPower} | defense power: {defensePower} | preliminary damage: {damage}");
+
+        if (damage < 0) damage = 0;
         if (damage <= target.Defense)
         {
             result.Damage = 0;

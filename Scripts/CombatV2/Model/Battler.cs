@@ -2,7 +2,7 @@ using System;
 public class Battler
 {
     public string Name;
-    public string Level;
+    public int Level;
     public int HP;
     public int Heart;
     public int Mind;
@@ -14,10 +14,10 @@ public class Battler
     public int CurrentDices;
     public int MaxDices;
 
-    public Battler(string name, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int dices)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int dices)
     {
         Name = name;
-        Level = "Level 1"; // TODO: Placeholder, can be set dynamically later
+        Level = level; // TODO: Placeholder, can be set dynamically later
         HP = hp;
         Heart = heart;
         Mind = mind;

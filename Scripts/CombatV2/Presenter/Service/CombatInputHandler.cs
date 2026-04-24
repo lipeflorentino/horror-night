@@ -139,10 +139,10 @@ public class CombatInputHandler : MonoBehaviour
         NotifyEndTurnAvailability();
     }
 
-    public void OnOpenInfoPanel()
+    public void OnToggleInfoPanel(bool isVisible)
     {
-        // TODO: Implement info panel opening logic
-        Debug.Log("[Input] Open Info Panel");
+        Combat.View.SetInfoPanelVisible(isVisible);
+        Debug.Log($"[Input] Combat info panel visible: {isVisible}");
     }
 
     private void NotifyEndTurnAvailability()

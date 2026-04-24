@@ -10,6 +10,7 @@ public class CombatView : MonoBehaviour
     public FeedbackView FeedbackView;
     public DicePanelView DicePanelView;
     public CombatEndView CombatEndView;
+    public CombatInfoPanelView InfoPanelView;
 
     public void Init()
     {
@@ -40,7 +41,9 @@ public class CombatView : MonoBehaviour
         FeedbackView = FindObjectOfType<FeedbackView>();
         DicePanelView = FindObjectOfType<DicePanelView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
+        InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
         DicePanelView.HidePanel();
+        InfoPanelView.Init();
     }
 
     public void BindInput(CombatInputHandler inputHandler)
@@ -52,6 +55,7 @@ public class CombatView : MonoBehaviour
     {
         PlayerPanel.Bind(player);
         EnemyPanel.Bind(enemy);
+        InfoPanelView.Bind(player, enemy);
     }
 
     public void UpdateAddDiceAttackCount(int count)
@@ -96,5 +100,11 @@ public class CombatView : MonoBehaviour
     {
         if (ActionPanel != null)
             ActionPanel.SetAllInteractable(isEnabled);
+    }
+
+    public void SetInfoPanelVisible(bool isVisible)
+    {
+        if (InfoPanelView != null)
+            InfoPanelView.SetVisible(isVisible);
     }
 }

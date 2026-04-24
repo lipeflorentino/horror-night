@@ -15,6 +15,7 @@ public class ActionPanelView : MonoBehaviour
     public TMP_Text AddDiceDefenseCountText;
     public GameObject AttackDiceCountContainer, DefendDiceCountContainer;
     public Button EndTurnButton;
+    public Toggle InfoToggle;
     public event Action AttackClicked;
     public event Action DefendClicked;
     public event Action AddDiceToAttackClicked;
@@ -22,6 +23,7 @@ public class ActionPanelView : MonoBehaviour
     public event Action AddDiceToDefenseClicked;
     public event Action RemoveDiceFromDefenseClicked;
     public event Action EndTurnClicked;
+    public event Action<bool> InfoToggled;
     private CombatInputHandler BoundInputHandler;
 
     private void Awake()
@@ -46,6 +48,9 @@ public class ActionPanelView : MonoBehaviour
 
         if (EndTurnButton != null)
             EndTurnButton.onClick.AddListener(HandleEndTurnClick);
+
+        if (InfoToggle != null)
+            InfoToggle.onValueChanged.AddListener(HandleInfoToggleChanged);
 
         if (BoundInputHandler != null)
             BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
@@ -74,6 +79,9 @@ public class ActionPanelView : MonoBehaviour
         if (EndTurnButton != null)
             EndTurnButton.onClick.RemoveListener(HandleEndTurnClick);
 
+        if (InfoToggle != null)
+            InfoToggle.onValueChanged.RemoveListener(HandleInfoToggleChanged);
+
         if (BoundInputHandler != null)
             BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
     }
@@ -91,7 +99,9 @@ public class ActionPanelView : MonoBehaviour
         AddDiceToDefenseClicked += inputHandler.OnAddDiceToDefense;
         RemoveDiceFromDefenseClicked += inputHandler.OnRemoveDiceFromDefense;
         EndTurnClicked += inputHandler.OnEndTurn;
+        InfoToggled += inputHandler.OnToggleInfoPanel;
         inputHandler.EndTurnAvailabilityChanged += SetEndTurnInteractable;
+        InfoToggle.SetIsOnWithoutNotify(false);
         SetEndTurnInteractable(false);
     }
 
@@ -125,6 +135,9 @@ public class ActionPanelView : MonoBehaviour
 
         if (EndTurnButton != null)
             EndTurnButton.interactable = isInteractable;
+
+        if (InfoToggle != null)
+            InfoToggle.interactable = isInteractable;
     }
 
     private void HandleAttackClick()
@@ -160,6 +173,11 @@ public class ActionPanelView : MonoBehaviour
     private void HandleEndTurnClick()
     {
         EndTurnClicked?.Invoke();
+    }
+
+    private void HandleInfoToggleChanged(bool isEnabled)
+    {
+        InfoToggled?.Invoke(isEnabled);
     }
 
     public void SetPlayerRoleButtons(bool isPlayerAttacker)

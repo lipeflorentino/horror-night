@@ -17,6 +17,7 @@ public class CombatManager : MonoBehaviour
 
     private DiceService DiceService;
     private ActionResolverService Resolver;
+    private InitiativeResolver InitiativeResolver;
     private EnemyActionSelector EnemyActionSelector;
 
     private ActionDefinition AttackDef;
@@ -36,12 +37,14 @@ public class CombatManager : MonoBehaviour
     {
         DiceService = new DiceService();
         Resolver = new ActionResolverService();
+        InitiativeResolver = new InitiativeResolver();
         EnemyActionSelector = new EnemyActionSelector();
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
 
         SessionData = CombatSessionStore.Consume();
         InitializeBattlers(SessionData);
+        DefineStartingTurnByInitiative();
 
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
@@ -54,13 +57,20 @@ public class CombatManager : MonoBehaviour
         UpdateTurnRoleUI();
     }
 
+    private void DefineStartingTurnByInitiative()
+    {
+        Battler firstBattler = InitiativeResolver.ResolveStartingBattler(Player, Enemy);
+        PlayerIsAttacker = firstBattler == Player;
+        Debug.Log($"[Combat] Starting battler by initiative: {firstBattler?.Name}");
+    }
+
     private void InitializeBattlers(CombatSessionData sessionData)
     {
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
             return;
         }
 
@@ -71,6 +81,7 @@ public class CombatManager : MonoBehaviour
 
         Player = new Battler(
             "Player",
+            1, // Level can be set dynamically later based on player stats or session data
             Mathf.RoundToInt(playerSnapshot.hp),
             Mathf.RoundToInt(playerSnapshot.heart),
             Mathf.RoundToInt(playerSnapshot.mind),
@@ -86,6 +97,7 @@ public class CombatManager : MonoBehaviour
             string enemyName = enemySnapshot.source != null ? enemySnapshot.source.enemyName : "Enemy";
             Enemy = new Battler(
                 enemyName,
+                enemySnapshot.runTier, 
                 enemySnapshot.hp,
                 enemySnapshot.heart,
                 enemySnapshot.mind,
@@ -99,7 +111,7 @@ public class CombatManager : MonoBehaviour
         else
         {
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
         }
 
         Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
