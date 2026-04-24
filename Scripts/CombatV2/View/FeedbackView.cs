@@ -13,6 +13,7 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private Transform playerAttackEffectAnchor;
     [SerializeField] private Transform enemyAttackEffectAnchor;
     [SerializeField] private float attackEffectDuration = 0.75f;
+    [SerializeField] private CanvasGroup canvasGroup;
     void Start()
     {
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
@@ -53,11 +54,10 @@ public class FeedbackView : MonoBehaviour
         }
 
         GameObject effect = Instantiate(attackEffectPrefab, anchor.position, Quaternion.identity, anchor);
-        CanvasGroup canvasGroup = effect.GetComponent<CanvasGroup>();
         Image slashImage = effect.GetComponent<Image>();
         slashImage.color = attackerIsPlayer 
-            ? new Color(1f, 1f, 1f, 1f) // branco
-            : new Color(1f, 0.3f, 0.3f, 1f); // vermelho
+            ? new Color(1f, 1f, 1f, 1f)
+            : new Color(1f, 0.3f, 0.3f, 1f);
         RectTransform rect = effect.GetComponent<RectTransform>();
         rect.rotation = Quaternion.Euler(0, 0, Random.Range(-30f, 30f));
         StartCoroutine(AnimateSlash(rect, canvasGroup));

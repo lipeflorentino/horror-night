@@ -61,7 +61,6 @@ public class CombatManager : MonoBehaviour
     {
         Battler firstBattler = InitiativeResolver.ResolveStartingBattler(Player, Enemy);
         PlayerIsAttacker = firstBattler == Player;
-        Debug.Log($"[Combat] Starting battler by initiative: {firstBattler?.Name}");
     }
 
     private void InitializeBattlers(CombatSessionData sessionData)
@@ -113,8 +112,6 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
             Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
         }
-
-        Debug.Log($"[Combat] Session loaded. Player HP: {Player.HP} | Enemy HP: {Enemy.HP}");
     }
 
     public void ReceivePlayerInput(ActionType type, int allocatedDice)

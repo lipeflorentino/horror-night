@@ -86,8 +86,6 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
         UpdateCombatView();
         NotifyEndTurnAvailability();
-
-        Debug.Log($"[Input] Added dice to DEFENSE: {DefenseDiceAllocated}");
     }
 
     public void OnRemoveDiceFromAttack()
@@ -101,7 +99,6 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
         UpdateCombatView();
         NotifyEndTurnAvailability();
-        Debug.Log($"[Input] Removed dice from ATTACK: {AttackDiceAllocated}");
     }
 
     public void OnRemoveDiceFromDefense()
@@ -142,7 +139,6 @@ public class CombatInputHandler : MonoBehaviour
     public void OnToggleInfoPanel(bool isVisible)
     {
         Combat.View.SetInfoPanelVisible(isVisible);
-        Debug.Log($"[Input] Combat info panel visible: {isVisible}");
     }
 
     private void NotifyEndTurnAvailability()
