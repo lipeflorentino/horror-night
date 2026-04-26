@@ -58,27 +58,21 @@ public class CombatView : MonoBehaviour
         InfoPanelView.Bind(player, enemy);
     }
 
-    public void UpdateAddDiceAttackCount(int count)
-    {
-        ActionPanel.UpdateAddDiceAttackCount(count);
-    }
-
-    public void UpdateAddDiceDefenseCount(int count)
-    {
-        ActionPanel.UpdateAddDiceDefenseCount(count);
-    }
-
     public void UpdateTurnOwner(bool isPlayerAttacker)
     {
         FeedbackView.ShowTurnStartFeedback(isPlayerAttacker);
     }
 
-    public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
+    public IEnumerator PlayDiceResolution(
+        IReadOnlyList<DiceResult> playerPowerRolls,
+        IReadOnlyList<DiceResult> playerAccuracyRolls,
+        IReadOnlyList<DiceResult> enemyPowerRolls,
+        IReadOnlyList<DiceResult> enemyAccuracyRolls)
     {
         if (DicePanelView  == null)
             yield break;
 
-        yield return DicePanelView.PlayDiceResolution(playerRolls, enemyRolls);
+        yield return DicePanelView.PlayDiceResolution(playerPowerRolls, playerAccuracyRolls, enemyPowerRolls, enemyAccuracyRolls);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

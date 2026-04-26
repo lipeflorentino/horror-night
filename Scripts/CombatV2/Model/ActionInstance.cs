@@ -1,11 +1,20 @@
 public class ActionInstance
 {
     public ActionDefinition Definition;
-    public DiceResult Dice;
+    public DiceResult PowerDice;
+    public DiceResult AccuracyDice;
 
     public ActionInstance(ActionDefinition definition, DiceResult dice)
     {
         Definition = definition;
-        Dice = dice;
+        PowerDice = dice;
+        AccuracyDice = dice;
+    }
+
+    public ActionInstance(ActionDefinition definition, DiceResult powerDice, DiceResult accuracyDice)
+    {
+        Definition = definition;
+        PowerDice = powerDice;
+        AccuracyDice = accuracyDice;
     }
 }

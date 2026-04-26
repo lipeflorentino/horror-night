@@ -10,12 +10,22 @@ public class ActionPanelView : MonoBehaviour
     public Button AddDiceAttackButton;
     public Button RemoveDiceAttackButton;
     public Button AddDiceDefenseButton;
-    public TMP_Text AddDiceAttackCountText;
     public Button RemoveDiceDefenseButton;
-    public TMP_Text AddDiceDefenseCountText;
     public GameObject AttackDiceCountContainer, DefendDiceCountContainer;
     public Button EndTurnButton;
     public Toggle InfoToggle;
+
+    [Header("Confirm Action Panel")]
+    public GameObject ConfirmPanel;
+    public TMP_Text ConfirmActionText;
+    public Button ConfirmButton;
+
+    [Header("Stat Dice Selector")]
+    public Button SelectMindDiceButton;
+    public Button SelectHeartDiceButton;
+    public Button SelectBodyDiceButton;
+    public TMP_Text SelectedDiceTypeText;
+
     public event Action AttackClicked;
     public event Action DefendClicked;
     public event Action AddDiceToAttackClicked;
@@ -23,6 +33,10 @@ public class ActionPanelView : MonoBehaviour
     public event Action AddDiceToDefenseClicked;
     public event Action RemoveDiceFromDefenseClicked;
     public event Action EndTurnClicked;
+    public event Action ConfirmClicked;
+    public event Action MindDiceTypeSelected;
+    public event Action HeartDiceTypeSelected;
+    public event Action BodyDiceTypeSelected;
     public event Action<bool> InfoToggled;
     private CombatInputHandler BoundInputHandler;
 
@@ -49,11 +63,25 @@ public class ActionPanelView : MonoBehaviour
         if (EndTurnButton != null)
             EndTurnButton.onClick.AddListener(HandleEndTurnClick);
 
+        if (ConfirmButton != null)
+            ConfirmButton.onClick.AddListener(HandleConfirmClick);
+
+        if (SelectMindDiceButton != null)
+            SelectMindDiceButton.onClick.AddListener(HandleMindDiceTypeClick);
+
+        if (SelectHeartDiceButton != null)
+            SelectHeartDiceButton.onClick.AddListener(HandleHeartDiceTypeClick);
+
+        if (SelectBodyDiceButton != null)
+            SelectBodyDiceButton.onClick.AddListener(HandleBodyDiceTypeClick);
+
         if (InfoToggle != null)
             InfoToggle.onValueChanged.AddListener(HandleInfoToggleChanged);
 
         if (BoundInputHandler != null)
-            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
+            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
+
+        HideConfirmPanel();
     }
 
     private void OnDestroy()
@@ -79,17 +107,29 @@ public class ActionPanelView : MonoBehaviour
         if (EndTurnButton != null)
             EndTurnButton.onClick.RemoveListener(HandleEndTurnClick);
 
+        if (ConfirmButton != null)
+            ConfirmButton.onClick.RemoveListener(HandleConfirmClick);
+
+        if (SelectMindDiceButton != null)
+            SelectMindDiceButton.onClick.RemoveListener(HandleMindDiceTypeClick);
+
+        if (SelectHeartDiceButton != null)
+            SelectHeartDiceButton.onClick.RemoveListener(HandleHeartDiceTypeClick);
+
+        if (SelectBodyDiceButton != null)
+            SelectBodyDiceButton.onClick.RemoveListener(HandleBodyDiceTypeClick);
+
         if (InfoToggle != null)
             InfoToggle.onValueChanged.RemoveListener(HandleInfoToggleChanged);
 
         if (BoundInputHandler != null)
-            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
+            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
     }
 
     public void BindInput(CombatInputHandler inputHandler)
     {
         if (BoundInputHandler != null)
-            BoundInputHandler.EndTurnAvailabilityChanged -= SetEndTurnInteractable;
+            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
 
         BoundInputHandler = inputHandler;
         AttackClicked += inputHandler.OnAttack;
@@ -98,19 +138,26 @@ public class ActionPanelView : MonoBehaviour
         RemoveDiceFromAttackClicked += inputHandler.OnRemoveDiceFromAttack;
         AddDiceToDefenseClicked += inputHandler.OnAddDiceToDefense;
         RemoveDiceFromDefenseClicked += inputHandler.OnRemoveDiceFromDefense;
-        EndTurnClicked += inputHandler.OnEndTurn;
+        EndTurnClicked += inputHandler.OnSkipTurn;
+        ConfirmClicked += inputHandler.OnConfirmAction;
+        MindDiceTypeSelected += inputHandler.OnSelectMindDiceType;
+        HeartDiceTypeSelected += inputHandler.OnSelectHeartDiceType;
+        BodyDiceTypeSelected += inputHandler.OnSelectBodyDiceType;
         InfoToggled += inputHandler.OnToggleInfoPanel;
-        inputHandler.EndTurnAvailabilityChanged += SetEndTurnInteractable;
-        InfoToggle.SetIsOnWithoutNotify(false);
-        SetEndTurnInteractable(false);
+        inputHandler.ConfirmAvailabilityChanged += SetConfirmInteractable;
+
+        if (InfoToggle != null)
+            InfoToggle.SetIsOnWithoutNotify(false);
+
+        SetConfirmInteractable(false);
+        SetSelectedDiceTypeLabel("Body");
+        HideConfirmPanel();
     }
 
-    public void SetEndTurnInteractable(bool isInteractable)
+    public void SetConfirmInteractable(bool isInteractable)
     {
-        if (EndTurnButton != null)
-        {
-            EndTurnButton.interactable = isInteractable;
-        }
+        if (ConfirmButton != null)
+            ConfirmButton.interactable = isInteractable;
     }
 
     public void SetAllInteractable(bool isInteractable)
@@ -135,6 +182,9 @@ public class ActionPanelView : MonoBehaviour
 
         if (EndTurnButton != null)
             EndTurnButton.interactable = isInteractable;
+
+        if (ConfirmButton != null)
+            ConfirmButton.interactable = isInteractable;
 
         if (InfoToggle != null)
             InfoToggle.interactable = isInteractable;
@@ -175,6 +225,26 @@ public class ActionPanelView : MonoBehaviour
         EndTurnClicked?.Invoke();
     }
 
+    private void HandleConfirmClick()
+    {
+        ConfirmClicked?.Invoke();
+    }
+
+    private void HandleMindDiceTypeClick()
+    {
+        MindDiceTypeSelected?.Invoke();
+    }
+
+    private void HandleHeartDiceTypeClick()
+    {
+        HeartDiceTypeSelected?.Invoke();
+    }
+
+    private void HandleBodyDiceTypeClick()
+    {
+        BodyDiceTypeSelected?.Invoke();
+    }
+
     private void HandleInfoToggleChanged(bool isEnabled)
     {
         InfoToggled?.Invoke(isEnabled);
@@ -182,29 +252,32 @@ public class ActionPanelView : MonoBehaviour
 
     public void SetPlayerRoleButtons(bool isPlayerAttacker)
     {
-        AttackButton.gameObject.SetActive(isPlayerAttacker);
-        AddDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
-        AttackDiceCountContainer.SetActive(isPlayerAttacker);
+        if (AttackButton != null)
+            AttackButton.gameObject.SetActive(isPlayerAttacker);
 
-        if (RemoveDiceAttackButton != null)
-            RemoveDiceAttackButton.gameObject.SetActive(isPlayerAttacker);
-
-        DefendButton.gameObject.SetActive(!isPlayerAttacker);
-        AddDiceDefenseButton.gameObject.SetActive(!isPlayerAttacker);
-        DefendDiceCountContainer.SetActive(!isPlayerAttacker);
-
-        if (RemoveDiceDefenseButton != null)
-            RemoveDiceDefenseButton.gameObject.SetActive(!isPlayerAttacker);
+        if (DefendButton != null)
+            DefendButton.gameObject.SetActive(!isPlayerAttacker);
     }
 
-    public void UpdateAddDiceAttackCount(int count)
+    public void ShowConfirmPanel(string actionLabel)
     {
-        AddDiceAttackCountText.text = count.ToString();
+        if (ConfirmPanel != null)
+            ConfirmPanel.SetActive(true);
+
+        if (ConfirmActionText != null)
+            ConfirmActionText.text = actionLabel;
     }
 
-    public void UpdateAddDiceDefenseCount(int count)
+    public void HideConfirmPanel()
     {
-        AddDiceDefenseCountText.text = count.ToString();
+        if (ConfirmPanel != null)
+            ConfirmPanel.SetActive(false);
+    }
+
+    public void SetSelectedDiceTypeLabel(string diceType)
+    {
+        if (SelectedDiceTypeText != null)
+            SelectedDiceTypeText.text = diceType;
     }
 
     public void HighlightSelectedAction(ActionInstance action)
