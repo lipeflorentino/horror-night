@@ -12,31 +12,62 @@ public class DicePanelView : MonoBehaviour
     [SerializeField, Min(1)] private int maxSlotsPerSide = 3;
     [SerializeField] private float postRollDelay = 0.4f;
     [SerializeField] private GameObject diceResolutionPanel;
-    [SerializeField] private Color playerColor = new(0.4f, 0.6f, 1f);
-    [SerializeField] private Color enemyColor = new(1f, 0.4f, 0.4f);
+    [SerializeField] private Color playerPowerColor = Color.green;
+    [SerializeField] private Color playerAccuracyColor = Color.blue;
+    [SerializeField] private Color enemyPowerColor = new(0.6f, 0.3f, 0.9f);
+    [SerializeField] private Color enemyAccuracyColor = Color.red;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
     private bool slotsInitialized;
 
-    public IEnumerator PlayDiceResolution(IReadOnlyList<DiceResult> playerRolls, IReadOnlyList<DiceResult> enemyRolls)
+    public IEnumerator PlayDiceResolution(
+        IReadOnlyList<DiceResult> playerPowerRolls,
+        IReadOnlyList<DiceResult> playerAccuracyRolls,
+        IReadOnlyList<DiceResult> enemyPowerRolls,
+        IReadOnlyList<DiceResult> enemyAccuracyRolls)
     {
         EnsureSlotsInitialized();
         ShowDiceResolution(true);
 
         List<Coroutine> runningCoroutines = new();
 
-        int playerCount = Mathf.Min(playerRolls.Count, maxSlotsPerSide);
-        int enemyCount = Mathf.Min(enemyRolls.Count, maxSlotsPerSide);
+        int playerPowerCount = playerPowerRolls != null ? playerPowerRolls.Count : 0;
+        int playerAccuracyCount = playerAccuracyRolls != null ? playerAccuracyRolls.Count : 0;
+        int enemyPowerCount = enemyPowerRolls != null ? enemyPowerRolls.Count : 0;
+        int enemyAccuracyCount = enemyAccuracyRolls != null ? enemyAccuracyRolls.Count : 0;
+
+        int playerCount = Mathf.Min(playerPowerCount + playerAccuracyCount, maxSlotsPerSide);
+        int enemyCount = Mathf.Min(enemyPowerCount + enemyAccuracyCount, maxSlotsPerSide);
 
         PrepareSlots(runtimePlayerSlots, playerCount);
         PrepareSlots(runtimeEnemySlots, enemyCount);
 
-        for (int i = 0; i < playerCount; i++)
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[i].PlayRollAnimation(playerRolls[i].Value)));
+        int slotIndex = 0;
+        for (int i = 0; i < playerPowerCount && slotIndex < playerCount; i++, slotIndex++)
+        {
+            runtimePlayerSlots[slotIndex].SetDiceColor(playerPowerColor);
+            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerPowerRolls[i].Value)));
+        }
 
-        for (int i = 0; i < enemyCount; i++)
-            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[i].PlayRollAnimation(enemyRolls[i].Value)));
+        for (int i = 0; i < playerAccuracyCount && slotIndex < playerCount; i++, slotIndex++)
+        {
+            runtimePlayerSlots[slotIndex].SetDiceColor(playerAccuracyColor);
+            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerAccuracyRolls[i].Value)));
+        }
+
+        slotIndex = 0;
+        for (int i = 0; i < enemyPowerCount && slotIndex < enemyCount; i++, slotIndex++)
+        {
+            runtimeEnemySlots[slotIndex].SetDiceColor(enemyPowerColor);
+            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyPowerRolls[i].Value)));
+        }
+
+        for (int i = 0; i < enemyAccuracyCount && slotIndex < enemyCount; i++, slotIndex++)
+        {
+            runtimeEnemySlots[slotIndex].SetDiceColor(enemyAccuracyColor);
+            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyAccuracyRolls[i].Value)));
+        }
 
         for (int i = 0; i < runningCoroutines.Count; i++)
             yield return runningCoroutines[i];
@@ -96,7 +127,6 @@ public class DicePanelView : MonoBehaviour
         {
             DiceRollUI slot = Instantiate(diceRollSlotPrefab, container);
             slot.gameObject.SetActive(false);
-            slot.SetDiceColor(GetDiceColor(container == playerSlotsContainer));
             slotBuffer.Add(slot);
         }
     }
@@ -116,11 +146,5 @@ public class DicePanelView : MonoBehaviour
     public void HidePanel()
     {
         ShowDiceResolution(false);
-    }
-
-    public Color GetDiceColor(bool isPlayer)
-    {
-        Color diceColor = isPlayer ? playerColor : enemyColor;
-        return diceColor;
     }
 }

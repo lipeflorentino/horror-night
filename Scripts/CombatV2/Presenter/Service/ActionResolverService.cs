@@ -5,6 +5,9 @@ public class ActionResolverService
 {
     public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
+        bool ignoreDefense = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
+        bool powerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
+
         ActionResolutionResult result = new()
 
         {
@@ -21,13 +24,13 @@ public class ActionResolverService
         }
 
         float attackPower = CalculatePower(attack);
-        float defensePower = CalculatePower(defense);
+        float defensePower = ignoreDefense ? 0f : CalculatePower(defense) * GetDefenseAccuracyMultiplier(defense);
         int damage = (int)(attackPower - defensePower);
 
         Console.WriteLine($"[Resolve] Calculated attack power: {attackPower} | defense power: {defensePower} | preliminary damage: {damage}");
 
         if (damage < 0) damage = 0;
-        if (damage <= target.Defense)
+        if (!ignoreDefense && damage <= target.Defense)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;
@@ -39,6 +42,21 @@ public class ActionResolverService
         result.Damage = damage;
         result.Outcome = result.HitQuality == HitQuality.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
         result.FeedbackText = result.HitQuality == HitQuality.Critical ? "CRITICAL HIT!" : string.Empty;
+        if (ignoreDefense)
+        {
+            result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
+                ? "DEFENSE IGNORED!"
+                : $"{result.FeedbackText} | DEFENSE IGNORED!";
+        }
+
+        if (powerMaxTriggered)
+        {
+            TriggerPowerMaxPlaceholder(attacker);
+            result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
+                ? "POWER MAX (EFFECT PLACEHOLDER)"
+                : $"{result.FeedbackText} | POWER MAX (EFFECT PLACEHOLDER)";
+        }
+
         Console.WriteLine($"[Resolve] Attacker: {attacker.Name} | AttackPower: {attackPower} | DefensePower: {defensePower} | Damage: {damage}");
 
         return result;
@@ -46,7 +64,10 @@ public class ActionResolverService
 
     private ActionAccuracy CalculateAccuracy(ActionInstance action)
     {
-        return action.Dice.Tier switch
+        if (action == null || action.AccuracyDice == null)
+            return ActionAccuracy.Missed;
+
+        return action.AccuracyDice.Tier switch
         {
             DiceTier.Low => ActionAccuracy.Missed,
             DiceTier.Medium => ActionAccuracy.Hit,
@@ -57,13 +78,24 @@ public class ActionResolverService
 
     private HitQuality CalculateHitQuality(ActionInstance action)
     {
-        return action.Dice.Tier == DiceTier.High ? HitQuality.Critical : HitQuality.Normal;
+        if (action == null || action.AccuracyDice == null)
+            return HitQuality.Normal;
+
+        return action.AccuracyDice.Tier == DiceTier.High ? HitQuality.Critical : HitQuality.Normal;
     }
 
     private float CalculatePower(ActionInstance action)
     {
-        float multiplier = GetMultiplier(action.Dice.Tier);
+        if (action == null || action.PowerDice == null)
+            return 0f;
+
+        float multiplier = GetMultiplier(action.PowerDice.Tier);
         return action.Definition.BasePower * multiplier;
+    }
+
+    private void TriggerPowerMaxPlaceholder(Battler attacker)
+    {
+        Console.WriteLine($"[Resolve] {attacker.Name} triggered POWER MAX placeholder effect.");
     }
 
     private float GetMultiplier(DiceTier tier)
@@ -74,6 +106,20 @@ public class ActionResolverService
             DiceTier.Medium => 1f,
             DiceTier.High => 1.5f,
             _ => 1f,
+        };
+    }
+
+    private float GetDefenseAccuracyMultiplier(ActionInstance defense)
+    {
+        if (defense == null || defense.AccuracyDice == null)
+            return 0.5f;
+
+        return defense.AccuracyDice.Tier switch
+        {
+            DiceTier.Low => 0.5f,
+            DiceTier.Medium => 1f,
+            DiceTier.High => 1.25f,
+            _ => 1f
         };
     }
 }

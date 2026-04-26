@@ -1,15 +1,27 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+
+public enum StatDiceType
+{
+    Mind,
+    Heart,
+    Body
+}
 
 public class CombatInputHandler : MonoBehaviour
 {
+    private const int DicePerTurn = 3;
+
     private CombatManager Combat;
-    private int AttackDiceAllocated = 0;
-    private int DefenseDiceAllocated = 0;
+    private readonly List<StatDiceType> PowerDiceTypes = new();
+    private readonly List<StatDiceType> AccuracyDiceTypes = new();
     private ActionType? SelectedAction = null;
     private ActionType AllowedAction = ActionType.Attack;
     private bool IsWaitingTurnResolution = false;
-    public event Action<bool> EndTurnAvailabilityChanged;
+    private StatDiceType SelectedDiceType = StatDiceType.Body;
+
+    public event Action<bool> ConfirmAvailabilityChanged;
 
     public void Init(CombatManager cm)
     {
@@ -26,12 +38,13 @@ public class CombatInputHandler : MonoBehaviour
         AllowedAction = allowedAction;
         SelectedAction = null;
         IsWaitingTurnResolution = false;
-        AttackDiceAllocated = 0;
-        DefenseDiceAllocated = 0;
-        Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
-        Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        PowerDiceTypes.Clear();
+        AccuracyDiceTypes.Clear();
+        SelectedDiceType = GetFirstAvailableDiceType();
+        Combat.View.ActionPanel.SetSelectedDiceTypeLabel(SelectedDiceType.ToString());
+        Combat.View.ActionPanel.HideConfirmPanel();
         UpdateCombatView();
-        NotifyEndTurnAvailability();
+        NotifyConfirmAvailability();
     }
 
     public void OnAttack()
@@ -44,7 +57,8 @@ public class CombatInputHandler : MonoBehaviour
         }
 
         SelectedAction = ActionType.Attack;
-        NotifyEndTurnAvailability();
+        Combat.View.ActionPanel.ShowConfirmPanel("Attack");
+        NotifyConfirmAvailability();
         Debug.Log("[Input] Selected ATTACK");
     }
 
@@ -58,65 +72,71 @@ public class CombatInputHandler : MonoBehaviour
         }
 
         SelectedAction = ActionType.Defense;
-        NotifyEndTurnAvailability();
+        Combat.View.ActionPanel.ShowConfirmPanel("Defense");
+        NotifyConfirmAvailability();
         Debug.Log("[Input] Selected DEFENSE");
     }
 
     public void OnAddDiceToAttack()
     {
         if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Attack) return;
-        if (Combat.Player.CurrentDices <= 0) return;
+        if (GetRemainingDiceCount() <= 0) return;
+        if (!CanUseDiceType(SelectedDiceType)) return;
 
-        AttackDiceAllocated++;
-        Combat.Player.CurrentDices--;
-        Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
+        PowerDiceTypes.Add(SelectedDiceType);
         UpdateCombatView();
-        NotifyEndTurnAvailability();
+        NotifyConfirmAvailability();
     }
 
     public void OnAddDiceToDefense()
     {
         if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Defense) return;
-        if (Combat.Player.CurrentDices <= 0) return;
+        if (GetRemainingDiceCount() <= 0) return;
+        if (!CanUseDiceType(SelectedDiceType)) return;
 
-        DefenseDiceAllocated++;
-        Combat.Player.CurrentDices--;
-        Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        AccuracyDiceTypes.Add(SelectedDiceType);
         UpdateCombatView();
-        NotifyEndTurnAvailability();
+        NotifyConfirmAvailability();
     }
 
     public void OnRemoveDiceFromAttack()
     {
         if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Attack) return;
-        if (AttackDiceAllocated <= 0) return;
+        if (PowerDiceTypes.Count <= 0) return;
 
-        AttackDiceAllocated--;
-        Combat.Player.CurrentDices++;
-        Combat.View.UpdateAddDiceAttackCount(AttackDiceAllocated);
+        PowerDiceTypes.RemoveAt(PowerDiceTypes.Count - 1);
         UpdateCombatView();
-        NotifyEndTurnAvailability();
+        NotifyConfirmAvailability();
     }
 
     public void OnRemoveDiceFromDefense()
     {
         if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Defense) return;
-        if (DefenseDiceAllocated <= 0) return;
+        if (AccuracyDiceTypes.Count <= 0) return;
 
-        DefenseDiceAllocated--;
-        Combat.Player.CurrentDices++;
-        Combat.View.UpdateAddDiceDefenseCount(DefenseDiceAllocated);
+        AccuracyDiceTypes.RemoveAt(AccuracyDiceTypes.Count - 1);
         UpdateCombatView();
-        NotifyEndTurnAvailability();
+        NotifyConfirmAvailability();
 
-        Debug.Log($"[Input] Removed dice from DEFENSE: {DefenseDiceAllocated}");
+        Debug.Log($"[Input] Removed dice from ACCURACY: {AccuracyDiceTypes.Count}");
     }
 
-    public void OnEndTurn()
+    public void OnSelectMindDiceType()
+    {
+        SelectDiceType(StatDiceType.Mind);
+    }
+
+    public void OnSelectHeartDiceType()
+    {
+        SelectDiceType(StatDiceType.Heart);
+    }
+
+    public void OnSelectBodyDiceType()
+    {
+        SelectDiceType(StatDiceType.Body);
+    }
+
+    public void OnConfirmAction()
     {
         if (IsWaitingTurnResolution) return;
         if (SelectedAction == null)
@@ -125,15 +145,36 @@ public class CombatInputHandler : MonoBehaviour
             return;
         }
 
-        IsWaitingTurnResolution = true;
+        if (PowerDiceTypes.Count + AccuracyDiceTypes.Count <= 0)
+        {
+            Debug.Log("[Input] No dice allocated");
+            return;
+        }
 
-        Combat.ReceivePlayerInput(
-            SelectedAction.Value,
-            SelectedAction.Value == ActionType.Attack ? AttackDiceAllocated : DefenseDiceAllocated
-        );
+        IsWaitingTurnResolution = true;
+        Combat.ReceivePlayerInput(SelectedAction.Value, new List<StatDiceType>(PowerDiceTypes), new List<StatDiceType>(AccuracyDiceTypes));
+        SelectedAction = null;
+        Combat.View.ActionPanel.HideConfirmPanel();
+        NotifyConfirmAvailability();
+    }
+
+    public void OnEndTurn()
+    {
+        OnSkipTurn();
+    }
+
+    public void OnSkipTurn()
+    {
+        if (IsWaitingTurnResolution) return;
 
         SelectedAction = null;
-        NotifyEndTurnAvailability();
+        PowerDiceTypes.Clear();
+        AccuracyDiceTypes.Clear();
+        Combat.View.ActionPanel.HideConfirmPanel();
+
+        IsWaitingTurnResolution = true;
+        Combat.ReceivePlayerSkipTurn();
+        NotifyConfirmAvailability();
     }
 
     public void OnToggleInfoPanel(bool isVisible)
@@ -141,16 +182,41 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.SetInfoPanelVisible(isVisible);
     }
 
-    private void NotifyEndTurnAvailability()
+    private void NotifyConfirmAvailability()
     {
-        bool hasValidDiceAllocation = SelectedAction switch
-        {
-            ActionType.Attack => AttackDiceAllocated > 0,
-            ActionType.Defense => DefenseDiceAllocated > 0,
-            _ => false
-        };
-
+        bool hasValidDiceAllocation = PowerDiceTypes.Count + AccuracyDiceTypes.Count > 0;
         bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null && hasValidDiceAllocation;
-        EndTurnAvailabilityChanged?.Invoke(isAvailable);
+        ConfirmAvailabilityChanged?.Invoke(isAvailable);
+    }
+
+    private void SelectDiceType(StatDiceType diceType)
+    {
+        if (!CanUseDiceType(diceType))
+        {
+            Debug.Log($"[Input] {diceType} die cannot be selected because its stat is 0.");
+            return;
+        }
+
+        SelectedDiceType = diceType;
+        Combat.View.ActionPanel.SetSelectedDiceTypeLabel(diceType.ToString());
+    }
+
+    private bool CanUseDiceType(StatDiceType diceType)
+    {
+        return Combat.GetDiceMaxValueForType(Combat.Player, diceType) > 0;
+    }
+
+    private int GetRemainingDiceCount()
+    {
+        return Mathf.Max(0, DicePerTurn - (PowerDiceTypes.Count + AccuracyDiceTypes.Count));
+    }
+
+    private StatDiceType GetFirstAvailableDiceType()
+    {
+        if (CanUseDiceType(StatDiceType.Body)) return StatDiceType.Body;
+        if (CanUseDiceType(StatDiceType.Heart)) return StatDiceType.Heart;
+        if (CanUseDiceType(StatDiceType.Mind)) return StatDiceType.Mind;
+
+        return StatDiceType.Body;
     }
 }
