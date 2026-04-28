@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DiceService
 {
-    private readonly Random random = new();
+    private readonly System.Random random = new();
 
     public DiceResult Roll(int maxValue = 6)
     {

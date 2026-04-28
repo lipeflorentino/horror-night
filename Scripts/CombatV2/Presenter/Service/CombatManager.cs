@@ -247,7 +247,7 @@ public class CombatManager : MonoBehaviour
 
         if (result.AppliesDamage)
         {
-            target.ReceiveDamage(result.Damage);
+            result.FinalTarget.ReceiveDamage(result.Damage);
         }
 
         View.ShowResolveFeedback(result, PlayerIsAttacker == false);

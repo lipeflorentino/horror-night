@@ -1,12 +1,7 @@
 public enum ActionAccuracy
 {
     Missed,
-    Hit
-}
-
-public enum HitQuality
-{
-    Normal,
+    Hit,
     Critical
 }
 
@@ -15,15 +10,17 @@ public enum ActionOutcome
     Missed,
     Blocked,
     Hit,
-    CriticalHit
+    CriticalHit,
+    Parried,
+    Evaded
 }
 
 public class ActionResolutionResult
 {
     public int Damage;
     public ActionAccuracy Accuracy;
-    public HitQuality HitQuality;
     public ActionOutcome Outcome;
+    public Battler FinalTarget;
     public string FeedbackText;
 
     public bool AppliesDamage => Damage > 0;

@@ -5,14 +5,31 @@ public class ActionResolverService
 {
     public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
-        bool ignoreDefense = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
-        bool powerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
+        bool attackPowerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
+        bool defensePowerMaxTriggered = defense.PowerDice != null && defense.PowerDice.IsMaxRoll;
+        bool attackAccuracyMaxTriggered = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
+        bool defenseAccuracyMaxTriggered = defense.AccuracyDice != null && defense.AccuracyDice.IsMaxRoll;
+        bool ignoreAttack = defenseAccuracyMaxTriggered && !attackAccuracyMaxTriggered;
+        bool ignoreDefense = attackAccuracyMaxTriggered && !defenseAccuracyMaxTriggered;
+        bool hasEvaded = false;
+        bool hasParried = false;
+
+        if (ignoreAttack)
+        {
+            if (defensePowerMaxTriggered)
+            {
+                hasParried = true;
+            } else
+            {
+                hasEvaded = true;
+            }
+        }
 
         ActionResolutionResult result = new()
-
         {
-            Accuracy = CalculateAccuracy(attack),
-            HitQuality = CalculateHitQuality(attack)
+
+            Accuracy = CalculateAccuracy(attack, defense),
+            FinalTarget = target
         };
 
         if (result.Accuracy == ActionAccuracy.Missed)
@@ -22,26 +39,46 @@ public class ActionResolverService
             result.FeedbackText = "MISSED";
             return result;
         }
+        if (hasEvaded)
+        {
+            result.Outcome = ActionOutcome.Evaded;
+            result.FeedbackText = "EVADED";
+            Console.WriteLine($"[Resolve] Attack evaded due to defense accuracy max. Damage: {0}");
+            return result;
+        }
+        if (hasParried)
+        {
+            result.Outcome = ActionOutcome.Parried;
+            result.FeedbackText = "PARRIED";
+        }
 
-        float attackPower = CalculatePower(attack);
-        float defensePower = ignoreDefense ? 0f : CalculatePower(defense) * GetDefenseAccuracyMultiplier(defense);
+        float attackPower = ignoreAttack ? 0f : CalculatePower(attack);
+        float defensePower = ignoreDefense ? 0f : CalculatePower(defense);
         int damage = (int)(attackPower - defensePower);
 
         Console.WriteLine($"[Resolve] Calculated attack power: {attackPower} | defense power: {defensePower} | preliminary damage: {damage}");
 
         if (damage < 0) damage = 0;
-        if (!ignoreDefense && damage <= target.Defense)
+        if (damage <= target.Defense && !hasParried)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;
             result.FeedbackText = "BLOCKED";
-            Console.WriteLine($"[Resolve] Attack blocked. Damage: {damage} | TargetDefense: {target.Defense}");
+            Console.WriteLine($"[Resolve] Attack blocked.");
             return result;
         }
 
         result.Damage = damage;
-        result.Outcome = result.HitQuality == HitQuality.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
-        result.FeedbackText = result.HitQuality == HitQuality.Critical ? "CRITICAL HIT!" : string.Empty;
+        result.Outcome = result.Accuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
+        result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : string.Empty;
+
+        if (ignoreAttack)
+        {
+             result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
+                ? "ATTACK IGNORED!"
+                : $"{result.FeedbackText} | ATTACK IGNORED!";
+        }
+
         if (ignoreDefense)
         {
             result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
@@ -49,7 +86,7 @@ public class ActionResolverService
                 : $"{result.FeedbackText} | DEFENSE IGNORED!";
         }
 
-        if (powerMaxTriggered)
+        if (attackPowerMaxTriggered || defensePowerMaxTriggered)
         {
             TriggerPowerMaxPlaceholder(attacker);
             result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
@@ -62,26 +99,18 @@ public class ActionResolverService
         return result;
     }
 
-    private ActionAccuracy CalculateAccuracy(ActionInstance action)
+    private ActionAccuracy CalculateAccuracy(ActionInstance attack, ActionInstance defense)
     {
-        if (action == null || action.AccuracyDice == null)
+        if (attack == null || attack.AccuracyDice == null)
             return ActionAccuracy.Missed;
 
-        return action.AccuracyDice.Tier switch
+        return attack.AccuracyDice.Tier switch
         {
             DiceTier.Low => ActionAccuracy.Missed,
             DiceTier.Medium => ActionAccuracy.Hit,
-            DiceTier.High => ActionAccuracy.Hit,
+            DiceTier.High => ActionAccuracy.Critical,
             _ => ActionAccuracy.Hit,
         };
-    }
-
-    private HitQuality CalculateHitQuality(ActionInstance action)
-    {
-        if (action == null || action.AccuracyDice == null)
-            return HitQuality.Normal;
-
-        return action.AccuracyDice.Tier == DiceTier.High ? HitQuality.Critical : HitQuality.Normal;
     }
 
     private float CalculatePower(ActionInstance action)
@@ -106,20 +135,6 @@ public class ActionResolverService
             DiceTier.Medium => 1f,
             DiceTier.High => 1.5f,
             _ => 1f,
-        };
-    }
-
-    private float GetDefenseAccuracyMultiplier(ActionInstance defense)
-    {
-        if (defense == null || defense.AccuracyDice == null)
-            return 0.5f;
-
-        return defense.AccuracyDice.Tier switch
-        {
-            DiceTier.Low => 0.5f,
-            DiceTier.Medium => 1f,
-            DiceTier.High => 1.25f,
-            _ => 1f
         };
     }
 }
