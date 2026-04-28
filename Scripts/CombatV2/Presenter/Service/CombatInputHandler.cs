@@ -2,24 +2,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StatDiceType
-{
-    Mind,
-    Heart,
-    Body
-}
-
 public class CombatInputHandler : MonoBehaviour
 {
     private const int DicePerTurn = 3;
-
     private CombatManager Combat;
     private readonly List<StatDiceType> PowerDiceTypes = new();
     private readonly List<StatDiceType> AccuracyDiceTypes = new();
     private ActionType? SelectedAction = null;
     private ActionType AllowedAction = ActionType.Attack;
     private bool IsWaitingTurnResolution = false;
-    private StatDiceType SelectedDiceType = StatDiceType.Body;
+    private StatDiceType SelectedPowerDiceType = StatDiceType.Body;
+    private StatDiceType SelectedAccuracyDiceType = StatDiceType.Mind;
 
     public event Action<bool> ConfirmAvailabilityChanged;
 
@@ -40,14 +33,14 @@ public class CombatInputHandler : MonoBehaviour
         IsWaitingTurnResolution = false;
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
-        SelectedDiceType = GetFirstAvailableDiceType();
-        Combat.View.ActionPanel.SetSelectedDiceTypeLabel(SelectedDiceType.ToString());
+        SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
+        // Combat.View.ActionPanel.SetSelectedDiceTypeLabel(SelectedDiceType.ToString());
         Combat.View.ActionPanel.HideConfirmPanel();
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
 
-    public void OnAttack()
+    public void OnSelectAttack()
     {
         if (IsWaitingTurnResolution) return;
         if (AllowedAction != ActionType.Attack)
@@ -62,7 +55,7 @@ public class CombatInputHandler : MonoBehaviour
         Debug.Log("[Input] Selected ATTACK");
     }
 
-    public void OnDefend()
+    public void OnSelectDefend()
     {
         if (IsWaitingTurnResolution) return;
         if (AllowedAction != ActionType.Defense)
@@ -77,63 +70,79 @@ public class CombatInputHandler : MonoBehaviour
         Debug.Log("[Input] Selected DEFENSE");
     }
 
-    public void OnAddDiceToAttack()
+    public void OnAddPowerDice()
     {
+        
         if (IsWaitingTurnResolution) return;
         if (GetRemainingDiceCount() <= 0) return;
-        if (!CanUseDiceType(SelectedDiceType)) return;
+        if (!CanUseDiceType(SelectedPowerDiceType)) return;
 
-        PowerDiceTypes.Add(SelectedDiceType);
+        PowerDiceTypes.Add(SelectedPowerDiceType);
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
 
-    public void OnAddDiceToDefense()
+    public void OnAddAccuracyDice()
     {
         if (IsWaitingTurnResolution) return;
         if (GetRemainingDiceCount() <= 0) return;
-        if (!CanUseDiceType(SelectedDiceType)) return;
+        if (!CanUseDiceType(SelectedAccuracyDiceType)) return;
 
-        AccuracyDiceTypes.Add(SelectedDiceType);
+        AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
 
-    public void OnRemoveDiceFromAttack()
+    public void OnRemovePowerDice()
     {
         if (IsWaitingTurnResolution) return;
         if (PowerDiceTypes.Count <= 0) return;
 
-        PowerDiceTypes.RemoveAt(PowerDiceTypes.Count - 1);
+        PowerDiceTypes.Remove(SelectedPowerDiceType);
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
 
-    public void OnRemoveDiceFromDefense()
+    public void OnRemoveAccuracyDice()
     {
         if (IsWaitingTurnResolution) return;
         if (AccuracyDiceTypes.Count <= 0) return;
 
-        AccuracyDiceTypes.RemoveAt(AccuracyDiceTypes.Count - 1);
+        AccuracyDiceTypes.Remove(SelectedAccuracyDiceType);
         UpdateCombatView();
         NotifyConfirmAvailability();
 
         Debug.Log($"[Input] Removed dice from ACCURACY: {AccuracyDiceTypes.Count}");
     }
 
-    public void OnSelectMindDiceType()
+    public void OnSelectMindPowerDiceType()
     {
-        SelectDiceType(StatDiceType.Mind);
+        SelectDiceType(StatDiceType.Mind, "power");
     }
 
-    public void OnSelectHeartDiceType()
+    public void OnSelectHeartPowerDiceType()
     {
-        SelectDiceType(StatDiceType.Heart);
+        SelectDiceType(StatDiceType.Heart, "power");
     }
 
-    public void OnSelectBodyDiceType()
+    public void OnSelectBodyPowerDiceType()
     {
-        SelectDiceType(StatDiceType.Body);
+        SelectDiceType(StatDiceType.Body, "power");
+    }
+
+    public void OnSelectMindAccuracyDiceType()
+    {
+        SelectDiceType(StatDiceType.Mind, "accuracy");
+    }
+
+    public void OnSelectHeartAccuracyDiceType()
+    {
+        SelectDiceType(StatDiceType.Heart, "accuracy");
+    }
+
+    public void OnSelectBodyAccuracyDiceType()
+    {
+        SelectDiceType(StatDiceType.Body, "accuracy");
     }
 
     public void OnConfirmAction()
@@ -189,7 +198,7 @@ public class CombatInputHandler : MonoBehaviour
         ConfirmAvailabilityChanged?.Invoke(isAvailable);
     }
 
-    private void SelectDiceType(StatDiceType diceType)
+    private void SelectDiceType(StatDiceType diceType, string type)
     {
         if (!CanUseDiceType(diceType))
         {
@@ -197,7 +206,15 @@ public class CombatInputHandler : MonoBehaviour
             return;
         }
 
-        SelectedDiceType = diceType;
+        if (type == "power")
+        {
+            SelectedPowerDiceType = diceType;
+        }  
+        else
+        {
+            SelectedAccuracyDiceType = diceType;
+        }
+        
         Combat.View.ActionPanel.SetSelectedDiceTypeLabel(diceType.ToString());
     }
 

@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public class ActionPanelView : MonoBehaviour
 {
-    public Button AttackButton;
-    public Button DefendButton;
-    public Button AddDiceAttackButton;
-    public Button RemoveDiceAttackButton;
-    public Button AddDiceDefenseButton;
-    public Button RemoveDiceDefenseButton;
+    public Button SelectAttackButton;
+    public Button SelectDefendButton;
+    public Button AddPowerDiceButton;
+    public Button RemovePowerDiceButton;
+    public Button AddAccuracyDiceButton;
+    public Button RemoveAccuracyDiceButton;
     public GameObject AttackDiceCountContainer, DefendDiceCountContainer;
     public Button EndTurnButton;
     public Toggle InfoToggle;
@@ -21,44 +21,50 @@ public class ActionPanelView : MonoBehaviour
     public Button ConfirmButton;
 
     [Header("Stat Dice Selector")]
-    public Button SelectMindDiceButton;
-    public Button SelectHeartDiceButton;
-    public Button SelectBodyDiceButton;
+    public Button SelectMindPowerDiceButton;
+    public Button SelectHeartPowerDiceButton;
+    public Button SelectBodyPowerDiceButton;
+    public Button SelectMindAccuracyDiceButton;
+    public Button SelectHeartAccuracyDiceButton;
+    public Button SelectBodyAccuracyDiceButton;
     public TMP_Text SelectedDiceTypeText;
 
-    public event Action AttackClicked;
-    public event Action DefendClicked;
-    public event Action AddDiceToAttackClicked;
-    public event Action RemoveDiceFromAttackClicked;
-    public event Action AddDiceToDefenseClicked;
-    public event Action RemoveDiceFromDefenseClicked;
+    public event Action SelectAttackClicked;
+    public event Action SelectDefendClicked;
+    public event Action AddPowerDiceClicked;
+    public event Action RemovePowerDiceClicked;
+    public event Action AddAccuracyDiceClicked;
+    public event Action RemoveAccuracyDiceClicked;
     public event Action EndTurnClicked;
     public event Action ConfirmClicked;
-    public event Action MindDiceTypeSelected;
-    public event Action HeartDiceTypeSelected;
-    public event Action BodyDiceTypeSelected;
+    public event Action MindPowerDiceTypeSelected;
+    public event Action HeartPowerDiceTypeSelected;
+    public event Action BodyPowerDiceTypeSelected;
+    public event Action MindAccuracyDiceTypeSelected;
+    public event Action HeartAccuracyDiceTypeSelected;
+    public event Action BodyAccuracyDiceTypeSelected;
     public event Action<bool> InfoToggled;
     private CombatInputHandler BoundInputHandler;
 
     private void Awake()
     {
-        if (AttackButton != null)
-            AttackButton.onClick.AddListener(HandleAttackClick);
+        if (SelectAttackButton != null)
+            SelectAttackButton.onClick.AddListener(HandleSelectAttackClick);
 
-        if (DefendButton != null)
-            DefendButton.onClick.AddListener(HandleDefendClick);
+        if (SelectDefendButton != null)
+            SelectDefendButton.onClick.AddListener(HandleSelectDefendClick);
 
-        if (AddDiceAttackButton != null)
-            AddDiceAttackButton.onClick.AddListener(HandleAddDiceToAttackClick);
+        if (AddPowerDiceButton != null)
+            AddPowerDiceButton.onClick.AddListener(HandleAddPowerDiceClick);
 
-        if (RemoveDiceAttackButton != null)
-            RemoveDiceAttackButton.onClick.AddListener(HandleRemoveDiceFromAttackClick);
+        if (RemovePowerDiceButton != null)
+            RemovePowerDiceButton.onClick.AddListener(HandleRemovePowerDiceClick);
 
-        if (AddDiceDefenseButton != null)
-            AddDiceDefenseButton.onClick.AddListener(HandleAddDiceToDefenseClick);
+        if (AddAccuracyDiceButton != null)
+            AddAccuracyDiceButton.onClick.AddListener(HandleAddAccuracyDiceClick);
 
-        if (RemoveDiceDefenseButton != null)
-            RemoveDiceDefenseButton.onClick.AddListener(HandleRemoveDiceFromDefenseClick);
+        if (RemoveAccuracyDiceButton != null)
+            RemoveAccuracyDiceButton.onClick.AddListener(HandleRemoveAccuracyDiceClick);
 
         if (EndTurnButton != null)
             EndTurnButton.onClick.AddListener(HandleEndTurnClick);
@@ -66,14 +72,23 @@ public class ActionPanelView : MonoBehaviour
         if (ConfirmButton != null)
             ConfirmButton.onClick.AddListener(HandleConfirmClick);
 
-        if (SelectMindDiceButton != null)
-            SelectMindDiceButton.onClick.AddListener(HandleMindDiceTypeClick);
+        if (SelectMindPowerDiceButton != null)
+            SelectMindPowerDiceButton.onClick.AddListener(HandleMindPowerDiceTypeClick);
 
-        if (SelectHeartDiceButton != null)
-            SelectHeartDiceButton.onClick.AddListener(HandleHeartDiceTypeClick);
+        if (SelectHeartPowerDiceButton != null)
+            SelectHeartPowerDiceButton.onClick.AddListener(HandleHeartPowerDiceTypeClick);
 
-        if (SelectBodyDiceButton != null)
-            SelectBodyDiceButton.onClick.AddListener(HandleBodyDiceTypeClick);
+        if (SelectBodyPowerDiceButton != null)
+            SelectBodyPowerDiceButton.onClick.AddListener(HandleBodyPowerDiceTypeClick);
+
+        if (SelectMindAccuracyDiceButton != null)
+            SelectMindAccuracyDiceButton.onClick.AddListener(HandleMindAccuracyDiceTypeClick);
+
+        if (SelectHeartAccuracyDiceButton != null)
+            SelectHeartAccuracyDiceButton.onClick.AddListener(HandleHeartAccuracyDiceTypeClick);
+
+        if (SelectBodyAccuracyDiceButton != null)
+            SelectBodyAccuracyDiceButton.onClick.AddListener(HandleBodyAccuracyDiceTypeClick);
 
         if (InfoToggle != null)
             InfoToggle.onValueChanged.AddListener(HandleInfoToggleChanged);
@@ -86,23 +101,23 @@ public class ActionPanelView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (AttackButton != null)
-            AttackButton.onClick.RemoveListener(HandleAttackClick);
+        if (SelectAttackButton != null)
+            SelectAttackButton.onClick.RemoveListener(HandleSelectAttackClick);
 
-        if (DefendButton != null)
-            DefendButton.onClick.RemoveListener(HandleDefendClick);
+        if (SelectDefendButton != null)
+            SelectDefendButton.onClick.RemoveListener(HandleSelectDefendClick);
 
-        if (AddDiceAttackButton != null)
-            AddDiceAttackButton.onClick.RemoveListener(HandleAddDiceToAttackClick);
+        if (AddPowerDiceButton != null)
+            AddPowerDiceButton.onClick.RemoveListener(HandleAddPowerDiceClick);
 
-        if (RemoveDiceAttackButton != null)
-            RemoveDiceAttackButton.onClick.RemoveListener(HandleRemoveDiceFromAttackClick);
+        if (RemovePowerDiceButton != null)
+            RemovePowerDiceButton.onClick.RemoveListener(HandleRemovePowerDiceClick);
 
-        if (AddDiceDefenseButton != null)
-            AddDiceDefenseButton.onClick.RemoveListener(HandleAddDiceToDefenseClick);
+        if (AddAccuracyDiceButton != null)
+            AddAccuracyDiceButton.onClick.RemoveListener(HandleAddAccuracyDiceClick);
 
-        if (RemoveDiceDefenseButton != null)
-            RemoveDiceDefenseButton.onClick.RemoveListener(HandleRemoveDiceFromDefenseClick);
+        if (RemoveAccuracyDiceButton != null)
+            RemoveAccuracyDiceButton.onClick.RemoveListener(HandleRemoveAccuracyDiceClick);
 
         if (EndTurnButton != null)
             EndTurnButton.onClick.RemoveListener(HandleEndTurnClick);
@@ -110,14 +125,23 @@ public class ActionPanelView : MonoBehaviour
         if (ConfirmButton != null)
             ConfirmButton.onClick.RemoveListener(HandleConfirmClick);
 
-        if (SelectMindDiceButton != null)
-            SelectMindDiceButton.onClick.RemoveListener(HandleMindDiceTypeClick);
+        if (SelectMindPowerDiceButton != null)
+            SelectMindPowerDiceButton.onClick.RemoveListener(HandleMindPowerDiceTypeClick);
 
-        if (SelectHeartDiceButton != null)
-            SelectHeartDiceButton.onClick.RemoveListener(HandleHeartDiceTypeClick);
+        if (SelectHeartPowerDiceButton != null)
+            SelectHeartPowerDiceButton.onClick.RemoveListener(HandleHeartPowerDiceTypeClick);
 
-        if (SelectBodyDiceButton != null)
-            SelectBodyDiceButton.onClick.RemoveListener(HandleBodyDiceTypeClick);
+        if (SelectBodyPowerDiceButton != null)
+            SelectBodyPowerDiceButton.onClick.RemoveListener(HandleBodyPowerDiceTypeClick);
+
+        if (SelectMindAccuracyDiceButton != null)
+            SelectMindAccuracyDiceButton.onClick.RemoveListener(HandleMindAccuracyDiceTypeClick);  
+
+        if (SelectHeartAccuracyDiceButton != null)
+            SelectHeartAccuracyDiceButton.onClick.RemoveListener(HandleHeartAccuracyDiceTypeClick);
+
+        if (SelectBodyAccuracyDiceButton != null)
+            SelectBodyAccuracyDiceButton.onClick.RemoveListener(HandleBodyAccuracyDiceTypeClick);
 
         if (InfoToggle != null)
             InfoToggle.onValueChanged.RemoveListener(HandleInfoToggleChanged);
@@ -132,17 +156,20 @@ public class ActionPanelView : MonoBehaviour
             BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
 
         BoundInputHandler = inputHandler;
-        AttackClicked += inputHandler.OnAttack;
-        DefendClicked += inputHandler.OnDefend;
-        AddDiceToAttackClicked += inputHandler.OnAddDiceToAttack;
-        RemoveDiceFromAttackClicked += inputHandler.OnRemoveDiceFromAttack;
-        AddDiceToDefenseClicked += inputHandler.OnAddDiceToDefense;
-        RemoveDiceFromDefenseClicked += inputHandler.OnRemoveDiceFromDefense;
+        SelectAttackClicked += inputHandler.OnSelectAttack;
+        SelectDefendClicked += inputHandler.OnSelectDefend;
+        AddPowerDiceClicked += inputHandler.OnAddPowerDice;
+        RemovePowerDiceClicked += inputHandler.OnRemovePowerDice;
+        AddAccuracyDiceClicked += inputHandler.OnAddAccuracyDice;
+        RemoveAccuracyDiceClicked += inputHandler.OnRemoveAccuracyDice;
         EndTurnClicked += inputHandler.OnSkipTurn;
         ConfirmClicked += inputHandler.OnConfirmAction;
-        MindDiceTypeSelected += inputHandler.OnSelectMindDiceType;
-        HeartDiceTypeSelected += inputHandler.OnSelectHeartDiceType;
-        BodyDiceTypeSelected += inputHandler.OnSelectBodyDiceType;
+        MindPowerDiceTypeSelected += inputHandler.OnSelectMindPowerDiceType;
+        HeartPowerDiceTypeSelected += inputHandler.OnSelectHeartPowerDiceType;
+        BodyPowerDiceTypeSelected += inputHandler.OnSelectBodyPowerDiceType;
+        MindAccuracyDiceTypeSelected += inputHandler.OnSelectMindAccuracyDiceType;
+        HeartAccuracyDiceTypeSelected += inputHandler.OnSelectHeartAccuracyDiceType;
+        BodyAccuracyDiceTypeSelected += inputHandler.OnSelectBodyAccuracyDiceType;
         InfoToggled += inputHandler.OnToggleInfoPanel;
         inputHandler.ConfirmAvailabilityChanged += SetConfirmInteractable;
 
@@ -162,23 +189,23 @@ public class ActionPanelView : MonoBehaviour
 
     public void SetAllInteractable(bool isInteractable)
     {
-        if (AttackButton != null)
-            AttackButton.interactable = isInteractable;
+        if (SelectAttackButton != null)
+            SelectAttackButton.interactable = isInteractable;
 
-        if (DefendButton != null)
-            DefendButton.interactable = isInteractable;
+        if (SelectDefendButton != null)
+            SelectDefendButton.interactable = isInteractable;
 
-        if (AddDiceAttackButton != null)
-            AddDiceAttackButton.interactable = isInteractable;
+        if (AddPowerDiceButton != null)
+            AddPowerDiceButton.interactable = isInteractable;
 
-        if (RemoveDiceAttackButton != null)
-            RemoveDiceAttackButton.interactable = isInteractable;
+        if (RemovePowerDiceButton != null)
+            RemovePowerDiceButton.interactable = isInteractable;
 
-        if (AddDiceDefenseButton != null)
-            AddDiceDefenseButton.interactable = isInteractable;
+        if (AddAccuracyDiceButton != null)
+            AddAccuracyDiceButton.interactable = isInteractable;
 
-        if (RemoveDiceDefenseButton != null)
-            RemoveDiceDefenseButton.interactable = isInteractable;
+        if (RemoveAccuracyDiceButton != null)
+            RemoveAccuracyDiceButton.interactable = isInteractable;
 
         if (EndTurnButton != null)
             EndTurnButton.interactable = isInteractable;
@@ -190,34 +217,34 @@ public class ActionPanelView : MonoBehaviour
             InfoToggle.interactable = isInteractable;
     }
 
-    private void HandleAttackClick()
+    private void HandleSelectAttackClick()
     {
-        AttackClicked?.Invoke();
+        SelectAttackClicked?.Invoke();
     }
 
-    private void HandleDefendClick()
+    private void HandleSelectDefendClick()
     {
-        DefendClicked?.Invoke();
+        SelectDefendClicked?.Invoke();
     }
 
-    private void HandleAddDiceToAttackClick()
+    private void HandleAddPowerDiceClick()
     {
-        AddDiceToAttackClicked?.Invoke();
+        AddPowerDiceClicked?.Invoke();
     }
 
-    private void HandleAddDiceToDefenseClick()
+    private void HandleAddAccuracyDiceClick()
     {
-        AddDiceToDefenseClicked?.Invoke();
+        AddAccuracyDiceClicked?.Invoke();
     }
 
-    private void HandleRemoveDiceFromAttackClick()
+    private void HandleRemovePowerDiceClick()
     {
-        RemoveDiceFromAttackClicked?.Invoke();
+        RemovePowerDiceClicked?.Invoke();
     }
 
-    private void HandleRemoveDiceFromDefenseClick()
+    private void HandleRemoveAccuracyDiceClick()
     {
-        RemoveDiceFromDefenseClicked?.Invoke();
+        RemoveAccuracyDiceClicked?.Invoke();
     }
 
     private void HandleEndTurnClick()
@@ -230,19 +257,34 @@ public class ActionPanelView : MonoBehaviour
         ConfirmClicked?.Invoke();
     }
 
-    private void HandleMindDiceTypeClick()
+    private void HandleMindPowerDiceTypeClick()
     {
-        MindDiceTypeSelected?.Invoke();
+        MindPowerDiceTypeSelected?.Invoke();
     }
 
-    private void HandleHeartDiceTypeClick()
+    private void HandleHeartPowerDiceTypeClick()
     {
-        HeartDiceTypeSelected?.Invoke();
+        HeartPowerDiceTypeSelected?.Invoke();
     }
 
-    private void HandleBodyDiceTypeClick()
+    private void HandleBodyPowerDiceTypeClick()
     {
-        BodyDiceTypeSelected?.Invoke();
+        BodyPowerDiceTypeSelected?.Invoke();
+    }
+
+    private void HandleMindAccuracyDiceTypeClick()
+    {
+        MindAccuracyDiceTypeSelected?.Invoke();
+    }
+
+    private void HandleHeartAccuracyDiceTypeClick()
+    {
+        HeartAccuracyDiceTypeSelected?.Invoke();
+    }
+
+    private void HandleBodyAccuracyDiceTypeClick()
+    {
+        BodyAccuracyDiceTypeSelected?.Invoke();
     }
 
     private void HandleInfoToggleChanged(bool isEnabled)
@@ -252,11 +294,11 @@ public class ActionPanelView : MonoBehaviour
 
     public void SetPlayerRoleButtons(bool isPlayerAttacker)
     {
-        if (AttackButton != null)
-            AttackButton.gameObject.SetActive(isPlayerAttacker);
+        if (SelectAttackButton != null)
+            SelectAttackButton.gameObject.SetActive(isPlayerAttacker);
 
-        if (DefendButton != null)
-            DefendButton.gameObject.SetActive(!isPlayerAttacker);
+        if (SelectDefendButton != null)
+            SelectDefendButton.gameObject.SetActive(!isPlayerAttacker);
     }
 
     public void ShowConfirmPanel(string actionLabel)

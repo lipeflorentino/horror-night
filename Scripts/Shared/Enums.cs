@@ -55,3 +55,10 @@ public enum EnemyTurnAction
     Attack,
     Defend
 }
+
+public enum StatDiceType
+{
+    Mind,
+    Heart,
+    Body
+}
