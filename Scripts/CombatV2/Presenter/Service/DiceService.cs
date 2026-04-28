@@ -52,7 +52,7 @@ public class DiceService
         return results;
     }
 
-    public List<int> ConvertToFaces(Battler battler, IReadOnlyList<StatDiceType> diceTypes)
+    public List<int> ConvertToFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
         List<int> diceFaces = new();
         if (diceTypes == null)
@@ -71,27 +71,27 @@ public class DiceService
         return diceFaces;
     }
 
-    public int GetDiceMaxValueForType(Battler battler, StatDiceType diceType)
+    public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)
     {
         if (battler == null)
             return 0;
 
         return diceType switch
         {
-            StatDiceType.Mind => Mathf.Max(0, battler.Mind),
-            StatDiceType.Heart => Mathf.Max(0, battler.Heart),
-            StatDiceType.Body => Mathf.Max(0, battler.Body),
+            DiceStatType.Mind => Mathf.Max(0, battler.Mind),
+            DiceStatType.Heart => Mathf.Max(0, battler.Heart),
+            DiceStatType.Body => Mathf.Max(0, battler.Body),
             _ => 0
         };
     }
 
-    public void LogDiceStatBonus(StatDiceType diceType)
+    public void LogDiceStatBonus(DiceStatType diceType)
     {
         string bonusText = diceType switch
         {
-            StatDiceType.Mind => "Mind DiceStatBonus placeholder",
-            StatDiceType.Heart => "Heart DiceStatBonus placeholder",
-            StatDiceType.Body => "Body DiceStatBonus placeholder",
+            DiceStatType.Mind => "Mind DiceStatBonus placeholder",
+            DiceStatType.Heart => "Heart DiceStatBonus placeholder",
+            DiceStatType.Body => "Body DiceStatBonus placeholder",
             _ => "Unknown DiceStatBonus placeholder"
         };
 

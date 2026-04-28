@@ -5,6 +5,20 @@ public enum DiceTier
     High
 }
 
+
+public enum DiceStatType
+{
+    Mind,
+    Heart,
+    Body
+}
+
+public enum DiceRollType
+{
+    Power, 
+    Accuracy
+}
+
 public class DiceResult
 {
     public int Value;

@@ -117,7 +117,7 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    public void ReceivePlayerInput(ActionType type, IReadOnlyList<StatDiceType> powerDiceTypes, IReadOnlyList<StatDiceType> accuracyDiceTypes)
+    public void ReceivePlayerInput(ActionType type, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
         if (CombatEnded)
             return;
@@ -146,7 +146,7 @@ public class CombatManager : MonoBehaviour
         EndTurn();
     }
 
-    private IEnumerator ResolveTurnRoutine(ActionType playerType, IReadOnlyList<StatDiceType> powerDiceTypes, IReadOnlyList<StatDiceType> accuracyDiceTypes)
+    private IEnumerator ResolveTurnRoutine(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
         yield return WaitForSeconds0_5;
 
@@ -190,7 +190,7 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
-    private void RollActions(ActionType playerType, IReadOnlyList<StatDiceType> powerDiceTypes, IReadOnlyList<StatDiceType> accuracyDiceTypes)
+    private void RollActions(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
         ActionDefinition playerAction = BuildDefinitionFromBattler(Player, playerType);
 
@@ -215,7 +215,7 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice.Value} | ACCURACY best:{enemyAccuracyDice.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
     }
 
-    public int GetDiceMaxValueForType(Battler battler, StatDiceType diceType)
+    public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)
     {
         return DiceService.GetDiceMaxValueForType(battler, diceType);
     }
