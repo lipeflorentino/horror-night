@@ -8,9 +8,14 @@ public class DiceService
 
     public DiceResult Roll(int maxValue = 6)
     {
+        return Roll(maxValue, 1, 1);
+    }
+
+    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel)
+    {
         int safeMaxValue = Math.Max(1, maxValue);
         int value = random.Next(1, safeMaxValue + 1);
-        DiceTier tier = GetTier(value, safeMaxValue);
+        DiceTier tier = GetTier(value, safeMaxValue, attackerLevel, defenderLevel);
 
         Console.WriteLine($"[Dice] Rolled d{safeMaxValue}: {value} → {tier}");
 
@@ -29,25 +34,35 @@ public class DiceService
 
     public List<DiceResult> RollMany(int diceCount)
     {
+        return RollMany(diceCount, 1, 1);
+    }
+
+    public List<DiceResult> RollMany(int diceCount, int attackerLevel, int defenderLevel)
+    {
         if (diceCount <= 0)
             return new List<DiceResult>();
 
         List<DiceResult> results = new(diceCount);
 
         for (int i = 0; i < diceCount; i++)
-            results.Add(Roll());
+            results.Add(Roll(6, attackerLevel, defenderLevel));
 
         return results;
     }
 
     public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues)
     {
+        return RollMany(diceMaxValues, 1, 1);
+    }
+
+    public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues, int attackerLevel, int defenderLevel)
+    {
         if (diceMaxValues == null || diceMaxValues.Count == 0)
             return new List<DiceResult>();
 
         List<DiceResult> results = new(diceMaxValues.Count);
         for (int i = 0; i < diceMaxValues.Count; i++)
-            results.Add(Roll(diceMaxValues[i]));
+            results.Add(Roll(diceMaxValues[i], attackerLevel, defenderLevel));
 
         return results;
     }
@@ -113,14 +128,35 @@ public class DiceService
         Debug.Log($"[Dice Bonus] {bonusText}");
     }
 
-    private DiceTier GetTier(int value, int maxValue)
+    private DiceTier GetTier(int value, int maxValue, int attackerLevel, int defenderLevel)
     {
         if (maxValue <= 1)
             return DiceTier.Low;
 
         float normalized = (float)value / maxValue;
-        if (normalized <= 0.34f) return DiceTier.Low;
-        if (normalized <= 0.67f) return DiceTier.Medium;
+
+        int delta = attackerLevel - defenderLevel;
+
+        float scaling = 5f;
+        float normalizedDelta = Mathf.Clamp(delta / scaling, -1f, 1f);
+
+        float biasStrength = 0.25f;
+        float shift = normalizedDelta * biasStrength;
+
+        float lowThreshold = 0.34f - shift;
+        float highThreshold = 0.67f - shift;
+
+        lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.6f);
+        highThreshold = Mathf.Clamp(highThreshold, lowThreshold + 0.1f, 0.95f);
+
+        if (normalizedDelta >= 0.9f)
+            lowThreshold = 0f;
+
+        if (normalizedDelta <= -0.9f)
+            highThreshold = 1f;
+
+        if (normalized <= lowThreshold) return DiceTier.Low;
+        if (normalized <= highThreshold) return DiceTier.Medium;
         return DiceTier.High;
     }
 }

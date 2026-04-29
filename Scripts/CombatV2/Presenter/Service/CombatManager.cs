@@ -83,7 +83,7 @@ public class CombatManager : MonoBehaviour
 
         Player = new Battler(
             "Player",
-            1,
+            Mathf.Max(1, playerSnapshot.level),
             Mathf.RoundToInt(playerSnapshot.hp),
             Mathf.RoundToInt(playerSnapshot.heart),
             Mathf.RoundToInt(playerSnapshot.mind),
@@ -202,10 +202,10 @@ public class CombatManager : MonoBehaviour
         List<int> powerDiceFaces = DiceService.ConvertToFaces(Player, powerDiceTypes);
         List<int> accuracyDiceFaces = DiceService.ConvertToFaces(Player, accuracyDiceTypes);
 
-        PendingPlayerPowerRolls = DiceService.RollMany(powerDiceFaces);
-        PendingPlayerAccuracyRolls = DiceService.RollMany(accuracyDiceFaces);
-        PendingEnemyPowerRolls = DiceService.RollMany(PendingEnemyAllocatedPowerDice);
-        PendingEnemyAccuracyRolls = DiceService.RollMany(PendingEnemyAllocatedAccuracyDice);
+        PendingPlayerPowerRolls = DiceService.RollMany(powerDiceFaces, Player.Level, Enemy.Level);
+        PendingPlayerAccuracyRolls = DiceService.RollMany(accuracyDiceFaces, Player.Level, Enemy.Level);
+        PendingEnemyPowerRolls = DiceService.RollMany(PendingEnemyAllocatedPowerDice, Enemy.Level, Player.Level);
+        PendingEnemyAccuracyRolls = DiceService.RollMany(PendingEnemyAllocatedAccuracyDice, Enemy.Level, Player.Level);
 
         DiceResult playerPowerDice = PendingPlayerPowerRolls.Count > 0 ? DiceService.GetBestResult(PendingPlayerPowerRolls) : DiceService.Roll(1);
         DiceResult playerAccuracyDice = PendingPlayerAccuracyRolls.Count > 0 ? DiceService.GetBestResult(PendingPlayerAccuracyRolls) : DiceService.Roll(1);

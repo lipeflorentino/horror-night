@@ -18,6 +18,7 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
     [SerializeField] private int initiative = 10;
+    [SerializeField] private int level = 1;
 
     [Header("Heart")]
     [SerializeField] private float maxHeart = 100f;
@@ -123,6 +124,7 @@ public class PlayerStatusManager : MonoBehaviour
     public float GetHeartRatio() => maxHeart <= 0f ? 0f : currentHeart / maxHeart;
     public float GetBodyRatio() => maxBody <= 0f ? 0f : currentBody / maxBody;
     public float GetMindRatio() => maxMind <= 0f ? 0f : currentMind / maxMind;
+    public int GetLevel() => Mathf.Max(1, level);
 
     public int GetStatValue(string statName)
     {
@@ -163,7 +165,7 @@ public class PlayerStatusManager : MonoBehaviour
                 return;
             case "initiative":
             case "iniciativa":
-                initiative = Mathf.Max(0, initiative + value);
+            initiative = Mathf.Max(0, initiative + value);
                 return;
         }
     }
@@ -177,6 +179,8 @@ public class PlayerStatusManager : MonoBehaviour
             mind = currentMind,
             attack = attack,
             defense = defense,
+            initiative = initiative,
+            level = GetLevel(),
             hp = currentHp,
             maxHeart = maxHeart,
             maxBody = maxBody,
@@ -202,6 +206,10 @@ public class PlayerStatusManager : MonoBehaviour
             attack = Mathf.Max(0, Mathf.RoundToInt(snapshot.attack));
         if (snapshot.defense > 0f)
             defense = Mathf.Max(0, Mathf.RoundToInt(snapshot.defense));
+        if (snapshot.initiative > 0f)
+            initiative = Mathf.Max(0, Mathf.RoundToInt(snapshot.initiative));
+        if (snapshot.level > 0)
+            level = Mathf.Max(1, snapshot.level);
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
