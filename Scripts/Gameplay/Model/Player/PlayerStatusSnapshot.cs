@@ -9,6 +9,7 @@ public struct PlayerStatusSnapshot
     [SerializeField] public float attack;
     [SerializeField] public float defense;
     [SerializeField] public float initiative;
+    [SerializeField] public int level;
     [SerializeField] public float hp;
     [SerializeField] public float maxHeart;
     [SerializeField] public float maxBody;
