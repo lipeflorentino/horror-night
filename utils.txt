@@ -1,3 +1,5 @@
+
+
 IDEIAS
     - Elemento que pode ser combinado a um item para upgrade (magica, éter, lumus)
     - Companions tem menor ativação de encounters

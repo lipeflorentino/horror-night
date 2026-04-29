@@ -34,7 +34,7 @@ public class CombatInputHandler : MonoBehaviour
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
         SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
-        // Combat.View.ActionPanel.SetSelectedDiceTypeLabel(SelectedDiceType.ToString());
+        UpdateSelectedDiceTypeLabel();
         Combat.View.ActionPanel.HideConfirmPanel();
         UpdateCombatView();
         NotifyConfirmAvailability();
@@ -70,79 +70,39 @@ public class CombatInputHandler : MonoBehaviour
         Debug.Log("[Input] Selected DEFENSE");
     }
 
-    public void OnAddPowerDice()
-    {
-        
-        if (IsWaitingTurnResolution) return;
-        if (GetRemainingDiceCount() <= 0) return;
-        if (!CanUseDiceType(SelectedPowerDiceType)) return;
-
-        PowerDiceTypes.Add(SelectedPowerDiceType);
-        UpdateCombatView();
-        NotifyConfirmAvailability();
-    }
-
-    public void OnAddAccuracyDice()
+    public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
         if (GetRemainingDiceCount() <= 0) return;
-        if (!CanUseDiceType(SelectedAccuracyDiceType)) return;
+        if (!CanUseDiceType(diceStatType)) return; // TODO: esta verificação deve ser feita para ativar e desativar botao
 
-        AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
+        if (diceRollType == DiceRollType.Power)
+        {
+            SelectedPowerDiceType = diceStatType; 
+            PowerDiceTypes.Add(SelectedPowerDiceType);   
+        }
+        else
+        {
+            SelectedAccuracyDiceType = diceStatType;
+            AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
+        } 
+            
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
 
-    public void OnRemovePowerDice()
+    public void OnRemoveDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (PowerDiceTypes.Count <= 0) return;
+        if (PowerDiceTypes.Count <= 0) return; // TODO: Bloqueio no botao
 
-        PowerDiceTypes.Remove(SelectedPowerDiceType);
+        if (diceRollType == DiceRollType.Power) 
+            PowerDiceTypes.Remove(SelectedPowerDiceType);
+        else 
+            AccuracyDiceTypes.Remove(SelectedAccuracyDiceType);
+
         UpdateCombatView();
         NotifyConfirmAvailability();
-    }
-
-    public void OnRemoveAccuracyDice()
-    {
-        if (IsWaitingTurnResolution) return;
-        if (AccuracyDiceTypes.Count <= 0) return;
-
-        AccuracyDiceTypes.Remove(SelectedAccuracyDiceType);
-        UpdateCombatView();
-        NotifyConfirmAvailability();
-
-        Debug.Log($"[Input] Removed dice from ACCURACY: {AccuracyDiceTypes.Count}");
-    }
-
-    public void OnSelectMindPowerDiceType()
-    {
-        SelectDiceType(DiceStatType.Mind, "power");
-    }
-
-    public void OnSelectHeartPowerDiceType()
-    {
-        SelectDiceType(DiceStatType.Heart, "power");
-    }
-
-    public void OnSelectBodyPowerDiceType()
-    {
-        SelectDiceType(DiceStatType.Body, "power");
-    }
-
-    public void OnSelectMindAccuracyDiceType()
-    {
-        SelectDiceType(DiceStatType.Mind, "accuracy");
-    }
-
-    public void OnSelectHeartAccuracyDiceType()
-    {
-        SelectDiceType(DiceStatType.Heart, "accuracy");
-    }
-
-    public void OnSelectBodyAccuracyDiceType()
-    {
-        SelectDiceType(DiceStatType.Body, "accuracy");
     }
 
     public void OnConfirmAction()
@@ -198,26 +158,6 @@ public class CombatInputHandler : MonoBehaviour
         ConfirmAvailabilityChanged?.Invoke(isAvailable);
     }
 
-    private void SelectDiceType(DiceStatType diceType, string type)
-    {
-        if (!CanUseDiceType(diceType))
-        {
-            Debug.Log($"[Input] {diceType} die cannot be selected because its stat is 0.");
-            return;
-        }
-
-        if (type == "power")
-        {
-            SelectedPowerDiceType = diceType;
-        }  
-        else
-        {
-            SelectedAccuracyDiceType = diceType;
-        }
-        
-        Combat.View.ActionPanel.SetSelectedDiceTypeLabel(diceType.ToString());
-    }
-
     private bool CanUseDiceType(DiceStatType diceType)
     {
         return Combat.GetDiceMaxValueForType(Combat.Player, diceType) > 0;
@@ -235,5 +175,10 @@ public class CombatInputHandler : MonoBehaviour
         if (CanUseDiceType(DiceStatType.Mind)) return DiceStatType.Mind;
 
         return DiceStatType.Body;
+    }
+
+    private void UpdateSelectedDiceTypeLabel()
+    {
+        Combat.View.ActionPanel.SetSelectedDiceTypeLabel($"P:{SelectedPowerDiceType} | A:{SelectedAccuracyDiceType}");
     }
 }

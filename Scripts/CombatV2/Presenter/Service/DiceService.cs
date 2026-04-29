@@ -58,14 +58,29 @@ public class DiceService
         if (diceTypes == null)
             return diceFaces;
 
+        Dictionary<DiceStatType, int> diceCountByType = new();
         for (int i = 0; i < diceTypes.Count; i++)
         {
-            int faceValue = GetDiceMaxValueForType(battler, diceTypes[i]);
-            if (faceValue <= 0)
-                continue;
+            DiceStatType type = diceTypes[i];
+            diceCountByType[type] = diceCountByType.TryGetValue(type, out int count) ? count + 1 : 1;
+        }
 
-            diceFaces.Add(faceValue);
-            LogDiceStatBonus(diceTypes[i]);
+        foreach (KeyValuePair<DiceStatType, int> pair in diceCountByType)
+        {
+            int totalValue = GetDiceMaxValueForType(battler, pair.Key);
+            int diceCount = Mathf.Max(0, pair.Value);
+            if (totalValue <= 0 || diceCount <= 0)
+                continue;
+                
+            int baseFace = Mathf.Max(1, totalValue / diceCount);
+            int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
+
+            for (int i = 0; i < diceCount; i++)
+            {
+                int bonus = i < remainder ? 1 : 0;
+                diceFaces.Add(baseFace + bonus);
+                LogDiceStatBonus(pair.Key);
+            }
         }
 
         return diceFaces;
