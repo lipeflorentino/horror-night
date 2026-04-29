@@ -36,6 +36,7 @@ public class CombatInputHandler : MonoBehaviour
         SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
         UpdateSelectedDiceTypeLabel();
         Combat.View.ActionPanel.HideConfirmPanel();
+        RefreshDiceButtons();
         UpdateCombatView();
         NotifyConfirmAvailability();
     }
@@ -74,7 +75,7 @@ public class CombatInputHandler : MonoBehaviour
     {
         if (IsWaitingTurnResolution) return;
         if (GetRemainingDiceCount() <= 0) return;
-        if (!CanUseDiceType(diceStatType)) return; // TODO: esta verificação deve ser feita para ativar e desativar botao
+        if (!CanUseDiceType(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
@@ -88,20 +89,26 @@ public class CombatInputHandler : MonoBehaviour
         } 
             
         UpdateCombatView();
+        RefreshDiceButtons();
         NotifyConfirmAvailability();
     }
 
     public void OnRemoveDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (PowerDiceTypes.Count <= 0) return; // TODO: Bloqueio no botao
-
-        if (diceRollType == DiceRollType.Power) 
-            PowerDiceTypes.Remove(SelectedPowerDiceType);
-        else 
-            AccuracyDiceTypes.Remove(SelectedAccuracyDiceType);
+        if (diceRollType == DiceRollType.Power)
+        {
+            if (PowerDiceTypes.Count <= 0) return;
+            PowerDiceTypes.Remove(diceStatType);
+        }
+        else
+        {
+            if (AccuracyDiceTypes.Count <= 0) return;
+            AccuracyDiceTypes.Remove(diceStatType);
+        }
 
         UpdateCombatView();
+        RefreshDiceButtons();
         NotifyConfirmAvailability();
     }
 
@@ -127,14 +134,10 @@ public class CombatInputHandler : MonoBehaviour
         NotifyConfirmAvailability();
     }
 
-    public void OnEndTurn()
-    {
-        OnSkipTurn();
-    }
-
     public void OnSkipTurn()
     {
         if (IsWaitingTurnResolution) return;
+        if (AllowedAction != ActionType.Attack) return;
 
         SelectedAction = null;
         PowerDiceTypes.Clear();
@@ -143,6 +146,7 @@ public class CombatInputHandler : MonoBehaviour
 
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerSkipTurn();
+        RefreshDiceButtons();
         NotifyConfirmAvailability();
     }
 
@@ -156,6 +160,24 @@ public class CombatInputHandler : MonoBehaviour
         bool hasValidDiceAllocation = PowerDiceTypes.Count + AccuracyDiceTypes.Count > 0;
         bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null && hasValidDiceAllocation;
         ConfirmAvailabilityChanged?.Invoke(isAvailable);
+    }
+
+    private void RefreshDiceButtons()
+    {
+        if (Combat == null || Combat.View == null || Combat.View.ActionPanel == null)
+            return;
+
+        bool canAllocateDice = !IsWaitingTurnResolution && GetRemainingDiceCount() > 0;
+        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
+            DiceStatType.Mind, canAllocateDice && CanUseDiceType(DiceStatType.Mind));
+        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
+            DiceStatType.Heart, canAllocateDice && CanUseDiceType(DiceStatType.Heart));
+        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
+            DiceStatType.Body, canAllocateDice && CanUseDiceType(DiceStatType.Body));
+
+        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Mind, PowerDiceTypes.Contains(DiceStatType.Mind), AccuracyDiceTypes.Contains(DiceStatType.Mind));
+        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Heart, PowerDiceTypes.Contains(DiceStatType.Heart), AccuracyDiceTypes.Contains(DiceStatType.Heart));
+        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Body, PowerDiceTypes.Contains(DiceStatType.Body), AccuracyDiceTypes.Contains(DiceStatType.Body));
     }
 
     private bool CanUseDiceType(DiceStatType diceType)

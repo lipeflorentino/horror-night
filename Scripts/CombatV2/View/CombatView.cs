@@ -90,6 +90,11 @@ public class CombatView : MonoBehaviour
         FeedbackView.ShowAttackEffect(attackerIsPlayer);
     }
 
+    public void ShowSkipTurnFeedback(bool isPlayerTurn)
+    {
+        FeedbackView.ShowSkipTurnFeedback(isPlayerTurn);
+    }
+
     public void SetCombatInputEnabled(bool isEnabled)
     {
         if (ActionPanel != null)

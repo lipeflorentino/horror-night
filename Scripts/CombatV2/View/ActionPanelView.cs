@@ -23,7 +23,7 @@ public class ActionPanelView : MonoBehaviour
 
     public event Action SelectAttackClicked;
     public event Action SelectDefendClicked;
-    public event Action EndTurnClicked;
+    public event Action SkipTurnClicked;
     public event Action ConfirmClicked;
     public event Action<DiceStatType, DiceRollType> AddMindPowerDiceClicked, AddHeartPowerDiceClicked, AddBodyPowerDiceClicked, AddMindAccuracyDiceClicked, AddHeartAccuracyDiceClicked, AddBodyAccuracyDiceClicked;
     public event Action<DiceStatType, DiceRollType> RemoveMindPowerDiceClicked, RemoveHeartPowerDiceClicked, RemoveBodyPowerDiceClicked, RemoveMindAccuracyDiceClicked, RemoveHeartAccuracyDiceClicked, RemoveBodyAccuracyDiceClicked;
@@ -39,7 +39,7 @@ public class ActionPanelView : MonoBehaviour
             SelectDefendButton.onClick.AddListener(HandleSelectDefendClick);
 
         if (EndTurnButton != null)
-            EndTurnButton.onClick.AddListener(HandleEndTurnClick);
+            EndTurnButton.onClick.AddListener(HandleSkipTurnClick);
 
         if (ConfirmButton != null)
             ConfirmButton.onClick.AddListener(HandleConfirmClick);
@@ -104,7 +104,7 @@ public class ActionPanelView : MonoBehaviour
             SelectDefendButton.onClick.RemoveListener(HandleSelectDefendClick);
 
         if (EndTurnButton != null)
-            EndTurnButton.onClick.RemoveListener(HandleEndTurnClick);
+            EndTurnButton.onClick.RemoveListener(HandleSkipTurnClick);
 
         if (ConfirmButton != null)
             ConfirmButton.onClick.RemoveListener(HandleConfirmClick);
@@ -161,6 +161,27 @@ public class ActionPanelView : MonoBehaviour
     public void BindInput(CombatInputHandler inputHandler)
     {
         if (BoundInputHandler != null)
+        {
+            SelectAttackClicked -= BoundInputHandler.OnSelectAttack;
+            SelectDefendClicked -= BoundInputHandler.OnSelectDefend;
+            AddMindPowerDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveMindPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
+            AddHeartPowerDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveHeartPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
+            AddBodyPowerDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveBodyPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
+            AddMindAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveMindAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
+            AddHeartAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveHeartAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
+            AddBodyAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
+            RemoveBodyAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
+            SkipTurnClicked -= BoundInputHandler.OnSkipTurn;
+            ConfirmClicked -= BoundInputHandler.OnConfirmAction;
+            InfoToggled -= BoundInputHandler.OnToggleInfoPanel;
+        }
+
+        if (BoundInputHandler != null)
             BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
 
         BoundInputHandler = inputHandler;
@@ -184,7 +205,7 @@ public class ActionPanelView : MonoBehaviour
         AddBodyAccuracyDiceClicked += inputHandler.OnAddDice;
         RemoveBodyAccuracyDiceClicked += inputHandler.OnRemoveDice;
 
-        EndTurnClicked += inputHandler.OnSkipTurn;
+        SkipTurnClicked += inputHandler.OnSkipTurn;
         ConfirmClicked += inputHandler.OnConfirmAction;
 
         InfoToggled += inputHandler.OnToggleInfoPanel;
@@ -197,6 +218,44 @@ public class ActionPanelView : MonoBehaviour
         SetConfirmInteractable(false);
         SetSelectedDiceTypeLabel("P:Body | A:Body");
         HideConfirmPanel();
+    }
+
+    public void SetAddDiceButtonsInteractable(DiceStatType type, bool isInteractable)
+    {
+        switch (type)
+        {
+            case DiceStatType.Mind:
+                if (AddMindPowerDiceButton != null) AddMindPowerDiceButton.interactable = isInteractable;
+                if (AddMindAccuracyDiceButton != null) AddMindAccuracyDiceButton.interactable = isInteractable;
+                break;
+            case DiceStatType.Heart:
+                if (AddHeartPowerDiceButton != null) AddHeartPowerDiceButton.interactable = isInteractable;
+                if (AddHeartAccuracyDiceButton != null) AddHeartAccuracyDiceButton.interactable = isInteractable;
+                break;
+            case DiceStatType.Body:
+                if (AddBodyPowerDiceButton != null) AddBodyPowerDiceButton.interactable = isInteractable;
+                if (AddBodyAccuracyDiceButton != null) AddBodyAccuracyDiceButton.interactable = isInteractable;
+                break;
+        }
+    }
+
+    public void SetRemoveDiceButtonsInteractable(DiceStatType type, bool hasPowerDie, bool hasAccuracyDie)
+    {
+        switch (type)
+        {
+            case DiceStatType.Mind:
+                if (RemoveMindPowerDiceButton != null) RemoveMindPowerDiceButton.interactable = hasPowerDie;
+                if (RemoveMindAccuracyDiceButton != null) RemoveMindAccuracyDiceButton.interactable = hasAccuracyDie;
+                break;
+            case DiceStatType.Heart:
+                if (RemoveHeartPowerDiceButton != null) RemoveHeartPowerDiceButton.interactable = hasPowerDie;
+                if (RemoveHeartAccuracyDiceButton != null) RemoveHeartAccuracyDiceButton.interactable = hasAccuracyDie;
+                break;
+            case DiceStatType.Body:
+                if (RemoveBodyPowerDiceButton != null) RemoveBodyPowerDiceButton.interactable = hasPowerDie;
+                if (RemoveBodyAccuracyDiceButton != null) RemoveBodyAccuracyDiceButton.interactable = hasAccuracyDie;
+                break;
+        }
     }
 
     public void SetConfirmInteractable(bool isInteractable)
@@ -269,9 +328,9 @@ public class ActionPanelView : MonoBehaviour
         SelectDefendClicked?.Invoke();
     }
 
-    private void HandleEndTurnClick()
+    private void HandleSkipTurnClick()
     {
-        EndTurnClicked?.Invoke();
+        SkipTurnClicked?.Invoke();
     }
 
     private void HandleConfirmClick()
@@ -351,6 +410,14 @@ public class ActionPanelView : MonoBehaviour
 
         if (SelectDefendButton != null)
             SelectDefendButton.gameObject.SetActive(!isPlayerAttacker);
+
+        SetSkipButtonVisible(isPlayerAttacker);
+    }
+
+    public void SetSkipButtonVisible(bool isVisible)
+    {
+        if (EndTurnButton != null)
+            EndTurnButton.gameObject.SetActive(isVisible);
     }
 
     public void ShowConfirmPanel(string actionLabel)
@@ -376,11 +443,17 @@ public class ActionPanelView : MonoBehaviour
 
     public void HighlightSelectedAction(ActionInstance action)
     {
-        //TODO: Implement visual highlight for the selected action button
         if (action == null)
         {
             Debug.LogWarning("HighlightSelectedAction called with null action.");
             return;
         }
+
+        bool isAttack = action.Definition != null && action.Definition.Type == ActionType.Attack;
+        if (SelectAttackButton != null)
+            SelectAttackButton.image.color = isAttack ? new Color(0.85f, 0.35f, 0.35f, 1f) : Color.white;
+
+        if (SelectDefendButton != null)
+            SelectDefendButton.image.color = isAttack ? Color.white : new Color(0.35f, 0.65f, 0.95f, 1f);
     }
 }
