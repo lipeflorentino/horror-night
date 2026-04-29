@@ -96,6 +96,11 @@ public class FeedbackView : MonoBehaviour
             TurnOwnerText.text = turnOwner;
     }
 
+    public void ShowSkipTurnFeedback(bool isPlayerTurn)
+    {
+        ShowStatusText("Turn skipped", isPlayerTurn);
+    }
+
     private IEnumerator AnimateSlash(RectTransform rect, CanvasGroup cg)
     {
         float duration = 0.3f;
