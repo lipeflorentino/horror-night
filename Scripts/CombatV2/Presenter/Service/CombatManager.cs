@@ -223,6 +223,16 @@ public class CombatManager : MonoBehaviour
         return DiceService.GetDiceMaxValueForType(battler, diceType);
     }
 
+    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes)
+    {
+        return DiceService.ConvertToFaces(Player, diceTypes);
+    }
+
+    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue = 6)
+    {
+        return DiceService.GetTierBoundaries(maxValue, Player.Level, Enemy.Level);
+    }
+
     private void Resolve()
     {
         ActionInstance attack;
