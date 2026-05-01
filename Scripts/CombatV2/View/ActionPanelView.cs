@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,9 @@ public class ActionPanelView : MonoBehaviour
 
     [Header("Stat Dice Selector")]
     public TMP_Text SelectedDiceTypeText;
+
+    [Header("Dice Allocation")]
+    [SerializeField] private DiceAllocationView diceAllocationView;
 
     public event Action SelectAttackClicked;
     public event Action SelectDefendClicked;
@@ -439,6 +443,14 @@ public class ActionPanelView : MonoBehaviour
     {
         if (SelectedDiceTypeText != null)
             SelectedDiceTypeText.text = diceType;
+    }
+
+    public void UpdateSelectionPreview(IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<int> powerFaces, IReadOnlyList<DiceStatType> accuracyDiceTypes, IReadOnlyList<int> accuracyFaces, (int lowMax, int mediumMax, int highMin) tierBoundaries)
+    {
+        if (diceAllocationView == null)
+            return;
+
+        diceAllocationView.UpdateSelectionPreview(powerDiceTypes, powerFaces, accuracyDiceTypes, accuracyFaces, tierBoundaries);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

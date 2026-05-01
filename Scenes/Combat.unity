@@ -9130,6 +9130,7 @@ MonoBehaviour:
   ConfirmActionText: {fileID: 0}
   ConfirmButton: {fileID: 0}
   SelectedDiceTypeText: {fileID: 0}
+  diceAllocationView: {fileID: 0}
 --- !u!1 &881612331
 GameObject:
   m_ObjectHideFlags: 0
@@ -9367,7 +9368,7 @@ GameObject:
   - component: {fileID: 909757095}
   - component: {fileID: 909757094}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14488,14 +14489,6 @@ MonoBehaviour:
   playerAccuracyColor: {r: 0, g: 0, b: 1, a: 1}
   enemyPowerColor: {r: 0.6, g: 0.3, b: 0.9, a: 1}
   enemyAccuracyColor: {r: 1, g: 0, b: 0, a: 1}
-  powerDiceContainer: {fileID: 0}
-  accuracyDiceContainer: {fileID: 0}
-  allocationItemPrefab: {fileID: 0}
-  mindDiceIcon: {fileID: 0}
-  heartDiceIcon: {fileID: 0}
-  bodyDiceIcon: {fileID: 0}
-  diceTiersText: {fileID: 0}
-  resultPanelText: {fileID: 0}
 --- !u!1 &1387928697
 GameObject:
   m_ObjectHideFlags: 0
@@ -16856,7 +16849,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1736665950
 RectTransform:
   m_ObjectHideFlags: 0

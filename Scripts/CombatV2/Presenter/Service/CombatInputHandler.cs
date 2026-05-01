@@ -211,13 +211,13 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshSelectionPreview()
     {
-        if (Combat == null || Combat.View == null || Combat.View.DicePanelView == null)
+        if (Combat == null || Combat.View == null || Combat.View.ActionPanel  == null)
             return;
 
         List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
         List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
         (int lowMax, int mediumMax, int highMin) boundaries = Combat.GetPlayerTierBoundaries(6);
-        Combat.View.DicePanelView.UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
+        Combat.View.ActionPanel .UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
     }
 
 }
