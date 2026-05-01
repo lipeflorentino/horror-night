@@ -19,42 +19,30 @@ MonoBehaviour:
   weight: 10
   tierMin: 0
   tierMax: 1
-  image: {fileID: 848058512, guid: 4780b4e85189b1648af8a92e09ef72e8, type: 3}
+  image: {fileID: -974051958, guid: 71e615ef3688d604eb62c4a21b3ada44, type: 3}
   tags:
-    behavior: Agressivo
-    style: "Fren\xE9tico"
-    type: "Aberra\xE7\xE3o"
+    behavior: 0
+    style: 1
+    type: 0
   hp:
-    min: 20
-    max: 30
+    min: 6
+    max: 9
   heart:
-    min: 3
-    max: 7
+    min: 6
+    max: 9
   body:
-    min: 4
-    max: 8
-  mind:
-    min: 3
-    max: 6
-  attack:
-    min: 1
+    min: 2
     max: 4
+  mind:
+    min: 1
+    max: 3
+  attack:
+    min: 3
+    max: 8
   defense:
-    min: 2
-    max: 5
-  criticalHitChance:
-    min: 2
-    max: 5
-  parryChance:
-    min: 0
-    max: 0
-  fleeChance:
-    min: 0
-    max: 0
-  instantKillChance:
-    min: 0
-    max: 0
-  learnChance:
-    min: 0
-    max: 0
+    min: 4
+    max: 9
+  initiative:
+    min: 6
+    max: 12
   specialRule: 

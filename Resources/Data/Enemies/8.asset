@@ -19,42 +19,30 @@ MonoBehaviour:
   weight: 9
   tierMin: 1
   tierMax: 2
-  image: {fileID: -1548928159, guid: 71e615ef3688d604eb62c4a21b3ada44, type: 3}
+  image: {fileID: -974051958, guid: 71e615ef3688d604eb62c4a21b3ada44, type: 3}
   tags:
-    behavior: Cauteloso
-    style: Furtivo
-    type: Entidade
+    behavior: 2
+    style: 0
+    type: 3
   hp:
-    min: 20
-    max: 30
+    min: 8
+    max: 11
   heart:
-    min: 3
-    max: 7
+    min: 8
+    max: 11
   body:
-    min: 4
-    max: 8
+    min: 3
+    max: 4
   mind:
     min: 3
     max: 6
   attack:
-    min: 5
+    min: 4
     max: 8
   defense:
-    min: 4
-    max: 6
-  criticalHitChance:
-    min: 2
-    max: 4
-  parryChance:
-    min: 2
-    max: 5
-  fleeChance:
-    min: 0
-    max: 0
-  instantKillChance:
-    min: 0
-    max: 0
-  learnChance:
-    min: 0
-    max: 0
+    min: 5
+    max: 10
+  initiative:
+    min: 8
+    max: 10
   specialRule: 

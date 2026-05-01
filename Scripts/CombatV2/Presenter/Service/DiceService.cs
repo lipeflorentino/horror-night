@@ -32,37 +32,17 @@ public class DiceService
         return best;
     }
 
-    public List<DiceResult> RollMany(int diceCount)
-    {
-        return RollMany(diceCount, 1, 1);
-    }
-
-    public List<DiceResult> RollMany(int diceCount, int attackerLevel, int defenderLevel)
-    {
-        if (diceCount <= 0)
-            return new List<DiceResult>();
-
-        List<DiceResult> results = new(diceCount);
-
-        for (int i = 0; i < diceCount; i++)
-            results.Add(Roll(6, attackerLevel, defenderLevel));
-
-        return results;
-    }
-
-    public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues)
-    {
-        return RollMany(diceMaxValues, 1, 1);
-    }
-
-    public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues, int attackerLevel, int defenderLevel)
+    public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues, int attackerLevel = 1, int defenderLevel = 1)
     {
         if (diceMaxValues == null || diceMaxValues.Count == 0)
-            return new List<DiceResult>();
+            return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel) };
 
         List<DiceResult> results = new(diceMaxValues.Count);
         for (int i = 0; i < diceMaxValues.Count; i++)
             results.Add(Roll(diceMaxValues[i], attackerLevel, defenderLevel));
+
+        if (results.Count == 0)
+            results.Add(Roll(1, attackerLevel, defenderLevel));
 
         return results;
     }

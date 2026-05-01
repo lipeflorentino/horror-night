@@ -46,10 +46,9 @@ public class EnemyCSVImporter
             if (id <= 0)
                 continue;
 
-            EnemyArchetype archetype = ParseArchetype(values[3]);
             string assetPath = OutputFolder + id + ".asset";
 
-            EnemySO enemy = LoadOrCreateEnemy(assetPath, archetype);
+            EnemySO enemy = LoadOrCreateEnemy(assetPath);
             
             if (enemy == null)
                 continue;
@@ -57,18 +56,21 @@ public class EnemyCSVImporter
             enemy.id = id;
             enemy.enemyName = values[1];
             enemy.description = values[2];
-            enemy.archetype = archetype;
+            enemy.archetype = ParseArchetype(values[3]);
             enemy.weight = Mathf.Max(1, ParseInt(values[4]));
             enemy.tierMin = Mathf.Max(0, ParseInt(values[5]));
             enemy.tierMax = Mathf.Max(enemy.tierMin, ParseInt(values[6]));
-            enemy.tags.behavior = values[7];
-            enemy.tags.style = values[8];
-            enemy.tags.type = values[9];
+            enemy.tags.behavior = EnumParser.ParseOrDefault(values[7], EnemyBehaviorTag.Aggressive);
+            enemy.tags.style = EnumParser.ParseOrDefault(values[8], EnemyStyleTag.Brutal);
+            enemy.tags.type = EnumParser.ParseOrDefault(values[9], EnemyTypeTag.Creature);
             enemy.heart = BuildRange(values[10], values[11]);
             enemy.body = BuildRange(values[12], values[13]);
             enemy.mind = BuildRange(values[14], values.Length > 15 ? values[15] : values[14]);
             enemy.specialRule = values.Length > 16 ? values[16] : string.Empty;
             enemy.hp = BuildRange(values[18], values[19]);
+            enemy.attack = BuildRange(values[20], values[21]);
+            enemy.defense = BuildRange(values[22], values[23]);
+            enemy.initiative = BuildRange(values[24], values[25]);
 
             if (values.Length > 19)
             {
@@ -85,7 +87,7 @@ public class EnemyCSVImporter
         Debug.Log("Importação de inimigos concluída!");
     }
 
-    private static EnemySO LoadOrCreateEnemy(string assetPath, EnemyArchetype archetype)
+    private static EnemySO LoadOrCreateEnemy(string assetPath)
     {
         EnemySO loaded = AssetDatabase.LoadAssetAtPath<EnemySO>(assetPath);
         if (loaded != null)
@@ -149,5 +151,17 @@ public class EnemyCSVImporter
     {
         int.TryParse(value.Trim(), out int parsed);
         return parsed;
+    }
+    
+    public static class EnumParser
+    {
+        public static T ParseOrDefault<T>(string value, T defaultValue) where T : struct
+        {
+            if (Enum.TryParse<T>(value, true, out var result))
+                return result;
+
+            Debug.LogWarning($"Invalid enum value '{value}' for {typeof(T).Name}");
+            return defaultValue;
+        }
     }
 }

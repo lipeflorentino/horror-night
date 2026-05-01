@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 71e615ef3688d604eb62c4a21b3ada44
+guid: 58da4ebb965715c4ba0a18b903608a3f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_0
+      name: action_panel_ui_0
       rect:
         serializedVersion: 2
-        x: 59
-        y: 623
-        width: 444
-        height: 349
+        x: 0
+        y: 867
+        width: 354
+        height: 104
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ab8c9c40d9750b4eafc0cb2b446ed05
-      internalID: -974051958
+      spriteID: eb09ca6afb30a804c8cce076af2a0d51
+      internalID: -1567214897
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_1
+      name: action_panel_ui_1
       rect:
         serializedVersion: 2
-        x: 550
-        y: 571
-        width: 361
-        height: 412
+        x: 388
+        y: 874
+        width: 102
+        height: 88
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +145,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c6e48209c168cfd419a41735c5fd3eb7
-      internalID: -1732195487
+      spriteID: 352b5ce10032ada43a01054c77e0d273
+      internalID: -395751617
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_2
+      name: action_panel_ui_2
       rect:
         serializedVersion: 2
-        x: 1015
-        y: 585
-        width: 494
-        height: 405
+        x: 516
+        y: 876
+        width: 99
+        height: 86
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7bed5452110bb804f9d332468cf30e4c
-      internalID: -1548928159
+      spriteID: 5aad1432d545f994c8bb0836605d08fc
+      internalID: -880196090
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_3
+      name: action_panel_ui_3
       rect:
         serializedVersion: 2
-        x: 61
-        y: 283
-        width: 492
-        height: 277
+        x: 7
+        y: 682
+        width: 150
+        height: 150
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,20 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7baf337a457a319448a219f8c6d7ae9c
-      internalID: -269053753
+      spriteID: 14c996a9d62445a4d8f5f4d45877ae70
+      internalID: -1506258228
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_4
+      name: action_panel_ui_4
       rect:
         serializedVersion: 2
-        x: 521
-        y: 79
-        width: 487
-        height: 388
+        x: 192
+        y: 681
+        width: 150
+        height: 150
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -208,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a71dcb88a396f254ca7d03a162e07216
-      internalID: -601219630
+      spriteID: 975a71023dfe18542acd42661deba8e7
+      internalID: 25892221
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_5
+      name: action_panel_ui_5
       rect:
         serializedVersion: 2
-        x: 1056
-        y: 140
-        width: 419
-        height: 377
+        x: 1
+        y: 558
+        width: 342
+        height: 94
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,8 +229,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0d391a0aba7cfd3479ecc93d70240c1d
-      internalID: 1388472527
+      spriteID: 86f3f13faa7773a428c2d693c97a964a
+      internalID: -1580707324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: action_panel_ui_6
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 338
+        width: 243
+        height: 308
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fccf9a46cb3fefb4a9ac255481db8e53
+      internalID: 1335379725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: action_panel_ui_7
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 180
+        width: 235
+        height: 89
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1e695db1af8f9642b58405557bcfa1c
+      internalID: -1897837135
       vertices: []
       indices: 
       edges: []
@@ -246,12 +288,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      creatures_unrevealed_tileset_0: -974051958
-      creatures_unrevealed_tileset_1: -1732195487
-      creatures_unrevealed_tileset_2: -1548928159
-      creatures_unrevealed_tileset_3: -269053753
-      creatures_unrevealed_tileset_4: -601219630
-      creatures_unrevealed_tileset_5: 1388472527
+      action_panel_ui_0: -1567214897
+      action_panel_ui_1: -395751617
+      action_panel_ui_2: -880196090
+      action_panel_ui_3: -1506258228
+      action_panel_ui_4: 25892221
+      action_panel_ui_5: -1580707324
+      action_panel_ui_6: 1335379725
+      action_panel_ui_7: -1897837135
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

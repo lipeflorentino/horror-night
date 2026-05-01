@@ -19,42 +19,30 @@ MonoBehaviour:
   weight: 6
   tierMin: 1
   tierMax: 4
-  image: {fileID: 1597767951, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  image: {fileID: 21300000, guid: d0ee6d588dab4544a8a84ce129e2b30c, type: 2}
   tags:
-    behavior: Cauteloso
-    style: Brutal
-    type: Humanoide
+    behavior: 2
+    style: 1
+    type: 2
   hp:
-    min: 20
-    max: 30
+    min: 14
+    max: 20
   heart:
-    min: 2
-    max: 4
+    min: 14
+    max: 20
   body:
-    min: 2
-    max: 4
+    min: 6
+    max: 10
   mind:
-    min: 3
-    max: 6
+    min: 4
+    max: 7
   attack:
-    min: 1
-    max: 3
+    min: 4
+    max: 8
   defense:
-    min: 2
-    max: 5
-  criticalHitChance:
     min: 3
     max: 6
-  parryChance:
-    min: 0
-    max: 0
-  fleeChance:
-    min: 0
-    max: 0
-  instantKillChance:
-    min: 0
-    max: 0
-  learnChance:
-    min: 0
-    max: 0
+  initiative:
+    min: 4
+    max: 8
   specialRule: Causa medo ao entrar em combate

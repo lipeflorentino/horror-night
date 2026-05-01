@@ -19,6 +19,7 @@ public class CombatManager : MonoBehaviour
     private ActionResolverService Resolver;
     private InitiativeResolver InitiativeResolver;
     private EnemyActionSelector EnemyActionSelector;
+    private EnemyTurnPlanner EnemyTurnPlanner;
 
     private ActionDefinition AttackDef;
     private ActionDefinition DefenseDef;
@@ -31,8 +32,8 @@ public class CombatManager : MonoBehaviour
     private List<DiceResult> PendingPlayerAccuracyRolls = new();
     private List<DiceResult> PendingEnemyPowerRolls = new();
     private List<DiceResult> PendingEnemyAccuracyRolls = new();
-    private int PendingEnemyAllocatedPowerDice = 1;
-    private int PendingEnemyAllocatedAccuracyDice = 1;
+    private List<DiceStatType> PendingEnemyPowerDiceTypes = new();
+    private List<DiceStatType> PendingEnemyAccuracyDiceTypes = new();
     private bool CombatEnded;
     private CombatSessionData SessionData;
 
@@ -42,6 +43,7 @@ public class CombatManager : MonoBehaviour
         Resolver = new ActionResolverService();
         InitiativeResolver = new InitiativeResolver();
         EnemyActionSelector = new EnemyActionSelector();
+        EnemyTurnPlanner = new EnemyTurnPlanner(EnemyActionSelector);
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
 
@@ -182,16 +184,10 @@ public class CombatManager : MonoBehaviour
 
     private void GenerateEnemyAction()
     {
-        PendingEnemyAction = EnemyActionSelector.Select(AttackDef, DefenseDef);
-        int totalEnemyDice = Mathf.Max(1, Enemy.CurrentDices);
-        int enemyAllocatedDice = Mathf.Clamp(Random.Range(1, totalEnemyDice + 1), 1, totalEnemyDice);
-        PendingEnemyAllocatedPowerDice = Mathf.Clamp(Random.Range(0, enemyAllocatedDice + 1), 0, enemyAllocatedDice);
-        PendingEnemyAllocatedAccuracyDice = enemyAllocatedDice - PendingEnemyAllocatedPowerDice;
-
-        if (PendingEnemyAllocatedPowerDice == 0 && PendingEnemyAllocatedAccuracyDice == 0)
-            PendingEnemyAllocatedAccuracyDice = 1;
-
-        Enemy.CurrentDices = Mathf.Max(Enemy.CurrentDices - enemyAllocatedDice, 0);
+        EnemyTurnPlan plan = EnemyTurnPlanner.BuildPlan(Enemy, SessionData?.EnemyInstance, AttackDef, DefenseDef);
+        PendingEnemyAction = plan.Action;
+        PendingEnemyPowerDiceTypes = plan.PowerDiceTypes;
+        PendingEnemyAccuracyDiceTypes = plan.AccuracyDiceTypes;
         Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
@@ -201,16 +197,18 @@ public class CombatManager : MonoBehaviour
 
         List<int> powerDiceFaces = DiceService.ConvertToFaces(Player, powerDiceTypes);
         List<int> accuracyDiceFaces = DiceService.ConvertToFaces(Player, accuracyDiceTypes);
+        List<int> enemyPowerDiceFaces = DiceService.ConvertToFaces(Enemy, PendingEnemyPowerDiceTypes);
+        List<int> enemyAccuracyDiceFaces = DiceService.ConvertToFaces(Enemy, PendingEnemyAccuracyDiceTypes);
 
         PendingPlayerPowerRolls = DiceService.RollMany(powerDiceFaces, Player.Level, Enemy.Level);
         PendingPlayerAccuracyRolls = DiceService.RollMany(accuracyDiceFaces, Player.Level, Enemy.Level);
-        PendingEnemyPowerRolls = DiceService.RollMany(PendingEnemyAllocatedPowerDice, Enemy.Level, Player.Level);
-        PendingEnemyAccuracyRolls = DiceService.RollMany(PendingEnemyAllocatedAccuracyDice, Enemy.Level, Player.Level);
+        PendingEnemyPowerRolls = DiceService.RollMany(enemyPowerDiceFaces, Enemy.Level, Player.Level);
+        PendingEnemyAccuracyRolls = DiceService.RollMany(enemyAccuracyDiceFaces, Enemy.Level, Player.Level);
 
-        DiceResult playerPowerDice = PendingPlayerPowerRolls.Count > 0 ? DiceService.GetBestResult(PendingPlayerPowerRolls) : DiceService.Roll(1);
-        DiceResult playerAccuracyDice = PendingPlayerAccuracyRolls.Count > 0 ? DiceService.GetBestResult(PendingPlayerAccuracyRolls) : DiceService.Roll(1);
-        DiceResult enemyPowerDice = PendingEnemyPowerRolls.Count > 0 ? DiceService.GetBestResult(PendingEnemyPowerRolls) : DiceService.Roll(1);
-        DiceResult enemyAccuracyDice = PendingEnemyAccuracyRolls.Count > 0 ? DiceService.GetBestResult(PendingEnemyAccuracyRolls) : DiceService.Roll(1);
+        DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
+        DiceResult playerAccuracyDice = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
+        DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
+        DiceResult enemyAccuracyDice = DiceService.GetBestResult(PendingEnemyAccuracyRolls);
 
         PendingPlayerAction = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
         PendingEnemyAction.Definition = BuildDefinitionFromBattler(Enemy, PendingEnemyAction.Definition.Type);

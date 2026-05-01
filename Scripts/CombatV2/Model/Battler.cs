@@ -3,7 +3,7 @@ public class Battler
 {
     public string Name;
     public int Level;
-    public int HP;
+    public int HP, MaxHp;
     public int Heart;
     public int Mind;
     public int Body;
@@ -17,7 +17,7 @@ public class Battler
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int dices)
     {
         Name = name;
-        Level = level; // TODO: Placeholder, can be set dynamically later
+        Level = level;
         HP = hp;
         Heart = heart;
         Mind = mind;
@@ -27,6 +27,7 @@ public class Battler
         Initiative = initiative;
         CurrentDices = dices;
         MaxDices = dices;
+        MaxHp = HP;
     }
 
     public void ReceiveDamage(int damage)

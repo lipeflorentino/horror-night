@@ -19,42 +19,30 @@ MonoBehaviour:
   weight: 2
   tierMin: 3
   tierMax: 10
-  image: {fileID: 712402801, guid: 63f037405f3dd5a4e9bbbc418fc38f0f, type: 3}
+  image: {fileID: 21300000, guid: 6713a97de48587348901b061b962d781, type: 2}
   tags:
-    behavior: "Implac\xE1vel"
-    style: "Ritual\xEDstico"
-    type: Entidade
+    behavior: 4
+    style: 2
+    type: 3
   hp:
-    min: 20
-    max: 30
+    min: 30
+    max: 42
   heart:
-    min: 3
-    max: 6
+    min: 30
+    max: 42
   body:
-    min: 4
-    max: 8
+    min: 10
+    max: 16
   mind:
-    min: 4
-    max: 8
+    min: 10
+    max: 14
   attack:
+    min: 9
+    max: 15
+  defense:
+    min: 7
+    max: 12
+  initiative:
     min: 3
     max: 6
-  defense:
-    min: 1
-    max: 2
-  criticalHitChance:
-    min: 0
-    max: 0
-  parryChance:
-    min: 0
-    max: 0
-  fleeChance:
-    min: 0
-    max: 0
-  instantKillChance:
-    min: 0
-    max: 0
-  learnChance:
-    min: 0
-    max: 0
   specialRule: "Ganha b\xF4nus quando encontro \xE9 for\xE7ado"

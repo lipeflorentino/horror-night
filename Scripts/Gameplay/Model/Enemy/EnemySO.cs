@@ -2,21 +2,23 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EnemyBehaviorTag { Aggressive, Defensive, Cautious, Erratic, Relentless }
+public enum EnemyStyleTag { Stealthy, Brutal, Ritualistic, Primal, Mental }
+public enum EnemyTypeTag { Aberration, Creature, Humanoid, Entity, Beast, Spirit, Flying }
+public enum EnemyArchetype { Normal, Special, Boss }
+
 [Serializable]
 public class EnemyTagSet
 {
-    public string behavior;
-    public string style;
-    public string type;
+    public EnemyBehaviorTag behavior;
+    public EnemyStyleTag style;
+    public EnemyTypeTag type;
 
     public IEnumerable<string> Enumerate()
     {
-        if (!string.IsNullOrWhiteSpace(behavior))
-            yield return behavior;
-        if (!string.IsNullOrWhiteSpace(style))
-            yield return style;
-        if (!string.IsNullOrWhiteSpace(type))
-            yield return type;
+        yield return behavior.ToString().ToLowerInvariant();
+        yield return style.ToString().ToLowerInvariant();
+        yield return type.ToString().ToLowerInvariant();
     }
 }
 
@@ -37,7 +39,7 @@ public class EnemySO : ScriptableObject
     public Sprite image;
 
     [Header("Tags")]
-    public EnemyTagSet tags = new EnemyTagSet();
+    public EnemyTagSet tags = new();
 
     [Header("Stats Range")]
     public StatRange hp;
@@ -48,9 +50,7 @@ public class EnemySO : ScriptableObject
     [Header("Combat - Advanced Stats")]
     public StatRange attack;
     public StatRange defense;
-    public StatRange criticalHitChance;
-    public StatRange parryChance;
-    public StatRange learnChance;
+    public StatRange initiative;
 
     [Header("Optional")]
     [TextArea] public string specialRule;
@@ -78,6 +78,7 @@ public class EnemySO : ScriptableObject
 
         int rolledAttack = attack.Roll(difficulty);
         int rolledDefense = defense.Roll(difficulty);
+        int rolledInitiative = initiative.Roll(difficulty);
 
         return new EnemyInstance
         {
@@ -88,7 +89,7 @@ public class EnemySO : ScriptableObject
             mind = rolledMind,
             attack = rolledAttack,
             defense = rolledDefense,
-            initiative = Mathf.Max(0, rolledMind),
+            initiative = rolledInitiative,
             runTier = context != null ? context.tier : 0
         };
     }

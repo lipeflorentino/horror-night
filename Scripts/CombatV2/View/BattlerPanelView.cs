@@ -4,7 +4,7 @@ using TMPro;
 
 public class BattlerPanelView : MonoBehaviour
 {
-    public TMP_Text NameText;
+    public TMP_Text NameText, LevelText;
     public TMP_Text MindText;
     public TMP_Text HeartText;
     public TMP_Text BodyText;
@@ -20,6 +20,9 @@ public class BattlerPanelView : MonoBehaviour
         if (NameText != null)
             NameText.text = battler.Name;
 
+        if (LevelText != null)
+            LevelText.text = "Lv. " + battler.Level.ToString();
+
         if (MindText != null)
             MindText.text = battler.Mind.ToString();
 
@@ -33,7 +36,7 @@ public class BattlerPanelView : MonoBehaviour
             HpText.text = battler.HP.ToString();
 
         if (HpFill != null)
-            HpFill.fillAmount = battler.HP / 100f;
+            HpFill.fillAmount = battler.HP / battler.MaxHp;
 
         if (DiceText != null)
             DiceText.text = battler.CurrentDices.ToString();

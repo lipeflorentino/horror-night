@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 71e615ef3688d604eb62c4a21b3ada44
+guid: f2e6fa6157bdb5a488cb29acb8375a0b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,127 +110,43 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_0
+      name: icons_action_ui_0
       rect:
         serializedVersion: 2
-        x: 59
-        y: 623
-        width: 444
-        height: 349
+        x: 33
+        y: 34
+        width: 298
+        height: 295
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 1, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ab8c9c40d9750b4eafc0cb2b446ed05
-      internalID: -974051958
+      spriteID: 59c76829fe4a6354eb35fb6dabc284bc
+      internalID: 1791094722
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: creatures_unrevealed_tileset_1
+      name: icons_action_ui_1
       rect:
         serializedVersion: 2
-        x: 550
-        y: 571
-        width: 361
-        height: 412
+        x: 562
+        y: 34
+        width: 296
+        height: 294
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c6e48209c168cfd419a41735c5fd3eb7
-      internalID: -1732195487
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_unrevealed_tileset_2
-      rect:
-        serializedVersion: 2
-        x: 1015
-        y: 585
-        width: 494
-        height: 405
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7bed5452110bb804f9d332468cf30e4c
-      internalID: -1548928159
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_unrevealed_tileset_3
-      rect:
-        serializedVersion: 2
-        x: 61
-        y: 283
-        width: 492
-        height: 277
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7baf337a457a319448a219f8c6d7ae9c
-      internalID: -269053753
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_unrevealed_tileset_4
-      rect:
-        serializedVersion: 2
-        x: 521
-        y: 79
-        width: 487
-        height: 388
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a71dcb88a396f254ca7d03a162e07216
-      internalID: -601219630
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_unrevealed_tileset_5
-      rect:
-        serializedVersion: 2
-        x: 1056
-        y: 140
-        width: 419
-        height: 377
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0d391a0aba7cfd3479ecc93d70240c1d
-      internalID: 1388472527
+      spriteID: 61811940efd03cc438ff3dee8f888928
+      internalID: -755577345
       vertices: []
       indices: 
       edges: []
@@ -246,12 +162,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      creatures_unrevealed_tileset_0: -974051958
-      creatures_unrevealed_tileset_1: -1732195487
-      creatures_unrevealed_tileset_2: -1548928159
-      creatures_unrevealed_tileset_3: -269053753
-      creatures_unrevealed_tileset_4: -601219630
-      creatures_unrevealed_tileset_5: 1388472527
+      icons_action_ui_0: 1791094722
+      icons_action_ui_1: -755577345
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
