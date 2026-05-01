@@ -10,7 +10,6 @@ public class ActionPanelView : MonoBehaviour
     public Button SelectDefendButton;
     public Button AddMindPowerDiceButton, AddHeartPowerDiceButton, AddBodyPowerDiceButton, AddMindAccuracyDiceButton, AddHeartAccuracyDiceButton, AddBodyAccuracyDiceButton;
     public Button RemoveMindPowerDiceButton, RemoveHeartPowerDiceButton, RemoveBodyPowerDiceButton, RemoveMindAccuracyDiceButton, RemoveHeartAccuracyDiceButton, RemoveBodyAccuracyDiceButton;
-    public GameObject AttackDiceCountContainer, DefendDiceCountContainer;
     public Button EndTurnButton;
     public Toggle InfoToggle;
 
@@ -18,9 +17,6 @@ public class ActionPanelView : MonoBehaviour
     public GameObject ConfirmPanel;
     public TMP_Text ConfirmActionText;
     public Button ConfirmButton;
-
-    [Header("Stat Dice Selector")]
-    public TMP_Text SelectedDiceTypeText;
 
     [Header("Dice Allocation")]
     [SerializeField] private DiceAllocationView diceAllocationView;
@@ -220,7 +216,6 @@ public class ActionPanelView : MonoBehaviour
             InfoToggle.SetIsOnWithoutNotify(false);
 
         SetConfirmInteractable(false);
-        SetSelectedDiceTypeLabel("P:Body | A:Body");
         HideConfirmPanel();
     }
 
@@ -437,12 +432,6 @@ public class ActionPanelView : MonoBehaviour
     {
         if (ConfirmPanel != null)
             ConfirmPanel.SetActive(false);
-    }
-
-    public void SetSelectedDiceTypeLabel(string diceType)
-    {
-        if (SelectedDiceTypeText != null)
-            SelectedDiceTypeText.text = diceType;
     }
 
     public void UpdateSelectionPreview(IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<int> powerFaces, IReadOnlyList<DiceStatType> accuracyDiceTypes, IReadOnlyList<int> accuracyFaces, (int lowMax, int mediumMax, int highMin) tierBoundaries)

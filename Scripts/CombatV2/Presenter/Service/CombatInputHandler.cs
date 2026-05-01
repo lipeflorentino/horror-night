@@ -34,7 +34,6 @@ public class CombatInputHandler : MonoBehaviour
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
         SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
-        UpdateSelectedDiceTypeLabel();
         Combat.View.ActionPanel.HideConfirmPanel();
         RefreshSelectionPreview();
         RefreshDiceButtons();
@@ -202,12 +201,6 @@ public class CombatInputHandler : MonoBehaviour
 
         return DiceStatType.Body;
     }
-
-    private void UpdateSelectedDiceTypeLabel()
-    {
-        Combat.View.ActionPanel.SetSelectedDiceTypeLabel($"P:{SelectedPowerDiceType} | A:{SelectedAccuracyDiceType}");
-    }
-
 
     private void RefreshSelectionPreview()
     {
