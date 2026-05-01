@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,10 +113,10 @@ TextureImporter:
       name: creatures_tileset_0
       rect:
         serializedVersion: 2
-        x: 43
-        y: 580
-        width: 451
-        height: 401
+        x: 36
+        y: 602
+        width: 436
+        height: 398
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,8 +124,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e178ec29775e9df47a99ac26a5fd1044
-      internalID: 1001697032
+      spriteID: 5cf74d58c9053614489b614ff8f2ced6
+      internalID: 2012608854
       vertices: []
       indices: 
       edges: []
@@ -134,72 +134,9 @@ TextureImporter:
       name: creatures_tileset_1
       rect:
         serializedVersion: 2
-        x: 559
-        y: 582
-        width: 440
-        height: 404
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 78cca5564734d8343b365a4af149ee0a
-      internalID: 1597767951
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_tileset_2
-      rect:
-        serializedVersion: 2
-        x: 1031
-        y: 589
-        width: 485
-        height: 397
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a0554f7e6334e524c9e0882892ac3d70
-      internalID: 712402801
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_tileset_3
-      rect:
-        serializedVersion: 2
-        x: 47
-        y: 265
-        width: 506
-        height: 299
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c1bbb46813a1ba04e89171a23fd81c76
-      internalID: -836211400
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: creatures_tileset_4
-      rect:
-        serializedVersion: 2
-        x: 535
-        y: 97
-        width: 482
+        x: 549
+        y: 101
+        width: 464
         height: 347
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -208,8 +145,71 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3e7c249f794e72459626a9d695b75ad
-      internalID: -354716006
+      spriteID: c608c6a4a8935d645845a5d4f2bba8e7
+      internalID: -981021936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: creatures_tileset_2
+      rect:
+        serializedVersion: 2
+        x: 1049
+        y: 142
+        width: 444
+        height: 349
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e364bb40506f4e848aefe12dd06dfefd
+      internalID: 615584942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: creatures_tileset_3
+      rect:
+        serializedVersion: 2
+        x: 1040
+        y: 593
+        width: 485
+        height: 403
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d87fa30e6394fc4b8c18747f3cd0a05
+      internalID: 571625993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: creatures_tileset_4
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 569
+        width: 432
+        height: 422
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5d423e3a6fd41e4a8009b85f508defb
+      internalID: 968066556
       vertices: []
       indices: 
       edges: []
@@ -218,10 +218,10 @@ TextureImporter:
       name: creatures_tileset_5
       rect:
         serializedVersion: 2
-        x: 1056
-        y: 156
-        width: 442
-        height: 320
+        x: 60
+        y: 282
+        width: 484
+        height: 279
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,8 +229,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0df9c1ddd38024e4bb58b15241e55ecc
-      internalID: 1209198942
+      spriteID: 22149d6f30d1a7640ae2bfc6c96b5f8c
+      internalID: -911472227
       vertices: []
       indices: 
       edges: []
@@ -246,12 +246,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      creatures_tileset_0: 1001697032
-      creatures_tileset_1: 1597767951
-      creatures_tileset_2: 712402801
-      creatures_tileset_3: -836211400
-      creatures_tileset_4: -354716006
-      creatures_tileset_5: 1209198942
+      creatures_tileset_0: 2012608854
+      creatures_tileset_1: -981021936
+      creatures_tileset_2: 615584942
+      creatures_tileset_3: 571625993
+      creatures_tileset_4: 968066556
+      creatures_tileset_5: -911472227
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

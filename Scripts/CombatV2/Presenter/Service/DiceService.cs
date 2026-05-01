@@ -114,14 +114,14 @@ public class DiceService
             return DiceTier.Low;
 
         float normalized = (float)value / maxValue;
-        GetThresholds(maxValue, attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
+        GetThresholds(attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
 
         if (normalized <= lowThreshold) return DiceTier.Low;
         if (normalized <= highThreshold) return DiceTier.Medium;
         return DiceTier.High;
     }
 
-    private void GetThresholds(int maxValue, int attackerLevel, int defenderLevel, out float lowThreshold, out float highThreshold)
+    private void GetThresholds(int attackerLevel, int defenderLevel, out float lowThreshold, out float highThreshold)
     {
         int delta = attackerLevel - defenderLevel;
 
@@ -147,7 +147,7 @@ public class DiceService
     public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel)
     {
         int safeMaxValue = Math.Max(1, maxValue);
-        GetThresholds(safeMaxValue, attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
+        GetThresholds(attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
 
         int lowMax = 0;
         int mediumMax = 0;

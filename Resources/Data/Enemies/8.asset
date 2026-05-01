@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 9
   tierMin: 1
   tierMax: 2
-  image: {fileID: -974051958, guid: 71e615ef3688d604eb62c4a21b3ada44, type: 3}
+  image: {fileID: 21300000, guid: ab85e34efef7afe47b7db036f6e0617d, type: 2}
   tags:
     behavior: 2
     style: 0

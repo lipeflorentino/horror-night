@@ -23,9 +23,9 @@ public class DicePanelView : MonoBehaviour
     [SerializeField] private RectTransform powerDiceContainer;
     [SerializeField] private RectTransform accuracyDiceContainer;
     [SerializeField] private DiceAllocationItemUI allocationItemPrefab;
-    [SerializeField] private Sprite mindIcon;
-    [SerializeField] private Sprite heartIcon;
-    [SerializeField] private Sprite bodyIcon;
+    [SerializeField] private Sprite mindDiceIcon;
+    [SerializeField] private Sprite heartDiceIcon;
+    [SerializeField] private Sprite bodyDiceIcon;
     [SerializeField] private TMPro.TMP_Text diceTiersText;
     [SerializeField] private TMPro.TMP_Text resultPanelText;
 
@@ -192,9 +192,9 @@ public class DicePanelView : MonoBehaviour
     {
         return type switch
         {
-            DiceStatType.Mind => mindIcon,
-            DiceStatType.Heart => heartIcon,
-            DiceStatType.Body => bodyIcon,
+            DiceStatType.Mind => mindDiceIcon,
+            DiceStatType.Heart => heartDiceIcon,
+            DiceStatType.Body => bodyDiceIcon,
             _ => null
         };
     }

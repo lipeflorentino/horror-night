@@ -5,5 +5,5 @@ ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,HeartMi
 4,Rastejador da Folhagem,Criatura que se arrasta sob folhas mortas,Normal,9,0,2,Aggressive,Primal,Beast,9,13,3,6,2,3,,Assets/Art/Sprites/Creatures/creatures_tileset_3.asset,9,13,3,6,5,8,5,9
 5,Corvo Espectral,Ave de olhos vazios que observa em silêncio,Normal,8,0,2,Cautious,Stealthy,Spirit,7,10,2,4,3,5,,Assets/Art/Sprites/Creatures/creatures_tileset_4.asset,7,10,2,5,3,5,2,4
 6,Lenhador Perdido,Alma condenada que vaga entre as árvores,Normal,7,0,2,Erratic,Brutal,Humanoid,10,14,4,6,2,4,,Assets/Art/Sprites/Creatures/creatures_tileset_5.asset,10,14,4,6,4,7,4,8
-7,Filhote do Breu,Pequena aberração que caça em grupos,Normal,10,0,1,Aggressive,Frenetic,Aberration,6,9,2,4,1,3,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset.png,6,9,3,8,4,9,6,12
-8,Vulto da Névoa,Forma indistinta que surge entre a neblina,Normal,9,1,2,Cautious,Stealthy,Entity,8,11,3,4,3,6,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset.png,8,11,4,8,5,10,8,10
+7,Filhote do Breu,Pequena aberração que caça em grupos,Normal,10,0,1,Aggressive,Frenetic,Aberration,6,9,2,4,1,3,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset_0.asset,6,9,3,8,4,9,6,12
+8,Vulto da Névoa,Forma indistinta que surge entre a neblina,Normal,9,1,2,Cautious,Stealthy,Entity,8,11,3,4,3,6,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset_1.asset,8,11,4,8,5,10,8,10

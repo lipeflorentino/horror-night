@@ -14,6 +14,7 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text AttackText;
     public TMP_Text DefenseText;
     public TMP_Text InitiativeText;
+    // TODO: implementar effects (buff e debuff)
 
     public void Bind(Battler battler)
     {

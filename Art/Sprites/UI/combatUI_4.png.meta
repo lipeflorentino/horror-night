@@ -110,27 +110,6 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: combatUI_4_0
-      rect:
-        serializedVersion: 2
-        x: 143
-        y: 804
-        width: 1055
-        height: 45
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4beec13a644481a4994a2d0fbc8728e9
-      internalID: -62932660
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: combatUI_4_1
       rect:
         serializedVersion: 2
@@ -139,7 +118,7 @@ TextureImporter:
         width: 713
         height: 308
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -147,27 +126,6 @@ TextureImporter:
       bones: []
       spriteID: ac4eb5d082d175643865f8f80c904ba8
       internalID: -975478995
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: combatUI_4_2
-      rect:
-        serializedVersion: 2
-        x: 974
-        y: 430
-        width: 323
-        height: 321
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 290c443eaaead3246bcd43faab52f287
-      internalID: -2062393788
       vertices: []
       indices: 
       edges: []
@@ -202,7 +160,7 @@ TextureImporter:
         width: 234
         height: 234
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -210,27 +168,6 @@ TextureImporter:
       bones: []
       spriteID: e72413f138432bf4e96babd835347552
       internalID: -23503520
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: combatUI_4_5
-      rect:
-        serializedVersion: 2
-        x: 594
-        y: 0
-        width: 718
-        height: 269
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ef2b4bfd2d12d0c48b9a68fcfefe127a
-      internalID: 801041795
       vertices: []
       indices: 
       edges: []

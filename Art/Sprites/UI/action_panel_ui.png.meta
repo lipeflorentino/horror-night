@@ -236,27 +236,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: action_panel_ui_6
-      rect:
-        serializedVersion: 2
-        x: 368
-        y: 338
-        width: 243
-        height: 308
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fccf9a46cb3fefb4a9ac255481db8e53
-      internalID: 1335379725
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: action_panel_ui_7
       rect:
         serializedVersion: 2

@@ -181,7 +181,7 @@ TextureImporter:
         width: 225
         height: 83
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 5, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -189,48 +189,6 @@ TextureImporter:
       bones: []
       spriteID: 1d8b672a6a1c26f4681ab85f72bf37bf
       internalID: -1381891710
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_4
-      rect:
-        serializedVersion: 2
-        x: 361
-        y: 428
-        width: 241
-        height: 84
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4483573837e61da4d99feb4e76adeabc
-      internalID: -1994872087
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_5
-      rect:
-        serializedVersion: 2
-        x: 641
-        y: 427
-        width: 228
-        height: 85
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3aa4efb100acaf449a6c842937664459
-      internalID: 12121593
       vertices: []
       indices: 
       edges: []
@@ -244,7 +202,7 @@ TextureImporter:
         width: 120
         height: 127
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -265,7 +223,7 @@ TextureImporter:
         width: 127
         height: 126
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -286,7 +244,7 @@ TextureImporter:
         width: 126
         height: 125
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -307,7 +265,7 @@ TextureImporter:
         width: 129
         height: 126
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -328,7 +286,7 @@ TextureImporter:
         width: 121
         height: 125
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -349,7 +307,7 @@ TextureImporter:
         width: 221
         height: 51
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -357,90 +315,6 @@ TextureImporter:
       bones: []
       spriteID: 5dccc39f184ba9a47b29ab9fc5bb77e1
       internalID: 759912743
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_12
-      rect:
-        serializedVersion: 2
-        x: 233
-        y: 20
-        width: 211
-        height: 204
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 59036c8498111f14d9e4225e47a1f388
-      internalID: -318792171
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_13
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 220
-        height: 230
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eac3ff2c48c23874098d96e4967fdc98
-      internalID: 637443867
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_14
-      rect:
-        serializedVersion: 2
-        x: 486
-        y: 5
-        width: 80
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9d3d81418ff4d8d44904f9029686986f
-      internalID: -1404050432
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CombatUI_New_15
-      rect:
-        serializedVersion: 2
-        x: 590
-        y: 2
-        width: 76
-        height: 73
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 519be1f141fdc5a4d9cdb4e372ced577
-      internalID: -650670837
       vertices: []
       indices: 
       edges: []
