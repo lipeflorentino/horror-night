@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8238358382391928727}
   - component: {fileID: 5736515447388381465}
   m_Layer: 5
-  m_Name: AttackImage
+  m_Name: EnemyAttackPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,14 +58,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9749273, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 46e2ed4d73483174b80f5c8c8100516a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 57dd1760d041e5541ae6fe5687014f52, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1

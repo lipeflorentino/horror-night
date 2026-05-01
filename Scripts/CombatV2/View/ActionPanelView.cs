@@ -92,6 +92,7 @@ public class ActionPanelView : MonoBehaviour
         if (BoundInputHandler != null)
             BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
 
+        diceAllocationView = FindObjectOfType<DiceAllocationView>();
         HideConfirmPanel();
     }
 

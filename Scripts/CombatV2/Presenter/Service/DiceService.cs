@@ -104,8 +104,6 @@ public class DiceService
             DiceStatType.Body => "Body DiceStatBonus placeholder",
             _ => "Unknown DiceStatBonus placeholder"
         };
-
-        Debug.Log($"[Dice Bonus] {bonusText}");
     }
 
     private DiceTier GetTier(int value, int maxValue, int attackerLevel, int defenderLevel)

@@ -54,8 +54,9 @@ public class EnemyTurnPlanner
 
     private static DiceStatType ChoosePlaceholderType(EnemyInstance snapshot, bool forPower)
     {
-        if (snapshot.source.tags == null)
-            return forPower ? DiceStatType.Body : DiceStatType.Mind;
+        DiceStatType defaultPlaceholderType = forPower ? DiceStatType.Body : DiceStatType.Mind;
+        
+        if (snapshot == null || snapshot.source == null || snapshot.source.tags == null) return defaultPlaceholderType;
 
         EnemyTagSet tags = snapshot.source.tags;
 
