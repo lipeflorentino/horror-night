@@ -36,6 +36,7 @@ public class CombatInputHandler : MonoBehaviour
         SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
         UpdateSelectedDiceTypeLabel();
         Combat.View.ActionPanel.HideConfirmPanel();
+        RefreshSelectionPreview();
         RefreshDiceButtons();
         UpdateCombatView();
         NotifyConfirmAvailability();
@@ -88,6 +89,7 @@ public class CombatInputHandler : MonoBehaviour
             AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
         } 
             
+        RefreshSelectionPreview();
         UpdateCombatView();
         RefreshDiceButtons();
         NotifyConfirmAvailability();
@@ -107,6 +109,7 @@ public class CombatInputHandler : MonoBehaviour
             AccuracyDiceTypes.Remove(diceStatType);
         }
 
+        RefreshSelectionPreview();
         UpdateCombatView();
         RefreshDiceButtons();
         NotifyConfirmAvailability();
@@ -143,6 +146,7 @@ public class CombatInputHandler : MonoBehaviour
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
         Combat.View.ActionPanel.HideConfirmPanel();
+        RefreshSelectionPreview();
 
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerSkipTurn();
@@ -203,4 +207,17 @@ public class CombatInputHandler : MonoBehaviour
     {
         Combat.View.ActionPanel.SetSelectedDiceTypeLabel($"P:{SelectedPowerDiceType} | A:{SelectedAccuracyDiceType}");
     }
+
+
+    private void RefreshSelectionPreview()
+    {
+        if (Combat == null || Combat.View == null || Combat.View.DicePanelView == null)
+            return;
+
+        List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
+        List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
+        (int lowMax, int mediumMax, int highMin) boundaries = Combat.GetPlayerTierBoundaries(6);
+        Combat.View.DicePanelView.UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
+    }
+
 }
