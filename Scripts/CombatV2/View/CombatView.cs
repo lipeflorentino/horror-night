@@ -64,15 +64,14 @@ public class CombatView : MonoBehaviour
     }
 
     public IEnumerator PlayDiceResolution(
-        IReadOnlyList<DiceResult> playerPowerRolls,
-        IReadOnlyList<DiceResult> playerAccuracyRolls,
-        IReadOnlyList<DiceResult> enemyPowerRolls,
-        IReadOnlyList<DiceResult> enemyAccuracyRolls)
+        IReadOnlyList<DiceResult> playerRolls,
+        IReadOnlyList<DiceResult> enemyRolls,
+        DiceRollType rollType)
     {
         if (DicePanelView  == null)
             yield break;
 
-        yield return DicePanelView.PlayDiceResolution(playerPowerRolls, playerAccuracyRolls, enemyPowerRolls, enemyAccuracyRolls);
+        yield return DicePanelView.PlayDiceResolution(playerRolls, enemyRolls, rollType);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

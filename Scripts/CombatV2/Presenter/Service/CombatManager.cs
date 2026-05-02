@@ -168,13 +168,14 @@ public class CombatManager : MonoBehaviour
         GenerateEnemyAction();
         yield return WaitForSeconds0_5;
         RollActions(playerType, powerDiceTypes, accuracyDiceTypes);
-        yield return View.PlayDiceResolution(
-            PendingPlayerPowerRolls,
-            PendingPlayerAccuracyRolls,
-            PendingEnemyPowerRolls,
-            PendingEnemyAccuracyRolls
-        );
-        yield return WaitForSeconds0_5;
+        bool attackerAccuracyEffective = ResolveAccuracyStage();
+
+        yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy);
+
+        if (attackerAccuracyEffective)
+        {
+            yield return View.PlayDiceResolution(PendingPlayerPowerRolls, PendingEnemyPowerRolls, DiceRollType.Power);
+        }
 
         Resolve();
 
@@ -268,6 +269,12 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
 
         View.UpdateView(Player, Enemy);
+    }
+
+    private bool ResolveAccuracyStage()
+    {
+        ActionInstance attack = PlayerIsAttacker ? PendingPlayerAction : PendingEnemyAction;
+        return attack != null && attack.AccuracyDice != null && attack.AccuracyDice.Tier != DiceTier.Low;
     }
 
     private void EndTurn()
