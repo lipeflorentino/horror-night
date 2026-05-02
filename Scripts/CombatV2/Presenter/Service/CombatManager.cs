@@ -255,6 +255,7 @@ public class CombatManager : MonoBehaviour
         }
 
         ActionResolutionResult result = Resolver.Resolve(attack, defense, attacker, target);
+        
         View.ShowAttackEffect(PlayerIsAttacker);
 
         if (result.AppliesDamage)
