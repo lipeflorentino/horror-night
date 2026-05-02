@@ -35,10 +35,34 @@ public class DiceService
     {
         DiceResult best = null;
         for (int i = 0; i < rolls.Count; i++)
-            if (best == null || rolls[i].Value > best.Value)
+            if (best == null || IsBetterRoll(rolls[i], best))
                 best = rolls[i];
 
         return best;
+    }
+
+    private bool IsBetterRoll(DiceResult candidate, DiceResult currentBest)
+    {
+        if (candidate.Value != currentBest.Value)
+            return candidate.Value > currentBest.Value;
+
+        int candidatePriority = GetStatPriority(candidate.StatType);
+        int currentPriority = GetStatPriority(currentBest.StatType);
+        if (candidatePriority != currentPriority)
+            return candidatePriority > currentPriority;
+
+        return false;
+    }
+
+    private int GetStatPriority(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => 3,
+            DiceStatType.Heart => 2,
+            DiceStatType.Body => 1,
+            _ => 0
+        };
     }
 
     public List<DiceResult> RollMany(Battler battler, IReadOnlyList<DiceStatType> diceTypes, DiceRollType rollType, int attackerLevel = 1, int defenderLevel = 1)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class DicePanelView : MonoBehaviour
 {
@@ -11,64 +12,42 @@ public class DicePanelView : MonoBehaviour
     [SerializeField] private RectTransform enemySlotsContainer;
     [SerializeField, Min(1)] private int maxSlotsPerSide = 3;
     [SerializeField] private float postRollDelay = 0.4f;
+    [SerializeField] private float highlightResultDelay = 2f;
     [SerializeField] private GameObject diceResolutionPanel;
+    [SerializeField] private TMP_Text rollTypeLabel;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
     private bool slotsInitialized;
 
     public IEnumerator PlayDiceResolution(
-        IReadOnlyList<DiceResult> playerPowerRolls,
-        IReadOnlyList<DiceResult> playerAccuracyRolls,
-        IReadOnlyList<DiceResult> enemyPowerRolls,
-        IReadOnlyList<DiceResult> enemyAccuracyRolls)
+        IReadOnlyList<DiceResult> playerRolls,
+        IReadOnlyList<DiceResult> enemyRolls,
+        DiceRollType rollType)
     {
         EnsureSlotsInitialized();
         ShowDiceResolution(true);
+        UpdateRollTypeLabel(rollType);
 
         List<Coroutine> runningCoroutines = new();
 
-        int playerPowerCount = playerPowerRolls != null ? playerPowerRolls.Count : 0;
-        int playerAccuracyCount = playerAccuracyRolls != null ? playerAccuracyRolls.Count : 0;
-        int enemyPowerCount = enemyPowerRolls != null ? enemyPowerRolls.Count : 0;
-        int enemyAccuracyCount = enemyAccuracyRolls != null ? enemyAccuracyRolls.Count : 0;
+        int playerCount = Mathf.Min(playerRolls != null ? playerRolls.Count : 0, maxSlotsPerSide);
+        int enemyCount = Mathf.Min(enemyRolls != null ? enemyRolls.Count : 0, maxSlotsPerSide);
+        int playerHighlightedIndex = GetHighlightedRollIndex(playerRolls, playerCount);
+        int enemyHighlightedIndex = GetHighlightedRollIndex(enemyRolls, enemyCount);
 
-        int playerCount = Mathf.Min(playerPowerCount + playerAccuracyCount, maxSlotsPerSide);
-        int enemyCount = Mathf.Min(enemyPowerCount + enemyAccuracyCount, maxSlotsPerSide);
-
-        PrepareSlots(runtimePlayerSlots, playerCount);
-        PrepareSlots(runtimeEnemySlots, enemyCount);
-
-        int slotIndex = 0;
-        for (int i = 0; i < playerPowerCount && slotIndex < playerCount; i++, slotIndex++)
-        {
-            runtimePlayerSlots[slotIndex].SetDiceIcon(playerPowerRolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerPowerRolls[i].Value, playerPowerRolls[i].MaxValue)));
-        }
-
-        for (int i = 0; i < playerAccuracyCount && slotIndex < playerCount; i++, slotIndex++)
-        {
-            runtimePlayerSlots[slotIndex].SetDiceIcon(playerAccuracyRolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerAccuracyRolls[i].Value, playerAccuracyRolls[i].MaxValue)));
-        }
-
-        slotIndex = 0;
-        for (int i = 0; i < enemyPowerCount && slotIndex < enemyCount; i++, slotIndex++)
-        {
-            runtimeEnemySlots[slotIndex].SetDiceIcon(enemyPowerRolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyPowerRolls[i].Value, enemyPowerRolls[i].MaxValue)));
-        }
-
-        for (int i = 0; i < enemyAccuracyCount && slotIndex < enemyCount; i++, slotIndex++)
-        {
-            runtimeEnemySlots[slotIndex].SetDiceIcon(enemyAccuracyRolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyAccuracyRolls[i].Value, enemyAccuracyRolls[i].MaxValue)));
-        }
+        PrepareSlots(runtimePlayerSlots, playerCount, playerHighlightedIndex);
+        PrepareSlots(runtimeEnemySlots, enemyCount, enemyHighlightedIndex);
+        EnqueueRollAnimations(runtimePlayerSlots, playerRolls, playerCount, runningCoroutines);
+        EnqueueRollAnimations(runtimeEnemySlots, enemyRolls, enemyCount, runningCoroutines);
 
         for (int i = 0; i < runningCoroutines.Count; i++)
             yield return runningCoroutines[i];
 
         yield return new WaitForSeconds(postRollDelay);
+        SetHighlightedIndex(runtimePlayerSlots, playerHighlightedIndex, playerCount);
+        SetHighlightedIndex(runtimeEnemySlots, enemyHighlightedIndex, enemyCount);
+        yield return new WaitForSeconds(highlightResultDelay);
         ShowDiceResolution(false);
     }
 
@@ -127,7 +106,7 @@ public class DicePanelView : MonoBehaviour
         }
     }
 
-    private void PrepareSlots(List<DiceRollUI> slots, int usedCount)
+    private void PrepareSlots(List<DiceRollUI> slots, int usedCount, int highlightedIndex)
     {
         for (int i = 0; i < slots.Count; i++)
         {
@@ -135,8 +114,76 @@ public class DicePanelView : MonoBehaviour
             slots[i].gameObject.SetActive(isActive);
 
             if (isActive)
+            {
                 slots[i].ClearValue();
+                slots[i].SetHighlighted(i == highlightedIndex);
+            }
         }
+    }
+
+    private void EnqueueRollAnimations(List<DiceRollUI> slots, IReadOnlyList<DiceResult> rolls, int usedCount, List<Coroutine> runningCoroutines)
+    {
+        if (rolls == null)
+            return;
+
+        for (int i = 0; i < usedCount; i++)
+        {
+            slots[i].SetDiceIcon(rolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(slots[i].PlayRollAnimation(rolls[i].Value, rolls[i].MaxValue)));
+        }
+    }
+
+    private void SetHighlightedIndex(List<DiceRollUI> slots, int highlightedIndex, int usedCount)
+    {
+        for (int i = 0; i < usedCount; i++)
+            slots[i].SetHighlighted(i == highlightedIndex);
+    }
+
+    private void UpdateRollTypeLabel(DiceRollType rollType)
+    {
+        if (rollTypeLabel == null)
+            return;
+
+        rollTypeLabel.text = rollType == DiceRollType.Accuracy ? "ACCURACY ROLL" : "POWER ROLL";
+    }
+
+    private int GetHighlightedRollIndex(IReadOnlyList<DiceResult> rolls, int usedCount)
+    {
+        if (rolls == null || usedCount <= 0)
+            return -1;
+
+        int bestIndex = 0;
+        for (int i = 1; i < usedCount; i++)
+        {
+            if (IsBetterRoll(rolls[i], rolls[bestIndex]))
+                bestIndex = i;
+        }
+
+        return bestIndex;
+    }
+
+    private bool IsBetterRoll(DiceResult candidate, DiceResult currentBest)
+    {
+        if (candidate.Value != currentBest.Value)
+            return candidate.Value > currentBest.Value;
+
+        int candidatePriority = GetStatPriority(candidate.StatType);
+        int currentPriority = GetStatPriority(currentBest.StatType);
+        if (candidatePriority != currentPriority)
+            return candidatePriority > currentPriority;
+
+        return false;
+    }
+
+    private int GetStatPriority(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => 3,
+            DiceStatType.Heart => 2,
+            DiceStatType.Body => 1,
+            _ => 0
+        };
     }
 
     public void HidePanel()
