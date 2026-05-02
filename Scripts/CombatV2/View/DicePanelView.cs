@@ -12,10 +12,6 @@ public class DicePanelView : MonoBehaviour
     [SerializeField, Min(1)] private int maxSlotsPerSide = 3;
     [SerializeField] private float postRollDelay = 0.4f;
     [SerializeField] private GameObject diceResolutionPanel;
-    [SerializeField] private Color playerPowerColor = Color.green;
-    [SerializeField] private Color playerAccuracyColor = Color.blue;
-    [SerializeField] private Color enemyPowerColor = new(0.6f, 0.3f, 0.9f);
-    [SerializeField] private Color enemyAccuracyColor = Color.red;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
@@ -46,27 +42,27 @@ public class DicePanelView : MonoBehaviour
         int slotIndex = 0;
         for (int i = 0; i < playerPowerCount && slotIndex < playerCount; i++, slotIndex++)
         {
-            runtimePlayerSlots[slotIndex].SetDiceColor(playerPowerColor);
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerPowerRolls[i].Value)));
+            runtimePlayerSlots[slotIndex].SetDiceIcon(playerPowerRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerPowerRolls[i].Value, playerPowerRolls[i].MaxValue)));
         }
 
         for (int i = 0; i < playerAccuracyCount && slotIndex < playerCount; i++, slotIndex++)
         {
-            runtimePlayerSlots[slotIndex].SetDiceColor(playerAccuracyColor);
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerAccuracyRolls[i].Value)));
+            runtimePlayerSlots[slotIndex].SetDiceIcon(playerAccuracyRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[slotIndex].PlayRollAnimation(playerAccuracyRolls[i].Value, playerAccuracyRolls[i].MaxValue)));
         }
 
         slotIndex = 0;
         for (int i = 0; i < enemyPowerCount && slotIndex < enemyCount; i++, slotIndex++)
         {
-            runtimeEnemySlots[slotIndex].SetDiceColor(enemyPowerColor);
-            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyPowerRolls[i].Value)));
+            runtimeEnemySlots[slotIndex].SetDiceIcon(enemyPowerRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyPowerRolls[i].Value, enemyPowerRolls[i].MaxValue)));
         }
 
         for (int i = 0; i < enemyAccuracyCount && slotIndex < enemyCount; i++, slotIndex++)
         {
-            runtimeEnemySlots[slotIndex].SetDiceColor(enemyAccuracyColor);
-            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyAccuracyRolls[i].Value)));
+            runtimeEnemySlots[slotIndex].SetDiceIcon(enemyAccuracyRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(runtimeEnemySlots[slotIndex].PlayRollAnimation(enemyAccuracyRolls[i].Value, enemyAccuracyRolls[i].MaxValue)));
         }
 
         for (int i = 0; i < runningCoroutines.Count; i++)

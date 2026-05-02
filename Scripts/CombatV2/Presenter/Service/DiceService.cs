@@ -6,20 +6,29 @@ public class DiceService
 {
     private readonly System.Random random = new();
 
-    public DiceResult Roll(int maxValue = 6)
+    private readonly struct DiceRollSpec
     {
-        return Roll(maxValue, 1, 1);
+        public readonly int MaxValue;
+        public readonly DiceStatType StatType;
+        public readonly DiceRollType RollType;
+
+        public DiceRollSpec(int maxValue, DiceStatType statType, DiceRollType rollType)
+        {
+            MaxValue = maxValue;
+            StatType = statType;
+            RollType = rollType;
+        }
     }
 
-    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel)
+    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
     {
         int safeMaxValue = Math.Max(1, maxValue);
         int value = random.Next(1, safeMaxValue + 1);
         DiceTier tier = GetTier(value, safeMaxValue, attackerLevel, defenderLevel);
 
-        Console.WriteLine($"[Dice] Rolled d{safeMaxValue}: {value} → {tier}");
+        Console.WriteLine($"[Dice] Rolled {rollType} {statType} d{safeMaxValue}: {value} -> {tier}");
 
-        return new DiceResult(value, tier, safeMaxValue);
+        return new DiceResult(value, tier, safeMaxValue, statType, rollType);
     }
 
     public DiceResult GetBestResult(List<DiceResult> rolls)
@@ -32,17 +41,18 @@ public class DiceService
         return best;
     }
 
-    public List<DiceResult> RollMany(IReadOnlyList<int> diceMaxValues, int attackerLevel = 1, int defenderLevel = 1)
+    public List<DiceResult> RollMany(Battler battler, IReadOnlyList<DiceStatType> diceTypes, DiceRollType rollType, int attackerLevel = 1, int defenderLevel = 1)
     {
-        if (diceMaxValues == null || diceMaxValues.Count == 0)
-            return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel) };
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, diceTypes, rollType);
+        if (diceSpecs.Count == 0)
+            return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel, DiceStatType.Body, rollType) };
 
-        List<DiceResult> results = new(diceMaxValues.Count);
-        for (int i = 0; i < diceMaxValues.Count; i++)
-            results.Add(Roll(diceMaxValues[i], attackerLevel, defenderLevel));
-
-        if (results.Count == 0)
-            results.Add(Roll(1, attackerLevel, defenderLevel));
+        List<DiceResult> results = new(diceSpecs.Count);
+        for (int i = 0; i < diceSpecs.Count; i++)
+        {
+            DiceRollSpec spec = diceSpecs[i];
+            results.Add(Roll(spec.MaxValue, attackerLevel, defenderLevel, spec.StatType, spec.RollType));
+        }
 
         return results;
     }
@@ -50,8 +60,18 @@ public class DiceService
     public List<int> ConvertToFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
         List<int> diceFaces = new();
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, diceTypes, DiceRollType.Power);
+        for (int i = 0; i < diceSpecs.Count; i++)
+            diceFaces.Add(diceSpecs[i].MaxValue);
+
+        return diceFaces;
+    }
+
+    private List<DiceRollSpec> BuildDiceRollSpecs(Battler battler, IReadOnlyList<DiceStatType> diceTypes, DiceRollType rollType)
+    {
+        List<DiceRollSpec> diceSpecs = new();
         if (diceTypes == null)
-            return diceFaces;
+            return diceSpecs;
 
         Dictionary<DiceStatType, int> diceCountByType = new();
         for (int i = 0; i < diceTypes.Count; i++)
@@ -66,19 +86,19 @@ public class DiceService
             int diceCount = Mathf.Max(0, pair.Value);
             if (totalValue <= 0 || diceCount <= 0)
                 continue;
-                
+
             int baseFace = Mathf.Max(1, totalValue / diceCount);
             int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
 
             for (int i = 0; i < diceCount; i++)
             {
                 int bonus = i < remainder ? 1 : 0;
-                diceFaces.Add(baseFace + bonus);
+                diceSpecs.Add(new DiceRollSpec(baseFace + bonus, pair.Key, rollType));
                 LogDiceStatBonus(pair.Key);
             }
         }
 
-        return diceFaces;
+        return diceSpecs;
     }
 
     public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)
@@ -178,4 +198,3 @@ public class DiceService
     }
 
 }
-

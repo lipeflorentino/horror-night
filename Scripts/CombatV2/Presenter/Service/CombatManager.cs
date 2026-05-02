@@ -195,15 +195,10 @@ public class CombatManager : MonoBehaviour
     {
         ActionDefinition playerAction = BuildDefinitionFromBattler(Player, playerType);
 
-        List<int> powerDiceFaces = DiceService.ConvertToFaces(Player, powerDiceTypes);
-        List<int> accuracyDiceFaces = DiceService.ConvertToFaces(Player, accuracyDiceTypes);
-        List<int> enemyPowerDiceFaces = DiceService.ConvertToFaces(Enemy, PendingEnemyPowerDiceTypes);
-        List<int> enemyAccuracyDiceFaces = DiceService.ConvertToFaces(Enemy, PendingEnemyAccuracyDiceTypes);
-
-        PendingPlayerPowerRolls = DiceService.RollMany(powerDiceFaces, Player.Level, Enemy.Level);
-        PendingPlayerAccuracyRolls = DiceService.RollMany(accuracyDiceFaces, Player.Level, Enemy.Level);
-        PendingEnemyPowerRolls = DiceService.RollMany(enemyPowerDiceFaces, Enemy.Level, Player.Level);
-        PendingEnemyAccuracyRolls = DiceService.RollMany(enemyAccuracyDiceFaces, Enemy.Level, Player.Level);
+        PendingPlayerPowerRolls = DiceService.RollMany(Player, powerDiceTypes, DiceRollType.Power, Player.Level, Enemy.Level);
+        PendingPlayerAccuracyRolls = DiceService.RollMany(Player, accuracyDiceTypes, DiceRollType.Accuracy, Player.Level, Enemy.Level);
+        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, PendingEnemyPowerDiceTypes, DiceRollType.Power, Enemy.Level, Player.Level);
+        PendingEnemyAccuracyRolls = DiceService.RollMany(Enemy, PendingEnemyAccuracyDiceTypes, DiceRollType.Accuracy, Enemy.Level, Player.Level);
 
         DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
         DiceResult playerAccuracyDice = DiceService.GetBestResult(PendingPlayerAccuracyRolls);

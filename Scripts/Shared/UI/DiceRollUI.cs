@@ -10,6 +10,11 @@ public class DiceRollUI : MonoBehaviour
     [SerializeField] private float rollDuration = 0.65f;
     [SerializeField] private float spinSpeed = 900f;
     [SerializeField] private float updateInterval = 0.06f;
+    
+    [Header("Dice Icons")]
+    [SerializeField] private Sprite mindDiceIcon;
+    [SerializeField] private Sprite heartDiceIcon;
+    [SerializeField] private Sprite bodyDiceIcon;
 
     public void ClearValue()
     {
@@ -51,9 +56,20 @@ public class DiceRollUI : MonoBehaviour
             diceValueText.text = finalValue.ToString();
     }
 
-    public void SetDiceColor(Color color)
+    public void SetDiceIcon(DiceStatType statType)
     {
         if (diceImage != null)
-            diceImage.color = color;
+            diceImage.sprite = GetIcon(statType);
+    }
+
+    public Sprite GetIcon(DiceStatType type)
+    {
+        return type switch
+        {
+            DiceStatType.Mind => mindDiceIcon,
+            DiceStatType.Heart => heartDiceIcon,
+            _ => bodyDiceIcon,
+        };
+
     }
 }
