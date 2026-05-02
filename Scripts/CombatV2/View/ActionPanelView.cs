@@ -220,40 +220,62 @@ public class ActionPanelView : MonoBehaviour
         HideConfirmPanel();
     }
 
-    public void SetAddDiceButtonsInteractable(DiceStatType type, bool isInteractable)
+    public void SetAddDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
-        switch (type)
+        switch (stat)
         {
             case DiceStatType.Mind:
-                if (AddMindPowerDiceButton != null) AddMindPowerDiceButton.interactable = isInteractable;
-                if (AddMindAccuracyDiceButton != null) AddMindAccuracyDiceButton.interactable = isInteractable;
+                if (rollType == DiceRollType.Power && AddMindPowerDiceButton != null)
+                    AddMindPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && AddMindAccuracyDiceButton != null)
+                    AddMindAccuracyDiceButton.interactable = isInteractable;
                 break;
+
             case DiceStatType.Heart:
-                if (AddHeartPowerDiceButton != null) AddHeartPowerDiceButton.interactable = isInteractable;
-                if (AddHeartAccuracyDiceButton != null) AddHeartAccuracyDiceButton.interactable = isInteractable;
+                if (rollType == DiceRollType.Power && AddHeartPowerDiceButton != null)
+                    AddHeartPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && AddHeartAccuracyDiceButton != null)
+                    AddHeartAccuracyDiceButton.interactable = isInteractable;
                 break;
+
             case DiceStatType.Body:
-                if (AddBodyPowerDiceButton != null) AddBodyPowerDiceButton.interactable = isInteractable;
-                if (AddBodyAccuracyDiceButton != null) AddBodyAccuracyDiceButton.interactable = isInteractable;
+                if (rollType == DiceRollType.Power && AddBodyPowerDiceButton != null)
+                    AddBodyPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && AddBodyAccuracyDiceButton != null)
+                    AddBodyAccuracyDiceButton.interactable = isInteractable;
                 break;
         }
     }
 
-    public void SetRemoveDiceButtonsInteractable(DiceStatType type, bool hasPowerDie, bool hasAccuracyDie)
+    public void SetRemoveDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
-        switch (type)
+        switch (stat)
         {
             case DiceStatType.Mind:
-                if (RemoveMindPowerDiceButton != null) RemoveMindPowerDiceButton.interactable = hasPowerDie;
-                if (RemoveMindAccuracyDiceButton != null) RemoveMindAccuracyDiceButton.interactable = hasAccuracyDie;
+                if (rollType == DiceRollType.Power && RemoveMindPowerDiceButton != null)
+                    RemoveMindPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && RemoveMindAccuracyDiceButton != null)
+                    RemoveMindAccuracyDiceButton.interactable = isInteractable;
                 break;
+
             case DiceStatType.Heart:
-                if (RemoveHeartPowerDiceButton != null) RemoveHeartPowerDiceButton.interactable = hasPowerDie;
-                if (RemoveHeartAccuracyDiceButton != null) RemoveHeartAccuracyDiceButton.interactable = hasAccuracyDie;
+                if (rollType == DiceRollType.Power && RemoveHeartPowerDiceButton != null)
+                    RemoveHeartPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && RemoveHeartAccuracyDiceButton != null)
+                    RemoveHeartAccuracyDiceButton.interactable = isInteractable;
                 break;
+
             case DiceStatType.Body:
-                if (RemoveBodyPowerDiceButton != null) RemoveBodyPowerDiceButton.interactable = hasPowerDie;
-                if (RemoveBodyAccuracyDiceButton != null) RemoveBodyAccuracyDiceButton.interactable = hasAccuracyDie;
+                if (rollType == DiceRollType.Power && RemoveBodyPowerDiceButton != null)
+                    RemoveBodyPowerDiceButton.interactable = isInteractable;
+
+                if (rollType == DiceRollType.Accuracy && RemoveBodyAccuracyDiceButton != null)
+                    RemoveBodyAccuracyDiceButton.interactable = isInteractable;
                 break;
         }
     }

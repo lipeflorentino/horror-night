@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CombatInputHandler : MonoBehaviour
 {
-    private const int DicePerTurn = 3;
     private CombatManager Combat;
     private readonly List<DiceStatType> PowerDiceTypes = new();
     private readonly List<DiceStatType> AccuracyDiceTypes = new();
@@ -74,18 +73,20 @@ public class CombatInputHandler : MonoBehaviour
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (GetRemainingDiceCount() <= 0) return;
+        if (GetRemainingDiceCount(diceRollType) <= 0) return;
         if (!CanUseDiceType(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
             SelectedPowerDiceType = diceStatType; 
             PowerDiceTypes.Add(SelectedPowerDiceType);   
+            // TODO: decrement current PowerDices
         }
         else
         {
             SelectedAccuracyDiceType = diceStatType;
             AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
+            // TODO: decrement current AccuracyDices
         } 
             
         RefreshSelectionPreview();
@@ -167,20 +168,40 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshDiceButtons()
     {
-        if (Combat == null || Combat.View == null || Combat.View.ActionPanel == null)
+        if (Combat.View.ActionPanel == null)
             return;
 
-        bool canAllocateDice = !IsWaitingTurnResolution && GetRemainingDiceCount() > 0;
-        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
-            DiceStatType.Mind, canAllocateDice && CanUseDiceType(DiceStatType.Mind));
-        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
-            DiceStatType.Heart, canAllocateDice && CanUseDiceType(DiceStatType.Heart));
-        Combat.View.ActionPanel.SetAddDiceButtonsInteractable(
-            DiceStatType.Body, canAllocateDice && CanUseDiceType(DiceStatType.Body));
+        bool canAllocate = !IsWaitingTurnResolution;
 
-        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Mind, PowerDiceTypes.Contains(DiceStatType.Mind), AccuracyDiceTypes.Contains(DiceStatType.Mind));
-        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Heart, PowerDiceTypes.Contains(DiceStatType.Heart), AccuracyDiceTypes.Contains(DiceStatType.Heart));
-        Combat.View.ActionPanel.SetRemoveDiceButtonsInteractable(DiceStatType.Body, PowerDiceTypes.Contains(DiceStatType.Body), AccuracyDiceTypes.Contains(DiceStatType.Body));
+        int remainingPower = GetRemainingDiceCount(DiceRollType.Power);
+        int remainingAccuracy = GetRemainingDiceCount(DiceRollType.Accuracy);
+
+        foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
+        {
+            Combat.View.ActionPanel.SetAddDiceButtonInteractable(
+                stat,
+                DiceRollType.Power,
+                canAllocate && remainingPower > 0 && CanUseDiceType(stat)
+            );
+
+            Combat.View.ActionPanel.SetAddDiceButtonInteractable(
+                stat,
+                DiceRollType.Accuracy,
+                canAllocate && remainingAccuracy > 0 && CanUseDiceType(stat)
+            );
+            
+            Combat.View.ActionPanel.SetRemoveDiceButtonInteractable(
+                stat,
+                DiceRollType.Power,
+                PowerDiceTypes.Contains(stat)
+            );
+
+            Combat.View.ActionPanel.SetRemoveDiceButtonInteractable(
+                stat,
+                DiceRollType.Accuracy,
+                AccuracyDiceTypes.Contains(stat)
+            );
+        }
     }
 
     private bool CanUseDiceType(DiceStatType diceType)
@@ -188,9 +209,11 @@ public class CombatInputHandler : MonoBehaviour
         return Combat.GetDiceMaxValueForType(Combat.Player, diceType) > 0;
     }
 
-    private int GetRemainingDiceCount()
+    private int GetRemainingDiceCount(DiceRollType diceRollType)
     {
-        return Mathf.Max(0, DicePerTurn - (PowerDiceTypes.Count + AccuracyDiceTypes.Count));
+        int MaxDicesPerTurn = diceRollType == DiceRollType.Power ? Combat.Player.CurrentPowerDices : Combat.Player.CurrentAccuracyDices;
+        int allocatedDices = diceRollType == DiceRollType.Power ? PowerDiceTypes.Count : AccuracyDiceTypes.Count;
+        return Mathf.Max(0, MaxDicesPerTurn - allocatedDices);
     }
 
     private DiceStatType GetFirstAvailableDiceType()

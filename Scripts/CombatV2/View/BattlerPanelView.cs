@@ -39,8 +39,9 @@ public class BattlerPanelView : MonoBehaviour
         if (HpFill != null)
             HpFill.fillAmount = battler.HP / battler.MaxHp;
 
-        if (DiceText != null)
-            DiceText.text = battler.CurrentDices.ToString();
+        // TODO: verificar criação de currentPowerDices e currentAccuracyDices
+        // if (DiceText != null)
+        //     DiceText.text = battler.CurrentDices.ToString();
 
         if (AttackText != null)
             AttackText.text = battler.Attack.ToString();

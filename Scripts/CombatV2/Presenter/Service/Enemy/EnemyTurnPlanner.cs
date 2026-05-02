@@ -20,10 +20,12 @@ public class EnemyTurnPlanner
     public EnemyTurnPlan BuildPlan(Battler enemy, EnemyInstance enemySnapshot, ActionDefinition attackDef, ActionDefinition defenseDef)
     {
         ActionInstance action = enemyActionSelector.Select(attackDef, defenseDef);
-        int totalEnemyDice = Mathf.Max(1, enemy.CurrentDices);
-        int enemyAllocatedDice = Mathf.Clamp(Random.Range(1, totalEnemyDice + 1), 1, totalEnemyDice);
-        int allocatedPowerDice = Mathf.Clamp(Random.Range(0, enemyAllocatedDice + 1), 0, enemyAllocatedDice);
-        int allocatedAccuracyDice = Mathf.Max(0, enemyAllocatedDice - allocatedPowerDice);
+        int totalEnemyPowerDice = Mathf.Max(1, enemy.CurrentPowerDices);
+        int totalEnemyAccuracyDice = Mathf.Max(1, enemy.CurrentAccuracyDices);
+        int enemyAllocatedPowerDice = Mathf.Clamp(Random.Range(1, totalEnemyPowerDice + 1), 1, totalEnemyPowerDice);
+        int enemyAllocatedAccuracyDice = Mathf.Clamp(Random.Range(1, totalEnemyAccuracyDice + 1), 1, totalEnemyAccuracyDice);
+        int allocatedPowerDice = Mathf.Clamp(Random.Range(0, enemyAllocatedPowerDice + 1), 0, enemyAllocatedPowerDice);
+        int allocatedAccuracyDice = Mathf.Clamp(Random.Range(0, enemyAllocatedAccuracyDice + 1), 0, enemyAllocatedAccuracyDice);
 
         if (allocatedPowerDice == 0 && allocatedAccuracyDice == 0)
             allocatedAccuracyDice = 1;
@@ -31,7 +33,8 @@ public class EnemyTurnPlanner
         List<DiceStatType> powerTypes = BuildStatTypeList(enemySnapshot, allocatedPowerDice, true);
         List<DiceStatType> accuracyTypes = BuildStatTypeList(enemySnapshot, allocatedAccuracyDice, false);
 
-        enemy.CurrentDices = Mathf.Max(enemy.CurrentDices - enemyAllocatedDice, 0);
+        enemy.CurrentPowerDices = Mathf.Max(enemy.CurrentPowerDices - enemyAllocatedPowerDice, 0);
+        enemy.CurrentAccuracyDices = Mathf.Max(enemy.CurrentAccuracyDices - enemyAllocatedAccuracyDice, 0);
 
         return new EnemyTurnPlan
         {

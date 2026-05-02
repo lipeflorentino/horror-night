@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +7,8 @@ using UnityEngine.SceneManagement;
 public class CombatManager : MonoBehaviour
 {
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
-    private const int DefaultDiceCount = 3;
+    private const int DefaultPowerDiceCount = 3;
+    private const int DefaultAccuracyDiceCount = 3;
     [SerializeField] private string gameplaySceneName = "Gameplay";
     public CombatView View;
     public CombatInputHandler Input;
@@ -73,8 +75,8 @@ public class CombatManager : MonoBehaviour
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
             return;
         }
 
@@ -93,7 +95,8 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.attack),
             Mathf.RoundToInt(playerSnapshot.defense),
             Mathf.RoundToInt(playerSnapshot.initiative),
-            DefaultDiceCount
+            Mathf.RoundToInt(playerSnapshot.powerDices),
+            Mathf.RoundToInt(playerSnapshot.accuracyDices)
         );
 
         if (enemySnapshot != null)
@@ -109,13 +112,14 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.attack,
                 enemySnapshot.defense,
                 enemySnapshot.initiative,
-                DefaultDiceCount
+                DefaultPowerDiceCount,
+                DefaultAccuracyDiceCount
             );
         }
         else
         {
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultDiceCount);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
         }
     }
 
@@ -270,8 +274,8 @@ public class CombatManager : MonoBehaviour
         if (CombatEnded)
             return;
 
-        Player.RecoverDice(1);
-        Enemy.RecoverDice(1);
+        Player.RecoverDices(1);
+        Enemy.RecoverDices(1);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
 
@@ -397,7 +401,9 @@ public class CombatManager : MonoBehaviour
                 mind = Player.Mind,
                 body = Player.Body,
                 attack = Player.Attack,
-                defense = Player.Defense
+                defense = Player.Defense,
+                powerDices = Player.CurrentPowerDices,
+                accuracyDices = Player.CurrentAccuracyDices
             };
         }
 
@@ -408,6 +414,8 @@ public class CombatManager : MonoBehaviour
         snapshot.body = Player.Body;
         snapshot.attack = Player.Attack;
         snapshot.defense = Player.Defense;
+        snapshot.powerDices = Player.CurrentPowerDices;
+        snapshot.accuracyDices = Player.CurrentAccuracyDices;
         return snapshot;
     }
 }

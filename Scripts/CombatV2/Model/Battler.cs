@@ -11,10 +11,10 @@ public class Battler
     public int Defense;
     public int Initiative;
 
-    public int CurrentDices;
-    public int MaxDices;
+    public int CurrentPowerDices, CurrentAccuracyDices;
+    public int MaxPowerDices, MaxAccuracyDices;
 
-    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int dices)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices)
     {
         Name = name;
         Level = level;
@@ -25,8 +25,10 @@ public class Battler
         Attack = attack;
         Defense = defense;
         Initiative = initiative;
-        CurrentDices = dices;
-        MaxDices = dices;
+        CurrentPowerDices = powerDices;
+        MaxPowerDices = powerDices;
+        CurrentAccuracyDices = accuracyDices;
+        MaxAccuracyDices = accuracyDices;
         MaxHp = HP;
     }
 
@@ -36,11 +38,16 @@ public class Battler
         if (HP < 0) HP = 0;
     }
 
-    public void RecoverDice(int amount)
+    public void RecoverDices(int amount)
     {
-        CurrentDices += amount;
-        if (CurrentDices > MaxDices)
-            CurrentDices = MaxDices;
+        CurrentPowerDices += amount;
+        CurrentAccuracyDices += amount;
+
+        if (CurrentPowerDices > MaxPowerDices)
+            CurrentPowerDices = MaxPowerDices;
+
+        if (CurrentAccuracyDices > MaxAccuracyDices)
+            CurrentAccuracyDices = MaxAccuracyDices;
     }
 
     public bool IsAlive()
