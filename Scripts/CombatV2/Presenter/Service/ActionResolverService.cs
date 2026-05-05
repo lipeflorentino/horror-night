@@ -74,6 +74,8 @@ public class ActionResolverService
         result.Damage = damage;
         result.Outcome = result.Accuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
         result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : string.Empty;
+        result.AttackCountText = $"Attack Power: {attackPower:0.##}";
+        result.DefenseCountText = $"Defense Power: {defensePower:0.##}";
 
         if (ignoreAttack)
         {

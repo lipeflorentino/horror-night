@@ -22,6 +22,8 @@ public class ActionResolutionResult
     public ActionOutcome Outcome;
     public Battler FinalTarget;
     public string FeedbackText;
+    public string AttackCountText;
+    public string DefenseCountText;
 
     public bool AppliesDamage => Damage > 0;
 }

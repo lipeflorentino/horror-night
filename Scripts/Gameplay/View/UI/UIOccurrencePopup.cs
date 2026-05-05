@@ -91,6 +91,7 @@ public class UIOccurrencePopup : MonoBehaviour
 
         OccurrenceResult result = callback != null ? callback.Invoke(selectedIndex) : default;
 
+        // TODO: adjust PlayRollAnimation to receive maxRandomValue and use it instead of hardcoding 6
         if (result.requiresRoll && diceRollUI != null)
             yield return StartCoroutine(diceRollUI.PlayRollAnimation(result.playerRoll));
 

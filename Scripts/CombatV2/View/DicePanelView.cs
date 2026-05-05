@@ -14,7 +14,7 @@ public class DicePanelView : MonoBehaviour
     [SerializeField] private float postRollDelay = 0.4f;
     [SerializeField] private float highlightResultDelay = 2f;
     [SerializeField] private GameObject diceResolutionPanel;
-    [SerializeField] private TMP_Text rollTypeLabel;
+    [SerializeField] private TMP_Text playerRollTypeLabel, enemyRollTypeLabel;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
@@ -136,10 +136,10 @@ public class DicePanelView : MonoBehaviour
 
     private void UpdateRollTypeLabel(DiceRollType rollType)
     {
-        if (rollTypeLabel == null)
-            return;
-
-        rollTypeLabel.text = rollType == DiceRollType.Accuracy ? "ACCURACY ROLL" : "POWER ROLL";
+        if (playerRollTypeLabel != null)
+            playerRollTypeLabel.text = rollType == DiceRollType.Accuracy ? "Accuracy Roll" : "Power Roll";
+        if (enemyRollTypeLabel != null)
+            enemyRollTypeLabel.text = rollType == DiceRollType.Accuracy ? "Accuracy Roll" : "Power Roll";
     }
 
     private int GetHighlightedRollIndex(IReadOnlyList<DiceResult> rolls, int usedCount)

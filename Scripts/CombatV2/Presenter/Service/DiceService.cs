@@ -71,14 +71,51 @@ public class DiceService
         if (diceSpecs.Count == 0)
             return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel, DiceStatType.Body, rollType) };
 
-        List<DiceResult> results = new(diceSpecs.Count);
+        ConsumeDicePool(battler, rollType, diceSpecs.Count);
+
+        List<DiceResult> rawResults = new(diceSpecs.Count);
         for (int i = 0; i < diceSpecs.Count; i++)
         {
             DiceRollSpec spec = diceSpecs[i];
-            results.Add(Roll(spec.MaxValue, attackerLevel, defenderLevel, spec.StatType, spec.RollType));
+            rawResults.Add(Roll(spec.MaxValue, attackerLevel, defenderLevel, spec.StatType, spec.RollType));
         }
 
-        return results;
+        return AggregateDuplicateStatResults(rawResults, attackerLevel, defenderLevel);
+    }
+
+    private void ConsumeDicePool(Battler battler, DiceRollType rollType, int spentDiceCount)
+    {
+        if (battler == null || spentDiceCount <= 0)
+            return;
+
+        if (rollType == DiceRollType.Power)
+            battler.CurrentPowerDices = Mathf.Max(0, battler.CurrentPowerDices - spentDiceCount);
+        else
+            battler.CurrentAccuracyDices = Mathf.Max(0, battler.CurrentAccuracyDices - spentDiceCount);
+    }
+
+    private List<DiceResult> AggregateDuplicateStatResults(List<DiceResult> rawResults, int attackerLevel, int defenderLevel)
+    {
+        Dictionary<DiceStatType, DiceResult> aggregatedByStat = new();
+        List<DiceResult> orderedResults = new();
+
+        for (int i = 0; i < rawResults.Count; i++)
+        {
+            DiceResult roll = rawResults[i];
+            if (!aggregatedByStat.TryGetValue(roll.StatType, out DiceResult aggregate))
+            {
+                DiceResult firstResult = new DiceResult(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType);
+                aggregatedByStat[roll.StatType] = firstResult;
+                orderedResults.Add(firstResult);
+                continue;
+            }
+
+            aggregate.Value += roll.Value;
+            aggregate.MaxValue += roll.MaxValue;
+            aggregate.Tier = GetTier(aggregate.Value, aggregate.MaxValue, attackerLevel, defenderLevel);
+        }
+        
+        return orderedResults;
     }
 
     public List<int> ConvertToFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
