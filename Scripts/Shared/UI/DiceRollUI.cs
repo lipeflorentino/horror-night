@@ -7,7 +7,7 @@ public class DiceRollUI : MonoBehaviour
 {
     [SerializeField] private Image diceImage;
     [SerializeField] private TMP_Text diceValueText;
-    [SerializeField] private Image highlightFrame;
+    // [SerializeField] private Image highlightFrame;
     [SerializeField] private TMP_Text bestText;
     [SerializeField, Range(0f, 1f)] private float dimmedAlpha = 0.3f;
     [SerializeField] private float rollDuration = 0.65f;
@@ -21,8 +21,9 @@ public class DiceRollUI : MonoBehaviour
 
     public void SetHighlighted(bool highlighted)
     {
-        if (highlightFrame != null)
-            highlightFrame.enabled = highlighted;
+        // TODO: criar no futuro um particle effect para highlight
+        // if (highlightFrame != null)
+        //    highlightFrame.enabled = highlighted;
 
         if (bestText != null)
             bestText.gameObject.SetActive(highlighted);

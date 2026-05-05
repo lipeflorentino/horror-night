@@ -5777,9 +5777,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diceImage: {fileID: 655845558}
   diceValueText: {fileID: 412866182}
+  bestText: {fileID: 0}
+  dimmedAlpha: 0.3
   rollDuration: 0.65
   spinSpeed: 900
   updateInterval: 0.06
+  mindDiceIcon: {fileID: 0}
+  heartDiceIcon: {fileID: 0}
+  bodyDiceIcon: {fileID: 0}
 --- !u!1 &520395060
 GameObject:
   m_ObjectHideFlags: 0
@@ -9662,8 +9667,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 260, y: 20.0378}
-  m_SizeDelta: {x: 680, y: 191.0757}
+  m_AnchoredPosition: {x: 260, y: 58.332596}
+  m_SizeDelta: {x: 680, y: 267.6653}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &893485778
 MonoBehaviour:
@@ -9737,7 +9742,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 79, y: 130}
+  m_AnchoredPosition: {x: 79, y: 184}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &909757094
@@ -9760,7 +9765,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Dice Results
+  m_text: Power Dice Results
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9769,8 +9774,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4286758590
-  m_fontColor: {r: 0.745283, g: 0.7439019, b: 0.5090424, a: 1}
+    rgba: 4278240767
+  m_fontColor: {r: 1, g: 0.7734498, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -9787,8 +9792,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -13139,6 +13144,7 @@ Transform:
   - {fileID: 879936858}
   - {fileID: 693511208}
   - {fileID: 1858818099}
+  - {fileID: 1385657253}
   - {fileID: 2085209836}
   - {fileID: 1684893445}
   m_Father: {fileID: 0}
@@ -14778,7 +14784,7 @@ GameObject:
   - component: {fileID: 1385657253}
   - component: {fileID: 1385657254}
   m_Layer: 5
-  m_Name: DiceResolutionUI
+  m_Name: DicePanelView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14792,16 +14798,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1385657252}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 3.7274525}
   m_LocalScale: {x: 0.86742, y: 0.86742, z: 0.86742}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1736665950}
-  m_Father: {fileID: 1906172014}
+  m_Children: []
+  m_Father: {fileID: 1161733802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -165, y: -270}
+  m_AnchoredPosition: {x: -670.61365, y: -257.29346}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1385657254
@@ -14819,11 +14824,11 @@ MonoBehaviour:
   diceRollSlotPrefab: {fileID: 8804681754432368700, guid: 033c20d55396315439decf7ae87c3450, type: 3}
   playerSlotsContainer: {fileID: 250410132}
   enemySlotsContainer: {fileID: 646944047}
-  powerDiceIcon: {fileID: 0}
-  accuracyDiceIcon: {fileID: 0}
   maxSlotsPerSide: 3
   postRollDelay: 2.5
+  highlightResultDelay: 2
   diceResolutionPanel: {fileID: 1736665949}
+  rollTypeLabel: {fileID: 909757094}
 --- !u!1 &1425546475
 GameObject:
   m_ObjectHideFlags: 0
@@ -16911,7 +16916,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1736665950}
   m_Layer: 5
-  m_Name: DiceResolutionPanel
+  m_Name: DiceRollsUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16924,20 +16929,20 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736665949}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.86742, y: 0.86742, z: 0.86742}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 893485777}
   - {fileID: 909757093}
   - {fileID: 250410132}
   - {fileID: 646944047}
-  m_Father: {fileID: 1385657253}
+  m_Father: {fileID: 1906172014}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -165, y: -270}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1749615313
@@ -18389,7 +18394,7 @@ RectTransform:
   m_Children:
   - {fileID: 1492399766}
   - {fileID: 551743913}
-  - {fileID: 1385657253}
+  - {fileID: 1736665950}
   - {fileID: 202698024}
   - {fileID: 290580614}
   - {fileID: 364909759}
@@ -27255,6 +27260,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33cf17521dde4b249bec15dd1c0aba93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentHp: 0
+  maxHp: 0
+  currentMind: 0
+  currentBody: 0
+  currentHeart: 0
   NameText: {fileID: 710608301}
   LevelText: {fileID: 1866455299}
   MindText: {fileID: 1979483478}
@@ -27847,9 +27857,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diceImage: {fileID: 3101243787621562198}
   diceValueText: {fileID: 2932349106032213262}
+  bestText: {fileID: 0}
+  dimmedAlpha: 0.3
   rollDuration: 0.65
   spinSpeed: 900
   updateInterval: 0.06
+  mindDiceIcon: {fileID: 0}
+  heartDiceIcon: {fileID: 0}
+  bodyDiceIcon: {fileID: 0}
 --- !u!4 &4990041881718748094
 Transform:
   m_ObjectHideFlags: 0
@@ -29355,6 +29370,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33cf17521dde4b249bec15dd1c0aba93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentHp: 0
+  maxHp: 0
+  currentMind: 0
+  currentBody: 0
+  currentHeart: 0
   NameText: {fileID: 1297798116}
   LevelText: {fileID: 13581265}
   MindText: {fileID: 3131412777073127546}

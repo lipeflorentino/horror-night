@@ -4,6 +4,9 @@ using TMPro;
 
 public class BattlerPanelView : MonoBehaviour
 {
+    public int currentHp, maxHp, currentMind, currentBody, currentHeart;
+
+    [Header("HUD Text")]
     public TMP_Text NameText, LevelText;
     public TMP_Text MindText;
     public TMP_Text HeartText;
@@ -18,6 +21,14 @@ public class BattlerPanelView : MonoBehaviour
 
     public void Bind(Battler battler)
     {
+        // Bind Stats
+        currentHp = battler.HP;
+        maxHp = battler.MaxHp;
+        currentMind = battler.Mind;
+        currentHeart = battler.Heart;
+        currentBody = battler.Body;
+
+        // Bind Texts
         if (NameText != null)
             NameText.text = battler.Name;
 
@@ -37,7 +48,7 @@ public class BattlerPanelView : MonoBehaviour
             HpText.text = battler.HP.ToString();
 
         if (HpFill != null)
-            HpFill.fillAmount = battler.HP / battler.MaxHp;
+            HpFill.fillAmount = Mathf.Clamp01((float)battler.HP / battler.MaxHp);
 
         // TODO: verificar criação de currentPowerDices e currentAccuracyDices
         // if (DiceText != null)

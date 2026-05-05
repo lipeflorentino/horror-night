@@ -135,7 +135,7 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(ResolveTurnRoutine(type, powerDiceTypes, accuracyDiceTypes));
+        StartCoroutine(ResolveTurnFlow(type, powerDiceTypes, accuracyDiceTypes));
     }
 
     public void ReceivePlayerSkipTurn()
@@ -157,17 +157,16 @@ public class CombatManager : MonoBehaviour
         EndTurn();
     }
 
-    private IEnumerator ResolveTurnRoutine(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
-    {
-        yield return WaitForSeconds0_5;
-        yield return ResolveTurnFlow(playerType, powerDiceTypes, accuracyDiceTypes);
-    }
-
     private IEnumerator ResolveTurnFlow(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
-        GenerateEnemyAction();
         yield return WaitForSeconds0_5;
+
+        GenerateEnemyAction();
+
+        yield return WaitForSeconds0_5;
+
         RollActions(playerType, powerDiceTypes, accuracyDiceTypes);
+
         bool attackerAccuracyEffective = ResolveAccuracyStage();
 
         yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy);
@@ -311,14 +310,14 @@ public class CombatManager : MonoBehaviour
             return;
         }
 
-        Transform demonTransform = enemyBattler.transform.Find("EnemyVisual");
-        if (demonTransform == null)
+        Transform visualTransform = enemyBattler.transform.Find("EnemyVisual");
+        if (visualTransform == null)
         {
             Debug.LogWarning("[Combat] EnemyVisual transform not found.");
             return;
         }
 
-        if (demonTransform.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
+        if (visualTransform.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
         {
             spriteRenderer.sprite = enemySprite;
         }

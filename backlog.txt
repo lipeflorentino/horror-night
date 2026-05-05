@@ -38,3 +38,7 @@ TAREFA
     - Corrigir limite de dados, deve ser para cada um (Power, Accuracy)
     - Verificar calculos do DiceResult
     - Corrigir icone dos dados no painel de rolagem
+    - fazer dados iguais somar o valor
+    - fazer subtrair do numero total de dados a cada turno 
+    - as skills ao serem habilitadas, são inseridas nos dados.
+    - 

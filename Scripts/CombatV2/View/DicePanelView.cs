@@ -112,12 +112,7 @@ public class DicePanelView : MonoBehaviour
         {
             bool isActive = i < usedCount;
             slots[i].gameObject.SetActive(isActive);
-
-            if (isActive)
-            {
-                slots[i].ClearValue();
-                slots[i].SetHighlighted(i == highlightedIndex);
-            }
+            slots[i].SetHighlighted(false);
         }
     }
 
