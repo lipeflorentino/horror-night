@@ -52,7 +52,6 @@ public class CombatInputHandler : MonoBehaviour
         SelectedAction = ActionType.Attack;
         Combat.View.ActionPanel.ShowConfirmPanel("Attack");
         NotifyConfirmAvailability();
-        Debug.Log("[Input] Selected ATTACK");
     }
 
     public void OnSelectDefend()
@@ -67,7 +66,6 @@ public class CombatInputHandler : MonoBehaviour
         SelectedAction = ActionType.Defense;
         Combat.View.ActionPanel.ShowConfirmPanel("Defense");
         NotifyConfirmAvailability();
-        Debug.Log("[Input] Selected DEFENSE");
     }
 
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)

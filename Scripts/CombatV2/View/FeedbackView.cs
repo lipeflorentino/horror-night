@@ -8,6 +8,7 @@ public class FeedbackView : MonoBehaviour
     public TMP_Text TurnOwnerText;
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
+    [SerializeField] private ActionLogView actionLogView;
 
     [Header("Attack Effect")]
     [SerializeField] private GameObject playerAttackEffectPrefab;
@@ -22,6 +23,7 @@ public class FeedbackView : MonoBehaviour
     {
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
         enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
+        actionLogView = FindObjectOfType<ActionLogView>();
 
         if (playerFeedbacks == null)
             Debug.LogError("FeedbackView: PlayerFeedbacks component is missing.");
@@ -35,6 +37,8 @@ public class FeedbackView : MonoBehaviour
         {
             ShowStatusText(result.FeedbackText, targetIsPlayer);
         }
+
+        actionLogView.ShowFromResult(result);
 
         if (!result.AppliesDamage)
             return;

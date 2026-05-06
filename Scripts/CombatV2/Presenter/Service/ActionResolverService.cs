@@ -25,6 +25,15 @@ public class ActionResolverService
             FinalTarget = target
         };
 
+        float attackPower = ignoreAttack ? 0f : CalculatePower(attack);
+        float defensePower = ignoreDefense ? 0f : CalculatePower(defense);
+        int damage = (int)(attackPower - defensePower);
+        
+        result.AttackPowerLogText = $"Attack Power: {attackPower}";
+        result.DefensePowerLogText = $"Defense Power: {defensePower}";
+        result.AttackAccuracyLogText = $"Attack Accuracy: {attackAccuracy}";
+        result.DefenseAccuracyLogText = $"Defense Accuracy: {defenseAccuracy}";
+
         if (result.Accuracy == ActionAccuracy.Missed)
         {
             result.Damage = 0;
@@ -58,10 +67,6 @@ public class ActionResolverService
             result.FeedbackText = "PARRIED";
         }
 
-        float attackPower = ignoreAttack ? 0f : CalculatePower(attack);
-        float defensePower = ignoreDefense ? 0f : CalculatePower(defense);
-        int damage = (int)(attackPower - defensePower);
-
         if (damage < 0) damage = 0;
         if (damage <= target.Defense && !hasParried)
         {
@@ -74,10 +79,6 @@ public class ActionResolverService
         result.Damage = damage;
         result.Outcome = result.Accuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
         result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : string.Empty;
-        result.AttackPowerLogText = $"Attack Power: {attackPower:0.##}";
-        result.DefensePowerLogText = $"Defense Power: {defensePower:0.##}";
-        result.AttackAccuracyLogText = $"Attack Accuracy: {attackAccuracy:0.##}";
-        result.DefenseAccuracyLogText = $"Defense Accuracy: {defenseAccuracy:0.##}";
 
         if (ignoreAttack)
         {

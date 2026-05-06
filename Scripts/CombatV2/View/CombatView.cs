@@ -11,6 +11,7 @@ public class CombatView : MonoBehaviour
     public DicePanelView DicePanelView;
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
+    public ActionLogView ActionLogView;
 
     public void Init()
     {
@@ -42,6 +43,7 @@ public class CombatView : MonoBehaviour
         DicePanelView = FindObjectOfType<DicePanelView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
+        ActionLogView = FindObjectOfType<ActionLogView>();
         DicePanelView.HidePanel();
         InfoPanelView.Init();
     }
