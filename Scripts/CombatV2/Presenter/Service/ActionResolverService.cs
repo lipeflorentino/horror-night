@@ -98,8 +98,8 @@ public class ActionResolverService
         {
             TriggerPowerMaxPlaceholder(attacker);
             result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
-                ? "POWER MAX (EFFECT PLACEHOLDER)"
-                : $"{result.FeedbackText} | POWER MAX (EFFECT PLACEHOLDER)";
+                ? "POWER MAX"
+                : $"{result.FeedbackText} | POWER MAX";
         }
 
         return result;
@@ -130,7 +130,7 @@ public class ActionResolverService
 
     private void TriggerPowerMaxPlaceholder(Battler attacker)
     {
-        Console.WriteLine($"[Resolve] {attacker.Name} triggered POWER MAX placeholder effect.");
+        Console.WriteLine($"[Resolve] {attacker.Name} triggered POWER MAX effect.");
     }
 
     private float GetMultiplier(DiceTier tier)

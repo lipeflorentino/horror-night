@@ -77,14 +77,12 @@ public class CombatInputHandler : MonoBehaviour
         if (diceRollType == DiceRollType.Power)
         {
             SelectedPowerDiceType = diceStatType; 
-            PowerDiceTypes.Add(SelectedPowerDiceType);   
-            // TODO: decrement current PowerDices
+            PowerDiceTypes.Add(SelectedPowerDiceType);
         }
         else
         {
             SelectedAccuracyDiceType = diceStatType;
             AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
-            // TODO: decrement current AccuracyDices
         } 
             
         RefreshSelectionPreview();

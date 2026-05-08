@@ -43,4 +43,6 @@ public class EnemyInstance
     public int defense;
     public int initiative;
     public int runTier;
+    public int currentPowerDices;
+    public int currentAccuracyDices;
 }

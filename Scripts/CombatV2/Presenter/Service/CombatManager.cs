@@ -95,8 +95,8 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.attack),
             Mathf.RoundToInt(playerSnapshot.defense),
             Mathf.RoundToInt(playerSnapshot.initiative),
-            Mathf.RoundToInt(playerSnapshot.powerDices),
-            Mathf.RoundToInt(playerSnapshot.accuracyDices)
+            Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : DefaultPowerDiceCount),
+            Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount)
         );
 
         if (enemySnapshot != null)
@@ -112,8 +112,8 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.attack,
                 enemySnapshot.defense,
                 enemySnapshot.initiative,
-                DefaultPowerDiceCount,
-                DefaultAccuracyDiceCount
+                enemySnapshot.currentPowerDices > 0 ? enemySnapshot.currentPowerDices : DefaultPowerDiceCount,
+                enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : DefaultAccuracyDiceCount
             );
         }
         else
@@ -255,11 +255,12 @@ public class CombatManager : MonoBehaviour
         }
 
         ActionResolutionResult result = Resolver.Resolve(attack, defense, attacker, target);
-        
+        Debug.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | Feedback: {result.FeedbackText}");
         View.ShowAttackEffect(PlayerIsAttacker);
 
         if (result.AppliesDamage)
         {
+            Debug.Log($"[Resolve] Applying {result.Damage} damage to {result.FinalTarget.Name}");
             result.FinalTarget.ReceiveDamage(result.Damage);
         }
 

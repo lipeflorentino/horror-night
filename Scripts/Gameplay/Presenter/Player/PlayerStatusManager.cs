@@ -19,6 +19,10 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int defense = 5;
     [SerializeField] private int initiative = 10;
     [SerializeField] private int level = 1;
+    [SerializeField] private int currentPowerDices = 3;
+    [SerializeField] private int currentAccuracyDices = 3;
+    [SerializeField] private int maxPowerDices = 3;
+    [SerializeField] private int maxAccuracyDices = 3;
 
     [Header("Heart")]
     [SerializeField] private float maxHeart = 100f;
@@ -186,6 +190,10 @@ public class PlayerStatusManager : MonoBehaviour
             maxBody = maxBody,
             maxMind = maxMind,
             maxHp = maxHp,
+            powerDices = currentPowerDices,
+            accuracyDices = currentAccuracyDices,
+            maxPowerDices = maxPowerDices,
+            maxAccuracyDices = maxAccuracyDices,
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints,
             inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot()
@@ -211,6 +219,10 @@ public class PlayerStatusManager : MonoBehaviour
         if (snapshot.level > 0)
             level = Mathf.Max(1, snapshot.level);
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
+        currentPowerDices = Mathf.Max(0, snapshot.powerDices);
+        currentAccuracyDices = Mathf.Max(0, snapshot.accuracyDices);
+        maxPowerDices = Mathf.Max(1, snapshot.maxPowerDices > 0 ? snapshot.maxPowerDices : maxPowerDices);
+        maxAccuracyDices = Mathf.Max(1, snapshot.maxAccuracyDices > 0 ? snapshot.maxAccuracyDices : maxAccuracyDices);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
         
