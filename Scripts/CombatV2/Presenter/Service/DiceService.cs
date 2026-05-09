@@ -26,7 +26,7 @@ public class DiceService
         int value = random.Next(1, safeMaxValue + 1);
         DiceTier tier = GetTier(value, safeMaxValue, attackerLevel, defenderLevel);
 
-        Console.WriteLine($"[Dice] Rolled {rollType} {statType} d{safeMaxValue}: {value} -> {tier}");
+        Logger.Log($"[Dice] Rolled {rollType} {statType} d{safeMaxValue}: {value} -> {tier}");
 
         return new DiceResult(value, tier, safeMaxValue, statType, rollType);
     }
@@ -104,7 +104,7 @@ public class DiceService
             DiceResult roll = rawResults[i];
             if (!aggregatedByStat.TryGetValue(roll.StatType, out DiceResult aggregate))
             {
-                DiceResult firstResult = new DiceResult(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType);
+                DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType);
                 aggregatedByStat[roll.StatType] = firstResult;
                 orderedResults.Add(firstResult);
                 continue;

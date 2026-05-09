@@ -7,6 +7,9 @@ public class ActionResolverService
         ActionAccuracy attackAccuracy = CalculateAccuracy(attack);
         ActionAccuracy defenseAccuracy = CalculateAccuracy(defense);
 
+        Logger.Log($"Power Dice - Attack: {attack.PowerDice?.Value ?? 0}, Defense: {defense.PowerDice?.Value ?? 0}, isMaxRoll Attack: {attack.PowerDice?.IsMaxRoll ?? false}, isMaxRoll Defense: {defense.PowerDice?.IsMaxRoll ?? false}");
+        Logger.Log($"Accuracy Dice - Attack: {attack.AccuracyDice?.Value ?? 0}, Defense: {defense.AccuracyDice?.Value ?? 0}, isMaxRoll Attack: {attack.AccuracyDice?.IsMaxRoll ?? false}, isMaxRoll Defense: {defense.AccuracyDice?.IsMaxRoll ?? false}");
+
         bool attackPowerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
         bool defensePowerMaxTriggered = defense.PowerDice != null && defense.PowerDice.IsMaxRoll;
         bool attackAccuracyMaxTriggered = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
@@ -125,12 +128,12 @@ public class ActionResolverService
             return 0f;
 
         float multiplier = GetMultiplier(action.PowerDice.Tier);
-        return action.Definition.BasePower * multiplier;
+        return action.Definition.BasePower * (int)multiplier;
     }
 
     private void TriggerPowerMaxPlaceholder(Battler attacker)
     {
-        Console.WriteLine($"[Resolve] {attacker.Name} triggered POWER MAX effect.");
+        Logger.Log($"[Resolve] {attacker.Name} triggered POWER MAX effect.");
     }
 
     private float GetMultiplier(DiceTier tier)
