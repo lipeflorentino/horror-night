@@ -26,7 +26,7 @@ public class DiceResult
     public int MaxValue;
     public DiceStatType StatType;
     public DiceRollType RollType;
-    public bool IsMaxRoll => Value >= MaxValue;
+    public bool IsMaxRoll => Value >= MaxValue && MaxValue > 1;
 
     public DiceResult(int value, DiceTier tier, int maxValue, DiceStatType statType, DiceRollType rollType)
     {

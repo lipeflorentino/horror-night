@@ -7,9 +7,6 @@ public class ActionResolverService
         ActionAccuracy attackAccuracy = CalculateAccuracy(attack);
         ActionAccuracy defenseAccuracy = CalculateAccuracy(defense);
 
-        Logger.Log($"Power Dice - Attack: {attack.PowerDice?.Value ?? 0}, Defense: {defense.PowerDice?.Value ?? 0}, isMaxRoll Attack: {attack.PowerDice?.IsMaxRoll ?? false}, isMaxRoll Defense: {defense.PowerDice?.IsMaxRoll ?? false}");
-        Logger.Log($"Accuracy Dice - Attack: {attack.AccuracyDice?.Value ?? 0}, Defense: {defense.AccuracyDice?.Value ?? 0}, isMaxRoll Attack: {attack.AccuracyDice?.IsMaxRoll ?? false}, isMaxRoll Defense: {defense.AccuracyDice?.IsMaxRoll ?? false}");
-
         bool attackPowerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
         bool defensePowerMaxTriggered = defense.PowerDice != null && defense.PowerDice.IsMaxRoll;
         bool attackAccuracyMaxTriggered = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
@@ -18,12 +15,11 @@ public class ActionResolverService
         bool hasEvaded = false;
         bool hasParried = false;
 
-        bool ignoreAttack = (defenseAccuracyMaxTriggered && !attackAccuracyMaxTriggered) || attackAccuracy == ActionAccuracy.Missed;
-        bool ignoreDefense = (attackAccuracyMaxTriggered && !defenseAccuracyMaxTriggered) || defenseAccuracy == ActionAccuracy.Missed;
+        bool ignoreAttack = (defenseAccuracyMaxTriggered && defense.AccuracyDice.Value > attack.AccuracyDice.Value && !attackAccuracyMaxTriggered) || attackAccuracy == ActionAccuracy.Missed;
+        bool ignoreDefense = (attackAccuracyMaxTriggered && attack.AccuracyDice.Value > defense.AccuracyDice.Value && !defenseAccuracyMaxTriggered) || defenseAccuracy == ActionAccuracy.Missed;
 
         ActionResolutionResult result = new()
         {
-
             Accuracy = attackAccuracy,
             FinalTarget = target
         };
@@ -31,6 +27,8 @@ public class ActionResolverService
         float attackPower = ignoreAttack ? 0f : CalculatePower(attack);
         float defensePower = ignoreDefense ? 0f : CalculatePower(defense);
         int damage = (int)(attackPower - defensePower);
+
+        Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
         
         result.AttackPowerLogText = $"Attack Power: {attackPower}";
         result.DefensePowerLogText = $"Defense Power: {defensePower}";
@@ -70,8 +68,7 @@ public class ActionResolverService
             result.FeedbackText = "PARRIED";
         }
 
-        if (damage < 0) damage = 0;
-        if (damage <= target.Defense && !hasParried)
+        if (damage <= 0 && !hasParried && !hasEvaded)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;

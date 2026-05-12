@@ -22333,6 +22333,8 @@ MonoBehaviour:
   level: 1
   currentPowerDices: 3
   currentAccuracyDices: 3
+  maxPowerDices: 3
+  maxAccuracyDices: 3
   maxHeart: 10
   currentHeart: 10
   maxBody: 10

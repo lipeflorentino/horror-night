@@ -151,6 +151,8 @@ public class DiceService
             int baseFace = Mathf.Max(1, totalValue / diceCount);
             int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
 
+            if (!battler.IsPlayer) Logger.Log($"[DiceService] Building dice for {pair.Key}: totalValue={totalValue}, diceCount={diceCount}, baseFace={baseFace}, remainder={remainder}");
+
             for (int i = 0; i < diceCount; i++)
             {
                 int bonus = i < remainder ? 1 : 0;

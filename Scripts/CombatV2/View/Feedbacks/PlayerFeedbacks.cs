@@ -10,7 +10,7 @@ public class PlayerFeedbacks : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerStatusText;
     private const float PlayerFlashDuration = 0.15f;
     private const float PlayerFlashAlpha = 0.45f;
-    private const float PlayerStatusDuration = 0.6f;
+    private const float PlayerStatusDuration = 2f;
 
     [Header("Player Damage Flash")]
     [SerializeField] private Color playerFlashColor = new(0.9f, 0.1f, 0.1f, PlayerFlashAlpha);
@@ -64,6 +64,7 @@ public class PlayerFeedbacks : MonoBehaviour
         }
 
         playerFlashImage.enabled = false;
+        playerFlashImage.gameObject.SetActive(false);
     }
 
     private IEnumerator AnimatePlayerStatusText(string text)

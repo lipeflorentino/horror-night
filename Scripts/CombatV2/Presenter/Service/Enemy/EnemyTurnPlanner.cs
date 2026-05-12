@@ -20,21 +20,19 @@ public class EnemyTurnPlanner
     public EnemyTurnPlan BuildPlan(Battler enemy, EnemyInstance enemySnapshot, ActionDefinition attackDef, ActionDefinition defenseDef)
     {
         ActionInstance action = enemyActionSelector.Select(attackDef, defenseDef);
-        int totalEnemyPowerDice = Mathf.Max(1, enemy.CurrentPowerDices);
-        int totalEnemyAccuracyDice = Mathf.Max(1, enemy.CurrentAccuracyDices);
-        int enemyAllocatedPowerDice = Mathf.Clamp(Random.Range(1, totalEnemyPowerDice + 1), 1, totalEnemyPowerDice);
-        int enemyAllocatedAccuracyDice = Mathf.Clamp(Random.Range(1, totalEnemyAccuracyDice + 1), 1, totalEnemyAccuracyDice);
-        int allocatedPowerDice = Mathf.Clamp(Random.Range(0, enemyAllocatedPowerDice + 1), 0, enemyAllocatedPowerDice);
-        int allocatedAccuracyDice = Mathf.Clamp(Random.Range(0, enemyAllocatedAccuracyDice + 1), 0, enemyAllocatedAccuracyDice);
 
-        if (allocatedPowerDice == 0 && allocatedAccuracyDice == 0)
-            allocatedAccuracyDice = 1;
+        int totalAvailableDice = enemy.CurrentPowerDices + enemy.CurrentAccuracyDices;
+        int allocatedAccuracyDice = 1;
+        int allocatedPowerDice = Mathf.Max(1, totalAvailableDice - 1);
+        
+        allocatedAccuracyDice = Mathf.Min(allocatedAccuracyDice, enemy.CurrentAccuracyDices);
+        allocatedPowerDice = Mathf.Min(allocatedPowerDice, enemy.CurrentPowerDices);
+        
+        List<DiceStatType> accuracyTypes = BuildStrategyStatTypeList(enemy, allocatedAccuracyDice);
+        List<DiceStatType> powerTypes = BuildStrategyStatTypeList(enemy, allocatedPowerDice);
 
-        List<DiceStatType> powerTypes = BuildStatTypeList(enemySnapshot, allocatedPowerDice, true);
-        List<DiceStatType> accuracyTypes = BuildStatTypeList(enemySnapshot, allocatedAccuracyDice, false);
-
-        enemy.CurrentPowerDices = Mathf.Max(enemy.CurrentPowerDices - enemyAllocatedPowerDice, 0);
-        enemy.CurrentAccuracyDices = Mathf.Max(enemy.CurrentAccuracyDices - enemyAllocatedAccuracyDice, 0);
+        enemy.CurrentAccuracyDices = Mathf.Max(enemy.CurrentAccuracyDices - allocatedAccuracyDice, 0);
+        enemy.CurrentPowerDices = Mathf.Max(enemy.CurrentPowerDices - allocatedPowerDice, 0);
 
         return new EnemyTurnPlan
         {
@@ -44,15 +42,33 @@ public class EnemyTurnPlanner
         };
     }
 
-    private static List<DiceStatType> BuildStatTypeList(EnemyInstance snapshot, int count, bool forPower)
+    private static List<DiceStatType> BuildStrategyStatTypeList(Battler enemy, int count)
     {
         List<DiceStatType> types = new();
         int safeCount = Mathf.Max(0, count);
-        DiceStatType chosenType = ChoosePlaceholderType(snapshot, forPower);
+        
+        DiceStatType strategicType = ChooseStrategicStatType(enemy);
+        
         for (int i = 0; i < safeCount; i++)
-            types.Add(chosenType);
+            types.Add(strategicType);
 
         return types;
+    }
+
+    private static DiceStatType ChooseStrategicStatType(Battler enemy)
+    {
+        int mindValue = enemy.Mind;
+        int heartValue = enemy.Heart;
+        int bodyValue = enemy.Body;
+        
+        int maxValue = Mathf.Max(mindValue, Mathf.Max(heartValue, bodyValue));
+
+        if (mindValue == maxValue)
+            return DiceStatType.Mind;
+        if (heartValue == maxValue)
+            return DiceStatType.Heart;
+        
+        return DiceStatType.Body;
     }
 
     private static DiceStatType ChoosePlaceholderType(EnemyInstance snapshot, bool forPower)

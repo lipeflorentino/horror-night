@@ -75,8 +75,8 @@ public class CombatManager : MonoBehaviour
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
+            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, true);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
             return;
         }
 
@@ -96,7 +96,8 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.defense),
             Mathf.RoundToInt(playerSnapshot.initiative),
             Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : DefaultPowerDiceCount),
-            Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount)
+            Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount),
+            true
         );
 
         if (enemySnapshot != null)
@@ -113,13 +114,14 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.defense,
                 enemySnapshot.initiative,
                 enemySnapshot.currentPowerDices > 0 ? enemySnapshot.currentPowerDices : DefaultPowerDiceCount,
-                enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : DefaultAccuracyDiceCount
+                enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : DefaultAccuracyDiceCount,
+                false
             );
         }
         else
         {
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount);
+            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
         }
     }
 
@@ -192,7 +194,6 @@ public class CombatManager : MonoBehaviour
         PendingEnemyAction = plan.Action;
         PendingEnemyPowerDiceTypes = plan.PowerDiceTypes;
         PendingEnemyAccuracyDiceTypes = plan.AccuracyDiceTypes;
-        Debug.Log($"[AI] Enemy selected {PendingEnemyAction.Definition.Type}");
     }
 
     private void RollActions(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
@@ -367,11 +368,11 @@ public class CombatManager : MonoBehaviour
 
     private void QuitCombat()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+        #else
+                Application.Quit();
+        #endif
     }
 
     private void ProceedToGameplayScene()
