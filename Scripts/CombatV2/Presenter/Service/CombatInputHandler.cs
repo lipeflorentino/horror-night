@@ -229,7 +229,7 @@ public class CombatInputHandler : MonoBehaviour
         List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
         List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
         (int lowMax, int mediumMax, int highMin) boundaries = Combat.GetPlayerTierBoundaries(6);
-        Combat.View.ActionPanel .UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
+        Combat.View.ActionPanel.UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
     }
 
 }

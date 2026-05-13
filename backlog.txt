@@ -35,6 +35,5 @@ TO DO
 
 TAREFA
     - Implementar DiceStatEffects
-    - Verificar calculos do DiceResult
     - as skills ao serem habilitadas, são inseridas nos dados.
     - GetThresholds baseado nas stats 
