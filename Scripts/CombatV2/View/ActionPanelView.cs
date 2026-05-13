@@ -457,12 +457,24 @@ public class ActionPanelView : MonoBehaviour
             ConfirmPanel.SetActive(false);
     }
 
-    public void UpdateSelectionPreview(IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<int> powerFaces, IReadOnlyList<DiceStatType> accuracyDiceTypes, IReadOnlyList<int> accuracyFaces, (int lowMax, int mediumMax, int highMin) tierBoundaries)
+    public void UpdateSelectionPreview(
+        IReadOnlyList<DiceStatType> powerDiceTypes,
+        IReadOnlyList<int> powerFaces,
+        IReadOnlyList<DiceStatType> accuracyDiceTypes,
+        IReadOnlyList<int> accuracyFaces,
+        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
     {
         if (diceAllocationView == null)
             return;
 
-        diceAllocationView.UpdateSelectionPreview(powerDiceTypes, powerFaces, accuracyDiceTypes, accuracyFaces, tierBoundaries);
+        diceAllocationView.UpdateSelectionPreview(
+            powerDiceTypes,
+            powerFaces,
+            accuracyDiceTypes,
+            accuracyFaces,
+            powerTierBoundaries,
+            accuracyTierBoundaries);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

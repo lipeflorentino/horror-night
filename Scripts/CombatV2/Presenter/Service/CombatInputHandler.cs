@@ -228,8 +228,61 @@ public class CombatInputHandler : MonoBehaviour
 
         List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
         List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
-        (int lowMax, int mediumMax, int highMin) boundaries = Combat.GetPlayerTierBoundaries(6);
-        Combat.View.ActionPanel.UpdateSelectionPreview(PowerDiceTypes, powerFaces, AccuracyDiceTypes, accuracyFaces, boundaries);
+        Logger.Log($"[Input] Power Dice Types: {string.Join(", ", PowerDiceTypes)}, Faces: {string.Join(", ", powerFaces)}");
+        Logger.Log($"[Input] Accuracy Dice Types: {string.Join(", ", AccuracyDiceTypes)}, Faces: {string.Join(", ", accuracyFaces)}");
+        DiceStatType powerPrimaryStat = GetPrimaryStat(PowerDiceTypes);
+        DiceStatType accuracyPrimaryStat = GetPrimaryStat(AccuracyDiceTypes);
+        int powerMaxValue = SumFaces(powerFaces);
+        int accuracyMaxValue = SumFaces(accuracyFaces);
+        Logger.Log($"[Input] Power Max Value: {powerMaxValue}, Primary Stat: {powerPrimaryStat}");
+        Logger.Log($"[Input] Accuracy Max Value: {accuracyMaxValue}, Primary Stat: {accuracyPrimaryStat}");
+
+        (int lowMax, int mediumMax, int highMin) powerBoundaries = Combat.GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
+        (int lowMax, int mediumMax, int highMin) accuracyBoundaries = Combat.GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
+
+        Combat.View.ActionPanel.UpdateSelectionPreview(
+            PowerDiceTypes,
+            powerFaces,
+            AccuracyDiceTypes,
+            accuracyFaces,
+            powerBoundaries,
+            accuracyBoundaries);
+    }
+
+    private static int SumFaces(IReadOnlyList<int> faces)
+    {
+        if (faces == null || faces.Count == 0)
+            return 1;
+
+        int total = 0;
+        for (int i = 0; i < faces.Count; i++)
+            total += Mathf.Max(1, faces[i]);
+
+        return Mathf.Max(1, total);
+    }
+
+    private static DiceStatType GetPrimaryStat(IReadOnlyList<DiceStatType> diceTypes)
+    {
+        if (diceTypes == null || diceTypes.Count == 0)
+            return DiceStatType.Body;
+
+        int body = 0;
+        int heart = 0;
+        int mind = 0;
+
+        for (int i = 0; i < diceTypes.Count; i++)
+        {
+            switch (diceTypes[i])
+            {
+                case DiceStatType.Body: body++; break;
+                case DiceStatType.Heart: heart++; break;
+                case DiceStatType.Mind: mind++; break;
+            }
+        }
+
+        if (mind >= heart && mind >= body) return DiceStatType.Mind;
+        if (heart >= body) return DiceStatType.Heart;
+        return DiceStatType.Body;
     }
 
 }

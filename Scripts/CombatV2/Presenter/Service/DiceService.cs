@@ -195,40 +195,45 @@ public class DiceService
             return DiceTier.Low;
 
         float normalized = (float)value / maxValue;
-        GetThresholds(attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
+        GetThresholds(attackerLevel, defenderLevel, maxValue, out float lowThreshold, out float highThreshold);
 
         if (normalized <= lowThreshold) return DiceTier.Low;
         if (normalized <= highThreshold) return DiceTier.Medium;
         return DiceTier.High;
     }
 
-    private void GetThresholds(int attackerLevel, int defenderLevel, out float lowThreshold, out float highThreshold)
+    private void GetThresholds(int attackerLevel, int defenderLevel, int maxValue, out float lowThreshold, out float highThreshold)
     {
-        int delta = attackerLevel - defenderLevel;
+        int safeMaxValue = Mathf.Max(1, maxValue);
+        int delta = attackerLevel - defenderLevel;        
+        float diceGranularityFactor = 6f / safeMaxValue;
+        float deltaScale = Mathf.Clamp(4f * diceGranularityFactor, 2f, 10f);
+        float normalizedDelta = Mathf.Clamp(delta / deltaScale, -1f, 1f);
+        float fineTuning = 0.18f + (diceGranularityFactor - 1f) * 0.08f;
+        float shift = normalizedDelta * fineTuning;
 
-        float scaling = 5f;
-        float normalizedDelta = Mathf.Clamp(delta / scaling, -1f, 1f);
+        lowThreshold = Mathf.Clamp01(0.34f - shift);
+        highThreshold = Mathf.Clamp01(0.67f - shift);
 
-        float biasStrength = 0.25f;
-        float shift = normalizedDelta * biasStrength;
-
-        lowThreshold = 0.34f - shift;
-        highThreshold = 0.67f - shift;
-
-        lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.6f);
+        lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.7f);
         highThreshold = Mathf.Clamp(highThreshold, lowThreshold + 0.1f, 0.95f);
-
-        if (normalizedDelta >= 0.9f)
-            lowThreshold = 0f;
-
-        if (normalizedDelta <= -0.9f)
-            highThreshold = 1f;
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel)
+    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
     {
         int safeMaxValue = Math.Max(1, maxValue);
-        GetThresholds(attackerLevel, defenderLevel, out float lowThreshold, out float highThreshold);
+        GetThresholds(attackerLevel, defenderLevel, safeMaxValue, out float lowThreshold, out float highThreshold);
+
+        float statBias = statType switch
+        {
+            DiceStatType.Body => rollType == DiceRollType.Power ? -0.03f : 0.02f,
+            DiceStatType.Heart => 0f,
+            DiceStatType.Mind => rollType == DiceRollType.Accuracy ? -0.03f : 0.02f,
+            _ => 0f
+        };
+
+        lowThreshold = Mathf.Clamp(lowThreshold + statBias, 0.05f, 0.8f);
+        highThreshold = Mathf.Clamp(highThreshold + statBias, lowThreshold + 0.1f, 0.95f);
 
         int lowMax = 0;
         int mediumMax = 0;

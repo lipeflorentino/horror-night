@@ -228,9 +228,9 @@ public class CombatManager : MonoBehaviour
         return DiceService.ConvertToFaces(Player, diceTypes);
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue = 6)
+    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
-        return DiceService.GetTierBoundaries(maxValue, Player.Level, Enemy.Level);
+        return DiceService.GetTierBoundaries(maxValue, Player.Level, Enemy.Level, statType, rollType);
     }
 
     private void Resolve()

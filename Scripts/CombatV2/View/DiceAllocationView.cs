@@ -20,11 +20,12 @@ public class DiceAllocationView : MonoBehaviour
         IReadOnlyList<int> powerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
-        (int lowMax, int mediumMax, int highMin) tierBoundaries)
+        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
     {
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
-        UpdateDiceTiersLabel(tierBoundaries);
+        UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
         UpdateResultPanel(powerFaces, accuracyFaces);
     }
 
@@ -58,18 +59,26 @@ public class DiceAllocationView : MonoBehaviour
         };
     }
 
-    private void UpdateDiceTiersLabel((int lowMax, int mediumMax, int highMin) tierBoundaries)
+    private void UpdateDiceTiersLabel(
+        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
     {
         if (diceTiersText == null)
             return;
 
-        string lowRange = tierBoundaries.lowMax > 0 ? $"1-{tierBoundaries.lowMax}" : "-";
-        string mediumRange = tierBoundaries.mediumMax > tierBoundaries.lowMax
-            ? $"{tierBoundaries.lowMax + 1}-{tierBoundaries.mediumMax}"
+        string powerLow = powerTierBoundaries.lowMax > 0 ? $"1-{powerTierBoundaries.lowMax}" : "-";
+        string powerMedium = powerTierBoundaries.mediumMax > powerTierBoundaries.lowMax
+            ? $"{powerTierBoundaries.lowMax + 1}-{powerTierBoundaries.mediumMax}"
             : "-";
-        string highRange = tierBoundaries.highMin <= 6 ? $"{tierBoundaries.highMin}+" : "-";
+        string powerHigh = powerTierBoundaries.highMin <= powerTierBoundaries.mediumMax + 1 ? $"{powerTierBoundaries.highMin}+" : "-";
 
-        diceTiersText.text = $"Low ({lowRange}), Medium ({mediumRange}), High ({highRange})";
+        string accuracyLow = accuracyTierBoundaries.lowMax > 0 ? $"1-{accuracyTierBoundaries.lowMax}" : "-";
+        string accuracyMedium = accuracyTierBoundaries.mediumMax > accuracyTierBoundaries.lowMax
+            ? $"{accuracyTierBoundaries.lowMax + 1}-{accuracyTierBoundaries.mediumMax}"
+            : "-";
+        string accuracyHigh = accuracyTierBoundaries.highMin <= accuracyTierBoundaries.mediumMax + 1 ? $"{accuracyTierBoundaries.highMin}+" : "-";
+
+        diceTiersText.text = $"Power L({powerLow}) M({powerMedium}) H({powerHigh})\nAccuracy L({accuracyLow}) M({accuracyMedium}) H({accuracyHigh})";
     }
 
     private void UpdateResultPanel(IReadOnlyList<int> powerFaces, IReadOnlyList<int> accuracyFaces)
