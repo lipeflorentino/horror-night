@@ -26,7 +26,7 @@ public class DiceAllocationView : MonoBehaviour
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
         UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
-        UpdateResultPanel(powerFaces, accuracyFaces);
+        UpdateResultPanel(powerFaces, accuracyFaces, powerTierBoundaries, accuracyTierBoundaries);
     }
 
     private void RebuildAllocationContainer(RectTransform container, IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
@@ -70,18 +70,22 @@ public class DiceAllocationView : MonoBehaviour
         string powerMedium = powerTierBoundaries.mediumMax > powerTierBoundaries.lowMax
             ? $"{powerTierBoundaries.lowMax + 1}-{powerTierBoundaries.mediumMax}"
             : "-";
-        string powerHigh = powerTierBoundaries.highMin <= powerTierBoundaries.mediumMax + 1 ? $"{powerTierBoundaries.highMin}+" : "-";
+        string powerHigh = powerTierBoundaries.highMin > 0 ? $"{powerTierBoundaries.highMin}+" : "-";
 
         string accuracyLow = accuracyTierBoundaries.lowMax > 0 ? $"1-{accuracyTierBoundaries.lowMax}" : "-";
         string accuracyMedium = accuracyTierBoundaries.mediumMax > accuracyTierBoundaries.lowMax
             ? $"{accuracyTierBoundaries.lowMax + 1}-{accuracyTierBoundaries.mediumMax}"
             : "-";
-        string accuracyHigh = accuracyTierBoundaries.highMin <= accuracyTierBoundaries.mediumMax + 1 ? $"{accuracyTierBoundaries.highMin}+" : "-";
+        string accuracyHigh = accuracyTierBoundaries.highMin > 0 ? $"{accuracyTierBoundaries.highMin}+" : "-";
 
         diceTiersText.text = $"Power L({powerLow}) M({powerMedium}) H({powerHigh})\nAccuracy L({accuracyLow}) M({accuracyMedium}) H({accuracyHigh})";
     }
 
-    private void UpdateResultPanel(IReadOnlyList<int> powerFaces, IReadOnlyList<int> accuracyFaces)
+    private void UpdateResultPanel(
+        IReadOnlyList<int> powerFaces,
+        IReadOnlyList<int> accuracyFaces,
+        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
     {
         if (resultPanelText == null)
             return;
@@ -91,13 +95,13 @@ public class DiceAllocationView : MonoBehaviour
         int minAccuracy = SumMin(accuracyFaces);
         int maxAccuracy = SumMax(accuracyFaces);
 
-        int hitThreshold = minAccuracy <= 2 ? 3 : minAccuracy;
-        int criticalThreshold = minPower <= 4 ? 5 : minPower;
+        int hitThreshold = accuracyTierBoundaries.highMin > 0 ? accuracyTierBoundaries.highMin : maxAccuracy;
+        int criticalThreshold = powerTierBoundaries.highMin > 0 ? powerTierBoundaries.highMin : maxPower;
 
         StringBuilder sb = new();
         sb.AppendLine($"Damage: {minPower}-{maxPower}");
-        sb.AppendLine($"Hit Threshold: {hitThreshold}+");
-        sb.AppendLine($"Critical Threshold: {criticalThreshold}+");
+        sb.AppendLine($"Hit Threshold (High): {hitThreshold}+");
+        sb.AppendLine($"Critical Threshold (High): {criticalThreshold}+");
         sb.Append("Effects: Critical Hit, Power Max (placeholder), Accuracy Max (evade/parry)");
         resultPanelText.text = sb.ToString();
     }
