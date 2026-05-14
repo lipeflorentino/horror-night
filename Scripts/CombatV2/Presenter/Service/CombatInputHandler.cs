@@ -228,8 +228,6 @@ public class CombatInputHandler : MonoBehaviour
 
         List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
         List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
-        Logger.Log($"[Input] Power Dice Types: {string.Join(", ", PowerDiceTypes)}, Faces: {string.Join(", ", powerFaces)}");
-        Logger.Log($"[Input] Accuracy Dice Types: {string.Join(", ", AccuracyDiceTypes)}, Faces: {string.Join(", ", accuracyFaces)}");
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
         Logger.Log($"[Input] Power Max Value: {powerMaxValue}, Primary Stat: {powerPrimaryStat}");
