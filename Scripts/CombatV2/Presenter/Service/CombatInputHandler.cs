@@ -230,10 +230,8 @@ public class CombatInputHandler : MonoBehaviour
         List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
         Logger.Log($"[Input] Power Dice Types: {string.Join(", ", PowerDiceTypes)}, Faces: {string.Join(", ", powerFaces)}");
         Logger.Log($"[Input] Accuracy Dice Types: {string.Join(", ", AccuracyDiceTypes)}, Faces: {string.Join(", ", accuracyFaces)}");
-        DiceStatType powerPrimaryStat = GetPrimaryStat(PowerDiceTypes);
-        DiceStatType accuracyPrimaryStat = GetPrimaryStat(AccuracyDiceTypes);
-        int powerMaxValue = SumFaces(powerFaces);
-        int accuracyMaxValue = SumFaces(accuracyFaces);
+        (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
+        (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
         Logger.Log($"[Input] Power Max Value: {powerMaxValue}, Primary Stat: {powerPrimaryStat}");
         Logger.Log($"[Input] Accuracy Max Value: {accuracyMaxValue}, Primary Stat: {accuracyPrimaryStat}");
 
@@ -249,40 +247,46 @@ public class CombatInputHandler : MonoBehaviour
             accuracyBoundaries);
     }
 
-    private static int SumFaces(IReadOnlyList<int> faces)
+    private static (int maxValue, DiceStatType primaryStat) GetPreviewMaxValueAndPrimaryStat(IReadOnlyList<DiceStatType> diceTypes, IReadOnlyList<int> faces)
     {
-        if (faces == null || faces.Count == 0)
-            return 1;
+        if (diceTypes == null || faces == null || diceTypes.Count == 0 || faces.Count == 0)
+            return (1, DiceStatType.Body);
 
-        int total = 0;
-        for (int i = 0; i < faces.Count; i++)
-            total += Mathf.Max(1, faces[i]);
+        Dictionary<DiceStatType, int> maxValueByStat = new();
+        int itemCount = Mathf.Min(diceTypes.Count, faces.Count);
 
-        return Mathf.Max(1, total);
-    }
-
-    private static DiceStatType GetPrimaryStat(IReadOnlyList<DiceStatType> diceTypes)
-    {
-        if (diceTypes == null || diceTypes.Count == 0)
-            return DiceStatType.Body;
-
-        int body = 0;
-        int heart = 0;
-        int mind = 0;
-
-        for (int i = 0; i < diceTypes.Count; i++)
+        for (int i = 0; i < itemCount; i++)
         {
-            switch (diceTypes[i])
+            DiceStatType statType = diceTypes[i];
+            int faceValue = Mathf.Max(1, faces[i]);
+            maxValueByStat[statType] = maxValueByStat.TryGetValue(statType, out int currentValue)
+                ? currentValue + faceValue
+                : faceValue;
+        }
+
+        int selectedMaxValue = 1;
+        DiceStatType selectedStat = DiceStatType.Body;
+
+        foreach (KeyValuePair<DiceStatType, int> pair in maxValueByStat)
+        {
+            if (pair.Value > selectedMaxValue || (pair.Value == selectedMaxValue && GetStatPriority(pair.Key) > GetStatPriority(selectedStat)))
             {
-                case DiceStatType.Body: body++; break;
-                case DiceStatType.Heart: heart++; break;
-                case DiceStatType.Mind: mind++; break;
+                selectedMaxValue = pair.Value;
+                selectedStat = pair.Key;
             }
         }
 
-        if (mind >= heart && mind >= body) return DiceStatType.Mind;
-        if (heart >= body) return DiceStatType.Heart;
-        return DiceStatType.Body;
+        return (Mathf.Max(1, selectedMaxValue), selectedStat);
     }
 
+    private static int GetStatPriority(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => 3,
+            DiceStatType.Heart => 2,
+            DiceStatType.Body => 1,
+            _ => 0
+        };
+    }
 }
