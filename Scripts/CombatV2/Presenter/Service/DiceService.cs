@@ -205,18 +205,30 @@ public class DiceService
     private void GetThresholds(int attackerLevel, int defenderLevel, int maxValue, out float lowThreshold, out float highThreshold)
     {
         int safeMaxValue = Mathf.Max(1, maxValue);
-        int delta = attackerLevel - defenderLevel;        
-        float diceGranularityFactor = 6f / safeMaxValue;
-        float deltaScale = Mathf.Clamp(4f * diceGranularityFactor, 2f, 10f);
+        int delta = attackerLevel - defenderLevel;
+
+        // Baseline: medium é mais provável, extremos menos prováveis.
+        const float baseLowThreshold = 0.22f;
+        const float baseHighThreshold = 0.78f;
+
+        // Dados pequenos são mais "saltados", então reduzimos a influência do delta.
+        float granularity = Mathf.Clamp01((safeMaxValue - 1f) / 11f); // ~d12 já tem boa resolução.
+        float deltaScale = Mathf.Lerp(7f, 4f, granularity);
         float normalizedDelta = Mathf.Clamp(delta / deltaScale, -1f, 1f);
-        float fineTuning = 0.18f + (diceGranularityFactor - 1f) * 0.08f;
-        float shift = normalizedDelta * fineTuning;
 
-        lowThreshold = Mathf.Clamp01(0.34f - shift);
-        highThreshold = Mathf.Clamp01(0.67f - shift);
+        // Delta positivo favorece High (high começa antes) e reduz Low.
+        float maxShift = Mathf.Lerp(0.10f, 0.18f, granularity);
+        float shift = normalizedDelta * maxShift;
 
-        lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.7f);
-        highThreshold = Mathf.Clamp(highThreshold, lowThreshold + 0.1f, 0.95f);
+        lowThreshold = baseLowThreshold - shift;
+        highThreshold = baseHighThreshold - shift;
+
+        // Mantém o médio relevante na maior parte dos cenários.
+        lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.45f);
+        highThreshold = Mathf.Clamp(highThreshold, 0.55f, 0.95f);
+
+        if (highThreshold < lowThreshold + 0.2f)
+            highThreshold = Mathf.Min(0.95f, lowThreshold + 0.2f);
     }
 
     public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
@@ -237,7 +249,7 @@ public class DiceService
 
         int lowMax = 0;
         int mediumMax = 0;
-        int highMin = safeMaxValue;
+        int highMin = 0;
 
         for (int value = 1; value <= safeMaxValue; value++)
         {
