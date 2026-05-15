@@ -132,20 +132,15 @@ public class PlayerStatusManager : MonoBehaviour
 
     public int GetStatValue(string statName)
     {
-        switch (NormalizeStatName(statName))
+        return NormalizeStatName(statName) switch
         {
-            case "heart":
-                return Mathf.RoundToInt(currentHeart);
-            case "body":
-                return Mathf.RoundToInt(currentBody);
-            case "mind":
-                return Mathf.RoundToInt(currentMind);
-            case "initiative":
-            case "iniciativa":
-                return initiative;
-            default:
-                return 0;
-        }
+            "heart" => Mathf.RoundToInt(currentHeart),
+            "body" => Mathf.RoundToInt(currentBody),
+            "mind" => Mathf.RoundToInt(currentMind),
+            "initiative" => initiative,
+            _ => 0,
+        };
+
     }
 
     public void ApplyStatDelta(string statName, int value)
@@ -168,8 +163,7 @@ public class PlayerStatusManager : MonoBehaviour
                 else DecreaseMind(-value);
                 return;
             case "initiative":
-            case "iniciativa":
-            initiative = Mathf.Max(0, initiative + value);
+                initiative = Mathf.Max(0, initiative + value);
                 return;
         }
     }
