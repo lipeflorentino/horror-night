@@ -223,9 +223,9 @@ public class CombatManager : MonoBehaviour
         return DiceService.GetDiceMaxValueForType(battler, diceType);
     }
 
-    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes)
+    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes, bool isAggregated = false)
     {
-        return DiceService.ConvertToFaces(Player, diceTypes);
+        return isAggregated ? DiceService.ConvertToAggregatedFaces(Player, diceTypes) : DiceService.ConvertToFaces(Player, diceTypes);
     }
 
     public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
@@ -426,5 +426,13 @@ public class CombatManager : MonoBehaviour
         snapshot.powerDices = Player.CurrentPowerDices;
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
         return snapshot;
+    }
+
+    public int GetPlayerActionPower()
+    {
+        int atk = Player.Attack;
+        int df = Player.Defense;
+        Logger.Log($"[GetPlayerActionPower] Attack: {atk}, Defense: {df}");
+        return PlayerIsAttacker ? atk : df;
     }
 }

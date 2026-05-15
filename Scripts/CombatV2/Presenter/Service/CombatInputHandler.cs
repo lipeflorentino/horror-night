@@ -226,23 +226,47 @@ public class CombatInputHandler : MonoBehaviour
         if (Combat == null || Combat.View == null || Combat.View.ActionPanel  == null)
             return;
 
-        List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes);
-        List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes);
+        List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes, false);
+        List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes, false);
+
+        List<DiceStatType> aggregatedPowerTypes = GetAggregatedDiceTypes(PowerDiceTypes);
+        List<int> aggregatedPowerFaces = Combat.GetDiceFacesForSelection(aggregatedPowerTypes, true);
+        
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
-        Logger.Log($"[Input] Power Max Value: {powerMaxValue}, Primary Stat: {powerPrimaryStat}");
-        Logger.Log($"[Input] Accuracy Max Value: {accuracyMaxValue}, Primary Stat: {accuracyPrimaryStat}");
-
         (int lowMax, int mediumMax, int highMin) powerBoundaries = Combat.GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
         (int lowMax, int mediumMax, int highMin) accuracyBoundaries = Combat.GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
         Combat.View.ActionPanel.UpdateSelectionPreview(
+            Combat.GetPlayerActionPower(),
             PowerDiceTypes,
             powerFaces,
+            aggregatedPowerFaces,
             AccuracyDiceTypes,
             accuracyFaces,
             powerBoundaries,
             accuracyBoundaries);
+    }
+
+    private static List<DiceStatType> GetAggregatedDiceTypes(List<DiceStatType> diceTypes)
+    {
+        List<DiceStatType> aggregated = new();
+        Dictionary<DiceStatType, int> typeCount = new();
+        
+        for (int i = 0; i < diceTypes.Count; i++)
+        {
+            DiceStatType type = diceTypes[i];
+            typeCount[type] = typeCount.TryGetValue(type, out int count) ? count + 1 : 1;
+        }
+        
+        for (int i = 0; i < diceTypes.Count; i++)
+        {
+            DiceStatType type = diceTypes[i];
+            if (!aggregated.Contains(type))
+                aggregated.Add(type);
+        }
+        
+        return aggregated;
     }
 
     private static (int maxValue, DiceStatType primaryStat) GetPreviewMaxValueAndPrimaryStat(IReadOnlyList<DiceStatType> diceTypes, IReadOnlyList<int> faces)

@@ -458,8 +458,10 @@ public class ActionPanelView : MonoBehaviour
     }
 
     public void UpdateSelectionPreview(
+        int actionPower,
         IReadOnlyList<DiceStatType> powerDiceTypes,
         IReadOnlyList<int> powerFaces,
+        IReadOnlyList<int> aggregatedPowerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
         (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
@@ -469,8 +471,10 @@ public class ActionPanelView : MonoBehaviour
             return;
 
         diceAllocationView.UpdateSelectionPreview(
+            actionPower,
             powerDiceTypes,
             powerFaces,
+            aggregatedPowerFaces,
             accuracyDiceTypes,
             accuracyFaces,
             powerTierBoundaries,

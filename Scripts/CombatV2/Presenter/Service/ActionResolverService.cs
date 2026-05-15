@@ -24,9 +24,9 @@ public class ActionResolverService
             FinalTarget = target
         };
 
-        float attackPower = ignoreAttack ? 0f : CalculatePower(attack);
-        float defensePower = ignoreDefense ? 0f : CalculatePower(defense);
-        int damage = (int)(attackPower - defensePower);
+        int attackPower = ignoreAttack ? 0 : (int)CalculatePower(attack);
+        int defensePower = ignoreDefense ? 0 : (int)CalculatePower(defense);
+        int damage = attackPower - defensePower;
 
         Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
         
@@ -119,10 +119,10 @@ public class ActionResolverService
         };
     }
 
-    private float CalculatePower(ActionInstance action)
+    public int CalculatePower(ActionInstance action)
     {
         if (action == null || action.PowerDice == null)
-            return 0f;
+            return 0;
 
         float multiplier = GetMultiplier(action.PowerDice.Tier);
         return action.Definition.BasePower * (int)multiplier;

@@ -16,8 +16,10 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private TMP_Text resultPanelText;
 
     public void UpdateSelectionPreview(
+        int actionPower,
         IReadOnlyList<DiceStatType> powerDiceTypes,
         IReadOnlyList<int> powerFaces,
+        IReadOnlyList<int> aggregatedPowerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
         (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
@@ -26,7 +28,7 @@ public class DiceAllocationView : MonoBehaviour
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
         UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
-        UpdateResultPanel(powerFaces, accuracyFaces, powerTierBoundaries, accuracyTierBoundaries);
+        UpdateResultPanel(actionPower, aggregatedPowerFaces, powerTierBoundaries, accuracyTierBoundaries);
     }
 
     private void RebuildAllocationContainer(RectTransform container, IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
@@ -82,42 +84,64 @@ public class DiceAllocationView : MonoBehaviour
     }
 
     private void UpdateResultPanel(
-        IReadOnlyList<int> powerFaces,
-        IReadOnlyList<int> accuracyFaces,
+        int actionPower,
+        IReadOnlyList<int> aggregatedPowerFaces,
         (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
         (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
     {
         if (resultPanelText == null)
             return;
 
-        int minPower = SumMin(powerFaces);
-        int maxPower = SumMax(powerFaces);
-        int minAccuracy = SumMin(accuracyFaces);
-        int maxAccuracy = SumMax(accuracyFaces);
+        int minPower = SumMin(aggregatedPowerFaces);
+        int maxPower = SumMax(aggregatedPowerFaces);
 
-        int hitThreshold = accuracyTierBoundaries.highMin > 0 ? accuracyTierBoundaries.highMin : maxAccuracy;
-        int criticalThreshold = powerTierBoundaries.highMin > 0 ? powerTierBoundaries.highMin : maxPower;
+        float minDamage = actionPower * GetMultiplier(GetTier(minPower, powerTierBoundaries));
+        float maxDamage = actionPower * GetMultiplier(GetTier(maxPower, powerTierBoundaries));
+
+        int hitThreshold = accuracyTierBoundaries.lowMax + 1;
+        int criticalThreshold = accuracyTierBoundaries.highMin;
 
         StringBuilder sb = new();
-        sb.AppendLine($"Damage: {minPower}-{maxPower}");
-        sb.AppendLine($"Hit Threshold (High): {hitThreshold}+");
-        sb.AppendLine($"Critical Threshold (High): {criticalThreshold}+");
+        sb.AppendLine($"Damage: {minDamage:F0}-{maxDamage:F0}");
+        sb.AppendLine($"Hit Threshold: {hitThreshold}+");
+        sb.AppendLine($"Critical Threshold: {(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--")}");
         sb.Append("Effects: Critical Hit, Power Max (placeholder), Accuracy Max (evade/parry)");
         resultPanelText.text = sb.ToString();
+    }
+
+    private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin) boundaries)
+    {
+        if (value <= boundaries.lowMax)
+            return DiceTier.Low;
+        else if (value <= boundaries.mediumMax)
+            return DiceTier.Medium;
+        else
+            return DiceTier.High;
+    }
+
+    private float GetMultiplier(DiceTier tier)
+    {
+        return tier switch
+        {
+            DiceTier.Low => 0.5f,
+            DiceTier.Medium => 1f,
+            DiceTier.High => 1.5f,
+            _ => 1f,
+        };
     }
 
     private int SumMin(IReadOnlyList<int> faces)
     {
         if (faces == null || faces.Count == 0) return 0;
-        return faces.Count;
+        return 1;
     }
 
     private int SumMax(IReadOnlyList<int> faces)
     {
         if (faces == null || faces.Count == 0) return 0;
-        int total = 0;
+        int maxValue = 0;
         for (int i = 0; i < faces.Count; i++)
-            total += Mathf.Max(1, faces[i]);
-        return total;
+            maxValue = Mathf.Max(maxValue, Mathf.Max(1, faces[i]));
+        return maxValue;
     }
 }

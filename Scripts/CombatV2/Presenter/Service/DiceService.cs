@@ -118,6 +118,25 @@ public class DiceService
         return orderedResults;
     }
 
+    public List<int> ConvertToAggregatedFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
+    {
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, diceTypes, DiceRollType.Power);
+        Dictionary<DiceStatType, int> facesByType = new();
+        for (int i = 0; i < diceSpecs.Count; i++)
+        {
+            DiceRollSpec spec = diceSpecs[i];
+            facesByType[spec.StatType] = facesByType.TryGetValue(spec.StatType, out int currentFaces)
+                ? currentFaces + spec.MaxValue
+                : spec.MaxValue;
+        }
+        
+        List<int> diceFaces = new();
+        foreach (KeyValuePair<DiceStatType, int> pair in facesByType)
+            diceFaces.Add(pair.Value);
+
+        return diceFaces;
+    }
+
     public List<int> ConvertToFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
         List<int> diceFaces = new();

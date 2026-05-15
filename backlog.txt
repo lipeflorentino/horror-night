@@ -24,19 +24,15 @@ TO DO
     - Implementar sistemas que faltam
         - Presence, Treasure
     - Ajustar painel de infos (fechamento)
-    - Ajustar fluxo de combate e feedbacks de ações
-    - Implementar botão de voltar na UI de ações
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
 
     → adicionar uso de item em combate afetando snapshot (consumo real)
     → ou loot de inimigo integrado ao CombatResultSnapshot
-    - transformar CombatActionData em ActionDefinition + ActionInstance
 
 
 TAREFA
     - Implementar DiceStatEffects
     - as skills ao serem habilitadas, são inseridas nos dados.
-    - GetThresholds baseado nas stats 
 
     - Ganho de "XP" ao derrotar monstros cujo nível é maior ou igual ao do jogador. Pode perder level ao ser derrotado.
     - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
