@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -8,7 +9,7 @@ public class CombatResultSnapshot
     [SerializeField] public EnemyInstance EnemyInstance;
     [SerializeField] public bool PlayerWon;
     [SerializeField] public int XpGained;
-    [SerializeField] public int GoldCoinsGained;
+    [SerializeField] public Dictionary<ItemSO, int> ItensGained;
 }
 
 [Serializable]

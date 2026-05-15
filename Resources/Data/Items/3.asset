@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   id: 3
-  itemName: Gold Coin
+  itemName: Gold Coins
   description: Moeda comum
   weight: 100
   rarity: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerInventory))]
 public class PlayerStatusManager : MonoBehaviour
 {
 
@@ -41,11 +42,10 @@ public class PlayerStatusManager : MonoBehaviour
     [Header("HP")]
     [SerializeField] private float maxHp = 100f;
     [SerializeField] private float currentHp = 100f;
-    [Header("Rewards")]
-    [SerializeField] private string goldCoinsItemName = "Gold Coins";
 
     private void Awake()
     {
+        GetComponent<PlayerInventory>();
         currentArchetype = initialArchetype;
 
         currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
@@ -65,7 +65,10 @@ public class PlayerStatusManager : MonoBehaviour
 
         RestoreSnapshot(result.PlayerSnapshot);
         AddXp(result.XpGained);
-        AddInventoryItem(goldCoinsItemName, result.GoldCoinsGained);
+        foreach (var kvp in result.ItensGained)
+        {
+            AddInventoryItem(kvp.Key.itemName, kvp.Value);
+        }
     }
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;

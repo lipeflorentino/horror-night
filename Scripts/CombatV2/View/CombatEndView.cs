@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,11 +40,11 @@ public class CombatEndView : MonoBehaviour
         SetupButton(secondaryButton, "Quit", onQuit, true);
     }
 
-    public void ShowVictory(int xpReward, int goldCoinsReward, Action onProceed)
+    public void ShowVictory(int xpReward, Dictionary<ItemSO, int> itensReward, Action onProceed)
     {
         iconImage.sprite = victoryIcon;
         ShowRoot();
-        SetText("Vitória!", $"Recompensas:\n- XP: +{xpReward}\n- Gold Coins: +{goldCoinsReward}", string.Empty);
+        SetText("Vitória!", $"Recompensas:\n- XP: +{xpReward}\n- Itens: [\n+{string.Join(", ", itensReward.Select(kvp => $"-{kvp.Key.name}: {kvp.Value}\n]"))}", string.Empty);
         SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(secondaryButton, string.Empty, null, false);
 

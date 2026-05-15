@@ -38,7 +38,7 @@ public class CombatManager : MonoBehaviour
     private List<DiceStatType> PendingEnemyAccuracyDiceTypes = new();
     private bool CombatEnded;
     private int lastGrantedXp;
-    private int lastGrantedGoldCoins;
+    private Dictionary<ItemSO, int> lastGrantedItens;
     private CombatSessionData SessionData;
 
     void Start()
@@ -350,8 +350,8 @@ public class CombatManager : MonoBehaviour
         if (playerWon)
         {
             lastGrantedXp = GrantXpRewardIfEligible();
-            lastGrantedGoldCoins = GrantGoldCoinsReward();
-            View.CombatEndView.ShowVictory(lastGrantedXp, lastGrantedGoldCoins, ProceedToGameplayScene);
+            lastGrantedItens = SessionData?.EnemyInstance?.source != null ? SessionData.EnemyInstance.source.GetRandomLoot() : new Dictionary<ItemSO, int>();
+            View.CombatEndView.ShowVictory(lastGrantedXp, lastGrantedItens, ProceedToGameplayScene);
         }
         else
         {
@@ -387,7 +387,7 @@ public class CombatManager : MonoBehaviour
             EnemyInstance = SessionData?.EnemyInstance,
             PlayerWon = true,
             XpGained = lastGrantedXp,
-            GoldCoinsGained = lastGrantedGoldCoins
+            ItensGained = lastGrantedItens,
         });
 
         CombatReturnStore.Set(new CombatReturnSnapshot
