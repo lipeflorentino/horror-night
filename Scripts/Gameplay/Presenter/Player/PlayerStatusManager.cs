@@ -19,6 +19,8 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int defense = 5;
     [SerializeField] private int initiative = 10;
     [SerializeField] private int level = 1;
+    [SerializeField] private int currentXp = 0;
+    [SerializeField] private int maxXp = 10;
     [SerializeField] private int currentPowerDices = 3;
     [SerializeField] private int currentAccuracyDices = 3;
     [SerializeField] private int maxPowerDices = 3;
@@ -39,6 +41,8 @@ public class PlayerStatusManager : MonoBehaviour
     [Header("HP")]
     [SerializeField] private float maxHp = 100f;
     [SerializeField] private float currentHp = 100f;
+    [Header("Rewards")]
+    [SerializeField] private string goldCoinsItemName = "Gold Coins";
 
     private void Awake()
     {
@@ -60,6 +64,8 @@ public class PlayerStatusManager : MonoBehaviour
             return;
 
         RestoreSnapshot(result.PlayerSnapshot);
+        AddXp(result.XpGained);
+        AddInventoryItem(goldCoinsItemName, result.GoldCoinsGained);
     }
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;
@@ -179,6 +185,8 @@ public class PlayerStatusManager : MonoBehaviour
             defense = defense,
             initiative = initiative,
             level = GetLevel(),
+            currentXp = Mathf.Max(0, currentXp),
+            maxXp = Mathf.Max(1, maxXp),
             hp = currentHp,
             maxHeart = maxHeart,
             maxBody = maxBody,
@@ -212,6 +220,8 @@ public class PlayerStatusManager : MonoBehaviour
             initiative = Mathf.Max(0, Mathf.RoundToInt(snapshot.initiative));
         if (snapshot.level > 0)
             level = Mathf.Max(1, snapshot.level);
+        currentXp = Mathf.Max(0, snapshot.currentXp);
+        maxXp = Mathf.Max(1, snapshot.maxXp > 0 ? snapshot.maxXp : CalculateMaxXpForLevel(level));
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
         currentPowerDices = Mathf.Max(0, snapshot.powerDices);
         currentAccuracyDices = Mathf.Max(0, snapshot.accuracyDices);
@@ -268,5 +278,50 @@ public class PlayerStatusManager : MonoBehaviour
             default:
                 return normalized;
         }
+    }
+
+    private static int CalculateMaxXpForLevel(int currentLevel)
+    {
+        int normalizedLevel = Mathf.Max(1, currentLevel);
+        return normalizedLevel * 10;
+    }
+
+    public void AddXp(int xpAmount)
+    {
+        if (xpAmount <= 0)
+            return;
+
+        currentXp += xpAmount;
+
+        while (currentXp >= maxXp)
+        {
+            currentXp -= maxXp;
+            LevelUp();
+        }
+    }
+
+    public void LevelUp()
+    {
+        level = Mathf.Max(1, level + 1);
+        maxXp = CalculateMaxXpForLevel(level);
+
+        float hpIncrease = level * 5f;
+        maxHp = Mathf.Max(1f, maxHp + hpIncrease);
+        currentHp = Mathf.Clamp(currentHp + hpIncrease, 0f, maxHp);
+    }
+
+    public bool AddInventoryItem(string itemName, int quantity)
+    {
+        if (quantity <= 0 || playerInventory == null)
+            return false;
+
+        bool added = playerInventory.AddItem(itemName, quantity);
+        if (!added)
+        {
+            Debug.LogWarning($"[PlayerStatusManager] Item '{itemName}' não encontrado para recompensa de inventário.");
+            return false;
+        }
+
+        return true;
     }
 }

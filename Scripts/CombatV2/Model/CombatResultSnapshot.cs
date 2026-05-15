@@ -7,6 +7,8 @@ public class CombatResultSnapshot
     [SerializeField] public PlayerStatusSnapshot PlayerSnapshot;
     [SerializeField] public EnemyInstance EnemyInstance;
     [SerializeField] public bool PlayerWon;
+    [SerializeField] public int XpGained;
+    [SerializeField] public int GoldCoinsGained;
 }
 
 [Serializable]

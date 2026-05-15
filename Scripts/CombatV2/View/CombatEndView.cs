@@ -38,11 +38,11 @@ public class CombatEndView : MonoBehaviour
         SetupButton(secondaryButton, "Quit", onQuit, true);
     }
 
-    public void ShowVictory(Action onProceed)
+    public void ShowVictory(int xpReward, int goldCoinsReward, Action onProceed)
     {
         iconImage.sprite = victoryIcon;
         ShowRoot();
-        SetText("Vitória!", "Placeholder de recompensas\n- XP\n- Loot\n- Evento", string.Empty);
+        SetText("Vitória!", $"Recompensas:\n- XP: +{xpReward}\n- Gold Coins: +{goldCoinsReward}", string.Empty);
         SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(secondaryButton, string.Empty, null, false);
 
