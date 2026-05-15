@@ -9,8 +9,54 @@ public class PlayerInventory : MonoBehaviour
 
     public void AddItem(ItemSO item)
     {
+        if (item == null)
+            return;
+
         items.Add(item);
         Debug.Log("Item adicionado: " + item.itemName);
+    }
+
+    public void AddItem(ItemSO item, int quantity)
+    {
+        if (item == null || quantity <= 0)
+            return;
+
+        for (int i = 0; i < quantity; i++)
+            AddItem(item);
+    }
+
+    public ItemSO FindItemByName(string itemName)
+    {
+        if (string.IsNullOrWhiteSpace(itemName))
+            return null;
+
+        if (itemDatabase == null)
+            itemDatabase = FindObjectOfType<ItemDatabase>();
+
+        if (itemDatabase == null || itemDatabase.allItems == null)
+            return null;
+
+        for (int i = 0; i < itemDatabase.allItems.Count; i++)
+        {
+            ItemSO item = itemDatabase.allItems[i];
+            if (item != null && string.Equals(item.itemName, itemName, System.StringComparison.OrdinalIgnoreCase))
+                return item;
+        }
+
+        return null;
+    }
+
+    public bool AddItem(string itemName, int quantity)
+    {
+        if (string.IsNullOrWhiteSpace(itemName) || quantity <= 0)
+            return false;
+
+        ItemSO item = FindItemByName(itemName);
+        if (item == null)
+            return false;
+
+        AddItem(item, quantity);
+        return true;
     }
 
     public List<ItemSO> CreateSnapshot()
