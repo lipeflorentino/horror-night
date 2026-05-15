@@ -62,5 +62,6 @@ public class BattlerPanelView : MonoBehaviour
 
         if (InitiativeText != null)
             InitiativeText.text = battler.Initiative.ToString();
+
     }
 }

@@ -37,6 +37,8 @@ public class CombatManager : MonoBehaviour
     private List<DiceStatType> PendingEnemyPowerDiceTypes = new();
     private List<DiceStatType> PendingEnemyAccuracyDiceTypes = new();
     private bool CombatEnded;
+    private int lastGrantedXp;
+    private int lastGrantedGoldCoins;
     private CombatSessionData SessionData;
 
     void Start()
@@ -347,7 +349,9 @@ public class CombatManager : MonoBehaviour
         bool playerWon = Player.IsAlive() && !Enemy.IsAlive();
         if (playerWon)
         {
-            View.CombatEndView.ShowVictory(ProceedToGameplayScene);
+            lastGrantedXp = GrantXpRewardIfEligible();
+            lastGrantedGoldCoins = GrantGoldCoinsReward();
+            View.CombatEndView.ShowVictory(lastGrantedXp, lastGrantedGoldCoins, ProceedToGameplayScene);
         }
         else
         {
@@ -381,7 +385,9 @@ public class CombatManager : MonoBehaviour
         {
             PlayerSnapshot = BuildResultPlayerSnapshot(),
             EnemyInstance = SessionData?.EnemyInstance,
-            PlayerWon = true
+            PlayerWon = true,
+            XpGained = lastGrantedXp,
+            GoldCoinsGained = lastGrantedGoldCoins
         });
 
         CombatReturnStore.Set(new CombatReturnSnapshot
@@ -426,6 +432,22 @@ public class CombatManager : MonoBehaviour
         snapshot.powerDices = Player.CurrentPowerDices;
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
         return snapshot;
+    }
+
+    private int GrantXpRewardIfEligible()
+    {
+        if (Enemy.Level < Player.Level)
+            return 0;
+
+        int reward = Mathf.Max(0, Enemy.Level);
+        return reward;
+    }
+
+    private int GrantGoldCoinsReward()
+    {
+        int minGoldCoins = 1;
+        int maxGoldCoins = Mathf.Max(minGoldCoins, Enemy.Level * 10);
+        return UnityEngine.Random.Range(minGoldCoins, maxGoldCoins + 1);
     }
 
     public int GetPlayerActionPower()
