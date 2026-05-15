@@ -37,3 +37,14 @@ TAREFA
     - Implementar DiceStatEffects
     - as skills ao serem habilitadas, são inseridas nos dados.
     - GetThresholds baseado nas stats 
+
+    - Ganho de "XP" ao derrotar monstros cujo nível é maior ou igual ao do jogador. Pode perder level ao ser derrotado.
+    - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
+    - Cartas de estado de combate são habilitadas (com custo) e podem ser ativadas durante combate mediante a rolagem de dados ou condição especial. 
+        O estado de combate pode alterar significativamente as stats e ações do combatente
+    - Adicionar atributo de Agilidade que deverá ser usado para definir os thresholds low e high Accuracy
+    - Adicionar atributo de destreza que deverá ser usado para definir os thresholds low e high Power
+    - Adicionar indicativo visual de rolagem máxima (highlight)
+    - Ter a possibilidade de habilidades que dão buffs/debuffs caso certos valores no dados sejam tirados
+    - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
+    - Ter builds baseadas nas stats (mind, heart, body)
