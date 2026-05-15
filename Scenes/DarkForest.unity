@@ -6935,8 +6935,8 @@ GameObject:
   - component: {fileID: 5861470919307931023}
   - component: {fileID: 3665419804359163881}
   - component: {fileID: 4643986677191808141}
-  - component: {fileID: 1413714144169469854}
   - component: {fileID: 3305135831503883983}
+  - component: {fileID: 1413714144169469854}
   - component: {fileID: 8128930221019054240}
   - component: {fileID: 6985004927241914009}
   m_Layer: 0
@@ -7446,20 +7446,22 @@ MonoBehaviour:
     fillImage: {fileID: 6162320184280885047}
     valueText: {fileID: 6034745862005186359}
   playerInventory: {fileID: 0}
-  attack: 8
-  defense: 3
+  attack: 12
+  defense: 4
   initiative: 5
   level: 1
   currentPowerDices: 3
   currentAccuracyDices: 3
-  maxHeart: 10
-  currentHeart: 10
-  maxBody: 10
-  currentBody: 10
+  maxPowerDices: 3
+  maxAccuracyDices: 3
+  maxHeart: 8
+  currentHeart: 8
+  maxBody: 12
+  currentBody: 12
   maxMind: 10
   currentMind: 10
-  maxHp: 100
-  currentHp: 100
+  maxHp: 25
+  currentHp: 25
 --- !u!224 &1420438872995974988
 RectTransform:
   m_ObjectHideFlags: 0
