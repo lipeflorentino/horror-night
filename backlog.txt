@@ -33,6 +33,8 @@ TO DO
 
 
 TAREFA
+    - Implementar RewardView para mostrar UI de recompensas
+    - Possibilidade de mostrar recompensas no infos
     - Implementar uso de itens do inventario
     - Implementar DiceStatEffects
     - as skills ao serem habilitadas, são inseridas nos dados.
@@ -45,3 +47,7 @@ TAREFA
     - Ter a possibilidade de habilidades que dão buffs/debuffs caso certos valores no dados sejam tirados
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
+
+FIX
+    - MaxHp não está sendo persistido na volta ao combate (o currentHp virou maxHp)
+    - Se a rolagem de accuracy para defesa falhar nem deve rolar o power (vai direto para o damage)

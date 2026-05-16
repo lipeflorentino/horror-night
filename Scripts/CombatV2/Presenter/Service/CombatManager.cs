@@ -40,6 +40,7 @@ public class CombatManager : MonoBehaviour
     private int lastGrantedXp;
     private Dictionary<ItemSO, int> lastGrantedItens;
     private CombatSessionData SessionData;
+    private RewardService RewardService;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class CombatManager : MonoBehaviour
         InitiativeResolver = new InitiativeResolver();
         EnemyActionSelector = new EnemyActionSelector();
         EnemyTurnPlanner = new EnemyTurnPlanner(EnemyActionSelector);
+        RewardService = new RewardService();
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
 
@@ -350,7 +352,15 @@ public class CombatManager : MonoBehaviour
         if (playerWon)
         {
             lastGrantedXp = GrantXpRewardIfEligible();
-            lastGrantedItens = SessionData?.EnemyInstance?.source != null ? SessionData.EnemyInstance.source.GetRandomLoot() : new Dictionary<ItemSO, int>();
+            if (SessionData?.EnemyInstance?.source != null)
+            {
+                int grantedGoldCoins = GrantGoldCoinsReward();
+                lastGrantedItens = RewardService.GetRandomLoot(Enemy.Level, grantedGoldCoins);
+            }
+            else
+            {
+                lastGrantedItens = new Dictionary<ItemSO, int>();
+            }
             View.CombatEndView.ShowVictory(lastGrantedXp, lastGrantedItens, ProceedToGameplayScene);
         }
         else

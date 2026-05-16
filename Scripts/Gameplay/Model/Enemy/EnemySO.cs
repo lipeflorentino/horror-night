@@ -93,12 +93,4 @@ public class EnemySO : ScriptableObject
             runTier = context != null ? context.tier : 0
         };
     }
-
-    public Dictionary<ItemSO, int> GetRandomLoot()
-    {
-        // Placeholder implementation - replace with actual loot logic
-        Dictionary<ItemSO, int> loot = new();
-        // Example: loot.Add(someItemSO, quantity);
-        return loot;
-    }
 }
