@@ -23,10 +23,14 @@ public class CombatEndView : MonoBehaviour
     [SerializeField] private Button primaryButton;
     [SerializeField] private Button secondaryButton;
 
+    [Header("Rewards")]
+    [SerializeField] private RewardView rewardView;    
+
     private Coroutine countdownRoutine;
 
     private void Awake()
     {
+        rewardView = FindObjectOfType<RewardView>();
         Hide();
     }
 
@@ -38,6 +42,9 @@ public class CombatEndView : MonoBehaviour
         SetText("GAME OVER", "Você morreu. Deseja tentar novamente?", string.Empty);
         SetupButton(primaryButton, "Restart", onRestart, true);
         SetupButton(secondaryButton, "Quit", onQuit, true);
+        
+        if (rewardView != null)
+            rewardView.Clear();
     }
 
     public void ShowVictory(int xpReward, Dictionary<ItemSO, int> itensReward, Action onProceed)
@@ -45,9 +52,13 @@ public class CombatEndView : MonoBehaviour
         victoryPanel.SetActive(true);
         deathPanel.SetActive(false);
         ShowRoot();
-        SetText("Vitória!", $"Recompensas:\n- XP: +{xpReward}\n- Itens: [\n+{string.Join(", ", itensReward.Select(kvp => $"-{kvp.Key.name}: {kvp.Value}\n]"))}", string.Empty);
+        SetText("Vitória!", $"Recompensas:\n +{xpReward} XP", string.Empty);
+        SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(secondaryButton, string.Empty, null, false);
+        
+        if (rewardView != null)
+            rewardView.Show(itensReward);
 
         if (countdownRoutine != null)
             StopCoroutine(countdownRoutine);
