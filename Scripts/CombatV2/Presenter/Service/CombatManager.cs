@@ -163,7 +163,7 @@ public class CombatManager : MonoBehaviour
         EndTurn();
     }
 
-    private IEnumerator ResolveTurnFlow(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
+    private IEnumerator ResolveTurnFlow(ActionType action, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
         yield return WaitForSeconds0_5;
 
@@ -171,15 +171,20 @@ public class CombatManager : MonoBehaviour
 
         yield return WaitForSeconds0_5;
 
-        RollActions(playerType, powerDiceTypes, accuracyDiceTypes);
+        RollActions(action, powerDiceTypes, accuracyDiceTypes);
 
-        bool attackerAccuracyEffective = ResolveAccuracyStage();
+        bool attackerAccuracyEffective = ResolveAttackAccuracy();
+        bool defenseAccuracyEffective = ResolveDefenseAccuracy();
+        bool isPlayerDefending = action == ActionType.Defense;
 
         yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy);
 
-        if (attackerAccuracyEffective)
+        bool shouldPlayPowerResolution = attackerAccuracyEffective && (!isPlayerDefending || defenseAccuracyEffective);
+
+        if (shouldPlayPowerResolution)
         {
-            yield return View.PlayDiceResolution(PendingPlayerPowerRolls, PendingEnemyPowerRolls, DiceRollType.Power);
+            List<DiceResult> playerRolls = isPlayerDefending && !defenseAccuracyEffective ? null : PendingPlayerPowerRolls;
+            yield return View.PlayDiceResolution(playerRolls, PendingEnemyPowerRolls, DiceRollType.Power);
         }
 
         Resolve();
@@ -200,9 +205,9 @@ public class CombatManager : MonoBehaviour
         PendingEnemyAccuracyDiceTypes = plan.AccuracyDiceTypes;
     }
 
-    private void RollActions(ActionType playerType, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
+    private void RollActions(ActionType action, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
-        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, playerType);
+        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, action);
 
         PendingPlayerPowerRolls = DiceService.RollMany(Player, powerDiceTypes, DiceRollType.Power, Player.Level, Enemy.Level);
         PendingPlayerAccuracyRolls = DiceService.RollMany(Player, accuracyDiceTypes, DiceRollType.Accuracy, Player.Level, Enemy.Level);
@@ -276,10 +281,16 @@ public class CombatManager : MonoBehaviour
         View.UpdateView(Player, Enemy);
     }
 
-    private bool ResolveAccuracyStage()
+    private bool ResolveAttackAccuracy()
     {
         ActionInstance attack = PlayerIsAttacker ? PendingPlayerAction : PendingEnemyAction;
         return attack != null && attack.AccuracyDice != null && attack.AccuracyDice.Tier != DiceTier.Low;
+    }
+
+    public bool ResolveDefenseAccuracy()
+    {
+        ActionInstance defense = PlayerIsAttacker ? PendingEnemyAction : PendingPlayerAction;
+        return defense != null && defense.AccuracyDice != null && defense.AccuracyDice.Tier != DiceTier.Low;
     }
 
     private void EndTurn()
