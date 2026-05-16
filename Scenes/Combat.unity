@@ -8450,7 +8450,8 @@ MonoBehaviour:
   root: {fileID: 755369785}
   victoryIcon: {fileID: 0}
   gameoverIcon: {fileID: -1218606889, guid: 4780b4e85189b1648af8a92e09ef72e8, type: 3}
-  iconImage: {fileID: 646604911}
+  victoryPanel: {fileID: 128305560}
+  deathPanel: {fileID: 447051837}
   titleText: {fileID: 1800468685}
   subtitleText: {fileID: 299212193}
   countdownText: {fileID: 532485948}

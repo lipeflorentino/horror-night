@@ -12,8 +12,7 @@ public class CombatEndView : MonoBehaviour
 
     [Header("Root")]
     [SerializeField] private GameObject root;
-    [SerializeField] private Sprite victoryIcon, gameoverIcon;
-    [SerializeField] private Image iconImage;
+    [SerializeField] private GameObject victoryPanel, deathPanel;
 
     [Header("Texts")]
     [SerializeField] private TMP_Text titleText;
@@ -33,7 +32,8 @@ public class CombatEndView : MonoBehaviour
 
     public void ShowGameOver(Action onRestart, Action onQuit)
     {
-        iconImage.sprite = gameoverIcon;
+        deathPanel.SetActive(true);
+        victoryPanel.SetActive(false);
         ShowRoot();
         SetText("GAME OVER", "Você morreu. Deseja tentar novamente?", string.Empty);
         SetupButton(primaryButton, "Restart", onRestart, true);
@@ -42,7 +42,8 @@ public class CombatEndView : MonoBehaviour
 
     public void ShowVictory(int xpReward, Dictionary<ItemSO, int> itensReward, Action onProceed)
     {
-        iconImage.sprite = victoryIcon;
+        victoryPanel.SetActive(true);
+        deathPanel.SetActive(false);
         ShowRoot();
         SetText("Vitória!", $"Recompensas:\n- XP: +{xpReward}\n- Itens: [\n+{string.Join(", ", itensReward.Select(kvp => $"-{kvp.Key.name}: {kvp.Value}\n]"))}", string.Empty);
         SetupButton(primaryButton, "Continue", onProceed, true);
