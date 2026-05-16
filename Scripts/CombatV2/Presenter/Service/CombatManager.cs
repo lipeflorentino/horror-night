@@ -101,7 +101,8 @@ public class CombatManager : MonoBehaviour
             Mathf.RoundToInt(playerSnapshot.initiative),
             Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : DefaultPowerDiceCount),
             Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount),
-            true
+            true,
+            Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp)
         );
 
         if (enemySnapshot != null)
@@ -438,6 +439,7 @@ public class CombatManager : MonoBehaviour
                 body = Player.Body,
                 attack = Player.Attack,
                 defense = Player.Defense,
+                maxHp = Player.MaxHp,
                 powerDices = Player.CurrentPowerDices,
                 accuracyDices = Player.CurrentAccuracyDices
             };
@@ -450,6 +452,7 @@ public class CombatManager : MonoBehaviour
         snapshot.body = Player.Body;
         snapshot.attack = Player.Attack;
         snapshot.defense = Player.Defense;
+        snapshot.maxHp = Player.MaxHp;
         snapshot.powerDices = Player.CurrentPowerDices;
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
         return snapshot;

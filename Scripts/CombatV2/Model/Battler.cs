@@ -15,7 +15,7 @@ public class Battler
     public int MaxPowerDices, MaxAccuracyDices;
     public bool IsPlayer;
 
-    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1)
     {
         Name = name;
         Level = level;
@@ -30,7 +30,7 @@ public class Battler
         MaxPowerDices = powerDices;
         CurrentAccuracyDices = accuracyDices;
         MaxAccuracyDices = accuracyDices;
-        MaxHp = HP;
+        MaxHp = maxHp > 0 ? maxHp : HP;
         IsPlayer = isPlayer;
     }
 

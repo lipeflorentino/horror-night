@@ -50,4 +50,3 @@ TAREFA
 
 FIX
     - MaxHp não está sendo persistido na volta ao combate (o currentHp virou maxHp)
-    - Se a rolagem de accuracy para defesa falhar nem deve rolar o power (vai direto para o damage)
