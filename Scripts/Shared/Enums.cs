@@ -54,3 +54,11 @@ public enum EnemyTurnAction
     Attack,
     Defend
 }
+
+public enum ItemType
+{
+    Weapon,
+    Consumable,
+    Relic,
+    Broken
+}

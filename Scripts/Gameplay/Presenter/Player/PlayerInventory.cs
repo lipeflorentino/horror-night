@@ -1,11 +1,23 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] private ItemDatabase itemDatabase;
+    [SerializeField] private int maxWeaponSlots = 2;
+    [SerializeField] private int maxRelicSlots = 2;
     public List<ItemSO> items = new();
+    [SerializeField] private List<EquippedItemInstance> equippedWeapons = new();
+    [SerializeField] private List<EquippedItemInstance> equippedRelics = new();
+
+    private PlayerStatusManager playerStatusManager;
+
+    private void Awake()
+    {
+        playerStatusManager = GetComponent<PlayerStatusManager>();
+    }
 
     public void AddItem(ItemSO item)
     {
@@ -141,5 +153,139 @@ public class PlayerInventory : MonoBehaviour
         }
 
         return null;
+    }
+
+    public IReadOnlyList<EquippedItemInstance> GetEquippedWeapons() => equippedWeapons;
+    public IReadOnlyList<EquippedItemInstance> GetEquippedRelics() => equippedRelics;
+
+    public bool UseItem(ItemSO item)
+    {
+        if (item == null || playerStatusManager == null)
+            return false;
+
+        switch (item.type)
+        {
+            case ItemType.Consumable:
+                if (!items.Remove(item))
+                    return false;
+                ApplyStatBonus(item.statBonus);
+                return true;
+            case ItemType.Weapon:
+                return EquipItem(item, equippedWeapons, maxWeaponSlots);
+            case ItemType.Relic:
+                return EquipItem(item, equippedRelics, maxRelicSlots);
+            default:
+                return false;
+        }
+    }
+
+    public bool UnEquipItem(ItemSO item)
+    {
+        if (item == null)
+            return false;
+
+        if (TryUnequipFromSlots(item, equippedWeapons))
+            return true;
+
+        if (TryUnequipFromSlots(item, equippedRelics))
+            return true;
+
+        return false;
+    }
+
+    public bool DeschardItem(ItemSO item)
+    {
+        if (item == null)
+            return false;
+
+        if (items.Remove(item))
+            return true;
+
+        return RemoveEquippedItem(item, equippedWeapons) || RemoveEquippedItem(item, equippedRelics);
+    }
+
+    public void TickEquippedItems()
+    {
+        TickSlotCollection(equippedWeapons);
+        TickSlotCollection(equippedRelics);
+    }
+
+    private bool EquipItem(ItemSO item, List<EquippedItemInstance> slots, int maxSlots)
+    {
+        if (slots.Count >= maxSlots || !items.Remove(item))
+            return false;
+
+        EquippedItemInstance instance = new EquippedItemInstance(item);
+        slots.Add(instance);
+        ApplyStatBonus(item.statBonus);
+
+        if (!string.IsNullOrWhiteSpace(item.specialEffect) && !string.Equals(item.specialEffect, "none", StringComparison.OrdinalIgnoreCase))
+            Debug.Log($"[Inventory] Efeito especial ativo: {item.specialEffect} ({item.itemName})");
+
+        return true;
+    }
+
+    private void TickSlotCollection(List<EquippedItemInstance> slots)
+    {
+        for (int i = slots.Count - 1; i >= 0; i--)
+        {
+            EquippedItemInstance equippedItem = slots[i];
+            if (!equippedItem.ConsumeTurn())
+                continue;
+
+            RemoveStatBonus(equippedItem.SourceItem.statBonus);
+            ItemSO brokenVersion = ScriptableObject.CreateInstance<ItemSO>();
+            brokenVersion.id = equippedItem.SourceItem.id;
+            brokenVersion.itemName = $"{equippedItem.SourceItem.itemName} (Broken)";
+            brokenVersion.description = equippedItem.SourceItem.description;
+            brokenVersion.rarity = equippedItem.SourceItem.rarity;
+            brokenVersion.icon = equippedItem.SourceItem.icon;
+            brokenVersion.type = ItemType.Broken;
+            brokenVersion.weight = equippedItem.SourceItem.weight;
+            slots.RemoveAt(i);
+            items.Add(brokenVersion);
+        }
+    }
+
+    private void ApplyStatBonus(string statBonus)
+    {
+        foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
+            playerStatusManager.ApplyStatDelta(stat.statName, stat.value);
+    }
+
+    private void RemoveStatBonus(string statBonus)
+    {
+        foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
+            playerStatusManager.ApplyStatDelta(stat.statName, -stat.value);
+    }
+
+    private bool TryUnequipFromSlots(ItemSO item, List<EquippedItemInstance> slots)
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i].SourceItem != item)
+                continue;
+
+            slots.RemoveAt(i);
+            items.Add(item);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool RemoveEquippedItem(ItemSO item, List<EquippedItemInstance> slots)
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i].SourceItem != item)
+                continue;
+
+            RemoveStatBonus(item.statBonus);
+            slots.RemoveAt(i);
+            return true;
+        }
+
+        return false;
     }
 }
