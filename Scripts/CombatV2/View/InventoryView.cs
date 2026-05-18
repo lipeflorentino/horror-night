@@ -32,6 +32,20 @@ public class InventoryView : MonoBehaviour
     {
         if (closeButton != null)
             closeButton.onClick.AddListener(Close);
+
+        if (useButton != null)
+            useButton.onClick.AddListener(HandleUseClick);
+
+        if (equipButton != null)
+            equipButton.onClick.AddListener(HandleEquipClick);
+
+        if (unequipButton != null)
+            unequipButton.onClick.AddListener(HandleUnequipClick);
+
+        if (discardButton != null)
+            discardButton.onClick.AddListener(HandleDiscardClick);
+
+        HideInteractionPanel();
         Refresh();
     }
 
@@ -39,6 +53,18 @@ public class InventoryView : MonoBehaviour
     {
         if (closeButton != null)
             closeButton.onClick.RemoveListener(Close);
+
+        if (useButton != null)
+            useButton.onClick.RemoveListener(HandleUseClick);
+
+        if (equipButton != null)
+            equipButton.onClick.RemoveListener(HandleEquipClick);
+
+        if (unequipButton != null)
+            unequipButton.onClick.RemoveListener(HandleUnequipClick);
+
+        if (discardButton != null)
+            discardButton.onClick.RemoveListener(HandleDiscardClick);
     }
 
     public void BindInventory(PlayerInventory playerInventory)
@@ -51,7 +77,7 @@ public class InventoryView : MonoBehaviour
         ClearSpawnedItems();
 
         Dictionary<ItemSO, int> grouped = new();
-        if (boundInventory == null)
+       if (boundInventory == null)
             return;
 
         foreach (ItemSO item in boundInventory.items)
