@@ -41,6 +41,8 @@ public class CombatManager : MonoBehaviour
     private Dictionary<ItemSO, int> lastGrantedItens;
     private CombatSessionData SessionData;
     private RewardService RewardService;
+    private InventoryInputHandler InventoryInputHandler;
+    private PlayerInventory CombatPlayerInventory;
 
     void Start()
     {
@@ -57,8 +59,12 @@ public class CombatManager : MonoBehaviour
         InitializeBattlers(SessionData);
         DefineStartingTurnByInitiative();
 
-        Input = FindObjectOfType<CombatInputHandler>();
+        InventoryInputHandler = FindObjectOfType<InventoryInputHandler>();
         View = FindObjectOfType<CombatView>();
+        CombatPlayerInventory = ResolveCombatPlayerInventory();
+
+        if (InventoryInputHandler != null)
+            InventoryInputHandler.Init(CombatPlayerInventory);
 
         Input.Init(this);
         View.Init();
@@ -455,6 +461,8 @@ public class CombatManager : MonoBehaviour
         snapshot.maxHp = Player.MaxHp;
         snapshot.powerDices = Player.CurrentPowerDices;
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
+        if (CombatPlayerInventory != null)
+            snapshot.inventory = CombatPlayerInventory.GetSnapshot();
         return snapshot;
     }
 
@@ -480,5 +488,17 @@ public class CombatManager : MonoBehaviour
         int df = Player.Defense;
         Logger.Log($"[GetPlayerActionPower] Attack: {atk}, Defense: {df}");
         return PlayerIsAttacker ? atk : df;
+    }
+    
+    private PlayerInventory ResolveCombatPlayerInventory()
+    {
+        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
+        if (inventory == null)
+            return null;
+
+        if (SessionData != null)
+            inventory.RestoreSnapshot(SessionData.PlayerSnapshot.inventory);
+
+        return inventory;
     }
 }

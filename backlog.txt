@@ -45,3 +45,7 @@ TAREFA
     - Ter a possibilidade de habilidades que dão buffs/debuffs caso certos valores no dados sejam tirados
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
+
+
+Senha
+    @Lipeflorentino.1001

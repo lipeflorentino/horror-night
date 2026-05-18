@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -5,21 +6,32 @@ using UnityEngine.UI;
 
 public class InventoryView : MonoBehaviour
 {
-    [SerializeField] private PlayerInventory playerInventory;
     [SerializeField] private Transform weaponSlotsRoot;
     [SerializeField] private Transform relicSlotsRoot;
     [SerializeField] private Transform consumableSlotsRoot;
     [SerializeField] private InventoryItemView itemPrefab;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button closeButton;
+    [SerializeField] private GameObject interactionPanel;
+    [SerializeField] private TMP_Text interactionItemNameText;
+    [SerializeField] private Button useButton;
+    [SerializeField] private Button equipButton;
+    [SerializeField] private Button unequipButton;
+    [SerializeField] private Button discardButton;
 
     private readonly List<GameObject> spawnedItems = new();
+    private ItemSO selectedItem;
+    private PlayerInventory boundInventory;
+
+    public event Action<ItemSO> UseRequested;
+    public event Action<ItemSO> EquipRequested;
+    public event Action<ItemSO> UnequipRequested;
+    public event Action<ItemSO> DiscardRequested;
 
     private void OnEnable()
     {
         if (closeButton != null)
             closeButton.onClick.AddListener(Close);
-
         Refresh();
     }
 
@@ -29,12 +41,20 @@ public class InventoryView : MonoBehaviour
             closeButton.onClick.RemoveListener(Close);
     }
 
+    public void BindInventory(PlayerInventory playerInventory)
+    {
+        boundInventory = playerInventory;
+    }
+
     public void Refresh()
     {
         ClearSpawnedItems();
 
         Dictionary<ItemSO, int> grouped = new();
-        foreach (ItemSO item in playerInventory.items)
+        if (boundInventory == null)
+            return;
+
+        foreach (ItemSO item in boundInventory.items)
         {
             if (item == null)
                 continue;
@@ -53,40 +73,15 @@ public class InventoryView : MonoBehaviour
 
             InventoryItemView view = Instantiate(itemPrefab, parent);
             view.Bind(pair.Key, pair.Value);
+            view.InteractRequested += OpenInteractionForItem;
             spawnedItems.Add(view.gameObject);
         }
     }
 
-    public bool UseItem(ItemSO item)
+    public void SetStatus(string message)
     {
-        bool used = playerInventory.UseItem(item);
-        statusText.text = used ? $"Usou {item.itemName}" : $"Falha ao usar {item.itemName}";
-        Refresh();
-        return used;
-    }
-
-    public bool EquipItem(ItemSO item)
-    {
-        bool equipped = playerInventory.UseItem(item);
-        statusText.text = equipped ? $"Equipou {item.itemName}" : $"Falha ao equipar {item.itemName}";
-        Refresh();
-        return equipped;
-    }
-
-    public bool UnEquipItem(ItemSO item)
-    {
-        bool unequipped = playerInventory.UnEquipItem(item);
-        statusText.text = unequipped ? $"Desequipou {item.itemName}" : $"Falha ao desequipar {item.itemName}";
-        Refresh();
-        return unequipped;
-    }
-
-    public bool DeschardItem(ItemSO item)
-    {
-        bool discarded = playerInventory.DeschardItem(item);
-        statusText.text = discarded ? $"Descartou {item.itemName}" : $"Falha ao descartar {item.itemName}";
-        Refresh();
-        return discarded;
+        if (statusText != null)
+            statusText.text = message;
     }
 
     public void Open()
@@ -97,6 +92,7 @@ public class InventoryView : MonoBehaviour
 
     public void Close()
     {
+        HideInteractionPanel();
         gameObject.SetActive(false);
     }
 
@@ -113,8 +109,76 @@ public class InventoryView : MonoBehaviour
     private void ClearSpawnedItems()
     {
         for (int i = 0; i < spawnedItems.Count; i++)
+        {
+            InventoryItemView itemView = spawnedItems[i] != null ? spawnedItems[i].GetComponent<InventoryItemView>() : null;
+            if (itemView != null)
+                itemView.InteractRequested -= OpenInteractionForItem;
+
             Destroy(spawnedItems[i]);
+        }
 
         spawnedItems.Clear();
     }
+
+    private void OpenInteractionForItem(ItemSO item)
+    {
+        selectedItem = item;
+        if (interactionItemNameText != null)
+            interactionItemNameText.text = item != null ? item.itemName : string.Empty;
+
+        if (item == null)
+        {
+            HideInteractionPanel();
+            return;
+        }
+
+        bool isConsumable = item.type == ItemType.Consumable;
+        bool isEquipable = item.type == ItemType.Weapon || item.type == ItemType.Relic;
+        bool isEquipped = IsItemEquipped(item);
+
+        if (useButton != null)
+            useButton.gameObject.SetActive(isConsumable);
+
+        if (equipButton != null)
+            equipButton.gameObject.SetActive(isEquipable && !isEquipped);
+
+        if (unequipButton != null)
+            unequipButton.gameObject.SetActive(isEquipable && isEquipped);
+
+        if (discardButton != null)
+            discardButton.gameObject.SetActive(item.type != ItemType.Broken || !isEquipped);
+
+        if (interactionPanel != null)
+            interactionPanel.SetActive(true);
+    }
+
+    private bool IsItemEquipped(ItemSO item)
+    {
+        if (boundInventory == null || item == null)
+            return false;
+
+        IReadOnlyList<EquippedItemInstance> equippedCollection = item.type == ItemType.Weapon
+            ? boundInventory.GetEquippedWeapons()
+            : boundInventory.GetEquippedRelics();
+
+        for (int i = 0; i < equippedCollection.Count; i++)
+        {
+            if (equippedCollection[i].SourceItem == item)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void HideInteractionPanel()
+    {
+        selectedItem = null;
+        if (interactionPanel != null)
+            interactionPanel.SetActive(false);
+    }
+
+    private void HandleUseClick() => UseRequested?.Invoke(selectedItem);
+    private void HandleEquipClick() => EquipRequested?.Invoke(selectedItem);
+    private void HandleUnequipClick() => UnequipRequested?.Invoke(selectedItem);
+    private void HandleDiscardClick() => DiscardRequested?.Invoke(selectedItem);
 }
