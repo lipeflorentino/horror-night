@@ -11,10 +11,7 @@ public class InventoryInputHandler : MonoBehaviour
         if (inventoryView != null)
         {
             inventoryView.BindInventory(playerInventory);
-            inventoryView.UseRequested += OnUseItem;
-            inventoryView.EquipRequested += OnEquipItem;
-            inventoryView.UnequipRequested += OnUnequipItem;
-            inventoryView.DiscardRequested += OnDiscardItem;
+            inventoryView.OnInteractWithItem += HandleItemInteraction;
         }
     }
 
@@ -23,10 +20,26 @@ public class InventoryInputHandler : MonoBehaviour
         if (inventoryView == null)
             return;
 
-        inventoryView.UseRequested -= OnUseItem;
-        inventoryView.EquipRequested -= OnEquipItem;
-        inventoryView.UnequipRequested -= OnUnequipItem;
-        inventoryView.DiscardRequested -= OnDiscardItem;
+        inventoryView.OnInteractWithItem -= HandleItemInteraction;
+    }
+
+    private void HandleItemInteraction(ItemSO item, InventoryItemAction action, InventoryItemLocation location)
+    {
+        switch (action)
+        {
+            case InventoryItemAction.Use:
+                OnUseItem(item);
+                break;
+            case InventoryItemAction.Equip:
+                OnEquipItem(item);
+                break;
+            case InventoryItemAction.Unequip:
+                OnUnequipItem(item);
+                break;
+            case InventoryItemAction.Discard:
+                OnDiscardItem(item);
+                break;
+        }
     }
 
     public void OnUseItem(ItemSO item)
