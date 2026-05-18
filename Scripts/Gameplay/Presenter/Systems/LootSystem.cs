@@ -3,7 +3,7 @@ using UnityEngine;
 public class LootSystem : MonoBehaviour
 {
     [SerializeField] private ItemDatabase database;
-    [SerializeField] private UILootPopup popup;
+    [SerializeField] private LootView lootPopup;
     [SerializeField] private PlayerInventory inventory;
     [SerializeField] private PlayerGridMovement playerMovement;
 
@@ -15,8 +15,8 @@ public class LootSystem : MonoBehaviour
             playerMovement = FindObjectOfType<PlayerGridMovement>();
         if (database == null)
             database = FindObjectOfType<ItemDatabase>();
-        if (popup == null)
-            popup = FindObjectOfType<UILootPopup>();
+        if (lootPopup == null)
+            lootPopup = FindObjectOfType<LootView>();
     }
 
     public void TriggerLoot(LevelNode node)
@@ -37,7 +37,7 @@ public class LootSystem : MonoBehaviour
         if (playerMovement != null)
             playerMovement.enabled = false;
 
-        if (popup == null)
+        if (lootPopup == null)
         {
             inventory.AddItem(item);
             if (playerMovement != null)
@@ -45,7 +45,7 @@ public class LootSystem : MonoBehaviour
             return;
         }
 
-        popup.Show(item,
+        lootPopup.Show(item,
             onPick: () =>
             {
                 inventory.AddItem(item);

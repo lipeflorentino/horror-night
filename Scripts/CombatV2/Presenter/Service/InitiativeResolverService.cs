@@ -1,4 +1,4 @@
-public class InitiativeResolver
+public class InitiativeResolverService
 {
     public Battler ResolveStartingBattler(Battler firstBattler, Battler secondBattler)
     {

@@ -6,14 +6,14 @@ public class OccurrenceSystem : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private OccurrenceDatabase database;
-    [SerializeField] private UIOccurrencePopup popup;
+    [SerializeField] private OccurrenceView occurrencePopup;
     [SerializeField] private PlayerGridMovement playerMovement;
     [SerializeField] private PlayerStatusManager playerStatus;
 
     private void Awake()
     {
-        if (popup == null)
-            popup = FindObjectOfType<UIOccurrencePopup>();
+        if (occurrencePopup == null)
+            occurrencePopup = FindObjectOfType<OccurrenceView>();
 
         if (playerMovement == null)
             playerMovement = FindObjectOfType<PlayerGridMovement>();
@@ -38,7 +38,7 @@ public class OccurrenceSystem : MonoBehaviour
         if (playerMovement != null)
             playerMovement.enabled = false;
 
-        if (popup == null)
+        if (occurrencePopup == null)
         {
             ResolveOccurrence(selectedOccurrence, 2);
             if (playerMovement != null)
@@ -46,7 +46,7 @@ public class OccurrenceSystem : MonoBehaviour
             return;
         }
 
-        popup.Show(
+        occurrencePopup.Show(
             selectedOccurrence,
             onOptionSelected: selectedOption => ResolveOccurrence(selectedOccurrence, selectedOption),
             onClose: () =>

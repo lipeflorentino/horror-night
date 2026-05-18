@@ -19,7 +19,7 @@ public class CombatManager : MonoBehaviour
 
     private DiceService DiceService;
     private ActionResolverService Resolver;
-    private InitiativeResolver InitiativeResolver;
+    private InitiativeResolverService InitiativeResolverService;
     private EnemyActionSelector EnemyActionSelector;
     private EnemyTurnPlanner EnemyTurnPlanner;
 
@@ -46,7 +46,7 @@ public class CombatManager : MonoBehaviour
     {
         DiceService = new DiceService();
         Resolver = new ActionResolverService();
-        InitiativeResolver = new InitiativeResolver();
+        InitiativeResolverService = new InitiativeResolverService();
         EnemyActionSelector = new EnemyActionSelector();
         EnemyTurnPlanner = new EnemyTurnPlanner(EnemyActionSelector);
         RewardService = new RewardService();
@@ -70,7 +70,7 @@ public class CombatManager : MonoBehaviour
 
     private void DefineStartingTurnByInitiative()
     {
-        Battler firstBattler = InitiativeResolver.ResolveStartingBattler(Player, Enemy);
+        Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
         PlayerIsAttacker = firstBattler == Player;
     }
 

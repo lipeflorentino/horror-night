@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class UILootPopup : MonoBehaviour
+public class LootView : MonoBehaviour
 {
     [SerializeField] private GameObject root;
     [SerializeField] private TextMeshProUGUI nameText;

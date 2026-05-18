@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIOccurrencePopup : MonoBehaviour
+public class OccurrenceView : MonoBehaviour
 {
     [SerializeField] private GameObject root;
     [SerializeField] private GameObject choicesUIPanel;

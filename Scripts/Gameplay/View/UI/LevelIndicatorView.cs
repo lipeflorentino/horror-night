@@ -9,7 +9,7 @@ public class SlotRow
     public Image[] row;
 }
 
-public class UILevelIndicator : MonoBehaviour
+public class LevelIndicatorView : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LevelController levelController;
