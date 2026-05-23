@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4780b4e85189b1648af8a92e09ef72e8
+guid: 8bd4391d6856a9b498a187665bd5dfab
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: objects_tileset_0
+      name: bandagem_limpa
       rect:
         serializedVersion: 2
-        x: 154
-        y: 666
-        width: 313
-        height: 283
+        x: 13
+        y: 778
+        width: 199
+        height: 183
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4a6c677e1e3e3654ca533b2fb860876f
-      internalID: 1994089586
+      spriteID: 14c1199faebcf744d8744edbd211357c
+      internalID: 645806163
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_1
+      name: itens_4_1
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 755
+        width: 199
+        height: 235
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 866800d84929cb6469a159e2266f23cd
+      internalID: 106607120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: olho_de_odin
       rect:
         serializedVersion: 2
         x: 487
-        y: 659
-        width: 247
-        height: 295
+        y: 765
+        width: 249
+        height: 223
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e3795640a4a7ad147a73735cf025ad88
-      internalID: 848058512
+      spriteID: d87c1432dbcbce245a0052ae77a93149
+      internalID: -2122176550
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_2
+      name: machado_de_guerra
       rect:
         serializedVersion: 2
-        x: 822
-        y: 650
-        width: 227
-        height: 315
+        x: 770
+        y: 761
+        width: 203
+        height: 227
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b0b1b414f858e0c4a8c9ac786ae491e0
-      internalID: 1903587364
+      spriteID: 9f1917eea630fc64e9fcf5bd5ec1ebb3
+      internalID: -1491624676
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_3
+      name: lamina_runica
       rect:
         serializedVersion: 2
-        x: 1113
-        y: 641
-        width: 271
-        height: 329
+        x: 6
+        y: 495
+        width: 212
+        height: 256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: af2a80f56b7b9a1478ff51db153fa1fb
-      internalID: 1683510214
+      spriteID: e5ccbaeb1faec8945af6f9bc4fd9e952
+      internalID: -1266198046
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_4
+      name: adaga_sombria
       rect:
         serializedVersion: 2
-        x: 170
-        y: 326
-        width: 283
-        height: 295
+        x: 254
+        y: 500
+        width: 218
+        height: 238
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -208,20 +229,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d8a454106a8c1b64a8c38957af7e6af3
-      internalID: 106501455
+      spriteID: 21f9423f5507539408e9569aa2dbf8e5
+      internalID: -1073350467
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_5
+      name: itens_4_6
       rect:
         serializedVersion: 2
-        x: 471
-        y: 340
-        width: 281
-        height: 285
+        x: 504
+        y: 1
+        width: 229
+        height: 249
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,20 +250,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e5d86d0005f1ae84a803158e374382c2
-      internalID: -1997279113
+      spriteID: 6dffc819eba7bf441a46934f4dec23a0
+      internalID: 528920089
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_6
+      name: espada_runica_de_gelo
       rect:
         serializedVersion: 2
-        x: 804
-        y: 333
-        width: 270
-        height: 292
+        x: 0
+        y: 0
+        width: 219
+        height: 238
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -250,41 +271,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 88d9b58b7ea32744093477e1ec9c44c4
-      internalID: -447267847
+      spriteID: 1e46af6c5af64374d8c987f3348d5255
+      internalID: 1889888034
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_7
+      name: taca_de_ouro
       rect:
         serializedVersion: 2
-        x: 1094
-        y: 340
-        width: 309
-        height: 283
+        x: 772
+        y: 503
+        width: 200
+        height: 220
       alignment: 0
       pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      border: {x: 0, y: 1, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6817888749e07b94f8b6f261e2a29ab0
-      internalID: -1218606889
+      spriteID: 07d2d52519b13624d9a67be1b4f7f8e6
+      internalID: 1666126267
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: objects_tileset_8
+      name: adaga_rustica
       rect:
         serializedVersion: 2
-        x: 684
-        y: 36
-        width: 177
-        height: 286
+        x: 240
+        y: 256
+        width: 244
+        height: 222
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -292,8 +313,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 007d5ca79a808f74981e8d44f76f2078
-      internalID: 489331603
+      spriteID: 377afc92ba48437488bc4a702c4c2a3a
+      internalID: -590922314
       vertices: []
       indices: 
       edges: []
@@ -309,15 +330,16 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      objects_tileset_0: 1994089586
-      objects_tileset_1: 848058512
-      objects_tileset_2: 1903587364
-      objects_tileset_3: 1683510214
-      objects_tileset_4: 106501455
-      objects_tileset_5: -1997279113
-      objects_tileset_6: -447267847
-      objects_tileset_7: -1218606889
-      objects_tileset_8: 489331603
+      adaga_rustica: -590922314
+      adaga_sombria: -1073350467
+      bandagem_limpa: 645806163
+      espada_runica_de_gelo: 1889888034
+      itens_4_1: 106607120
+      itens_4_6: 528920089
+      lamina_runica: -1266198046
+      machado_de_guerra: -1491624676
+      olho_de_odin: -2122176550
+      taca_de_ouro: 1666126267
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

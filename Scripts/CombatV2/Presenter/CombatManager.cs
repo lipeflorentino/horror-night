@@ -60,6 +60,7 @@ public class CombatManager : MonoBehaviour
         DefineStartingTurnByInitiative();
 
         InventoryInputHandler = FindObjectOfType<InventoryInputHandler>();
+        Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = ResolveCombatPlayerInventory();
 

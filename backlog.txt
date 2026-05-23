@@ -20,7 +20,7 @@ Exemplos para seu RPG:
 
 
     
-TO DO 
+BACKLOG 
     - Implementar sistemas que faltam
         - Presence, Treasure
     - Ajustar painel de infos (fechamento)
@@ -46,6 +46,10 @@ TAREFA
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
 
+TO DO 
+    - Ajustar seed do banco de dados (LootCSVImporter)
+    - Criar os icones dos itens (de 10 em 10)
 
-Senha
-    @Lipeflorentino.1001
+FIXES
+    - Corrigir tela de Loot 
+    - 

@@ -318,7 +318,7 @@ public class PlayerStatusManager : MonoBehaviour
         if (quantity <= 0 || playerInventory == null)
             return false;
 
-        bool added = playerInventory.AddItem(itemName, quantity);
+        bool added = playerInventory.AddInventoryItem(itemName, quantity);
         if (!added)
         {
             Debug.LogWarning($"[PlayerStatusManager] Item '{itemName}' não encontrado para recompensa de inventário.");

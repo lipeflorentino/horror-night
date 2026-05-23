@@ -4,8 +4,8 @@ using System.IO;
 
 public class LootCSVImporter
 {
-    private static string csvPath = "Assets/Resources/Data/LootTable.csv";
-    private static string outputFolder = "Assets/Resources/Data/Items/";
+    private static readonly string csvPath = "Assets/Resources/Data/LootTable.csv";
+    private static readonly string outputFolder = "Assets/Resources/Data/Items/";
 
     [MenuItem("Tools/Import Loot CSV")]
     public static void ImportCSV()
@@ -41,9 +41,13 @@ public class LootCSVImporter
             int id = int.Parse(values[0]);
             string name = values[1];
             string description = values[2];
-            Rarity rarity = (Rarity)System.Enum.Parse(typeof(Rarity), values[3]);
-            int weight = int.Parse(values[4]);
-            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Icons/" + id + ".png");
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Objects/Itens/" + values[3] + ".png");
+            Rarity rarity = (Rarity)System.Enum.Parse(typeof(Rarity), values[4]);
+            int weight = int.Parse(values[5]);
+            int levelRequirement = int.Parse(values[6]);
+            string statBonus = values[7];
+            string specialEffect = values[8];
+            ItemType itemType = (ItemType)System.Enum.Parse(typeof(ItemType), values[9]);
             
             string assetPath = outputFolder + id + ".asset";
 
@@ -60,6 +64,10 @@ public class LootCSVImporter
             item.description = description;
             item.rarity = rarity;
             item.weight = weight;
+            item.levelRequirement = levelRequirement;
+            item.statBonus = statBonus;
+            item.specialEffect = specialEffect;
+            item.type = itemType;
             item.icon = sprite;
 
             EditorUtility.SetDirty(item);

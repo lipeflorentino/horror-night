@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904aadd8d61dff44587f61383c85c95a, type: 3}
+  m_Name: 80
+  m_EditorClassIdentifier: 
+  id: 80
+  itemName: Pimenta
+  description: Um pouco de pimenta ardida.
+  weight: 60
+  rarity: 0
+  icon: {fileID: 21300000, guid: ac237d265dc8b184db3206011ce9b1da, type: 3}
+  levelRequirement: 1
+  statBonus: hp+5:heart+1
+  specialEffect: none
+  type: 1
+  durability: -1

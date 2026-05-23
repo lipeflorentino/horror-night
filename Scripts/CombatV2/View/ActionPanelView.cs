@@ -34,6 +34,8 @@ public class ActionPanelView : MonoBehaviour
 
     private void Awake()
     {
+        inventoryView = FindObjectOfType<InventoryView>();
+
         if (SelectAttackButton != null)
             SelectAttackButton.onClick.AddListener(HandleSelectAttackClick);
 

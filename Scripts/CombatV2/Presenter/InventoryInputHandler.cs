@@ -5,6 +5,11 @@ public class InventoryInputHandler : MonoBehaviour
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private PlayerInventory playerInventory;
 
+    public void Start()
+    {
+        inventoryView = FindObjectOfType<InventoryView>();
+    }
+
     public void Init(PlayerInventory inventory)
     {
         playerInventory = inventory;
@@ -25,6 +30,7 @@ public class InventoryInputHandler : MonoBehaviour
 
     private void HandleItemInteraction(ItemSO item, InventoryItemAction action, InventoryItemLocation location)
     {
+        Logger.Log($"[InventoryInputHandler] Item: {item.itemName}");
         switch (action)
         {
             case InventoryItemAction.Use:
@@ -37,13 +43,14 @@ public class InventoryInputHandler : MonoBehaviour
                 OnUnequipItem(item);
                 break;
             case InventoryItemAction.Discard:
-                OnDiscardItem(item);
+                OnDischardItem(item);
                 break;
         }
     }
 
     public void OnUseItem(ItemSO item)
     {
+        Logger.Log($"[InventoryInputHandler] Tentando usar item: {item.itemName}");
         if (playerInventory == null || item == null)
             return;
 
@@ -55,8 +62,9 @@ public class InventoryInputHandler : MonoBehaviour
         }
     }
 
-    public void OnDiscardItem(ItemSO item)
+    public void OnDischardItem(ItemSO item)
     {
+        Logger.Log($"[InventoryInputHandler] Tentando descartar item: {item.itemName}");
         if (playerInventory == null || item == null)
             return;
 
@@ -70,6 +78,7 @@ public class InventoryInputHandler : MonoBehaviour
 
     public void OnEquipItem(ItemSO item)
     {
+        Logger.Log($"[InventoryInputHandler] Tentando equipar item: {item.itemName}");
         if (playerInventory == null || item == null)
             return;
 
@@ -83,6 +92,7 @@ public class InventoryInputHandler : MonoBehaviour
 
     public void OnUnequipItem(ItemSO item)
     {
+        Logger.Log($"[InventoryInputHandler] Tentando desequipar item: {item.itemName}");
         if (playerInventory == null || item == null)
             return;
 

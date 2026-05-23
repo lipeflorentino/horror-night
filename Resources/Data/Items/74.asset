@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904aadd8d61dff44587f61383c85c95a, type: 3}
+  m_Name: 74
+  m_EditorClassIdentifier: 
+  id: 74
+  itemName: Elmo de Ferro
+  description: "Um elmo robusto feito de ferro maci\xE7o."
+  weight: 25
+  rarity: 1
+  icon: {fileID: 21300000, guid: c59ba7770c0ed5c4791e2bfd24e82209, type: 3}
+  levelRequirement: 6
+  statBonus: defense+10
+  specialEffect: none
+  type: 0
+  durability: -1

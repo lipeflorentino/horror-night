@@ -12,17 +12,25 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private InventoryItemView itemPrefab;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button closeButton;
+    [SerializeField] private GameObject inventoryPanel;
 
     private readonly List<InventoryItemView> spawnedItems = new();
-    private PlayerInventory boundInventory;
+    [SerializeField] private PlayerInventory boundInventory;
 
     public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithItem;
+
+    // TODO: remove start after tests
+    private void Start()
+    {
+        boundInventory = FindObjectOfType<PlayerInventory>();
+    }
 
     private void OnEnable()
     {
         if (closeButton != null)
             closeButton.onClick.AddListener(Close);
 
+        Close();
         Refresh();
     }
 
@@ -34,7 +42,8 @@ public class InventoryView : MonoBehaviour
 
     public void BindInventory(PlayerInventory playerInventory)
     {
-        boundInventory = playerInventory;
+        // TODO: remove this comment and assign boundInventory = playerInventory; after testing InventoryView with a mock inventory
+        // boundInventory = playerInventory;
     }
 
     public void Refresh()
@@ -57,19 +66,21 @@ public class InventoryView : MonoBehaviour
 
     public void Open()
     {
-        gameObject.SetActive(true);
+        Logger.Log("Opening Inventory");
+        inventoryPanel.SetActive(true);
         Refresh();
     }
 
     public void Close()
     {
         CloseAllInteractionPanels();
-        gameObject.SetActive(false);
+        inventoryPanel.SetActive(false);
     }
 
     private void SpawnInventoryItems()
     {
         Dictionary<ItemSO, int> grouped = new();
+        Logger.Log($"[InventoryView] Agrupando itens para exibição... Total de itens: {boundInventory.items.Count}");
 
         foreach (ItemSO item in boundInventory.items)
         {
@@ -105,7 +116,7 @@ public class InventoryView : MonoBehaviour
     {
         if (itemPrefab == null || parent == null || item == null)
             return;
-
+        Logger.Log($"[InventoryView] Spawnando item: {item.itemName} (x{count}) no local {location}");
         InventoryItemView view = Instantiate(itemPrefab, parent);
         view.Bind(item, count, location);
         view.ItemSelected += HandleItemSelected;
@@ -123,7 +134,6 @@ public class InventoryView : MonoBehaviour
                 continue;
 
             bool shouldOpen = view == selectedView;
-            view.ConfigureActions();
             view.ShowInteractionPanel(shouldOpen);
         }
     }

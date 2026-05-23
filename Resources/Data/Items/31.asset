@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904aadd8d61dff44587f61383c85c95a, type: 3}
+  m_Name: 31
+  m_EditorClassIdentifier: 
+  id: 31
+  itemName: Bandagem Limpa
+  description: Ajuda a estancar ferimentos leves.
+  weight: 65
+  rarity: 0
+  icon: {fileID: 21300000, guid: 697afa83ba3f83e4e877678bd53824cf, type: 3}
+  levelRequirement: 4
+  statBonus: defense+2:hp+5
+  specialEffect: none
+  type: 1
+  durability: -1

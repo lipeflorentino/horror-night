@@ -72,11 +72,8 @@ public class EnemyCSVImporter
             enemy.defense = BuildRange(values[22], values[23]);
             enemy.initiative = BuildRange(values[24], values[25]);
 
-            if (values.Length > 19)
-            {
-                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(values[17]);
-                enemy.image = sprite;
-            }
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(values[17]);
+            enemy.image = sprite;
 
             EditorUtility.SetDirty(enemy);
         }

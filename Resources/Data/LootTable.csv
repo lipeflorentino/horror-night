@@ -1,51 +1,83 @@
-Id,Name,Description,Rarity,Weight,levelRequirement,statBonus,especialEffect,type,durability
-1,Sword,Ferro enferrujado,Common,50,1,atack+5,none,Weapon,10
-2,Magic Ring,Aumenta capacidade mental,Rare,10,5,mind+10,none,Relic,none
-3,Gold Coins,Moeda comum,Common,100,1,none,none,Consumable,none
-4,Cursed Skull,Item perigoso,Epic,5,10,defense+12,curse,Relic,15
-5,Health Potion,Restaura vida,Common,30,1,hp+20,none,Consumable,none
-6,Ancient Tome,Contém segredos antigos,Rare,15,8,mind+10,none,Relic,none
-7,Silver Dagger,Adaga afiada,Uncommon,25,3,atack+10,none,Weapon,20
-8,Enchanted Amulet,Proteção contra maldições,Rare,20,6,hp+5,none,Relic,none
-9,Dragon Scale,Escama resistente,Epic,8,12,defense+10,none,Relic,30
-10,Shadow Cloak,Permite furtividade,Legendary,2,15,speed+5,none,Relic,none
-11,Healing Herb,Erva curativa,Common,40,1,hp+10,none,Consumable,none
-12,Fire Bomb,Explosivo de fogo,Uncommon,20,4,atack+15,none,Consumable,none
-13,Ice Shard,Fragmento congelante,Uncommon,20,4,atack+10,none,Consumable,none
-14,Thunder Stone,Pedra de trovão,Rare,10,7,atack+20,none,Consumable,none
-15,Vampire Fang,Presas de vampiro,Epic,5,10,atack+25,none,Relic,none
-16,Giant's Club,Clava gigante,Uncommon,15,5,atack+15,fracture,Weapon,25
-17,Phantom Lantern,Lanterna fantasma,Rare,12,6,hp+15,none,Relic,none
-18,Poison Dagger,Adaga venenosa,Uncommon,18,4,atack+10,poison,Weapon,20
-19,Crystal Ball,Bola de cristal,Rare,8,9,mind+15,none,Relic,none
-20,Dark Grimoire,Grimório sombrio,Epic,4,11,mind+20,none,Relic,none
-21,Elixir da Força,Aumenta temporariamente o vigor.,Uncommon,39,5,heart+10,none,Consumable,none
-22,Anel de Cobre,Um anel comum sem muito brilho.,Common,42,2,atack+3,none,Relic,5
-23,Tônico de alcaçuz,Restaura energia mental.,Common,95,1,mind+4,none,Consumable,none
-24,Néctar dos Deuses,Uma bebida revigorante extremamente rara.,Rare,17,11,hp+18,none,Consumable,none
-25,Poção de Antídoto,Cura envenenamentos comuns.,Uncommon,31,4,heart+11,none,Consumable,none
-26,Amuleto de Osso,Feito de ossos de pequenos animais.,Common,78,2,atack+5,none,Relic,none
-27,Pão Amanhecido,Alimento simples para recuperar forças.,Common,50,4,body+4,none,Consumable,none
-28,Espada Curta,Uma espada de ferro simples.,Common,99,2,atack+3,none,Weapon,5
-29,Estátua de Barro,Uma pequena estatueta da sorte.,Common,92,1,defense+3,none,Relic,10
-30,Colar Simples,Um adorno de qualidade comum.,Common,53,3,speed+2,none,Relic,none
-31,Bandagem Limpa,Estanca sangramentos leves.,Common,65,4,defense+2:hp+5,none,Consumable,none
-32,Tônico Místico,Um consumível de efeito potente.,Rare,13,11,initiative+17:body+10,none,Consumable,none
-33,Olho de Odin,Um artefato lendário que tudo vê.,Legendary,3,18,body+42,none,Relic,40
-34,Machado de Guerra,Machado pesado feito para combate.,Uncommon,36,6,body+6:attack+10,fracture:bleeding,Weapon,15
-35,Escudo Gasto,Proteção básica feita de madeira.,Common,90,4,initiative+5:defense+7,none,Weapon,8
-36,Lâmina Rúnica,Inscrita com runas antigas de poder.,Epic,7,14,dexterity+28:attack+15,stun,Weapon,none
-37,Arco de Caça,Arco leve para caçadores iniciantes.,Common,95,1,dexterity+1,reach,Weapon,none
-38,Diadema Velho,Um objeto misterioso de eras passadas.,Common,89,3,initiative+1:mind+4,none,Relic,10
-39,Adaga Sombria,Uma adaga que brilha fracamente no escuro.,Uncommon,25,6,defense+6:heart+9,curse,Weapon,none
-40,Lança de Madeira,Uma lança simples com ponta afiada.,Common,72,2,attack+2,reach,Weapon,5
-41,Brincos Opacos,Acessório simples sem valor comercial.,Common,49,3,dexterity+2,none,Relic,none
-42,Ambrósia,Alimento divino que cura feridas profundas.,Epic,4,14,mind+26:body+10:heart:14,none,Consumable,none
-43,Chá de Ervas,Um consumível revigorante caseiro.,Common,99,3,mind+3,none,Consumable,none
-44,Anel do Sol,Irradia um calor reconfortante.,Rare,10,7,speed+14,none,Relic,20
-45,Adaga Rústica,Uma arma de qualidade comum.,Common,88,2,speed+2:attack+2,stun,Weapon,7
-46,Pendente de Pedra,Um amuleto rústico protetor.,Common,56,4,body+2,none,Relic,none
-47,Besta Leve,Dispara virotes com boa precisão.,Uncommon,29,6,speed+11:attack+10,reach,Weapon,none
-48,Bracelete Rústico,Feito de couro batido.,Common,47,2,hp+2,none,Relic,5
-49,Clava Simples,Um pedaço de madeira pesada para ataque.,Common,77,2,body+5:attack+3,none,Weapon,5
-50,Colar de Prata,Brilha suavemente sob a luz da lua.,Uncommon,22,3,hp+7,none,Relic,15
+Id,Name,Description,IconName,Rarity,Weight,LevelRequirement,StatBonus,SpecialEffect,Type,Durability
+1,Espada Velha,Uma espada de ferro desgastada pelo tempo.,espada_velha,Common,50,1,attack+5,none,Weapon,10
+2,Anel Mágico,Aumenta a capacidade mental do usuário.,anel_magico,Rare,10,5,mind+10,none,Relic,none
+3,Moedas de Ouro,Moedas comuns usadas em comércio.,moedas_de_ouro,Common,100,1,none,none,Consumable,none
+4,Cránio Amaldiçoado,Um artefato perigoso envolto em maldição.,cranio_amaldicoado,Epic,5,10,defense+12,curse,Relic,15
+5,Poção de Vida,Restaura parte da vida do usuário.,pocao_de_vida,Common,30,1,hp+20,none,Consumable,none
+6,Tomo Antigo,Contém segredos esquecidos de eras passadas.,tomo_antigo,Rare,15,8,mind+10,none,Relic,none
+7,Adaga de Prata,Uma adaga afiada e resistente.,adaga_de_prata,Uncommon,25,3,attack+10,none,Weapon,20
+8,Amuleto Encantado,Protege contra energias malignas.,amuleto_encantado,Rare,20,6,hp+5,none,Relic,none
+9,Escama de Dragão,Uma escama extremamente resistente.,escama_de_dragao,Epic,8,12,defense+10,none,Relic,30
+10,Manto das Sombras,Permite mover-se furtivamente.,manto_das_sombras,Legendary,2,15,speed+5,none,Relic,none
+11,Erva Curativa,Uma erva medicinal usada em tratamentos.,erva_curativa,Common,40,1,hp+10,none,Consumable,none
+12,Tocha Flamejante,Uma tocha envolta em chamas intensas.,tocha_flamejante,Uncommon,20,4,attack+15,none,Weapon,none
+13,Fragmento de Gelo,Um cristal congelante extremamente frio.,fragmento_de_gelo,Uncommon,20,4,attack+10,none,Consumable,none
+14,Pedra do Trovão,Uma pedra carregada com energia elétrica.,pedra_do_trovao,Rare,10,7,attack+20,none,Consumable,none
+15,Colar de Presa Vampírica,Colar de presas amaldiçoada de uma criatura noturna.,colar_de_presa_vampirica,Epic,5,10,attack+25,none,Relic,none
+16,Clava Gigante,Uma arma pesada capaz de esmagar ossos.,clava_gigante,Uncommon,15,5,attack+15,fracture,Weapon,25
+17,Lanterna Fantasma,Emite uma luz espectral misteriosa.,lanterna_fantasma,Rare,12,6,hp+15,none,Relic,none
+18,Adaga Envenenada,Uma lâmina coberta por veneno letal.,adaga_envenenada,Uncommon,18,4,attack+10,poison,Weapon,20
+19,Bola de Cristal,Permite enxergar além do comum.,bola_de_cristal,Rare,8,9,mind+15,none,Relic,none
+20,Grimório Sombrio,Um livro proibido de magia obscura.,grimorio_sombrio,Epic,4,11,mind+20,none,Relic,none
+21,Elixir Tônico,Aumenta temporariamente o vigor do usuário.,elixir_tonico,Uncommon,39,5,heart+10,none,Consumable,none
+22,Anel de Cobre,Um anel simples sem grande valor.,anel_de_cobre,Common,42,2,attack+3,none,Relic,5
+23,Tônico de Alcaçuz,Restaura parte da energia mental.,tonico_de_alcacuz,Common,95,1,mind+4,none,Consumable,none
+24,Néctar dos Deuses,Uso raro que revitaliza profundamente o corpo.,nectar_dos_deuses,Rare,17,11,hp+18,none,Consumable,none
+25,Poção Antídoto,Cura envenenamentos e toxinas leves.,pocao_antidoto,Uncommon,31,4,heart+11,none,Consumable,none
+26,Amuleto de Osso,Feito com ossos de pequenos animais.,amuleto_de_osso,Common,78,2,attack+5,none,Relic,none
+27,Pão Mofado,Um alimento simples para recuperar forças.,pao_mofado,Common,50,4,body+4,none,Consumable,none
+28,Espada Curva,Uma espada simples feita de ferro.,espada_curva,Common,99,2,attack+3,none,Weapon,5
+29,Estátua de Barro,Uma pequena estátua associada à sorte.,estatua_de_barro,Common,92,1,defense+3,none,Relic,10
+30,Colar Tribal,Um adorno tribal de fabricação manual.,colar_tribal,Common,53,3,speed+2,none,Relic,none
+31,Bandagem Limpa,Ajuda a estancar ferimentos leves.,bandagem_limpa,Common,65,4,defense+2:hp+5,none,Consumable,none
+32,Tônico Místico,Um tônico poderoso de origem desconhecida.,tonico_mistico,Rare,13,11,initiative+17:body+10,none,Consumable,none
+33,Olho de Odin,Um artefato lendário capaz de tudo observar.,olho_de_odin,Legendary,3,18,body+42,none,Relic,40
+34,Machado de Guerra,Um machado pesado usado em batalhas.,machado_de_guerra,Uncommon,36,6,body+6:attack+10,fracture:bleeding,Weapon,15
+35,Escudo Gasto,Um escudo simples já bastante usado.,escudo_gasto,Common,90,4,initiative+5:defense+7,none,Weapon,8
+36,Lâmina Rúnica,Uma espada marcada por runas ancestrais.,lamina_runica,Epic,7,14,dexterity+28:attack+15,stun,Weapon,none
+37,Arco de Caça,Um arco leve ideal para iniciantes.,arco_de_caca,Common,95,1,dexterity+1,reach,Weapon,none
+38,Diadema Velho,Um acessório antigo envolto em mistério.,diadema_velho,Common,89,3,initiative+1:mind+4,none,Relic,10
+39,Adaga Sombria,Uma adaga envolta em energia obscura.,adaga_sombria,Uncommon,25,6,defense+6:heart+9,curse,Weapon,none
+40,Lança de Madeira,Uma lança simples com ponta afiada.,lanca_de_madeira,Common,72,2,attack+2,reach,Weapon,5
+41,Brincos Opacos,Um acessório simples sem valor elevado.,brincos_opacos,Common,49,3,dexterity+2,none,Relic,none
+42,Ambrósia,Um alimento divino capaz de restaurar profundamente.,ambrosia,Epic,4,14,mind+26:body+10:heart+14,none,Consumable,none
+43,Chá de Ervas,Uma bebida caseira revitalizante.,cha_de_ervas,Common,99,3,mind+3,none,Consumable,none
+44,Anel do Sol,Emana um calor confortável e constante.,anel_do_sol,Rare,10,7,speed+14,none,Relic,20
+45,Adaga Rústica,Uma arma simples de fabricação comum.,adaga_rustica,Common,88,2,speed+2:attack+2,stun,Weapon,7
+46,Pendente de Pedra,Um amuleto rústico de proteção.,pendente_de_pedra,Common,56,4,body+2,none,Relic,none
+47,Besta Leve,Dispara virotes com boa precisão.,besta_leve,Uncommon,29,6,speed+11:attack+10,reach,Weapon,none
+48,Bracelete De Anubis,Um bracelete com símbolos antigos de proteção.,bracelete_de_anubis,Rare,12,8,defense+10,none,Relic,none
+49,Faca de Pedra,Uma arma improvisada de pedra.,faca_de_pedra,Common,77,2,attack+1,none,Weapon,6
+50,Colar de Obsidiana,Um colar feito de obsidiana negra e afiada.,colar_de_obsidiana,Epic,6,10,attack+20,stun,Relic,none
+51,Poção de Velocidade,Aumenta temporariamente a agilidade.,pocao_de_velocidade,Uncommon,30,5,speed+10,none,Consumable,none
+52,Anel de Prata,Um anel pesado e resistente.,anel_de_prata,Common,60,4,defense+5,none,Relic,10
+53,Espada Longa,Uma espada refinada de qualidade superior.,espada_longa,Uncommon,20,5,attack+12,none,Weapon,20
+54,Escudo de Ferro,Um escudo robusto feito de ferro maciço.,escudo_de_ferro,Uncommon,25,6,defense+10,none,Weapon,25
+55,Livro Solar,Um tomo antigo sobre o poder do sol.,livro_solar,Rare,15,8,mind+12,none,Relic,none
+56,Adaga de Gelo,Uma adaga congelante que causa dano de frio.,adaga_de_gelo,Uncommon,18,4,attack+10,freeze,Weapon,20
+57,Ossos Secos,Restos de criaturas que vagaram por terras desoladas.,ossos_secos,Common,85,2,defense+3,none,Relic,none
+58,Biscoito,Um biscoito simples para adocicar a boca.,biscoito,Common,90,1,hp+1,none,Consumable,none
+59,Anel de Ruby,Um anel adornado com uma pedra preciosa vermelha.,anel_de_ruby,Rare,10,7,attack+15:heart+5,none,Relic,20
+60,Jarra de Mel,Uma jarra de mel doce e viscoso.,jarra_de_mel,Common,50,2,hp+25:heart+10,none,Consumable,none
+61,Jarra de Biscoitos,Uma jarra cheia de biscoitos caseiros.,jarra_de_biscoitos,Common,40,2,hp+15:heart+5,none,Consumable,none
+62,Boneco de Pano,Um boneco de pano antigo e desgastado.,boneco_de_pano,Rare,14,1,none,none,Relic,none
+63,Jarro De Flor,Um jarro contendo uma flor murcha.,jarro_de_flor,Rare,12,1,none,none,Relic,none
+64,Cogumelo,Um cogumelo estranho encontrado em florestas escuras.,cogumelo,Common,80,1,hp+20:mind-5,none,Consumable,none
+65,Lápide,Uma lápide antiga com inscrições desgastadas.,lapide,Rare,10,1,none,none,Relic,none
+66,Taça de Ouro,Uma taça feita de ouro puro.,taca_de_ouro,Rare,8,1,hp+10:heart+5,none,Relic,none
+67,Taça de Prata,Uma taça feita de prata brilhante.,taca_de_prata,Uncommon,20,1,hp+5:heart+2,none,Relic,none
+68,Taça de Bronze,Uma taça feita de bronze resistente.,taca_de_bronze,Common,50,1,hp+2:heart+2,none,Relic,none
+69,Espada Runica de Gelo,Uma espada marcada por runas de gelo capaz de congelar inimigos.,espada_runica_de_gelo,Epic,7,14,dexterity+28:attack+15,freeze,Weapon,none
+70,Colar da Lua,Um colar que emana uma luz suave e misteriosa.,colar_da_lua,Rare,10,7,speed+14,none,Relic,20
+71,Tora de Madeira,Uma tora de madeira resistente ideal para construção ou defesa.,tora_de_madeira,Common,70,2,body+5:attack+3,none,Weapon,5
+72,Cinto de Couro,Um cinto simples feito de couro resistente.,cinto_de_couro,Common,60,2,hp+2:heart+1:defense+1,none,Relic,5
+73,Anel de Safira,Um anel adornado com uma pedra preciosa azul.,anel_de_safira,Rare,10,7,mind+15,none,Relic,20
+74,Elmo de Ferro,Um elmo robusto feito de ferro maciço.,elmo_de_ferro,Uncommon,25,6,defense+10,none,Weapon,25
+75,Tunica de Mithril, Uma tunica feita de mithril resistente.,tunica_de_mithril,Rare,15,8,defense+15:mind+10,magic,Relic,25
+76,Espada de Luz,Uma espada que emana uma luz brilhante e purificadora.,espada_de_luz,Legendary,2,15,attack+30:heart+10,holy,Weapon,none
+77,Bala de Caramelo,Uma bala doce e pegajosa.,bala_de_caramelo,Common,90,1,hp+5:heart+2,none,Consumable,none
+78,Açucar,Um saco de açúcar refinado.,acucar,Common,80,1,hp+10:heart+5,none,Consumable,none
+79,Saleiro,Um saleiro com sal grosso.,saleiro,Common,70,1,hp+5:heart+1,none,Consumable,none
+80,Pimenta,Um pouco de pimenta ardida.,pimenta,Common,60,1,hp+5:heart+1,none,Consumable,none
+81,Anel de Esmeralda,Um anel adornado com uma pedra preciosa verde.,anel_de_esmeralda,Rare,10,7,attack+15:heart+5,none,Relic,20
+82,Capa de Invisibilidade,Uma capa que torna o usuário invisível por um curto período.,capa_de_invisibilidade,Legendary,2,15,speed+20,none,Relic,none

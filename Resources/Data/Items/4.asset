@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: 4
   m_EditorClassIdentifier: 
   id: 4
-  itemName: Cursed Skull
-  description: Item perigoso
+  itemName: "Cr\xE1nio Amaldi\xE7oado"
+  description: "Um artefato perigoso envolto em maldi\xE7\xE3o."
   weight: 5
   rarity: 3
-  icon: {fileID: 545335481, guid: 67536acf7631070409d5df40ba1665fd, type: 3}
+  icon: {fileID: 21300000, guid: b5948907cfd7eb44fab94d1a3a257b7e, type: 3}
+  levelRequirement: 10
+  statBonus: defense+12
+  specialEffect: curse
+  type: 2
+  durability: -1

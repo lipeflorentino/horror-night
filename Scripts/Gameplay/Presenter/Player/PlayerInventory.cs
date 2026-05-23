@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
+[RequireComponent(typeof(PlayerStatusManager))]
 public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] private ItemDatabase itemDatabase;
@@ -17,6 +18,7 @@ public class PlayerInventory : MonoBehaviour
     private void Awake()
     {
         playerStatusManager = GetComponent<PlayerStatusManager>();
+        itemDatabase = FindObjectOfType<ItemDatabase>();
     }
 
     public void AddItem(ItemSO item)
@@ -28,7 +30,7 @@ public class PlayerInventory : MonoBehaviour
         Debug.Log("Item adicionado: " + item.itemName);
     }
 
-    public void AddItem(ItemSO item, int quantity)
+    public void AddManyItem(ItemSO item, int quantity)
     {
         if (item == null || quantity <= 0)
             return;
@@ -42,23 +44,20 @@ public class PlayerInventory : MonoBehaviour
         if (string.IsNullOrWhiteSpace(itemName))
             return null;
 
-        if (itemDatabase == null)
-            itemDatabase = FindObjectOfType<ItemDatabase>();
-
         if (itemDatabase == null || itemDatabase.allItems == null)
             return null;
 
         for (int i = 0; i < itemDatabase.allItems.Count; i++)
         {
             ItemSO item = itemDatabase.allItems[i];
-            if (item != null && string.Equals(item.itemName, itemName, System.StringComparison.OrdinalIgnoreCase))
+            if (item != null && string.Equals(item.itemName, itemName, StringComparison.OrdinalIgnoreCase))
                 return item;
         }
 
         return null;
     }
 
-    public bool AddItem(string itemName, int quantity)
+    public bool AddInventoryItem(string itemName, int quantity)
     {
         if (string.IsNullOrWhiteSpace(itemName) || quantity <= 0)
             return false;
@@ -67,7 +66,7 @@ public class PlayerInventory : MonoBehaviour
         if (item == null)
             return false;
 
-        AddItem(item, quantity);
+        AddManyItem(item, quantity);
         return true;
     }
 
@@ -78,7 +77,9 @@ public class PlayerInventory : MonoBehaviour
 
     public PlayerInventorySnapshot GetSnapshot()
     {
-        Dictionary<int, int> countsByItemId = new Dictionary<int, int>();
+        Dictionary<int, int> countsByItemId = new();
+        
+        Logger.Log($"[PlayerInventory] Criando snapshot de inventário... Itens atuais: {items.Count}");
 
         for (int i = 0; i < items.Count; i++)
         {
@@ -92,7 +93,7 @@ public class PlayerInventory : MonoBehaviour
             countsByItemId[item.id]++;
         }
 
-        PlayerInventorySnapshot snapshot = new PlayerInventorySnapshot
+        PlayerInventorySnapshot snapshot = new()
         {
             itemIds = new List<int>(countsByItemId.Count),
             itemQuantities = new List<int>(countsByItemId.Count)
@@ -107,20 +108,12 @@ public class PlayerInventory : MonoBehaviour
         return snapshot;
     }
 
-    public void RestoreSnapshot(List<ItemSO> snapshot)
-    {
-        items = snapshot != null ? new List<ItemSO>(snapshot) : new List<ItemSO>();
-    }
-
     public void RestoreSnapshot(PlayerInventorySnapshot snapshot)
     {
         items.Clear();
 
         if (snapshot == null || snapshot.itemIds == null || snapshot.itemQuantities == null)
             return;
-
-        if (itemDatabase == null)
-            itemDatabase = FindObjectOfType<ItemDatabase>();
 
         if (itemDatabase == null || itemDatabase.allItems == null)
             return;
@@ -160,6 +153,7 @@ public class PlayerInventory : MonoBehaviour
 
     public bool UseItem(ItemSO item)
     {
+        Logger.Log($"[Inventory] Tentando usar item: {item.itemName}");
         if (item == null || playerStatusManager == null)
             return false;
 
@@ -181,6 +175,7 @@ public class PlayerInventory : MonoBehaviour
 
     public bool UnEquipItem(ItemSO item)
     {
+        Logger.Log($"[Inventory] Tentando desequipar item: {item.itemName}");
         if (item == null)
             return false;
 
@@ -195,6 +190,7 @@ public class PlayerInventory : MonoBehaviour
 
     public bool DeschardItem(ItemSO item)
     {
+        Logger.Log($"[Inventory] Tentando descartar item: {item.itemName}");
         if (item == null)
             return false;
 
@@ -212,6 +208,7 @@ public class PlayerInventory : MonoBehaviour
 
     private bool EquipItem(ItemSO item, List<EquippedItemInstance> slots, int maxSlots)
     {
+        Logger.Log($"[Inventory] Tentando equipar item: {item.itemName} em slots do tipo {(slots == equippedWeapons ? "Weapon" : "Relic")}");
         if (slots.Count >= maxSlots || !items.Remove(item))
             return false;
 

@@ -23,7 +23,7 @@ public class TreasureSystem : MonoBehaviour
         ItemSO reward = database != null ? database.GetRandomWeighted() : null;
 
         if (reward != null)
-            inventory?.AddItem(reward);
+            inventory.AddItem(reward);
 
         Debug.Log($"[TreasureSystem] Treasure chest resolved on node {node.index}. Reward: {(reward != null ? reward.itemName : "None (mock)")}");
     }

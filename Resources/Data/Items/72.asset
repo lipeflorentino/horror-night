@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 904aadd8d61dff44587f61383c85c95a, type: 3}
+  m_Name: 72
+  m_EditorClassIdentifier: 
+  id: 72
+  itemName: Cinto de Couro
+  description: Um cinto simples feito de couro resistente.
+  weight: 60
+  rarity: 0
+  icon: {fileID: 21300000, guid: 259ce90b35fb7f24aa432b60c94df4f9, type: 3}
+  levelRequirement: 2
+  statBonus: hp+2:heart+1:defense+1
+  specialEffect: none
+  type: 2
+  durability: -1
