@@ -15,14 +15,13 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private GameObject inventoryPanel;
 
     private readonly List<InventoryItemUI> spawnedItems = new();
-    [SerializeField] private PlayerInventory boundInventory;
+    private ICombatInventory boundInventory;
 
     public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithInventoryItem;
 
     // TODO: remove start after tests
     private void Start()
     {
-        boundInventory = FindObjectOfType<PlayerInventory>();
     }
 
     private void OnEnable()
@@ -40,10 +39,9 @@ public class InventoryView : MonoBehaviour
             closeButton.onClick.RemoveListener(Close);
     }
 
-    public void BindInventory(PlayerInventory playerInventory)
+    public void BindInventory(ICombatInventory playerInventory)
     {
-        // TODO: remove this comment and assign boundInventory = playerInventory; after testing InventoryView with a mock inventory
-        // boundInventory = playerInventory;
+        boundInventory = playerInventory;
     }
 
     public void Refresh()
@@ -79,7 +77,7 @@ public class InventoryView : MonoBehaviour
     private void SpawnInventoryItems()
     {
         Dictionary<ItemSO, int> grouped = new();
-        foreach (ItemSO item in boundInventory.items)
+        foreach (ItemSO item in boundInventory.Items)
         {
             if (item == null)
                 continue;

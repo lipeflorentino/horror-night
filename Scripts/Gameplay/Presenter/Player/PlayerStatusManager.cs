@@ -65,8 +65,14 @@ public class PlayerStatusManager : MonoBehaviour
 
         RestoreSnapshot(result.PlayerSnapshot);
         AddXp(result.XpGained);
+        if (result.ItensGained == null)
+            return;
+
         foreach (var kvp in result.ItensGained)
         {
+            if (kvp.Key == null || kvp.Value <= 0)
+                continue;
+
             AddInventoryItem(kvp.Key.itemName, kvp.Value);
         }
     }

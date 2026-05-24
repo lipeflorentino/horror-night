@@ -42,7 +42,7 @@ public class CombatManager : MonoBehaviour
     private CombatSessionData SessionData;
     private RewardService RewardService;
     private InventoryInputHandler InventoryInputHandler;
-    private PlayerInventory CombatPlayerInventory;
+    private ICombatInventory CombatPlayerInventory;
 
     void Start()
     {
@@ -62,7 +62,7 @@ public class CombatManager : MonoBehaviour
         InventoryInputHandler = FindObjectOfType<InventoryInputHandler>();
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
-        CombatPlayerInventory = ResolveCombatPlayerInventory();
+        CombatPlayerInventory = BuildCombatInventory(SessionData);
 
         InventoryInputHandler.Init(this, CombatPlayerInventory);
 
@@ -76,30 +76,7 @@ public class CombatManager : MonoBehaviour
 
     public void RefreshCombatUI()
     {
-        // Sincroniza stats do Player Battler com PlayerStatusManager antes de atualizar a UI
-        if (Player != null && CombatPlayerInventory?.GetComponent<PlayerStatusManager>() != null)
-        {
-            SyncPlayerStatsFromStatusManager();
-        }
         View.UpdateView(Player, Enemy);
-    }
-    
-    public void SyncPlayerStatsFromStatusManager()
-    {
-        PlayerStatusManager statusManager = CombatPlayerInventory.GetComponent<PlayerStatusManager>();
-        if (statusManager == null || Player == null)
-            return;
-
-        Player.Heart = statusManager.GetStatValue("heart");
-        Player.Body = statusManager.GetStatValue("body");
-        Player.Mind = statusManager.GetStatValue("mind");
-        Player.Attack = statusManager.GetAttack();
-        Player.Defense = statusManager.GetDefense();
-        Player.Initiative = statusManager.GetInitiative();
-        
-        Debug.Log($"[CombatManager] Sincronizado stats do Player Battler: " +
-                  $"Heart={Player.Heart}, Body={Player.Body}, Mind={Player.Mind}, " +
-                  $"Attack={Player.Attack}, Defense={Player.Defense}, Initiative={Player.Initiative}");
     }
 
     private void DefineStartingTurnByInitiative()
@@ -518,14 +495,15 @@ public class CombatManager : MonoBehaviour
         return PlayerIsAttacker ? atk : df;
     }
     
-    private PlayerInventory ResolveCombatPlayerInventory()
+    private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)
     {
-        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
-        if (inventory == null)
-            return null;
+        ItemDatabase itemDatabase = FindObjectOfType<ItemDatabase>();
+        if (itemDatabase != null && sessionData != null)
+            return new CombatInventory(Player, itemDatabase, sessionData.PlayerSnapshot.inventory);
 
-        if (SessionData != null)
-            inventory.RestoreSnapshot(SessionData.PlayerSnapshot.inventory);
+        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
+        if (inventory != null && sessionData != null)
+            inventory.RestoreSnapshot(sessionData.PlayerSnapshot.inventory);
 
         return inventory;
     }
