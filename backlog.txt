@@ -47,9 +47,29 @@ TAREFA
     - Ter builds baseadas nas stats (mind, heart, body)
 
 TO DO 
-    - Ajustar seed do banco de dados (LootCSVImporter)
     - Criar os icones dos itens (de 10 em 10)
+    - Criar novos monstros 
+        - Lobisomem
+        - Cave Troll
+        - Aracna 
+        - Swamp Creature
+        - Witch
+        - Nightcrawler
+        - Creeper
+        - Ork
+        - Gobblin
+        - Pale Ork
+        - Dark Elf 
+        - Dark Wizard
+        - Treebeard
+        - Blood Sucker
+    
 
 FIXES
     - Corrigir tela de Loot 
-    - 
+    - Vitoria sem recompensa?
+    - Falta update nas stats do painel de ações
+    - Ajustar recompensa Xp (icone)
+
+
+    

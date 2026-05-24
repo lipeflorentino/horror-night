@@ -498,12 +498,19 @@ public class CombatManager : MonoBehaviour
     private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)
     {
         ItemDatabase itemDatabase = FindObjectOfType<ItemDatabase>();
-        if (itemDatabase != null && sessionData != null)
-            return new CombatInventory(Player, itemDatabase, sessionData.PlayerSnapshot.inventory);
+        PlayerInventorySnapshot snapshot = null;
+        if (sessionData?.PlayerSnapshot != null)
+            snapshot = sessionData.PlayerSnapshot.inventory;
 
         PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
-        if (inventory != null && sessionData != null)
-            inventory.RestoreSnapshot(sessionData.PlayerSnapshot.inventory);
+        if (snapshot == null && inventory != null)
+            snapshot = inventory.GetSnapshot();
+
+        if (itemDatabase != null)
+            return new CombatInventory(Player, itemDatabase, snapshot ?? new PlayerInventorySnapshot());
+
+        if (inventory != null && snapshot != null)
+            inventory.RestoreSnapshot(snapshot);
 
         return inventory;
     }

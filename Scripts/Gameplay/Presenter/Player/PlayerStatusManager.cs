@@ -45,9 +45,10 @@ public class PlayerStatusManager : MonoBehaviour
 
     private void Awake()
     {
-        GetComponent<PlayerInventory>();
+        if (playerInventory == null)
+            playerInventory = GetComponent<PlayerInventory>();
+            
         currentArchetype = initialArchetype;
-
         currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
         currentBody = Mathf.Clamp(currentBody, 0f, maxBody);
         currentMind = Mathf.Clamp(currentMind, 0f, maxMind);
