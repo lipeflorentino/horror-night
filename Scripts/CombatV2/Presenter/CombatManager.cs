@@ -76,7 +76,30 @@ public class CombatManager : MonoBehaviour
 
     public void RefreshCombatUI()
     {
+        // Sincroniza stats do Player Battler com PlayerStatusManager antes de atualizar a UI
+        if (Player != null && CombatPlayerInventory?.GetComponent<PlayerStatusManager>() != null)
+        {
+            SyncPlayerStatsFromStatusManager();
+        }
         View.UpdateView(Player, Enemy);
+    }
+    
+    public void SyncPlayerStatsFromStatusManager()
+    {
+        PlayerStatusManager statusManager = CombatPlayerInventory.GetComponent<PlayerStatusManager>();
+        if (statusManager == null || Player == null)
+            return;
+
+        Player.Heart = statusManager.GetStatValue("heart");
+        Player.Body = statusManager.GetStatValue("body");
+        Player.Mind = statusManager.GetStatValue("mind");
+        Player.Attack = statusManager.GetAttack();
+        Player.Defense = statusManager.GetDefense();
+        Player.Initiative = statusManager.GetInitiative();
+        
+        Debug.Log($"[CombatManager] Sincronizado stats do Player Battler: " +
+                  $"Heart={Player.Heart}, Body={Player.Body}, Mind={Player.Mind}, " +
+                  $"Attack={Player.Attack}, Defense={Player.Defense}, Initiative={Player.Initiative}");
     }
 
     private void DefineStartingTurnByInitiative()

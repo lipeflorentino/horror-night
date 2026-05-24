@@ -147,10 +147,15 @@ public class PlayerStatusManager : MonoBehaviour
             "body" => Mathf.RoundToInt(currentBody),
             "mind" => Mathf.RoundToInt(currentMind),
             "initiative" => initiative,
+            "attack" => attack,
+            "defense" => defense,
             _ => 0,
         };
-
     }
+
+    public int GetAttack() => attack;
+    public int GetDefense() => defense;
+    public int GetInitiative() => initiative;
 
     public void ApplyStatDelta(string statName, int value)
     {
