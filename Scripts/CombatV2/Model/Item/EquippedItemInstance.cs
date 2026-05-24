@@ -12,6 +12,13 @@ public class EquippedItemInstance
         RemainingDurability = item != null ? item.durability : -1;
     }
 
+    public EquippedItemInstance(ItemSO item, int remainingDurability)
+    {
+        SourceItem = item;
+        int defaultDurability = item != null ? item.durability : -1;
+        RemainingDurability = remainingDurability >= 0 ? remainingDurability : defaultDurability;
+    }
+
     public bool ConsumeTurn()
     {
         if (RemainingDurability < 0)

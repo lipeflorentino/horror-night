@@ -3,15 +3,17 @@ using UnityEngine;
 public class InventoryInputHandler : MonoBehaviour
 {
     [SerializeField] private InventoryView inventoryView;
-    [SerializeField] private PlayerInventory playerInventory;
+    [SerializeField] private MonoBehaviour playerInventorySource;
+    private ICombatInventory playerInventory;
     [SerializeField] private CombatManager Combat;
 
-    public void Init(CombatManager cm, PlayerInventory inventory)
+    public void Init(CombatManager cm, ICombatInventory inventory)
     {
         Combat = cm;
         inventoryView = FindObjectOfType<InventoryView>();
         Logger.Log($"[InventoryInputHandler] Inicializando com inventário do jogador: {inventory}");
         playerInventory = inventory;
+        playerInventorySource = inventory as MonoBehaviour;
         if (inventoryView != null)
         {
             inventoryView.BindInventory(playerInventory);

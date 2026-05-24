@@ -4,13 +4,14 @@ using System.Linq;
 using System;
 
 [RequireComponent(typeof(PlayerStatusManager))]
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : MonoBehaviour, ICombatInventory
 {
     [SerializeField] private ItemDatabase itemDatabase;
     [SerializeField] private PlayerStatusManager playerStatusManager;
     [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private int maxRelicSlots = 2;
     public List<ItemSO> items = new();
+    public IReadOnlyList<ItemSO> Items => items;
     [SerializeField] private List<EquippedItemInstance> equippedWeapons = new();
     [SerializeField] private List<EquippedItemInstance> equippedRelics = new();
 
@@ -95,7 +96,9 @@ public class PlayerInventory : MonoBehaviour
         PlayerInventorySnapshot snapshot = new()
         {
             itemIds = new List<int>(countsByItemId.Count),
-            itemQuantities = new List<int>(countsByItemId.Count)
+            itemQuantities = new List<int>(countsByItemId.Count),
+            equippedWeapons = CreateEquippedSnapshot(equippedWeapons),
+            equippedRelics = CreateEquippedSnapshot(equippedRelics)
         };
 
         foreach (KeyValuePair<int, int> entry in countsByItemId.OrderBy(entry => entry.Key))
@@ -110,28 +113,70 @@ public class PlayerInventory : MonoBehaviour
     public void RestoreSnapshot(PlayerInventorySnapshot snapshot)
     {
         items.Clear();
+        equippedWeapons.Clear();
+        equippedRelics.Clear();
 
-        if (snapshot == null || snapshot.itemIds == null || snapshot.itemQuantities == null)
+        if (snapshot == null)
             return;
 
         if (itemDatabase == null || itemDatabase.allItems == null)
             return;
 
-        int entryCount = Mathf.Min(snapshot.itemIds.Count, snapshot.itemQuantities.Count);
-
-        for (int i = 0; i < entryCount; i++)
+        if (snapshot.itemIds != null && snapshot.itemQuantities != null)
         {
-            int itemId = snapshot.itemIds[i];
-            int quantity = Mathf.Max(0, snapshot.itemQuantities[i]);
-            if (quantity == 0)
+            int entryCount = Mathf.Min(snapshot.itemIds.Count, snapshot.itemQuantities.Count);
+
+            for (int i = 0; i < entryCount; i++)
+            {
+                int itemId = snapshot.itemIds[i];
+                int quantity = Mathf.Max(0, snapshot.itemQuantities[i]);
+                if (quantity == 0)
+                    continue;
+
+                ItemSO item = FindItemById(itemId);
+                if (item == null)
+                    continue;
+
+                for (int j = 0; j < quantity; j++)
+                    items.Add(item);
+            }
+        }
+
+        RestoreEquippedSnapshot(snapshot.equippedWeapons, equippedWeapons);
+        RestoreEquippedSnapshot(snapshot.equippedRelics, equippedRelics);
+    }
+
+    private static List<EquippedItemSnapshot> CreateEquippedSnapshot(List<EquippedItemInstance> slots)
+    {
+        List<EquippedItemSnapshot> result = new();
+        for (int i = 0; i < slots.Count; i++)
+        {
+            EquippedItemInstance slot = slots[i];
+            if (slot?.SourceItem == null)
                 continue;
 
-            ItemSO item = FindItemById(itemId);
+            result.Add(new EquippedItemSnapshot
+            {
+                itemId = slot.SourceItem.id,
+                remainingDurability = slot.RemainingDurability
+            });
+        }
+
+        return result;
+    }
+
+    private void RestoreEquippedSnapshot(List<EquippedItemSnapshot> snapshots, List<EquippedItemInstance> destination)
+    {
+        if (snapshots == null)
+            return;
+
+        for (int i = 0; i < snapshots.Count; i++)
+        {
+            ItemSO item = FindItemById(snapshots[i].itemId);
             if (item == null)
                 continue;
 
-            for (int j = 0; j < quantity; j++)
-                items.Add(item);
+            destination.Add(new EquippedItemInstance(item, snapshots[i].remainingDurability));
         }
     }
 
