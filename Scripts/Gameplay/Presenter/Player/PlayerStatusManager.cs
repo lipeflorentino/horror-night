@@ -103,7 +103,7 @@ public class PlayerStatusManager : MonoBehaviour
         heartHud?.SetValue(currentHeart, maxHeart);
     }
 
-    public void Increasebody(float amount)
+    public void IncreaseBody(float amount)
     {
         currentBody = Mathf.Clamp(currentBody + amount, 0f, maxBody);
         bodyHud?.SetValue(currentBody, maxBody);
@@ -154,6 +154,7 @@ public class PlayerStatusManager : MonoBehaviour
 
     public void ApplyStatDelta(string statName, int value)
     {
+        Logger.Log($"[PlayerStatusManager] Aplicando stat delta: {statName} {value}");
         if (value == 0)
             return;
 
@@ -164,7 +165,7 @@ public class PlayerStatusManager : MonoBehaviour
                 else DecreaseHeart(-value);
                 return;
             case "body":
-                if (value > 0) Increasebody(value);
+                if (value > 0) IncreaseBody(value);
                 else DecreaseBody(-value);
                 return;
             case "mind":
@@ -173,6 +174,15 @@ public class PlayerStatusManager : MonoBehaviour
                 return;
             case "initiative":
                 initiative = Mathf.Max(0, initiative + value);
+                return;
+            case "attack":
+                attack = Mathf.Max(0, attack + value);
+                return;
+            case "defense":
+                defense = Mathf.Max(0, defense + value);
+                return;
+            default:
+                Logger.Log($"[PlayerStatusManager] Stat desconhecida: {statName}");
                 return;
         }
     }
@@ -235,7 +245,7 @@ public class PlayerStatusManager : MonoBehaviour
         
         if (playerInventory != null)
             playerInventory.RestoreSnapshot(snapshot.inventory);
-        
+        Logger.Log($"[PlayerStatusManager] Snapshot restaurado.");
         RefreshAllBars();
     }
 

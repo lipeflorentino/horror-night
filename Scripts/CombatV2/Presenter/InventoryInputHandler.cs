@@ -4,19 +4,19 @@ public class InventoryInputHandler : MonoBehaviour
 {
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private PlayerInventory playerInventory;
+    [SerializeField] private CombatManager Combat;
 
-    public void Start()
+    public void Init(CombatManager cm, PlayerInventory inventory)
     {
+        Combat = cm;
         inventoryView = FindObjectOfType<InventoryView>();
-    }
-
-    public void Init(PlayerInventory inventory)
-    {
+        Logger.Log($"[InventoryInputHandler] Inicializando com inventário do jogador: {inventory}");
         playerInventory = inventory;
         if (inventoryView != null)
         {
             inventoryView.BindInventory(playerInventory);
-            inventoryView.OnInteractWithItem += HandleItemInteraction;
+            inventoryView.OnInteractWithInventoryItem += HandleItemInteraction;
+            Logger.Log($"[InventoryInputHandler] Subscribed to inventoryView.OnInteractWithInventoryItem");
         }
     }
 
@@ -25,12 +25,11 @@ public class InventoryInputHandler : MonoBehaviour
         if (inventoryView == null)
             return;
 
-        inventoryView.OnInteractWithItem -= HandleItemInteraction;
+        inventoryView.OnInteractWithInventoryItem -= HandleItemInteraction;
     }
 
     private void HandleItemInteraction(ItemSO item, InventoryItemAction action, InventoryItemLocation location)
     {
-        Logger.Log($"[InventoryInputHandler] Item: {item.itemName}");
         switch (action)
         {
             case InventoryItemAction.Use:
@@ -46,6 +45,8 @@ public class InventoryInputHandler : MonoBehaviour
                 OnDischardItem(item);
                 break;
         }
+
+        Combat.RefreshCombatUI();
     }
 
     public void OnUseItem(ItemSO item)
@@ -78,7 +79,6 @@ public class InventoryInputHandler : MonoBehaviour
 
     public void OnEquipItem(ItemSO item)
     {
-        Logger.Log($"[InventoryInputHandler] Tentando equipar item: {item.itemName}");
         if (playerInventory == null || item == null)
             return;
 

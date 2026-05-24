@@ -9,15 +9,15 @@ public class InventoryView : MonoBehaviour
     [SerializeField] private Transform weaponSlotsRoot;
     [SerializeField] private Transform relicSlotsRoot;
     [SerializeField] private Transform consumableSlotsRoot;
-    [SerializeField] private InventoryItemView itemPrefab;
+    [SerializeField] private InventoryItemUI itemPrefab;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button closeButton;
     [SerializeField] private GameObject inventoryPanel;
 
-    private readonly List<InventoryItemView> spawnedItems = new();
+    private readonly List<InventoryItemUI> spawnedItems = new();
     [SerializeField] private PlayerInventory boundInventory;
 
-    public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithItem;
+    public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithInventoryItem;
 
     // TODO: remove start after tests
     private void Start()
@@ -66,7 +66,6 @@ public class InventoryView : MonoBehaviour
 
     public void Open()
     {
-        Logger.Log("Opening Inventory");
         inventoryPanel.SetActive(true);
         Refresh();
     }
@@ -80,8 +79,6 @@ public class InventoryView : MonoBehaviour
     private void SpawnInventoryItems()
     {
         Dictionary<ItemSO, int> grouped = new();
-        Logger.Log($"[InventoryView] Agrupando itens para exibição... Total de itens: {boundInventory.items.Count}");
-
         foreach (ItemSO item in boundInventory.items)
         {
             if (item == null)
@@ -116,20 +113,23 @@ public class InventoryView : MonoBehaviour
     {
         if (itemPrefab == null || parent == null || item == null)
             return;
-        Logger.Log($"[InventoryView] Spawnando item: {item.itemName} (x{count}) no local {location}");
-        InventoryItemView view = Instantiate(itemPrefab, parent);
-        view.Bind(item, count, location);
-        view.ItemSelected += HandleItemSelected;
-        view.OnInteractWithItem += HandleItemInteraction;
-        view.ShowInteractionPanel(false);
-        spawnedItems.Add(view);
+            
+        InventoryItemUI inventoryItemView = Instantiate(itemPrefab, parent);
+        ItemInfoPanelUI itemInfoPanel = FindObjectOfType<ItemInfoPanelUI>();
+        inventoryItemView.SetItemInfoPanel(itemInfoPanel);
+        
+        inventoryItemView.Bind(item, count, location);
+        inventoryItemView.ItemSelected += HandleItemSelected;
+        inventoryItemView.OnInteractWithItem += HandleItemInteraction;
+        inventoryItemView.ShowInteractionPanel(false);
+        spawnedItems.Add(inventoryItemView);
     }
 
-    private void HandleItemSelected(InventoryItemView selectedView)
+    private void HandleItemSelected(InventoryItemUI selectedView)
     {
         for (int i = 0; i < spawnedItems.Count; i++)
         {
-            InventoryItemView view = spawnedItems[i];
+            InventoryItemUI view = spawnedItems[i];
             if (view == null)
                 continue;
 
@@ -140,14 +140,14 @@ public class InventoryView : MonoBehaviour
 
     private void HandleItemInteraction(ItemSO item, InventoryItemAction action, InventoryItemLocation location)
     {
-        OnInteractWithItem?.Invoke(item, action, location);
+        OnInteractWithInventoryItem?.Invoke(item, action, location);
     }
 
     private void ClearSpawnedItems()
     {
         for (int i = 0; i < spawnedItems.Count; i++)
         {
-            InventoryItemView itemView = spawnedItems[i];
+            InventoryItemUI itemView = spawnedItems[i];
             if (itemView != null)
             {
                 itemView.ItemSelected -= HandleItemSelected;

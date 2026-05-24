@@ -8,7 +8,8 @@ public enum InventoryItemAction
     Use,
     Equip,
     Unequip,
-    Discard
+    Discard,
+    Close
 }
 
 public enum InventoryItemLocation
@@ -18,7 +19,7 @@ public enum InventoryItemLocation
     RelicSlot
 }
 
-public class InventoryItemView : MonoBehaviour
+public class InventoryItemUI : MonoBehaviour
 {
     [Header("Item Info")]
     [SerializeField] private Image iconImage;
@@ -30,13 +31,13 @@ public class InventoryItemView : MonoBehaviour
     private ItemSO boundItem;
     private int boundCount;
     private InventoryItemLocation location;
+    private bool isPanelOpen = false;
 
-    public event Action<InventoryItemView> ItemSelected;
+    public event Action<InventoryItemUI> ItemSelected;
     public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithItem;
 
     private void Awake()
     {
-        itemInfoPanelUI = FindObjectOfType<ItemInfoPanelUI>();
         if (interactButton != null) interactButton.onClick.AddListener(HandleSelectClick);
         ShowInteractionPanel(false);
     }
@@ -44,6 +45,15 @@ public class InventoryItemView : MonoBehaviour
     private void OnDestroy()
     {
         if (interactButton != null) interactButton.onClick.RemoveListener(HandleSelectClick);
+        if (itemInfoPanelUI != null && isPanelOpen)
+        {
+            itemInfoPanelUI.OnRaiseInteraction -= OnRaiseInteraction;
+        }
+    }
+
+    public void SetItemInfoPanel(ItemInfoPanelUI panel)
+    {
+        itemInfoPanelUI = panel;
     }
 
     public void Bind(ItemSO item, int count, InventoryItemLocation itemLocation)
@@ -58,22 +68,28 @@ public class InventoryItemView : MonoBehaviour
 
     public void ShowInteractionPanel(bool visible)
     {
-        if (visible)
+        if (itemInfoPanelUI == null)
+        {
+            return;
+        }
+
+        if (visible && !isPanelOpen)
         {
             itemInfoPanelUI.SetItemInfo(boundItem, boundCount, boundItem.statBonus, boundItem.specialEffect, boundItem.description, boundItem.type.ToString(), location);
             itemInfoPanelUI.OnRaiseInteraction += OnRaiseInteraction;
             itemInfoPanelUI.ShowTooltip(transform.position);
+            isPanelOpen = true;
         }
-        else
+        else if (!visible && isPanelOpen)
         {
             itemInfoPanelUI.HideTooltip();
             itemInfoPanelUI.OnRaiseInteraction -= OnRaiseInteraction;
+            isPanelOpen = false;
         }
     }
 
     private void HandleSelectClick()
     {
-        Logger.Log($"[InventoryItemView] Item selecionado: {boundItem.itemName}");
         if (boundItem == null) return;
         ItemSelected?.Invoke(this);
     }
@@ -81,10 +97,11 @@ public class InventoryItemView : MonoBehaviour
     private void OnRaiseInteraction(InventoryItemAction action)
     {
         if (boundItem == null) return;
-        OnInteractWithItem?.Invoke(boundItem, action, location);
-        Logger.Log($"[InventoryItemView] Interação: {action} para item {boundItem.itemName}");
+        if (action != InventoryItemAction.Close)
+        {
+            OnInteractWithItem?.Invoke(boundItem, action, location);
+        }
 
-        if (action == InventoryItemAction.Use || action == InventoryItemAction.Equip || action == InventoryItemAction.Unequip || action == InventoryItemAction.Discard)
-            ShowInteractionPanel(false);
+        ShowInteractionPanel(false);
     }
 }

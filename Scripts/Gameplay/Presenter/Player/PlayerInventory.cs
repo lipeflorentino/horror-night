@@ -7,13 +7,12 @@ using System;
 public class PlayerInventory : MonoBehaviour
 {
     [SerializeField] private ItemDatabase itemDatabase;
+    [SerializeField] private PlayerStatusManager playerStatusManager;
     [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private int maxRelicSlots = 2;
     public List<ItemSO> items = new();
     [SerializeField] private List<EquippedItemInstance> equippedWeapons = new();
     [SerializeField] private List<EquippedItemInstance> equippedRelics = new();
-
-    private PlayerStatusManager playerStatusManager;
 
     private void Awake()
     {
@@ -212,7 +211,7 @@ public class PlayerInventory : MonoBehaviour
         if (slots.Count >= maxSlots || !items.Remove(item))
             return false;
 
-        EquippedItemInstance instance = new EquippedItemInstance(item);
+        EquippedItemInstance instance = new(item);
         slots.Add(instance);
         ApplyStatBonus(item.statBonus);
 
@@ -246,12 +245,14 @@ public class PlayerInventory : MonoBehaviour
 
     private void ApplyStatBonus(string statBonus)
     {
+        Logger.Log($"[Inventory] Aplicando stat bonus: {statBonus}");
         foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
             playerStatusManager.ApplyStatDelta(stat.statName, stat.value);
     }
 
     private void RemoveStatBonus(string statBonus)
     {
+        Logger.Log($"[Inventory] Removendo stat bonus: {statBonus}");
         foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
             playerStatusManager.ApplyStatDelta(stat.statName, -stat.value);
     }

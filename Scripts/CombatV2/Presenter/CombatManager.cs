@@ -64,15 +64,19 @@ public class CombatManager : MonoBehaviour
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = ResolveCombatPlayerInventory();
 
-        if (InventoryInputHandler != null)
-            InventoryInputHandler.Init(CombatPlayerInventory);
+        InventoryInputHandler.Init(this, CombatPlayerInventory);
 
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
-        View.UpdateView(Player, Enemy);
+        RefreshCombatUI();
 
         UpdateTurnRoleUI();
+    }
+
+    public void RefreshCombatUI()
+    {
+        View.UpdateView(Player, Enemy);
     }
 
     private void DefineStartingTurnByInitiative()
