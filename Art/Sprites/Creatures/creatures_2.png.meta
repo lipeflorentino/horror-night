@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 63f037405f3dd5a4e9bbbc418fc38f0f
+guid: b763f134f390d8541a03e6c936090818
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,127 +110,211 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: demon
+      name: werewolf
       rect:
         serializedVersion: 2
-        x: 36
-        y: 602
-        width: 436
-        height: 398
+        x: 0
+        y: 342
+        width: 217
+        height: 246
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5cf74d58c9053614489b614ff8f2ced6
-      internalID: 2012608854
+      spriteID: d9d57270ea00bc143b28a12c2e86915f
+      internalID: 937243930
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: demon_warrior
+      name: cave_troll
       rect:
         serializedVersion: 2
-        x: 537
-        y: 101
-        width: 476
-        height: 347
+        x: 224
+        y: 345
+        width: 214
+        height: 261
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c608c6a4a8935d645845a5d4f2bba8e7
-      internalID: -981021936
+      spriteID: bda28a1d90c38f044956757dc4fbd2ef
+      internalID: -322660146
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: cursed_chest
+      name: giant_spider
       rect:
         serializedVersion: 2
-        x: 1049
-        y: 142
-        width: 444
-        height: 349
+        x: 444
+        y: 359
+        width: 199
+        height: 216
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e364bb40506f4e848aefe12dd06dfefd
-      internalID: 615584942
+      spriteID: 0226297341680c14aa49a26c480bfd80
+      internalID: -709103438
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost
+      name: werebear
       rect:
         serializedVersion: 2
-        x: 1040
-        y: 593
-        width: 485
-        height: 403
+        x: 661
+        y: 354
+        width: 167
+        height: 243
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3d87fa30e6394fc4b8c18747f3cd0a05
-      internalID: 571625993
+      spriteID: 40dbcf3aa2864ab4191761ddce6e5cef
+      internalID: 1359785287
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: zombie
+      name: skeleton
       rect:
         serializedVersion: 2
-        x: 549
-        y: 569
-        width: 432
-        height: 422
+        x: 839
+        y: 346
+        width: 165
+        height: 253
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f5d423e3a6fd41e4a8009b85f508defb
-      internalID: 968066556
+      spriteID: 296de7f2e4934cf41aaa20ed944570bb
+      internalID: 706701112
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: slime
+      name: forest_witch
       rect:
         serializedVersion: 2
-        x: 60
-        y: 282
-        width: 484
-        height: 279
+        x: 2
+        y: 0
+        width: 204
+        height: 247
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 22149d6f30d1a7640ae2bfc6c96b5f8c
-      internalID: -911472227
+      spriteID: fc2972e8ffbaaad4d94bb176da6cce6d
+      internalID: -2007449296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stone_golem
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 0
+        width: 216
+        height: 244
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed322f10a44771a4db49b714365ff22d
+      internalID: -1905118898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: specter
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 0
+        width: 177
+        height: 258
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b6ae8f5f3aeaf94895d80ec5019e04f
+      internalID: -740104300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: griffin
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 0
+        width: 201
+        height: 249
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 24bfe0db90f1a264f9ab11a1a4312020
+      internalID: 1290401090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: centaur
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 0
+        width: 198
+        height: 249
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2000fb5d34465140893148ae4bd428c
+      internalID: -745503572
       vertices: []
       indices: 
       edges: []
@@ -246,12 +330,18 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      cursed_chest: 615584942
-      demon: 2012608854
-      demon_warrior: -981021936
-      ghost: 571625993
-      slime: -911472227
-      zombie: 968066556
+      cave_troll: -322660146
+      centaur: -745503572
+      creatures_2_8: 1123017463
+      creatures_2_9: -1715427339
+      forest_witch: -2007449296
+      giant_spider: -709103438
+      griffin: 1290401090
+      skeleton: 706701112
+      specter: -740104300
+      stone_golem: -1905118898
+      werebear: 1359785287
+      werewolf: 937243930
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

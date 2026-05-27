@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class RewardService
 {
-    public Dictionary<ItemSO, int> GetRandomLoot(int enemyLevel, int guaranteedGoldCoins)
+    public Dictionary<ItemSO, int> GetRandomLoot(int enemyLevel)
     {
         Dictionary<ItemSO, int> loot = new();
 
@@ -15,7 +15,7 @@ public class RewardService
 
         ItemSO goldCoins = allItems.FirstOrDefault(item => item != null && string.Equals(item.itemName, "Gold Coins", StringComparison.OrdinalIgnoreCase));
         if (goldCoins != null)
-            loot[goldCoins] = Mathf.Max(1, guaranteedGoldCoins);
+            loot[goldCoins] = Mathf.Max(1, GrantGoldCoinsReward(enemyLevel));
 
         List<ItemSO> candidateItems = allItems
             .Where(item => item != null && item.weight > 0 && item != goldCoins)
@@ -44,6 +44,22 @@ public class RewardService
         }
 
         return loot;
+    }
+
+    public int GrantXpRewardIfEligible(int enemyLevel, int playerLevel)
+    {
+        if (playerLevel < enemyLevel)
+            return 0;
+
+        int reward = Mathf.Max(0, enemyLevel);
+        return reward;
+    }    
+
+    public int GrantGoldCoinsReward(int level)
+    {
+        int minGoldCoins = 1*level;
+        int maxGoldCoins = Mathf.Max(minGoldCoins, level * 10);
+        return UnityEngine.Random.Range(minGoldCoins, maxGoldCoins + 1);
     }
 
     private ItemSO RollWeightedItem(List<ItemSO> candidateItems, int enemyLevel)

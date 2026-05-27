@@ -1,0 +1,11 @@
+Id,Name,Description,Type,Weight,TierMin,TierMax,IconName,Products
+1,Guardião da Floresta,Um protetor silencioso que vigia as profundezas da floresta,Humanoid,10,0,5,forest_guardian,herbs:wood:stone
+2,Ermitão,Um velho sábio que vive isolado na floresta,Humanoid,8,0,5,hermit,herbs:stone
+3,Lenhador,Um trabalhador que corta madeira na floresta,Humanoid,6,0,5,lumberjack,wood:stone
+4,Caçador,Um habilidoso caçador que vive da caça na floresta,Humanoid,7,0,5,hunter,meat:wood:stone
+5,Centauro,Um ser híbrido entre humano e cavalo,Humanoid,5,3,6,centaur,meat:magic_itens:weapons
+6,Fairy,Uma criatura mágica que habita as florestas,Creature,4,0,5,fairy,herbs:stone:magic_itens
+7,Ursomen,Um ser híbrido entre urso e humano,Creature,3,3,6,werebear,meat:wood:stone
+8,Grifo,Uma criatura mítica com corpo de leão e cabeça de águia,Creature,2,4,7,griffin,meat:magic_itens:weapons
+9,Ent,Uma árvore viva que protege a floresta,Creature,4,4,7,ent,wood:stone:magic_itens
+10,Elfo,Um ser gracioso e ágil que habita as florestas,Humanoid,6,0,5,elf,herbs:magic_itens:weapons

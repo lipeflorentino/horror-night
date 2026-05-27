@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 63f037405f3dd5a4e9bbbc418fc38f0f
+guid: 61cb543ada8dd134ea03ab05a8a9f06f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,127 +110,169 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: demon
+      name: minotaur
       rect:
         serializedVersion: 2
-        x: 36
-        y: 602
-        width: 436
-        height: 398
+        x: 377
+        y: 338
+        width: 231
+        height: 283
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5cf74d58c9053614489b614ff8f2ced6
-      internalID: 2012608854
+      spriteID: b938454a37ddc064e942f092a829424d
+      internalID: 2092607408
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: demon_warrior
+      name: abomination
       rect:
         serializedVersion: 2
-        x: 537
-        y: 101
-        width: 476
-        height: 347
+        x: 610
+        y: 342
+        width: 203
+        height: 277
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c608c6a4a8935d645845a5d4f2bba8e7
-      internalID: -981021936
+      spriteID: a86a70d2c2c707944af5b9c967351e35
+      internalID: 1929569340
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: cursed_chest
+      name: vengeful_specter
       rect:
         serializedVersion: 2
-        x: 1049
-        y: 142
-        width: 444
-        height: 349
+        x: 814
+        y: 346
+        width: 191
+        height: 275
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e364bb40506f4e848aefe12dd06dfefd
-      internalID: 615584942
+      spriteID: e302725b695afc7478c226d149a0226a
+      internalID: -835880161
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghost
+      name: orc
       rect:
         serializedVersion: 2
-        x: 1040
-        y: 593
-        width: 485
-        height: 403
+        x: 0
+        y: 0
+        width: 205
+        height: 264
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3d87fa30e6394fc4b8c18747f3cd0a05
-      internalID: 571625993
+      spriteID: 945f8b9d118266546977c4f80a752c6a
+      internalID: 311348218
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: zombie
+      name: goblin
       rect:
         serializedVersion: 2
-        x: 549
-        y: 569
-        width: 432
-        height: 422
+        x: 206
+        y: 0
+        width: 179
+        height: 223
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f5d423e3a6fd41e4a8009b85f508defb
-      internalID: 968066556
+      spriteID: 6bd7710a8e301a94e98f6c829b4446b1
+      internalID: 18009849
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: slime
+      name: acher_skeleton
       rect:
         serializedVersion: 2
-        x: 60
-        y: 282
-        width: 484
-        height: 279
+        x: 405
+        y: 0
+        width: 194
+        height: 271
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 22149d6f30d1a7640ae2bfc6c96b5f8c
-      internalID: -911472227
+      spriteID: 0aa1f759f531ff343bb54d1c2c790697
+      internalID: 579033730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pale_orc
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 0
+        width: 208
+        height: 271
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f71b30d3686b7e47b2c6d5eb0a2c24e
+      internalID: -668393988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: treebeard
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 0
+        width: 190
+        height: 300
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c4b4bb92a9de27443b1f81a2f3b037f5
+      internalID: -894007898
       vertices: []
       indices: 
       edges: []
@@ -246,12 +288,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      cursed_chest: 615584942
-      demon: 2012608854
-      demon_warrior: -981021936
-      ghost: 571625993
-      slime: -911472227
-      zombie: 968066556
+      abomination: 1929569340
+      acher_skeleton: 579033730
+      goblin: 18009849
+      minotaur: 2092607408
+      orc: 311348218
+      pale_orc: -668393988
+      treebeard: -894007898
+      vengeful_specter: -835880161
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

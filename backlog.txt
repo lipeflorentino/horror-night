@@ -49,20 +49,9 @@ TAREFA
 TO DO 
     - Criar os icones dos itens (de 10 em 10)
     - Criar novos monstros 
-        - Lobisomem
-        - Cave Troll
-        - Aracna 
-        - Swamp Creature
-        - Witch
-        - Nightcrawler
-        - Creeper
-        - Ork
-        - Gobblin
-        - Pale Ork
         - Dark Elf 
         - Dark Wizard
-        - Treebeard
-        - Blood Sucker
+        - Leach
     
 
 FIXES
@@ -71,5 +60,3 @@ FIXES
     - Falta update nas stats do painel de ações
     - Ajustar recompensa Xp (icone)
 
-
-    

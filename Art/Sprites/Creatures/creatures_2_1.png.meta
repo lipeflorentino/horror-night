@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 63f037405f3dd5a4e9bbbc418fc38f0f
+guid: 47fd49abd0706dd4db310c7c4cbd8cee
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,127 +110,22 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: demon
+      name: giant_spider_nest
       rect:
         serializedVersion: 2
-        x: 36
-        y: 602
-        width: 436
-        height: 398
+        x: 436
+        y: 362
+        width: 226
+        height: 256
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5cf74d58c9053614489b614ff8f2ced6
-      internalID: 2012608854
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: demon_warrior
-      rect:
-        serializedVersion: 2
-        x: 537
-        y: 101
-        width: 476
-        height: 347
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c608c6a4a8935d645845a5d4f2bba8e7
-      internalID: -981021936
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: cursed_chest
-      rect:
-        serializedVersion: 2
-        x: 1049
-        y: 142
-        width: 444
-        height: 349
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e364bb40506f4e848aefe12dd06dfefd
-      internalID: 615584942
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghost
-      rect:
-        serializedVersion: 2
-        x: 1040
-        y: 593
-        width: 485
-        height: 403
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 3d87fa30e6394fc4b8c18747f3cd0a05
-      internalID: 571625993
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: zombie
-      rect:
-        serializedVersion: 2
-        x: 549
-        y: 569
-        width: 432
-        height: 422
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f5d423e3a6fd41e4a8009b85f508defb
-      internalID: 968066556
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: slime
-      rect:
-        serializedVersion: 2
-        x: 60
-        y: 282
-        width: 484
-        height: 279
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 22149d6f30d1a7640ae2bfc6c96b5f8c
-      internalID: -911472227
+      spriteID: 9ddbe1577cb4484419fb4506b7840d17
+      internalID: -602110540
       vertices: []
       indices: 
       edges: []
@@ -246,12 +141,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      cursed_chest: 615584942
-      demon: 2012608854
-      demon_warrior: -981021936
-      ghost: 571625993
-      slime: -911472227
-      zombie: 968066556
+      armored_skeleton: 674018669
+      giant_spider_nest: -602110540
+      night_shadow: -520933871
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

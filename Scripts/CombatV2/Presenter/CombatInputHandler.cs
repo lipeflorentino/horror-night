@@ -202,7 +202,7 @@ public class CombatInputHandler : MonoBehaviour
 
     private bool CanUseDiceType(DiceStatType diceType)
     {
-        return Combat.GetDiceMaxValueForType(Combat.Player, diceType) > 0;
+        return GetDiceMaxValueForType(diceType) > 0;
     }
 
     private int GetRemainingDiceCount(DiceRollType diceRollType)
@@ -226,19 +226,19 @@ public class CombatInputHandler : MonoBehaviour
         if (Combat == null || Combat.View == null || Combat.View.ActionPanel  == null)
             return;
 
-        List<int> powerFaces = Combat.GetDiceFacesForSelection(PowerDiceTypes, false);
-        List<int> accuracyFaces = Combat.GetDiceFacesForSelection(AccuracyDiceTypes, false);
+        List<int> powerFaces = GetDiceFacesForSelection(PowerDiceTypes, false);
+        List<int> accuracyFaces = GetDiceFacesForSelection(AccuracyDiceTypes, false);
 
         List<DiceStatType> aggregatedPowerTypes = GetAggregatedDiceTypes(PowerDiceTypes);
-        List<int> aggregatedPowerFaces = Combat.GetDiceFacesForSelection(aggregatedPowerTypes, true);
+        List<int> aggregatedPowerFaces = GetDiceFacesForSelection(aggregatedPowerTypes, true);
         
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
-        (int lowMax, int mediumMax, int highMin) powerBoundaries = Combat.GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
-        (int lowMax, int mediumMax, int highMin) accuracyBoundaries = Combat.GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
+        (int lowMax, int mediumMax, int highMin) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
+        (int lowMax, int mediumMax, int highMin) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
         Combat.View.ActionPanel.UpdateSelectionPreview(
-            Combat.GetPlayerActionPower(),
+            Combat.Player.GetBattlerActionPower(Combat.IsPlayerAttacker),
             PowerDiceTypes,
             powerFaces,
             aggregatedPowerFaces,
@@ -310,5 +310,20 @@ public class CombatInputHandler : MonoBehaviour
             DiceStatType.Body => 1,
             _ => 0
         };
+    }
+
+    public int GetDiceMaxValueForType(DiceStatType diceType)
+    {
+        return Combat.GetDiceService().GetDiceMaxValueForType(Combat.Player, diceType);
+    }
+
+    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes, bool isAggregated = false)
+    {
+        return isAggregated ? Combat.GetDiceService().ConvertToAggregatedFaces(Combat.Player, diceTypes) : Combat.GetDiceService().ConvertToFaces(Combat.Player, diceTypes);
+    }
+
+    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
+    {
+        return Combat.GetDiceService().GetTierBoundaries(maxValue, Combat.Player.Level, Combat.Enemy.Level, statType, rollType);
     }
 }

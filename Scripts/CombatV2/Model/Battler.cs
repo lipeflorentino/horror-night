@@ -56,4 +56,11 @@ public class Battler
     {
         return HP > 0;
     }
+
+    public int GetBattlerActionPower(bool isAttacker)
+    {
+        int atk = Attack;
+        int df = Defense;
+        return isAttacker ? atk : df;
+    }
 }

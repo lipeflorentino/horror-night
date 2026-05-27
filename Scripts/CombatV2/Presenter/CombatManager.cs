@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -43,6 +42,7 @@ public class CombatManager : MonoBehaviour
     private RewardService RewardService;
     private InventoryInputHandler InventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
+    private EnemyVisuals EnemyVisuals;
 
     void Start()
     {
@@ -65,6 +65,7 @@ public class CombatManager : MonoBehaviour
         CombatPlayerInventory = BuildCombatInventory(SessionData);
 
         InventoryInputHandler.Init(this, CombatPlayerInventory);
+        EnemyVisuals = FindObjectOfType<EnemyVisuals>();
 
         Input.Init(this);
         View.Init();
@@ -74,31 +75,20 @@ public class CombatManager : MonoBehaviour
         UpdateTurnRoleUI();
     }
 
-    public void RefreshCombatUI()
-    {
-        View.UpdateView(Player, Enemy);
-    }
-
-    private void DefineStartingTurnByInitiative()
-    {
-        Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
-        PlayerIsAttacker = firstBattler == Player;
-    }
-
     private void InitializeBattlers(CombatSessionData sessionData)
     {
         if (sessionData == null)
         {
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, true);
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
+            Player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, true);
+            Enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
             return;
         }
 
         PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
         EnemyInstance enemySnapshot = sessionData.EnemyInstance;
 
-        SetEnemyVisual(enemySnapshot ?? null);
+        EnemyVisuals.SetEnemyVisual(enemySnapshot ?? null);
 
         Player = new Battler(
             "Player",
@@ -139,6 +129,17 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
             Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
         }
+    }
+
+    public void RefreshCombatUI()
+    {
+        View.UpdateView(Player, Enemy);
+    }
+
+    private void DefineStartingTurnByInitiative()
+    {
+        Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
+        PlayerIsAttacker = firstBattler == Player;
     }
 
     public void ReceivePlayerInput(ActionType type, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
@@ -239,21 +240,6 @@ public class CombatManager : MonoBehaviour
         Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice.Value} | ACCURACY best:{enemyAccuracyDice.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
     }
 
-    public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)
-    {
-        return DiceService.GetDiceMaxValueForType(battler, diceType);
-    }
-
-    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes, bool isAggregated = false)
-    {
-        return isAggregated ? DiceService.ConvertToAggregatedFaces(Player, diceTypes) : DiceService.ConvertToFaces(Player, diceTypes);
-    }
-
-    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
-    {
-        return DiceService.GetTierBoundaries(maxValue, Player.Level, Enemy.Level, statType, rollType);
-    }
-
     private void Resolve()
     {
         ActionInstance attack;
@@ -326,36 +312,6 @@ public class CombatManager : MonoBehaviour
         View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
     }
 
-    public void SetEnemyVisual(EnemyInstance enemySnapshot = null)
-    {
-        Sprite enemySprite = enemySnapshot != null && enemySnapshot.source != null
-            ? enemySnapshot.source.image
-            : null;
-
-        GameObject enemyBattler = GameObject.Find("EnemyBattler");
-        if (enemyBattler == null)
-        {
-            Debug.LogWarning("[Combat] EnemyBattler GameObject not found.");
-            return;
-        }
-
-        Transform visualTransform = enemyBattler.transform.Find("EnemyVisual");
-        if (visualTransform == null)
-        {
-            Debug.LogWarning("[Combat] EnemyVisual transform not found.");
-            return;
-        }
-
-        if (visualTransform.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
-        {
-            spriteRenderer.sprite = enemySprite;
-        }
-        else
-        {
-            Debug.LogWarning("[Combat] Could not find SpriteRenderer to set enemy image.");
-        }
-    }
-
     private ActionDefinition BuildDefinitionFromBattler(Battler battler, ActionType actionType)
     {
         int basePower = actionType == ActionType.Attack ? battler.Attack : battler.Defense;
@@ -374,11 +330,11 @@ public class CombatManager : MonoBehaviour
         bool playerWon = Player.IsAlive() && !Enemy.IsAlive();
         if (playerWon)
         {
-            lastGrantedXp = GrantXpRewardIfEligible();
+            lastGrantedXp = RewardService.GrantXpRewardIfEligible(Enemy.Level, Player.Level);
             if (SessionData?.EnemyInstance?.source != null)
             {
-                int grantedGoldCoins = GrantGoldCoinsReward();
-                lastGrantedItens = RewardService.GetRandomLoot(Enemy.Level, grantedGoldCoins);
+                int grantedGoldCoins = RewardService.GrantGoldCoinsReward(Enemy.Level);
+                lastGrantedItens = RewardService.GetRandomLoot(Enemy.Level);
             }
             else
             {
@@ -470,30 +426,6 @@ public class CombatManager : MonoBehaviour
             snapshot.inventory = CombatPlayerInventory.GetSnapshot();
         return snapshot;
     }
-
-    private int GrantXpRewardIfEligible()
-    {
-        if (Enemy.Level < Player.Level)
-            return 0;
-
-        int reward = Mathf.Max(0, Enemy.Level);
-        return reward;
-    }
-
-    private int GrantGoldCoinsReward()
-    {
-        int minGoldCoins = 1;
-        int maxGoldCoins = Mathf.Max(minGoldCoins, Enemy.Level * 10);
-        return UnityEngine.Random.Range(minGoldCoins, maxGoldCoins + 1);
-    }
-
-    public int GetPlayerActionPower()
-    {
-        int atk = Player.Attack;
-        int df = Player.Defense;
-        Logger.Log($"[GetPlayerActionPower] Attack: {atk}, Defense: {df}");
-        return PlayerIsAttacker ? atk : df;
-    }
     
     private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)
     {
@@ -513,5 +445,10 @@ public class CombatManager : MonoBehaviour
             inventory.RestoreSnapshot(snapshot);
 
         return inventory;
+    }
+
+    public DiceService GetDiceService()
+    {
+        return DiceService;
     }
 }

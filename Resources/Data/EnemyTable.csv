@@ -1,9 +1,28 @@
-ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,HeartMin,HeartMax,BodyMin,BodyMax,MindMin,MindMax,SpecialRule,ImagePath,hpMin,hpMax,AttackMin,AttackMax,DefenseMin,DefenseMax,InitiativeMin,InitiativeMax
-1,Sussurro Rastejante,Uma presença que se move nas sombras,Normal,10,0,2,Aggressive,Stealthy,Aberration,8,12,3,5,2,4,,Assets/Art/Sprites/Creatures/creatures_tileset_0.asset,8,12,4,4,3,3,3,6
-2,Guardião do Breu,Predador que ronda clareiras sem lua,Special,6,1,4,Cautious,Brutal,Humanoid,14,20,6,10,4,7,Causa medo ao entrar em combate,Assets/Art/Sprites/Creatures/creatures_tileset_1.asset,14,20,4,8,3,6,4,8
-3,Avatar da Noite,Entidade que marca o fim da trilha,Boss,2,3,10,Relentless,Ritualistic,Entity,30,42,10,16,10,14,Ganha bônus quando encontro é forçado,Assets/Art/Sprites/Creatures/creatures_tileset_2.asset,30,42,9,15,7,12,3,6
-4,Rastejador da Folhagem,Criatura que se arrasta sob folhas mortas,Normal,9,0,2,Aggressive,Primal,Beast,9,13,3,6,2,3,,Assets/Art/Sprites/Creatures/creatures_tileset_3.asset,9,13,3,6,5,8,5,9
-5,Corvo Espectral,Ave de olhos vazios que observa em silêncio,Normal,8,0,2,Cautious,Stealthy,Spirit,7,10,2,4,3,5,,Assets/Art/Sprites/Creatures/creatures_tileset_4.asset,7,10,2,5,3,5,2,4
-6,Lenhador Perdido,Alma condenada que vaga entre as árvores,Normal,7,0,2,Erratic,Brutal,Humanoid,10,14,4,6,2,4,,Assets/Art/Sprites/Creatures/creatures_tileset_5.asset,10,14,4,6,4,7,4,8
-7,Filhote do Breu,Pequena aberração que caça em grupos,Normal,10,0,1,Aggressive,Frenetic,Aberration,6,9,2,4,1,3,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset_0.asset,6,9,3,8,4,9,6,12
-8,Vulto da Névoa,Forma indistinta que surge entre a neblina,Normal,9,1,2,Cautious,Stealthy,Entity,8,11,3,4,3,6,,Assets/Art/Sprites/Creatures/creatures_unrevealed_tileset_1.asset,8,11,4,8,5,10,8,10
+ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,HeartMin,HeartMax,BodyMin,BodyMax,MindMin,MindMax,SpecialRule,IconName,hpMin,hpMax,AttackMin,AttackMax,DefenseMin,DefenseMax,InitiativeMin,InitiativeMax
+1,Fantasma,Uma presença que se move nas sombras,Normal,10,0,2,Aggressive,Stealthy,Creature,8,12,3,5,2,4,none,ghost,8,12,4,4,3,3,3,6
+2,Demônio,Criatura nefasta que ronda clareiras,Normal,6,1,4,Cautious,Brutal,Creature,14,20,6,10,4,7,fear,demon,14,20,4,8,3,6,4,8
+3,Demônio Guerreiro,Um demonio guerreiro nascido para pelejar,Normal,2,3,10,Aggressive,Brutal,Creature,30,42,10,16,10,14,none,demon_warrior,30,42,9,15,7,12,3,6
+4,Planta Carnivora,De longe uma flor inofensiva de perto um apetite voraz,Normal,9,0,2,Aggressive,Brutal,Creature,9,13,3,6,2,3,none,killer_plant,9,13,3,6,5,8,5,9
+5,Geleia,Uma criatura gelatinosa que se move em silêncio,Normal,8,0,2,Cautious,Stealthy,Creature,7,10,2,4,3,5,none,slime,7,10,2,5,3,5,2,4
+6,Zumbi,Alma condenada que vaga entre as árvores,Normal,7,0,2,Erratic,Brutal,Humanoid,10,14,4,6,2,4,none,zombie,10,14,4,6,4,7,4,8
+7,Baú Amaldiçoado,Pequena aberração que parece um baú de tesouro,Normal,10,0,1,Aggressive,Frenetic,Creature,6,9,2,4,1,3,none,cursed_chest,6,9,3,8,4,9,6,12
+8,Lobisomem,Um ser que se transforma em lobo durante a noite,Normal,5,2,5,Aggressive,Brutal,Humanoid,20,30,6,10,4,8,fear,werewolf,20,30,5,10,4,8,3,6
+9,Troll da Floresta,Uma criatura enorme e poderosa que habita as florestas,Normal,5,2,5,Aggressive,Brutal,Creature,20,30,8,12,5,10,none,forest_troll,20,30,6,10,4,8,3,6
+10,Aranha Gigante,Uma aranha enorme que tece suas teias entre as árvores,Normal,8,0,3,Cautious,Stealthy,Creature,10,15,3,6,2,4,none,giant_spider,10,15,4,7,3,5,4,8
+11,Monstro do Pântano,Uma criatura grotesca que habita os pântanos,Normal,5,3,6,Aggressive,Brutal,Creature,15,25,5,10,4,7,fear,swamp_monster,15,25,6,10,4,8,3,6
+12,Esqueleto,Restos animados de um ser humano,Normal,7,0,2,Erratic,Brutal,Humanoid,8,12,3,5,1,3,none,skeleton,8,12,3,5,2,4,4,8
+13,Bruxa da Floresta,Uma bruxa que habita as profundezas da floresta,Normal,6,2,5,Cautious,Stealthy,Humanoid,12,18,4,7,3,5,none,forest_witch,12,18,5,8,3,6,4,8
+14,Vampiro,Um ser noturno que se alimenta de sangue,Normal,5,3,6,Aggressive,Stealthy,Humanoid,15,25,5,10,4,7,fear,vampire,15,25,6,10,4,8,3,6
+15,Minotauro,Um ser híbrido entre humano e touro,Special,5,3,6,Aggressive,Brutal,Humanoid,20,30,6,10,4,7,none,minotaur,20,30,5,10,4,8,3,6
+16,Golem de Pedra,Uma criatura feita de pedra animada por magia,Special,4,4,7,Aggressive,Brutal,Creature,40,50,10,15,5,10,none,stone_golem,40,50,9,15,7,12,2,4
+17,Espectro,Uma entidade fantasmagórica que assombra as florestas,Normal,6,0,3,Cautious,Stealthy,Creature,10,15,3,6,2,4,fear,specter,10,15,4,7,3,5,4,8
+18,Abominação,Uma criatura grotesca e deformada que se esconde nas sombras,Boss,5,3,6,Aggressive,Brutal,Creature,15,25,5,10,4,7,fear,abomination,15,25,6,10,4,8,3,6
+19,Esqueleto,Restos animados de um ser humano,Normal,7,0,2,Erratic,Brutal,Humanoid,8,12,3,5,1,3,none,skeleton,8,12,3,5,2,4,4,8
+21,Esqueleto com Armadura,Restos animados de um ser humano usando armadura,Normal,7,0,2,Erratic,Brutal,Humanoid,10,15,4,6,2,4,none,armored_skeleton,10,15,4,6,3,5,4,8
+22,Aranha Gigante com Ninhada,Uma aranha enorme que tece suas teias entre as árvores,Boss,8,0,3,Cautious,Stealthy,Creature,12,18,4,7,3,5,none,giant_spider_nest,12,18,5,8,4,6,4,8
+23,Espectro Vingativo,Uma entidade fantasmagórica que assombra as florestas,Special,6,0,3,Cautious,Stealthy,Creature,15,20,5,8,4,7,fear,vengeful_specter,15,20,6,10,4,8,4,8
+24,Orque,Uma criatura selvagem e agressiva que habita as florestas,Normal,5,2,5,Aggressive,Brutal,Humanoid,12,18,4,7,3,5,none,orc,12,18,5,8,4,7,3,6
+25,Goblin,Uma criatura pequena e astuta que vive nas florestas,Normal,6,1,4,Cautious,Stealthy,Humanoid,8,12,3,5,2,4,none,goblin,8,12,4,7,3,5,4,8
+26,Esqueleto Arqueiro,Restos animados de um ser humano usando armadura e arco,Normal,7,0,2,Erratic,Brutal,Humanoid,10,15,4,6,2,4,none,archer_skeleton,10,15,4,6,3,5,4,8
+27,Orque Pálido,Uma criatura selvagem e agressiva que habita as florestas,Boss,5,2,5,Aggressive,Brutal,Humanoid,10,15,4,7,3,5,fear,pale_orc,10,15,5,8,4,7,3,6
+28,Barbárvore,Uma criatura monstruosa em forma de árvore que guarda rancor de invasores,Boss,5,3,6,Aggressive,Brutal,Creature,15,25,5,10,4,7,fear,treebeard,15,25,6,10,4,8,3,6
