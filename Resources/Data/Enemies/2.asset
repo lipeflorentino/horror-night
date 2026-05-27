@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   id: 2
-  enemyName: "Guardi\xE3o do Breu"
-  description: Predador que ronda clareiras sem lua
-  archetype: 1
+  enemyName: "Dem\xF4nio"
+  description: Criatura nefasta que ronda clareiras
+  archetype: 0
   weight: 6
   tierMin: 1
   tierMax: 4
-  image: {fileID: 21300000, guid: d0ee6d588dab4544a8a84ce129e2b30c, type: 2}
+  image: {fileID: 21300000, guid: 593fe376cf356ae44b14ad1fc15aefff, type: 3}
   tags:
     behavior: 2
     style: 1
-    type: 2
+    type: 1
   hp:
     min: 14
     max: 20
@@ -45,4 +45,4 @@ MonoBehaviour:
   initiative:
     min: 4
     max: 8
-  specialRule: Causa medo ao entrar em combate
+  specialRule: fear

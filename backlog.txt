@@ -52,6 +52,9 @@ TO DO
         - Dark Elf 
         - Dark Wizard
         - Leach
+    - Criar NPCEncounterSystem
+        - sorteio assim como enemies/loot
+        - tem tipo (loja, melhoria, troca, etc)
     
 
 FIXES

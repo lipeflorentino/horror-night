@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   id: 3
-  enemyName: Avatar da Noite
-  description: Entidade que marca o fim da trilha
-  archetype: 2
+  enemyName: "Dem\xF4nio Guerreiro"
+  description: Um demonio guerreiro nascido para pelejar
+  archetype: 0
   weight: 2
   tierMin: 3
   tierMax: 10
-  image: {fileID: 21300000, guid: 6713a97de48587348901b061b962d781, type: 2}
+  image: {fileID: 21300000, guid: bb00add2f30e36341970168b035dffb6, type: 3}
   tags:
-    behavior: 4
-    style: 2
-    type: 3
+    behavior: 0
+    style: 1
+    type: 1
   hp:
     min: 30
     max: 42
@@ -45,4 +45,4 @@ MonoBehaviour:
   initiative:
     min: 3
     max: 6
-  specialRule: "Ganha b\xF4nus quando encontro \xE9 for\xE7ado"
+  specialRule: none

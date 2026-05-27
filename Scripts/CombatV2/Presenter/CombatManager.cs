@@ -42,7 +42,7 @@ public class CombatManager : MonoBehaviour
     private RewardService RewardService;
     private InventoryInputHandler InventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
-    private EnemyVisuals EnemyVisuals;
+    [SerializeField] private EnemyVisuals EnemyVisuals;
 
     void Start()
     {
@@ -134,6 +134,7 @@ public class CombatManager : MonoBehaviour
     public void RefreshCombatUI()
     {
         View.UpdateView(Player, Enemy);
+        Input.RefreshDiceAllocationUI();
     }
 
     private void DefineStartingTurnByInitiative()

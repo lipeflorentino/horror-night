@@ -230,6 +230,17 @@ public class ActionPanelView : MonoBehaviour
         HideConfirmPanel();
     }
 
+    public void UpdateDiceAllocationStats(int mind, int heart, int body)
+    {
+        if (diceAllocationView == null)
+            diceAllocationView = FindObjectOfType<DiceAllocationView>();
+
+        if (diceAllocationView == null)
+            return;
+
+        diceAllocationView.UpdateStatValueTexts(mind, heart, body);
+    }
+
     public void SetAddDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
         switch (stat)

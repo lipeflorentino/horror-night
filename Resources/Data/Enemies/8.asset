@@ -13,36 +13,36 @@ MonoBehaviour:
   m_Name: 8
   m_EditorClassIdentifier: 
   id: 8
-  enemyName: "Vulto da N\xE9voa"
-  description: Forma indistinta que surge entre a neblina
+  enemyName: Lobisomem
+  description: Um ser que se transforma em lobo durante a noite
   archetype: 0
-  weight: 9
-  tierMin: 1
-  tierMax: 2
-  image: {fileID: 21300000, guid: ab85e34efef7afe47b7db036f6e0617d, type: 2}
+  weight: 5
+  tierMin: 2
+  tierMax: 5
+  image: {fileID: 21300000, guid: 95d14c4b37ebe7b47a4efacfe4ef3760, type: 3}
   tags:
-    behavior: 2
-    style: 0
-    type: 3
+    behavior: 0
+    style: 1
+    type: 2
   hp:
-    min: 8
-    max: 11
+    min: 20
+    max: 30
   heart:
-    min: 8
-    max: 11
+    min: 20
+    max: 30
   body:
-    min: 3
-    max: 4
+    min: 6
+    max: 10
   mind:
-    min: 3
-    max: 6
-  attack:
     min: 4
     max: 8
-  defense:
+  attack:
     min: 5
     max: 10
+  defense:
+    min: 4
+    max: 8
   initiative:
-    min: 8
-    max: 10
-  specialRule: 
+    min: 3
+    max: 6
+  specialRule: fear

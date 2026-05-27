@@ -14,6 +14,13 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private Sprite bodyDiceIcon;
     [SerializeField] private TMP_Text diceTiersText;
     [SerializeField] private TMP_Text resultPanelText;
+    [Header("Stat Values")]
+    [SerializeField] private TMP_Text mindPowerValueText; 
+    [SerializeField] private TMP_Text mindAccuracyValueText;
+    [SerializeField] private TMP_Text heartPowerValueText; 
+    [SerializeField] private TMP_Text heartAccuracyValueText;
+    [SerializeField] private TMP_Text bodyPowerValueText; 
+    [SerializeField] private TMP_Text bodyAccuracyValueText;
 
     public void UpdateSelectionPreview(
         int actionPower,
@@ -29,6 +36,27 @@ public class DiceAllocationView : MonoBehaviour
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
         UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
         UpdateResultPanel(actionPower, aggregatedPowerFaces, powerTierBoundaries, accuracyTierBoundaries);
+    }
+
+    public void UpdateStatValueTexts(int mind, int heart, int body)
+    {
+        if (mindPowerValueText != null)
+            mindPowerValueText.text = $"Mind: {mind}";
+
+        if (mindAccuracyValueText != null)
+            mindAccuracyValueText.text = $"Mind: {mind}";
+
+        if (heartPowerValueText != null)
+            heartPowerValueText.text = $"Heart: {heart}";
+
+        if (heartAccuracyValueText != null)
+            heartAccuracyValueText.text = $"Heart: {heart}";
+
+        if (bodyPowerValueText != null)
+            bodyPowerValueText.text = $"Body: {body}";
+
+        if (bodyAccuracyValueText != null)
+            bodyAccuracyValueText.text = $"Body: {body}";
     }
 
     private void RebuildAllocationContainer(RectTransform container, IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)

@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: 4
   m_EditorClassIdentifier: 
   id: 4
-  enemyName: Rastejador da Folhagem
-  description: Criatura que se arrasta sob folhas mortas
+  enemyName: Planta Carnivora
+  description: De longe uma flor inofensiva de perto um apetite voraz
   archetype: 0
   weight: 9
   tierMin: 0
   tierMax: 2
-  image: {fileID: 21300000, guid: d078c57de67c6e3469ba0e2e8a77c1d2, type: 2}
+  image: {fileID: 21300000, guid: 01115c318cea8794c871221d0d8fb6f1, type: 3}
   tags:
     behavior: 0
-    style: 3
-    type: 4
+    style: 1
+    type: 1
   hp:
     min: 9
     max: 13
@@ -45,4 +45,4 @@ MonoBehaviour:
   initiative:
     min: 5
     max: 9
-  specialRule: 
+  specialRule: none

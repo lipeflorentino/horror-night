@@ -10,38 +10,38 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
-  m_Name: 5
+  m_Name: 16
   m_EditorClassIdentifier: 
-  id: 5
-  enemyName: Geleia
-  description: "Uma criatura gelatinosa que se move em sil\xEAncio"
-  archetype: 0
-  weight: 8
-  tierMin: 0
-  tierMax: 2
-  image: {fileID: 21300000, guid: 23e2107d5814d644bb76af2f212350f6, type: 3}
+  id: 16
+  enemyName: Golem de Pedra
+  description: Uma criatura feita de pedra animada por magia
+  archetype: 1
+  weight: 4
+  tierMin: 4
+  tierMax: 7
+  image: {fileID: 21300000, guid: a68083c8ecb9ec54d8631d332c9dfd02, type: 3}
   tags:
-    behavior: 2
-    style: 0
+    behavior: 0
+    style: 1
     type: 1
   hp:
-    min: 7
-    max: 10
+    min: 40
+    max: 50
   heart:
-    min: 7
-    max: 10
+    min: 40
+    max: 50
   body:
-    min: 2
-    max: 4
+    min: 10
+    max: 15
   mind:
-    min: 3
-    max: 5
+    min: 5
+    max: 10
   attack:
-    min: 2
-    max: 5
+    min: 9
+    max: 15
   defense:
-    min: 3
-    max: 5
+    min: 7
+    max: 12
   initiative:
     min: 2
     max: 4

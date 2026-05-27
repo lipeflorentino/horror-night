@@ -25,6 +25,13 @@ public class CombatInputHandler : MonoBehaviour
         Combat.View.UpdateView(Combat.Player, Combat.Enemy);
     }
 
+    public void RefreshDiceAllocationUI()
+    {
+        RefreshSelectionPreview();
+        RefreshDiceButtons();
+        NotifyConfirmAvailability();
+    }
+
     public void SetAllowedAction(ActionType allowedAction)
     {
         AllowedAction = allowedAction;
@@ -225,6 +232,8 @@ public class CombatInputHandler : MonoBehaviour
     {
         if (Combat == null || Combat.View == null || Combat.View.ActionPanel  == null)
             return;
+
+        Combat.View.ActionPanel.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
         List<int> powerFaces = GetDiceFacesForSelection(PowerDiceTypes, false);
         List<int> accuracyFaces = GetDiceFacesForSelection(AccuracyDiceTypes, false);
