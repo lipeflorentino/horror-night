@@ -14,6 +14,7 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private Sprite bodyDiceIcon;
     [SerializeField] private TMP_Text diceTiersText;
     [SerializeField] private TMP_Text resultPanelText;
+    
     [Header("Stat Values")]
     [SerializeField] private TMP_Text mindPowerValueText; 
     [SerializeField] private TMP_Text mindAccuracyValueText;

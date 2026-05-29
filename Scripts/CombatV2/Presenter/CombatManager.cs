@@ -46,6 +46,7 @@ public class CombatManager : MonoBehaviour
 
     void Start()
     {
+        Logger.Log("[CombatManager] Starting combat...");
         DiceService = new DiceService();
         Resolver = new ActionResolverService();
         InitiativeResolverService = new InitiativeResolverService();
@@ -65,7 +66,6 @@ public class CombatManager : MonoBehaviour
         CombatPlayerInventory = BuildCombatInventory(SessionData);
 
         InventoryInputHandler.Init(this, CombatPlayerInventory);
-        EnemyVisuals = FindObjectOfType<EnemyVisuals>();
 
         Input.Init(this);
         View.Init();
@@ -87,7 +87,7 @@ public class CombatManager : MonoBehaviour
 
         PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
         EnemyInstance enemySnapshot = sessionData.EnemyInstance;
-
+        EnemyVisuals = FindObjectOfType<EnemyVisuals>();
         EnemyVisuals.SetEnemyVisual(enemySnapshot ?? null);
 
         Player = new Battler(
