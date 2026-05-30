@@ -22,18 +22,16 @@ Exemplos para seu RPG:
     
 BACKLOG 
     - Implementar sistemas que faltam
-        - Presence, Treasure
+        - Presence, Treasure, NPC
     - Ajustar painel de infos (fechamento)
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
 
-    → adicionar uso de item em combate afetando snapshot (consumo real)
     → ou loot de inimigo integrado ao CombatResultSnapshot
     - Fazer painel de resultados (total damage, total kills, total xp, etc)
     - Fazer galeria  (monstros, itens, reliquias, etc.)
 
 
 TAREFA
-    - Implementar uso de itens do inventario
     - Implementar DiceStatEffects
     - As skills ao serem habilitadas, são inseridas nos dados.
     - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
@@ -47,11 +45,6 @@ TAREFA
     - Ter builds baseadas nas stats (mind, heart, body)
 
 TO DO 
-    - Criar os icones dos itens (de 10 em 10)
-    - Criar novos monstros 
-        - Dark Elf 
-        - Dark Wizard
-        - Leach
     - Criar NPCEncounterSystem
         - sorteio assim como enemies/loot
         - tem tipo (loja, melhoria, troca, etc)
@@ -60,7 +53,6 @@ TO DO
 
 FIXES
     - Corrigir tela de Loot 
-    - Vitoria sem recompensa?
     - Ajustar recompensa Xp (icone)
     - Não persistiu incremento na stat mind apos uso de item durante combate 
     - Restart apos morte voltou para o snapshot do ultimo combate

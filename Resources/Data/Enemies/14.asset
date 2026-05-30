@@ -28,14 +28,14 @@ MonoBehaviour:
     min: 35
     max: 50
   heart:
-    min: 18
-    max: 30
+    min: 5
+    max: 14
   body:
-    min: 6
+    min: 0
     max: 10
   mind:
-    min: 10
-    max: 16
+    min: 6
+    max: 14
   attack:
     min: 12
     max: 18

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -129,6 +130,9 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
             Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
         }
+
+        Dictionary<ItemSO, int> Loot = RewardService.GetRandomLoot(Enemy.Level);
+        Logger.Log("[CombatManager] Enemy Loot: " + string.Join(", ", Loot.Select(kvp => $"{kvp.Key.itemName}: {kvp.Value}")));
     }
 
     public void RefreshCombatUI()

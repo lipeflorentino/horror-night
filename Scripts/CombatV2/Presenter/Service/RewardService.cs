@@ -13,7 +13,7 @@ public class RewardService
         if (allItems == null || allItems.Length == 0)
             return loot;
 
-        ItemSO goldCoins = allItems.FirstOrDefault(item => item != null && string.Equals(item.itemName, "Gold Coins", StringComparison.OrdinalIgnoreCase));
+        ItemSO goldCoins = allItems.FirstOrDefault(item => item != null && string.Equals(item.itemName, "Moedas de Ouro", StringComparison.OrdinalIgnoreCase));
         if (goldCoins != null)
             loot[goldCoins] = Mathf.Max(1, GrantGoldCoinsReward(enemyLevel));
 
@@ -99,7 +99,7 @@ public class RewardService
                 return candidateItems[i];
         }
 
-        return candidateItems[candidateItems.Count - 1];
+        return candidateItems[^1];
     }
 
     private int RollQuantityByRarity(Rarity rarity, int enemyLevel)

@@ -42,7 +42,7 @@ public struct StatRange
     public int min;
     public int max;
 
-    public int Roll(float modifier = 1f)
+    public readonly int Roll(float modifier = 1f)
     {
         int clampedMin = Mathf.Max(0, min);
         int clampedMax = Mathf.Max(clampedMin, max);
