@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "Uma entidade fantasmag\xF3rica que assombra as florestas"
   archetype: 0
   weight: 6
-  tierMin: 0
-  tierMax: 3
+  tierMin: 1
+  tierMax: 4
   image: {fileID: 21300000, guid: bf9c5a47d2469884ebbe79817b0c873e, type: 3}
   tags:
     behavior: 2
     style: 0
-    type: 1
+    type: 0
   hp:
-    min: 10
-    max: 15
+    min: 14
+    max: 22
   heart:
     min: 10
     max: 15
@@ -37,12 +37,12 @@ MonoBehaviour:
     min: 2
     max: 4
   attack:
-    min: 4
-    max: 7
+    min: 5
+    max: 9
   defense:
     min: 3
     max: 5
   initiative:
-    min: 4
-    max: 8
+    min: 7
+    max: 11
   specialRule: fear

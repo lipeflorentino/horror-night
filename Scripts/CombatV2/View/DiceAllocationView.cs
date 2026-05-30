@@ -42,22 +42,22 @@ public class DiceAllocationView : MonoBehaviour
     public void UpdateStatValueTexts(int mind, int heart, int body)
     {
         if (mindPowerValueText != null)
-            mindPowerValueText.text = $"Mind: {mind}";
+            mindPowerValueText.text = $"{mind}";
 
         if (mindAccuracyValueText != null)
-            mindAccuracyValueText.text = $"Mind: {mind}";
+            mindAccuracyValueText.text = $"{mind}";
 
         if (heartPowerValueText != null)
-            heartPowerValueText.text = $"Heart: {heart}";
+            heartPowerValueText.text = $"{heart}";
 
         if (heartAccuracyValueText != null)
-            heartAccuracyValueText.text = $"Heart: {heart}";
+            heartAccuracyValueText.text = $"{heart}";
 
         if (bodyPowerValueText != null)
-            bodyPowerValueText.text = $"Body: {body}";
+            bodyPowerValueText.text = $"{body}";
 
         if (bodyAccuracyValueText != null)
-            bodyAccuracyValueText.text = $"Body: {body}";
+            bodyAccuracyValueText.text = $"{body}";
     }
 
     private void RebuildAllocationContainer(RectTransform container, IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)

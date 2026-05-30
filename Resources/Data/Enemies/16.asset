@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Uma criatura feita de pedra animada por magia
   archetype: 1
   weight: 4
-  tierMin: 4
-  tierMax: 7
+  tierMin: 8
+  tierMax: 12
   image: {fileID: 21300000, guid: a68083c8ecb9ec54d8631d332c9dfd02, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 0
   hp:
-    min: 40
-    max: 50
+    min: 70
+    max: 100
   heart:
-    min: 40
-    max: 50
+    min: 45
+    max: 60
   body:
-    min: 10
-    max: 15
+    min: 16
+    max: 22
   mind:
-    min: 5
-    max: 10
+    min: 1
+    max: 3
   attack:
-    min: 9
-    max: 15
+    min: 12
+    max: 18
   defense:
-    min: 7
-    max: 12
+    min: 18
+    max: 26
   initiative:
-    min: 2
-    max: 4
+    min: 1
+    max: 3
   specialRule: none

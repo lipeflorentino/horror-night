@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum EnemyBehaviorTag { Aggressive, Defensive, Cautious, Erratic, Relentless }
 public enum EnemyStyleTag { Stealthy, Brutal, Ritualistic, Primal, Mental }
-public enum EnemyTypeTag { Aberration, Creature, Humanoid, Entity, Beast, Spirit, Flying }
+public enum EnemyTypeTag { Creature, Flying, Hybrid, Inanimate }
 public enum EnemyArchetype { Normal, Special, Boss }
 
 [Serializable]

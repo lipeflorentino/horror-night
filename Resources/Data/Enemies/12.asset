@@ -17,16 +17,16 @@ MonoBehaviour:
   description: Restos animados de um ser humano
   archetype: 0
   weight: 7
-  tierMin: 0
-  tierMax: 2
+  tierMin: 1
+  tierMax: 4
   image: {fileID: 21300000, guid: 2016e5b51cdaf1d4480292dedfcaf75c, type: 3}
   tags:
     behavior: 3
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 8
-    max: 12
+    min: 10
+    max: 16
   heart:
     min: 8
     max: 12

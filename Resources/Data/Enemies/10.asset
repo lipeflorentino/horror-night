@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "Uma aranha enorme que tece suas teias entre as \xE1rvores"
   archetype: 0
   weight: 8
-  tierMin: 0
-  tierMax: 3
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: b85624feedc38bf43b89261bd86a9ba9, type: 3}
   tags:
     behavior: 2
     style: 0
-    type: 1
+    type: 0
   hp:
-    min: 10
-    max: 15
+    min: 20
+    max: 30
   heart:
     min: 10
     max: 15
@@ -37,12 +37,12 @@ MonoBehaviour:
     min: 2
     max: 4
   attack:
+    min: 7
+    max: 11
+  defense:
     min: 4
     max: 7
-  defense:
-    min: 3
-    max: 5
   initiative:
-    min: 4
-    max: 8
+    min: 8
+    max: 12
   specialRule: none

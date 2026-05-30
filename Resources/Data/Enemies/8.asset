@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Um ser que se transforma em lobo durante a noite
   archetype: 0
   weight: 5
-  tierMin: 2
-  tierMax: 5
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: 95d14c4b37ebe7b47a4efacfe4ef3760, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 20
-    max: 30
+    min: 40
+    max: 55
   heart:
-    min: 20
-    max: 30
+    min: 22
+    max: 34
   body:
-    min: 6
-    max: 10
+    min: 10
+    max: 16
   mind:
-    min: 4
-    max: 8
-  attack:
-    min: 5
-    max: 10
-  defense:
-    min: 4
-    max: 8
-  initiative:
     min: 3
     max: 6
+  attack:
+    min: 16
+    max: 24
+  defense:
+    min: 5
+    max: 9
+  initiative:
+    min: 10
+    max: 14
   specialRule: fear

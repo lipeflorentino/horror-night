@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "Pequena aberra\xE7\xE3o que parece um ba\xFA de tesouro"
   archetype: 0
   weight: 10
-  tierMin: 0
-  tierMax: 1
+  tierMin: 1
+  tierMax: 3
   image: {fileID: 21300000, guid: f5fbc06745d904f438cc626625b09e2d, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 3
   hp:
-    min: 6
-    max: 9
+    min: 10
+    max: 15
   heart:
     min: 6
     max: 9
@@ -37,11 +37,11 @@ MonoBehaviour:
     min: 1
     max: 3
   attack:
-    min: 3
-    max: 8
+    min: 5
+    max: 10
   defense:
-    min: 4
-    max: 9
+    min: 5
+    max: 10
   initiative:
     min: 6
     max: 12

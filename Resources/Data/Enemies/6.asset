@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "Alma condenada que vaga entre as \xE1rvores"
   archetype: 0
   weight: 7
-  tierMin: 0
-  tierMax: 2
+  tierMin: 1
+  tierMax: 3
   image: {fileID: 21300000, guid: 3a91d9230f555eb4b880756e2909f021, type: 3}
   tags:
     behavior: 3
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 10
-    max: 14
+    min: 14
+    max: 22
   heart:
     min: 10
     max: 14
@@ -38,10 +38,10 @@ MonoBehaviour:
     max: 4
   attack:
     min: 4
-    max: 6
-  defense:
-    min: 4
     max: 7
+  defense:
+    min: 5
+    max: 8
   initiative:
     min: 4
     max: 8

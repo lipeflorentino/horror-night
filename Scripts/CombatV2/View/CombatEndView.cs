@@ -53,7 +53,6 @@ public class CombatEndView : MonoBehaviour
         ShowRoot();
         SetText("Vitória!", $"Recompensas:\n +{xpReward} XP", string.Empty);
         SetupButton(primaryButton, "Continue", onProceed, true);
-        SetupButton(primaryButton, "Continue", onProceed, true);
         SetupButton(secondaryButton, string.Empty, null, false);
         
         if (rewardView != null)

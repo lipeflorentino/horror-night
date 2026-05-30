@@ -334,7 +334,6 @@ public class CombatManager : MonoBehaviour
             lastGrantedXp = RewardService.GrantXpRewardIfEligible(Enemy.Level, Player.Level);
             if (SessionData?.EnemyInstance?.source != null)
             {
-                int grantedGoldCoins = RewardService.GrantGoldCoinsReward(Enemy.Level);
                 lastGrantedItens = RewardService.GetRandomLoot(Enemy.Level);
             }
             else

@@ -112,18 +112,14 @@ public class LevelSO : ScriptableObject
 
     public float GetEffectiveActivityWeight(NodeActivityType activityType)
     {
-        switch (activityType)
+        return activityType switch
         {
-            case NodeActivityType.Loot:
-                return Mathf.Max(0f, Loot_Weight + Loot_Weight_Modifier);
-            case NodeActivityType.Occurrence:
-                return Mathf.Max(0f, Event_Weight + Event_Weight_Modifier);
-            case NodeActivityType.Encounter:
-                return Mathf.Max(0f, Encounter_Weight + Encounter_Weight_Modifier);
-            case NodeActivityType.Treasure:
-                return Mathf.Max(0f, Treasure_Weight + Treasure_Weight_Modifier);
-            default:
-                return Mathf.Max(0f, None_Weight + None_Weight_Modifier);
-        }
+            NodeActivityType.Loot => Mathf.Max(0f, Loot_Weight + Loot_Weight_Modifier),
+            NodeActivityType.Occurrence => Mathf.Max(0f, Event_Weight + Event_Weight_Modifier),
+            NodeActivityType.Encounter => Mathf.Max(0f, Encounter_Weight + Encounter_Weight_Modifier),
+            NodeActivityType.Treasure => Mathf.Max(0f, Treasure_Weight + Treasure_Weight_Modifier),
+            _ => Mathf.Max(0f, None_Weight + None_Weight_Modifier),
+        };
+
     }
 }

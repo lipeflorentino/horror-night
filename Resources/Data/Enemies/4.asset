@@ -17,16 +17,16 @@ MonoBehaviour:
   description: De longe uma flor inofensiva de perto um apetite voraz
   archetype: 0
   weight: 9
-  tierMin: 0
-  tierMax: 2
+  tierMin: 1
+  tierMax: 3
   image: {fileID: 21300000, guid: 01115c318cea8794c871221d0d8fb6f1, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 3
   hp:
-    min: 9
-    max: 13
+    min: 12
+    max: 18
   heart:
     min: 9
     max: 13
@@ -37,11 +37,11 @@ MonoBehaviour:
     min: 2
     max: 3
   attack:
-    min: 3
-    max: 6
+    min: 4
+    max: 8
   defense:
     min: 5
-    max: 8
+    max: 9
   initiative:
     min: 5
     max: 9

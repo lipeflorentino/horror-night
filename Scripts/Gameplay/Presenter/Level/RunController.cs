@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class RunController : MonoBehaviour
 {
+    private static WaitForSeconds _waitForSeconds0_5 = new(0.5f);
+
     [Header("Level Flow")]
     [SerializeField] private LevelSO startingLevel;
 
@@ -12,7 +14,7 @@ public class RunController : MonoBehaviour
     [SerializeField] private PlayerGridMovement playerMovement;
     [SerializeField] private Fade fadeEffect;
 
-    private LevelSO currentLevel;
+    public LevelSO currentLevel;
     private bool waitingForLevelUpInput;
 
     private void Awake()
@@ -148,7 +150,7 @@ public class RunController : MonoBehaviour
             Vector3 areaStartPosition = levelController.GetWorldPositionFromIndex(levelController.CurrentIndex);
             playerMovement.transform.position = areaStartPosition;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return _waitForSeconds0_5;
             yield return StartCoroutine(fadeEffect.FadeIn());
 
             playerMovement.enabled = true;

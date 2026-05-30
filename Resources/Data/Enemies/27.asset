@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Uma criatura selvagem e agressiva que habita as florestas
   archetype: 2
   weight: 5
-  tierMin: 2
-  tierMax: 5
+  tierMin: 12
+  tierMax: 16
   image: {fileID: 21300000, guid: de42411c901e9e448ab5d25e1dafa3bb, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 10
-    max: 15
+    min: 80
+    max: 120
   heart:
-    min: 10
-    max: 15
+    min: 40
+    max: 60
   body:
-    min: 4
-    max: 7
+    min: 12
+    max: 18
   mind:
-    min: 3
-    max: 5
+    min: 6
+    max: 10
   attack:
-    min: 5
-    max: 8
+    min: 18
+    max: 28
   defense:
-    min: 4
-    max: 7
+    min: 12
+    max: 18
   initiative:
-    min: 3
-    max: 6
+    min: 6
+    max: 10
   specialRule: fear

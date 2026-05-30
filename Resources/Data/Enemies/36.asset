@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
+  m_Name: 36
+  m_EditorClassIdentifier: 
+  id: 36
+  enemyName: Espantalho
+  description: Uma figura de espantalho animada por magia negra
+  archetype: 0
+  weight: 6
+  tierMin: 1
+  tierMax: 4
+  image: {fileID: 21300000, guid: 94c25dd3eecc2774d8e23c0911aa516f, type: 3}
+  tags:
+    behavior: 0
+    style: 1
+    type: 3
+  hp:
+    min: 12
+    max: 18
+  heart:
+    min: 8
+    max: 12
+  body:
+    min: 3
+    max: 5
+  mind:
+    min: 2
+    max: 4
+  attack:
+    min: 5
+    max: 8
+  defense:
+    min: 3
+    max: 5
+  initiative:
+    min: 4
+    max: 8
+  specialRule: fear

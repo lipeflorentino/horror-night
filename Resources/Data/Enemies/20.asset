@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
+  m_Name: 20
+  m_EditorClassIdentifier: 
+  id: 20
+  enemyName: Necromante
+  description: "Um mago que manipula os mortos para seus pr\xF3prios fins"
+  archetype: 1
+  weight: 5
+  tierMin: 10
+  tierMax: 14
+  image: {fileID: 21300000, guid: 01c2ffa3c87d7054692b830aba9a4986, type: 3}
+  tags:
+    behavior: 2
+    style: 0
+    type: 0
+  hp:
+    min: 30
+    max: 45
+  heart:
+    min: 10
+    max: 16
+  body:
+    min: 2
+    max: 4
+  mind:
+    min: 20
+    max: 30
+  attack:
+    min: 10
+    max: 15
+  defense:
+    min: 5
+    max: 8
+  initiative:
+    min: 8
+    max: 12
+  specialRule: fear

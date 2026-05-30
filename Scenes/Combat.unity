@@ -15901,7 +15901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1620778758
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26235,6 +26235,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
+  targetWidth: 3
+  targetHeight: 4
+  breathingSpeed: 1
+  breathingAmount: 0.02
+  floatSpeed: 1.5
+  floatAmount: 0.03
+  rotationSpeed: 1
+  rotationAmount: 1
 --- !u!4 &3905056813657250075
 Transform:
   m_ObjectHideFlags: 0
@@ -28242,7 +28250,7 @@ SpriteRenderer:
   m_SortingLayerID: -860475089
   m_SortingLayer: 7
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3a91d9230f555eb4b880756e2909f021, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b8f419bc9b4faf043b09b465864992d4, type: 3}
   m_Color: {r: 0.5943396, g: 0.5943396, b: 0.5943396, a: 1}
   m_FlipX: 1
   m_FlipY: 0

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
+  m_Name: 31
+  m_EditorClassIdentifier: 
+  id: 31
+  enemyName: Esqueleto Mago
+  description: Restos animados de um ser humano usando armadura e magias
+  archetype: 1
+  weight: 7
+  tierMin: 4
+  tierMax: 8
+  image: {fileID: 21300000, guid: c604055ba6298ba4383587087acba65c, type: 3}
+  tags:
+    behavior: 3
+    style: 1
+    type: 0
+  hp:
+    min: 22
+    max: 32
+  heart:
+    min: 12
+    max: 18
+  body:
+    min: 4
+    max: 7
+  mind:
+    min: 14
+    max: 22
+  attack:
+    min: 8
+    max: 12
+  defense:
+    min: 4
+    max: 7
+  initiative:
+    min: 4
+    max: 8
+  specialRule: fear

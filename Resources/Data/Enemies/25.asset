@@ -23,10 +23,10 @@ MonoBehaviour:
   tags:
     behavior: 2
     style: 0
-    type: 2
+    type: 0
   hp:
     min: 8
-    max: 12
+    max: 14
   heart:
     min: 8
     max: 12
@@ -43,6 +43,6 @@ MonoBehaviour:
     min: 3
     max: 5
   initiative:
-    min: 4
-    max: 8
+    min: 7
+    max: 11
   specialRule: none

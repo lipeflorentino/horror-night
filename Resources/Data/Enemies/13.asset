@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Uma bruxa que habita as profundezas da floresta
   archetype: 0
   weight: 6
-  tierMin: 2
-  tierMax: 5
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: f16ce75a477fe904f90f0c78e07da16c, type: 3}
   tags:
     behavior: 2
     style: 0
-    type: 2
+    type: 0
   hp:
-    min: 12
-    max: 18
+    min: 20
+    max: 30
   heart:
-    min: 12
+    min: 10
     max: 18
   body:
-    min: 4
-    max: 7
-  mind:
     min: 3
     max: 5
+  mind:
+    min: 14
+    max: 22
   attack:
-    min: 5
-    max: 8
+    min: 8
+    max: 12
   defense:
     min: 3
-    max: 6
+    max: 5
   initiative:
-    min: 4
-    max: 8
+    min: 8
+    max: 12
   specialRule: none

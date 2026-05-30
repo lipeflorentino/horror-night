@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Um ser noturno que se alimenta de sangue
   archetype: 0
   weight: 5
-  tierMin: 3
-  tierMax: 6
+  tierMin: 6
+  tierMax: 10
   image: {fileID: 21300000, guid: b8f419bc9b4faf043b09b465864992d4, type: 3}
   tags:
     behavior: 0
     style: 0
-    type: 2
+    type: 1
   hp:
-    min: 15
-    max: 25
+    min: 35
+    max: 50
   heart:
-    min: 15
-    max: 25
+    min: 18
+    max: 30
   body:
-    min: 5
-    max: 10
-  mind:
-    min: 4
-    max: 7
-  attack:
     min: 6
     max: 10
+  mind:
+    min: 10
+    max: 16
+  attack:
+    min: 12
+    max: 18
   defense:
-    min: 4
-    max: 8
+    min: 7
+    max: 11
   initiative:
-    min: 3
-    max: 6
+    min: 10
+    max: 15
   specialRule: fear

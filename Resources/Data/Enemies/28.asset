@@ -18,32 +18,32 @@ MonoBehaviour:
     invasores"
   archetype: 2
   weight: 5
-  tierMin: 3
-  tierMax: 6
+  tierMin: 12
+  tierMax: 16
   image: {fileID: 21300000, guid: 1eb682267abd1e6408582d112aa73565, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 3
   hp:
-    min: 15
-    max: 25
+    min: 100
+    max: 140
   heart:
-    min: 15
-    max: 25
+    min: 50
+    max: 70
   body:
-    min: 5
-    max: 10
+    min: 15
+    max: 22
   mind:
-    min: 4
-    max: 7
-  attack:
-    min: 6
-    max: 10
-  defense:
-    min: 4
+    min: 5
     max: 8
+  attack:
+    min: 16
+    max: 24
+  defense:
+    min: 16
+    max: 24
   initiative:
-    min: 3
-    max: 6
+    min: 2
+    max: 4
   specialRule: fear

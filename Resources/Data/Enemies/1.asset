@@ -17,32 +17,32 @@ MonoBehaviour:
   description: "Uma presen\xE7a que se move nas sombras"
   archetype: 0
   weight: 10
-  tierMin: 0
-  tierMax: 2
+  tierMin: 2
+  tierMax: 5
   image: {fileID: 21300000, guid: 8e138ab780679da4bbbc45db721abe49, type: 3}
   tags:
     behavior: 0
     style: 0
     type: 1
   hp:
-    min: 8
-    max: 12
+    min: 12
+    max: 18
   heart:
-    min: 8
-    max: 12
+    min: 10
+    max: 16
   body:
-    min: 3
-    max: 5
-  mind:
     min: 2
     max: 4
+  mind:
+    min: 6
+    max: 10
   attack:
-    min: 4
-    max: 4
+    min: 5
+    max: 8
   defense:
-    min: 3
-    max: 3
+    min: 2
+    max: 4
   initiative:
-    min: 3
-    max: 6
+    min: 7
+    max: 11
   specialRule: none

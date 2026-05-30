@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
+  m_Name: 37
+  m_EditorClassIdentifier: 
+  id: 37
+  enemyName: Ceifador
+  description: Uma entidade sombria que ceifa as almas dos vivos
+  archetype: 1
+  weight: 5
+  tierMin: 8
+  tierMax: 12
+  image: {fileID: 21300000, guid: b27bb63e961630348a550624bcf69cd4, type: 3}
+  tags:
+    behavior: 0
+    style: 0
+    type: 0
+  hp:
+    min: 45
+    max: 65
+  heart:
+    min: 20
+    max: 35
+  body:
+    min: 6
+    max: 10
+  mind:
+    min: 12
+    max: 18
+  attack:
+    min: 15
+    max: 22
+  defense:
+    min: 8
+    max: 12
+  initiative:
+    min: 10
+    max: 14
+  specialRule: fear

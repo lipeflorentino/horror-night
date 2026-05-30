@@ -14,7 +14,7 @@ public class EnemyRunContext
 
     public HashSet<string> BuildTagSet()
     {
-        HashSet<string> tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> tags = new(StringComparer.OrdinalIgnoreCase);
 
         if (string.IsNullOrWhiteSpace(levelTags))
             return tags;

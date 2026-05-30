@@ -17,32 +17,32 @@ MonoBehaviour:
   description: Uma criatura enorme e poderosa que habita as florestas
   archetype: 0
   weight: 5
-  tierMin: 2
-  tierMax: 5
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: e558acda17059bb41af8ec963bcd925e, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 0
   hp:
-    min: 20
-    max: 30
+    min: 45
+    max: 65
   heart:
-    min: 20
-    max: 30
+    min: 25
+    max: 40
   body:
-    min: 8
-    max: 12
+    min: 12
+    max: 18
   mind:
-    min: 5
-    max: 10
+    min: 2
+    max: 4
   attack:
-    min: 6
-    max: 10
+    min: 10
+    max: 15
   defense:
-    min: 4
-    max: 8
+    min: 8
+    max: 14
   initiative:
-    min: 3
-    max: 6
+    min: 2
+    max: 4
   specialRule: none

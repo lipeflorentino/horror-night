@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c27824f22da4e04b27b405e85bae54d, type: 3}
+  m_Name: 35
+  m_EditorClassIdentifier: 
+  id: 35
+  enemyName: Lagarto Arqueiro
+  description: Um lagarto enorme e agressivo que habita as florestas
+  archetype: 0
+  weight: 5
+  tierMin: 4
+  tierMax: 8
+  image: {fileID: 21300000, guid: 2ed1410bd9dbb4d4584d428ce8b48667, type: 3}
+  tags:
+    behavior: 0
+    style: 1
+    type: 0
+  hp:
+    min: 22
+    max: 34
+  heart:
+    min: 10
+    max: 15
+  body:
+    min: 3
+    max: 6
+  mind:
+    min: 2
+    max: 4
+  attack:
+    min: 8
+    max: 12
+  defense:
+    min: 3
+    max: 5
+  initiative:
+    min: 7
+    max: 11
+  specialRule: fear

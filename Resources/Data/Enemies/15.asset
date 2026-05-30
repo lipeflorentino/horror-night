@@ -17,32 +17,32 @@ MonoBehaviour:
   description: "Um ser h\xEDbrido entre humano e touro"
   archetype: 1
   weight: 5
-  tierMin: 3
-  tierMax: 6
+  tierMin: 6
+  tierMax: 10
   image: {fileID: 21300000, guid: b3748daee10bd464ab65ee36d9aefc3e, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 20
-    max: 30
+    min: 50
+    max: 70
   heart:
-    min: 20
-    max: 30
+    min: 30
+    max: 45
   body:
-    min: 6
-    max: 10
+    min: 10
+    max: 16
   mind:
+    min: 3
+    max: 5
+  attack:
+    min: 14
+    max: 20
+  defense:
+    min: 8
+    max: 12
+  initiative:
     min: 4
     max: 7
-  attack:
-    min: 5
-    max: 10
-  defense:
-    min: 4
-    max: 8
-  initiative:
-    min: 3
-    max: 6
   specialRule: none

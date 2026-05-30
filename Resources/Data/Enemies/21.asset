@@ -17,16 +17,16 @@ MonoBehaviour:
   description: Restos animados de um ser humano usando armadura
   archetype: 0
   weight: 7
-  tierMin: 0
-  tierMax: 2
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: fe16b39ea904daf46b31c9fc60b89130, type: 3}
   tags:
     behavior: 3
     style: 1
-    type: 2
+    type: 0
   hp:
-    min: 10
-    max: 15
+    min: 25
+    max: 35
   heart:
     min: 10
     max: 15
@@ -40,8 +40,8 @@ MonoBehaviour:
     min: 4
     max: 6
   defense:
-    min: 3
-    max: 5
+    min: 7
+    max: 11
   initiative:
     min: 4
     max: 8

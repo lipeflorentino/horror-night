@@ -17,16 +17,16 @@ MonoBehaviour:
   description: "Uma criatura grotesca que habita os p\xE2ntanos"
   archetype: 0
   weight: 5
-  tierMin: 3
-  tierMax: 6
+  tierMin: 4
+  tierMax: 8
   image: {fileID: 21300000, guid: 6305354cb83b5ae4587278ea9643e2b4, type: 3}
   tags:
     behavior: 0
     style: 1
-    type: 1
+    type: 2
   hp:
-    min: 15
-    max: 25
+    min: 30
+    max: 45
   heart:
     min: 15
     max: 25
@@ -37,11 +37,11 @@ MonoBehaviour:
     min: 4
     max: 7
   attack:
+    min: 8
+    max: 14
+  defense:
     min: 6
     max: 10
-  defense:
-    min: 4
-    max: 8
   initiative:
     min: 3
     max: 6
