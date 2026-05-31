@@ -34,8 +34,8 @@ public class CombatInfoPanelView : MonoBehaviour
         if (battler == null)
             return "-";
 
-        return $"{battler.Name}\nATK: {battler.Attack}\n DEF: {battler.Defense}\nMIND: {battler.Mind}\n HEART: {battler.Heart}\n" + 
-            $"BODY: {battler.Body}\n INIT: {battler.Initiative}\nLVL: {battler.Level} \nHP: {battler.HP}/{battler.MaxHp}\n" + 
+        return $"{battler.Name}\nATK: {battler.Attack}\n DEF: {battler.Defense}\nMIND: {battler.Mind}\n HEART: {battler.Heart}\n" +
+            $"BODY: {battler.Body}\n INIT: {battler.Initiative}\nFOCUS: {battler.Focus}\nSTR: {battler.Strength}\nAGI: {battler.Agility}\nLVL: {battler.Level} \nHP: {battler.HP}/{battler.MaxHp}\n" +
             $"Power Dices: {battler.CurrentPowerDices}/{battler.MaxPowerDices}\nAccuracy Dices: {battler.CurrentAccuracyDices}/{battler.MaxAccuracyDices}";
     }
 }

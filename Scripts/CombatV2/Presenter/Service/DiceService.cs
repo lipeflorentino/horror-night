@@ -4,31 +4,35 @@ using UnityEngine;
 
 public class DiceService
 {
+    private const float CombatStatThresholdShift = 0.05f;
     private readonly System.Random random = new();
 
     private readonly struct DiceRollSpec
     {
+        public readonly int MinValue;
         public readonly int MaxValue;
         public readonly DiceStatType StatType;
         public readonly DiceRollType RollType;
 
-        public DiceRollSpec(int maxValue, DiceStatType statType, DiceRollType rollType)
+        public DiceRollSpec(int minValue, int maxValue, DiceStatType statType, DiceRollType rollType)
         {
+            MinValue = minValue;
             MaxValue = maxValue;
             StatType = statType;
             RollType = rollType;
         }
     }
 
-    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
+    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int minValue = 1, int focus = 0, int strength = 0)
     {
         int safeMaxValue = Math.Max(1, maxValue);
-        int value = random.Next(1, safeMaxValue + 1);
-        DiceTier tier = GetTier(value, safeMaxValue, attackerLevel, defenderLevel);
+        int safeMinValue = Mathf.Clamp(minValue, 1, safeMaxValue);
+        int value = random.Next(safeMinValue, safeMaxValue + 1);
+        DiceTier tier = GetTier(value, safeMaxValue, attackerLevel, defenderLevel, rollType, focus, strength);
 
-        Logger.Log($"[Dice] Rolled {rollType} {statType} d{safeMaxValue}: {value} -> {tier}");
+        Logger.Log($"[Dice] Rolled {rollType} {statType} d{safeMaxValue} ({safeMinValue}-{safeMaxValue}): {value} -> {tier}");
 
-        return new DiceResult(value, tier, safeMaxValue, statType, rollType);
+        return new DiceResult(value, tier, safeMaxValue, statType, rollType, safeMinValue);
     }
 
     public DiceResult GetBestResult(List<DiceResult> rolls)
@@ -69,18 +73,20 @@ public class DiceService
     {
         List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, diceTypes, rollType);
         if (diceSpecs.Count == 0)
-            return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel, DiceStatType.Body, rollType) };
+            return new List<DiceResult> { Roll(1, attackerLevel, defenderLevel, DiceStatType.Body, rollType, 1, battler?.Focus ?? 0, battler?.Strength ?? 0) };
 
         ConsumeDicePool(battler, rollType, diceSpecs.Count);
 
+        int focus = battler?.Focus ?? 0;
+        int strength = battler?.Strength ?? 0;
         List<DiceResult> rawResults = new(diceSpecs.Count);
         for (int i = 0; i < diceSpecs.Count; i++)
         {
             DiceRollSpec spec = diceSpecs[i];
-            rawResults.Add(Roll(spec.MaxValue, attackerLevel, defenderLevel, spec.StatType, spec.RollType));
+            rawResults.Add(Roll(spec.MaxValue, attackerLevel, defenderLevel, spec.StatType, spec.RollType, spec.MinValue, focus, strength));
         }
 
-        return AggregateDuplicateStatResults(rawResults, attackerLevel, defenderLevel);
+        return AggregateDuplicateStatResults(rawResults, attackerLevel, defenderLevel, focus, strength);
     }
 
     private void ConsumeDicePool(Battler battler, DiceRollType rollType, int spentDiceCount)
@@ -94,7 +100,7 @@ public class DiceService
             battler.CurrentAccuracyDices = Mathf.Max(0, battler.CurrentAccuracyDices - spentDiceCount);
     }
 
-    private List<DiceResult> AggregateDuplicateStatResults(List<DiceResult> rawResults, int attackerLevel, int defenderLevel)
+    private List<DiceResult> AggregateDuplicateStatResults(List<DiceResult> rawResults, int attackerLevel, int defenderLevel, int focus, int strength)
     {
         Dictionary<DiceStatType, DiceResult> aggregatedByStat = new();
         List<DiceResult> orderedResults = new();
@@ -104,15 +110,16 @@ public class DiceService
             DiceResult roll = rawResults[i];
             if (!aggregatedByStat.TryGetValue(roll.StatType, out DiceResult aggregate))
             {
-                DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType);
+                DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType, roll.MinValue);
                 aggregatedByStat[roll.StatType] = firstResult;
                 orderedResults.Add(firstResult);
                 continue;
             }
 
             aggregate.Value += roll.Value;
+            aggregate.MinValue += roll.MinValue;
             aggregate.MaxValue += roll.MaxValue;
-            aggregate.Tier = GetTier(aggregate.Value, aggregate.MaxValue, attackerLevel, defenderLevel);
+            aggregate.Tier = GetTier(aggregate.Value, aggregate.MaxValue, attackerLevel, defenderLevel, aggregate.RollType, focus, strength);
         }
         
         return orderedResults;
@@ -160,6 +167,7 @@ public class DiceService
             diceCountByType[type] = diceCountByType.TryGetValue(type, out int count) ? count + 1 : 1;
         }
 
+        int agility = Mathf.Max(0, battler?.Agility ?? 0);
         foreach (KeyValuePair<DiceStatType, int> pair in diceCountByType)
         {
             int totalValue = GetDiceMaxValueForType(battler, pair.Key);
@@ -170,12 +178,14 @@ public class DiceService
             int baseFace = Mathf.Max(1, totalValue / diceCount);
             int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
 
-            if (!battler.IsPlayer) Logger.Log($"[DiceService] Building dice for {pair.Key}: totalValue={totalValue}, diceCount={diceCount}, baseFace={baseFace}, remainder={remainder}");
+            if (battler != null && !battler.IsPlayer) Logger.Log($"[DiceService] Building dice for {pair.Key}: totalValue={totalValue}, diceCount={diceCount}, baseFace={baseFace}, remainder={remainder}");
 
             for (int i = 0; i < diceCount; i++)
             {
                 int bonus = i < remainder ? 1 : 0;
-                diceSpecs.Add(new DiceRollSpec(baseFace + bonus, pair.Key, rollType));
+                int maxFace = baseFace + bonus;
+                int minFace = Mathf.Clamp(1 + agility, 1, maxFace);
+                diceSpecs.Add(new DiceRollSpec(minFace, maxFace, pair.Key, rollType));
                 LogDiceStatBonus(pair.Key);
             }
         }
@@ -208,41 +218,40 @@ public class DiceService
         };
     }
 
-    private DiceTier GetTier(int value, int maxValue, int attackerLevel, int defenderLevel)
+    private DiceTier GetTier(int value, int maxValue, int attackerLevel, int defenderLevel, DiceRollType rollType, int focus, int strength)
     {
         if (maxValue <= 1)
             return DiceTier.Low;
 
         float normalized = (float)value / maxValue;
-        GetThresholds(attackerLevel, defenderLevel, maxValue, out float lowThreshold, out float highThreshold);
+        GetThresholds(attackerLevel, defenderLevel, maxValue, rollType, focus, strength, out float lowThreshold, out float highThreshold);
 
         if (normalized <= lowThreshold) return DiceTier.Low;
         if (normalized <= highThreshold) return DiceTier.Medium;
         return DiceTier.High;
     }
 
-    private void GetThresholds(int attackerLevel, int defenderLevel, int maxValue, out float lowThreshold, out float highThreshold)
+    private void GetThresholds(int attackerLevel, int defenderLevel, int maxValue, DiceRollType rollType, int focus, int strength, out float lowThreshold, out float highThreshold)
     {
         int safeMaxValue = Mathf.Max(1, maxValue);
         int delta = attackerLevel - defenderLevel;
 
-        // Baseline: medium é mais provável, extremos menos prováveis.
-        const float baseLowThreshold = 0.22f;
-        const float baseHighThreshold = 0.78f;
+        const float baseLowThreshold = 0.25f;
+        const float baseHighThreshold = 0.75f;
 
-        // Dados pequenos são mais "saltados", então reduzimos a influência do delta.
-        float granularity = Mathf.Clamp01((safeMaxValue - 1f) / 11f); // ~d12 já tem boa resolução.
+        float granularity = Mathf.Clamp01((safeMaxValue - 1f) / 11f);
         float deltaScale = Mathf.Lerp(7f, 4f, granularity);
         float normalizedDelta = Mathf.Clamp(delta / deltaScale, -1f, 1f);
 
-        // Delta positivo favorece High (high começa antes) e reduz Low.
         float maxShift = Mathf.Lerp(0.10f, 0.18f, granularity);
-        float shift = normalizedDelta * maxShift;
+        float levelShift = normalizedDelta * maxShift;
+        int combatStat = rollType == DiceRollType.Accuracy ? focus : strength;
+        float combatStatShift = Mathf.Max(0, combatStat) * CombatStatThresholdShift;
+        float shift = levelShift + combatStatShift;
 
         lowThreshold = baseLowThreshold - shift;
         highThreshold = baseHighThreshold - shift;
 
-        // Mantém o médio relevante na maior parte dos cenários.
         lowThreshold = Mathf.Clamp(lowThreshold, 0.05f, 0.45f);
         highThreshold = Mathf.Clamp(highThreshold, 0.55f, 0.95f);
 
@@ -250,21 +259,10 @@ public class DiceService
             highThreshold = Mathf.Min(0.95f, lowThreshold + 0.2f);
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
+    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int focus = 0, int strength = 0)
     {
         int safeMaxValue = Math.Max(1, maxValue);
-        GetThresholds(attackerLevel, defenderLevel, safeMaxValue, out float lowThreshold, out float highThreshold);
-
-        float statBias = statType switch
-        {
-            DiceStatType.Body => rollType == DiceRollType.Power ? -0.03f : 0.02f,
-            DiceStatType.Heart => 0f,
-            DiceStatType.Mind => rollType == DiceRollType.Accuracy ? -0.03f : 0.02f,
-            _ => 0f
-        };
-
-        lowThreshold = Mathf.Clamp(lowThreshold + statBias, 0.05f, 0.8f);
-        highThreshold = Mathf.Clamp(highThreshold + statBias, lowThreshold + 0.1f, 0.95f);
+        GetThresholds(attackerLevel, defenderLevel, safeMaxValue, rollType, focus, strength, out float lowThreshold, out float highThreshold);
 
         int lowMax = 0;
         int mediumMax = 0;
@@ -295,5 +293,4 @@ public class DiceService
 
         return (lowMax, mediumMax, highMin);
     }
-
 }

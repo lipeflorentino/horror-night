@@ -37,6 +37,11 @@ public static class CombatResultStore
         Current = null;
         return result;
     }
+
+    public static void Clear()
+    {
+        Current = null;
+    }
 }
 
 public static class CombatReturnStore
@@ -53,5 +58,10 @@ public static class CombatReturnStore
         CombatReturnSnapshot snapshot = Current;
         Current = null;
         return snapshot;
+    }
+
+    public static void Clear()
+    {
+        Current = null;
     }
 }

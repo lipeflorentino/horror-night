@@ -9,6 +9,7 @@ public class CombatManager : MonoBehaviour
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
     private const int DefaultPowerDiceCount = 3;
     private const int DefaultAccuracyDiceCount = 3;
+    private const int CoreStatCap = 20;
     [SerializeField] private string gameplaySceneName = "Gameplay";
     public CombatView View;
     public CombatInputHandler Input;
@@ -95,16 +96,19 @@ public class CombatManager : MonoBehaviour
             "Player",
             Mathf.Max(1, playerSnapshot.level),
             Mathf.RoundToInt(playerSnapshot.hp),
-            Mathf.RoundToInt(playerSnapshot.heart),
-            Mathf.RoundToInt(playerSnapshot.mind),
-            Mathf.RoundToInt(playerSnapshot.body),
+            ClampCoreStat(playerSnapshot.heart),
+            ClampCoreStat(playerSnapshot.mind),
+            ClampCoreStat(playerSnapshot.body),
             Mathf.RoundToInt(playerSnapshot.attack),
             Mathf.RoundToInt(playerSnapshot.defense),
             Mathf.RoundToInt(playerSnapshot.initiative),
             Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : DefaultPowerDiceCount),
             Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount),
             true,
-            Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp)
+            Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp),
+            Mathf.RoundToInt(playerSnapshot.focus),
+            Mathf.RoundToInt(playerSnapshot.strength),
+            Mathf.RoundToInt(playerSnapshot.agility)
         );
 
         if (enemySnapshot != null)
@@ -122,7 +126,11 @@ public class CombatManager : MonoBehaviour
                 enemySnapshot.initiative,
                 enemySnapshot.currentPowerDices > 0 ? enemySnapshot.currentPowerDices : DefaultPowerDiceCount,
                 enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : DefaultAccuracyDiceCount,
-                false
+                false,
+                -1,
+                enemySnapshot.focus,
+                enemySnapshot.strength,
+                enemySnapshot.agility
             );
         }
         else
@@ -356,11 +364,10 @@ public class CombatManager : MonoBehaviour
 
     private void RestartCombat()
     {
-        if (SessionData != null)
-            CombatSessionStore.SetSession(SessionData);
-
-        string currentSceneName = SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene(currentSceneName);
+        CombatSessionStore.Clear();
+        CombatResultStore.Clear();
+        CombatReturnStore.Clear();
+        SceneManager.LoadScene(gameplaySceneName);
     }
 
     private void QuitCombat()
@@ -405,11 +412,18 @@ public class CombatManager : MonoBehaviour
             return new PlayerStatusSnapshot
             {
                 hp = Player.HP,
-                heart = Player.Heart,
-                mind = Player.Mind,
-                body = Player.Body,
+                heart = ClampCoreStat(Player.Heart),
+                mind = ClampCoreStat(Player.Mind),
+                body = ClampCoreStat(Player.Body),
                 attack = Player.Attack,
                 defense = Player.Defense,
+                initiative = Player.Initiative,
+                focus = Player.Focus,
+                strength = Player.Strength,
+                agility = Player.Agility,
+                maxHeart = ClampCoreStat(Player.Heart),
+                maxMind = ClampCoreStat(Player.Mind),
+                maxBody = ClampCoreStat(Player.Body),
                 maxHp = Player.MaxHp,
                 powerDices = Player.CurrentPowerDices,
                 accuracyDices = Player.CurrentAccuracyDices
@@ -418,11 +432,18 @@ public class CombatManager : MonoBehaviour
 
         PlayerStatusSnapshot snapshot = SessionData.PlayerSnapshot;
         snapshot.hp = Player.HP;
-        snapshot.heart = Player.Heart;
-        snapshot.mind = Player.Mind;
-        snapshot.body = Player.Body;
+        snapshot.heart = ClampCoreStat(Player.Heart);
+        snapshot.mind = ClampCoreStat(Player.Mind);
+        snapshot.body = ClampCoreStat(Player.Body);
         snapshot.attack = Player.Attack;
         snapshot.defense = Player.Defense;
+        snapshot.initiative = Player.Initiative;
+        snapshot.focus = Player.Focus;
+        snapshot.strength = Player.Strength;
+        snapshot.agility = Player.Agility;
+        snapshot.maxHeart = ClampCoreStat(Mathf.Max(snapshot.maxHeart, snapshot.heart));
+        snapshot.maxMind = ClampCoreStat(Mathf.Max(snapshot.maxMind, snapshot.mind));
+        snapshot.maxBody = ClampCoreStat(Mathf.Max(snapshot.maxBody, snapshot.body));
         snapshot.maxHp = Player.MaxHp;
         snapshot.powerDices = Player.CurrentPowerDices;
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
@@ -431,6 +452,11 @@ public class CombatManager : MonoBehaviour
         return snapshot;
     }
     
+    private static int ClampCoreStat(float value)
+    {
+        return Mathf.Clamp(Mathf.RoundToInt(value), 0, CoreStatCap);
+    }
+
     private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)
     {
         ItemDatabase itemDatabase = FindObjectOfType<ItemDatabase>();

@@ -29,4 +29,9 @@ public static class CombatSessionStore
         Current = null;
         return session;
     }
+
+    public static void Clear()
+    {
+        Current = null;
+    }
 }
