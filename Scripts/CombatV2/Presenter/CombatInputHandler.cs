@@ -247,7 +247,7 @@ public class CombatInputHandler : MonoBehaviour
         (int lowMax, int mediumMax, int highMin) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
         Combat.View.ActionPanel.UpdateSelectionPreview(
-            Combat.Player.GetBattlerActionPower(Combat.IsPlayerAttacker),
+            Combat.GetEffectivePlayerActionPower(),
             PowerDiceTypes,
             powerFaces,
             aggregatedPowerFaces,
@@ -333,6 +333,7 @@ public class CombatInputHandler : MonoBehaviour
 
     public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
-        return Combat.GetDiceService().GetTierBoundaries(maxValue, Combat.Player.Level, Combat.Enemy.Level, statType, rollType, Combat.Player.Focus, Combat.Player.Strength);
+        CombatRollContext context = Combat.BuildPlayerRollContext(maxValue, statType, rollType);
+        return Combat.GetDiceService().GetTierBoundaries(context);
     }
 }

@@ -19,6 +19,7 @@ public class CombatManager : MonoBehaviour
     public bool IsPlayerAttacker => PlayerIsAttacker;
 
     private DiceService DiceService;
+    private BattlerStateService BattlerStateService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
     private EnemyActionSelector EnemyActionSelector;
@@ -49,7 +50,8 @@ public class CombatManager : MonoBehaviour
     void Start()
     {
         Logger.Log("[CombatManager] Starting combat...");
-        DiceService = new DiceService();
+        BattlerStateService = new BattlerStateService();
+        DiceService = new DiceService(BattlerStateService);
         Resolver = new ActionResolverService();
         InitiativeResolverService = new InitiativeResolverService();
         EnemyActionSelector = new EnemyActionSelector();
@@ -149,6 +151,25 @@ public class CombatManager : MonoBehaviour
         Input.RefreshDiceAllocationUI();
     }
 
+    public BattlerStateService GetBattlerStateService()
+    {
+        return BattlerStateService;
+    }
+
+    public int GetEffectivePlayerActionPower()
+    {
+        ActionType actionType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        return BattlerStateService.GetEffectiveActionPower(Player, Enemy, actionType);
+    }
+
+    public CombatRollContext BuildPlayerRollContext(int maxValue, DiceStatType statType, DiceRollType rollType)
+    {
+        ActionType actionType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        int focus = BattlerStateService.GetEffectiveFocus(Player, Enemy, actionType);
+        int strength = BattlerStateService.GetEffectiveStrength(Player, Enemy, actionType);
+        return new CombatRollContext(Player, Enemy, actionType, rollType, statType, Player.Level, Enemy.Level, focus, strength, maxValue);
+    }
+
     private void DefineStartingTurnByInitiative()
     {
         Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
@@ -233,12 +254,13 @@ public class CombatManager : MonoBehaviour
 
     private void RollActions(ActionType action, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
-        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, action);
+        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, Enemy, action);
+        ActionType enemyActionType = PendingEnemyAction.Definition.Type;
 
-        PendingPlayerPowerRolls = DiceService.RollMany(Player, powerDiceTypes, DiceRollType.Power, Player.Level, Enemy.Level);
-        PendingPlayerAccuracyRolls = DiceService.RollMany(Player, accuracyDiceTypes, DiceRollType.Accuracy, Player.Level, Enemy.Level);
-        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, PendingEnemyPowerDiceTypes, DiceRollType.Power, Enemy.Level, Player.Level);
-        PendingEnemyAccuracyRolls = DiceService.RollMany(Enemy, PendingEnemyAccuracyDiceTypes, DiceRollType.Accuracy, Enemy.Level, Player.Level);
+        PendingPlayerPowerRolls = DiceService.RollMany(Player, Enemy, powerDiceTypes, action, DiceRollType.Power, Player.Level, Enemy.Level);
+        PendingPlayerAccuracyRolls = DiceService.RollMany(Player, Enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, Player.Level, Enemy.Level);
+        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, Player, PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, Enemy.Level, Player.Level);
+        PendingEnemyAccuracyRolls = DiceService.RollMany(Enemy, Player, PendingEnemyAccuracyDiceTypes, enemyActionType, DiceRollType.Accuracy, Enemy.Level, Player.Level);
 
         DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
         DiceResult playerAccuracyDice = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
@@ -246,7 +268,7 @@ public class CombatManager : MonoBehaviour
         DiceResult enemyAccuracyDice = DiceService.GetBestResult(PendingEnemyAccuracyRolls);
 
         PendingPlayerAction = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
-        PendingEnemyAction.Definition = BuildDefinitionFromBattler(Enemy, PendingEnemyAction.Definition.Type);
+        PendingEnemyAction.Definition = BuildDefinitionFromBattler(Enemy, Player, PendingEnemyAction.Definition.Type);
         PendingEnemyAction = new ActionInstance(PendingEnemyAction.Definition, enemyPowerDice, enemyAccuracyDice);
 
         Debug.Log($"[Flow] Player rolled POWER best:{playerPowerDice.Value} | ACCURACY best:{playerAccuracyDice.Value} using {PendingPlayerPowerRolls.Count + PendingPlayerAccuracyRolls.Count} dice.");
@@ -311,6 +333,8 @@ public class CombatManager : MonoBehaviour
 
         Player.RecoverDices(1);
         Enemy.RecoverDices(1);
+        BattlerStateService.TickTurnEnd(Player);
+        BattlerStateService.TickTurnEnd(Enemy);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
 
@@ -325,9 +349,9 @@ public class CombatManager : MonoBehaviour
         View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
     }
 
-    private ActionDefinition BuildDefinitionFromBattler(Battler battler, ActionType actionType)
+    private ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType)
     {
-        int basePower = actionType == ActionType.Attack ? battler.Attack : battler.Defense;
+        int basePower = BattlerStateService.GetEffectiveActionPower(battler, opponent, actionType);
         string id = actionType == ActionType.Attack ? "attack" : "defense";
         return new ActionDefinition(id, actionType, basePower);
     }
