@@ -42,6 +42,9 @@ public class EnemyInstance
     public int attack;
     public int defense;
     public int initiative;
+    public int focus;
+    public int strength;
+    public int agility;
     public int runTier;
     public int currentPowerDices;
     public int currentAccuracyDices;

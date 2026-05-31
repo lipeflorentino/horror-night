@@ -166,19 +166,26 @@ public class OccurrenceCSVImporter
                 return "heart";
             case "físico":
             case "fisico":
-            case "força":
-            case "forca":
-            case "strength":
             case "physical":
             case "corpo":
             case "body":
                 return "body";
+            case "força":
+            case "forca":
+            case "strength":
+                return "strength";
             case "mental":
             case "sanidade":
             case "sanity":
             case "mente":
             case "mind":
                 return "mind";
+            case "focus":
+            case "foco":
+                return "focus";
+            case "agility":
+            case "agilidade":
+                return "agility";
             default:
                 return "heart";
         }

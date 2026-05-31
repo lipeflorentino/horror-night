@@ -10,12 +10,15 @@ public class Battler
     public int Attack;
     public int Defense;
     public int Initiative;
+    public int Focus;
+    public int Strength;
+    public int Agility;
 
     public int CurrentPowerDices, CurrentAccuracyDices;
     public int MaxPowerDices, MaxAccuracyDices;
     public bool IsPlayer;
 
-    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
     {
         Name = name;
         Level = level;
@@ -26,6 +29,9 @@ public class Battler
         Attack = attack;
         Defense = defense;
         Initiative = initiative;
+        Focus = focus;
+        Strength = strength;
+        Agility = agility;
         CurrentPowerDices = powerDices;
         MaxPowerDices = powerDices;
         CurrentAccuracyDices = accuracyDices;
