@@ -26,7 +26,6 @@ BACKLOG
     - Ajustar painel de infos (fechamento)
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
 
-    → ou loot de inimigo integrado ao CombatResultSnapshot
     - Fazer painel de resultados (total damage, total kills, total xp, etc)
     - Fazer galeria  (monstros, itens, reliquias, etc.)
 
