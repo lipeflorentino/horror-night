@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 public class Battler
 {
     public string Name;
@@ -17,6 +18,7 @@ public class Battler
     public int CurrentPowerDices, CurrentAccuracyDices;
     public int MaxPowerDices, MaxAccuracyDices;
     public bool IsPlayer;
+    public List<BattlerStateInstance> States = new();
 
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
     {
@@ -68,5 +70,20 @@ public class Battler
         int atk = Attack;
         int df = Defense;
         return isAttacker ? atk : df;
+    }
+
+    public void ApplyState(BattlerStateDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    {
+        new BattlerStateService().ApplyState(this, definition, source, durationTurns, stacks);
+    }
+
+    public void RemoveState(string stateId)
+    {
+        new BattlerStateService().RemoveState(this, stateId);
+    }
+
+    public bool HasState(string stateId)
+    {
+        return new BattlerStateService().HasState(this, stateId);
     }
 }
