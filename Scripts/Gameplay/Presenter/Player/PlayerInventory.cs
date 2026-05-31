@@ -6,10 +6,16 @@ using System;
 [RequireComponent(typeof(PlayerStatusManager))]
 public class PlayerInventory : MonoBehaviour, ICombatInventory
 {
+    private const int CoreStatCap = 20;
+
     [SerializeField] private ItemDatabase itemDatabase;
     [SerializeField] private PlayerStatusManager playerStatusManager;
     [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private int maxRelicSlots = 2;
+    [SerializeField] private int baseHeart = -1;
+    [SerializeField] private int baseBody = -1;
+    [SerializeField] private int baseMind = -1;
+    [SerializeField] private bool hasCoreStatBase;
     public List<ItemSO> items = new();
     public IReadOnlyList<ItemSO> Items => items;
     [SerializeField] private List<EquippedItemInstance> equippedWeapons = new();
@@ -93,12 +99,20 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             countsByItemId[item.id]++;
         }
 
+        bool snapshotHasCoreStatBase = HasEquippedItems();
+        if (snapshotHasCoreStatBase)
+            EnsureCoreStatBaseInitialized();
+
         PlayerInventorySnapshot snapshot = new()
         {
             itemIds = new List<int>(countsByItemId.Count),
             itemQuantities = new List<int>(countsByItemId.Count),
             equippedWeapons = CreateEquippedSnapshot(equippedWeapons),
-            equippedRelics = CreateEquippedSnapshot(equippedRelics)
+            equippedRelics = CreateEquippedSnapshot(equippedRelics),
+            hasCoreStatBase = snapshotHasCoreStatBase && hasCoreStatBase,
+            baseHeart = snapshotHasCoreStatBase ? baseHeart : playerStatusManager != null ? playerStatusManager.GetStatValue("heart") : 0,
+            baseBody = snapshotHasCoreStatBase ? baseBody : playerStatusManager != null ? playerStatusManager.GetStatValue("body") : 0,
+            baseMind = snapshotHasCoreStatBase ? baseMind : playerStatusManager != null ? playerStatusManager.GetStatValue("mind") : 0
         };
 
         foreach (KeyValuePair<int, int> entry in countsByItemId.OrderBy(entry => entry.Key))
@@ -115,6 +129,10 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
         items.Clear();
         equippedWeapons.Clear();
         equippedRelics.Clear();
+        hasCoreStatBase = false;
+        baseHeart = -1;
+        baseBody = -1;
+        baseMind = -1;
 
         if (snapshot == null)
             return;
@@ -144,6 +162,7 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
 
         RestoreEquippedSnapshot(snapshot.equippedWeapons, equippedWeapons);
         RestoreEquippedSnapshot(snapshot.equippedRelics, equippedRelics);
+        RestoreCoreStatBase(snapshot);
     }
 
     private static List<EquippedItemSnapshot> CreateEquippedSnapshot(List<EquippedItemInstance> slots)
@@ -197,16 +216,17 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
 
     public bool UseItem(ItemSO item)
     {
-        Logger.Log($"[Inventory] Tentando usar item: {item.itemName}");
         if (item == null || playerStatusManager == null)
             return false;
+
+        Logger.Log($"[Inventory] Tentando usar item: {item.itemName}");
 
         switch (item.type)
         {
             case ItemType.Consumable:
                 if (!items.Remove(item))
                     return false;
-                ApplyStatBonus(item.statBonus);
+                ApplyConsumableStatBonus(item.statBonus);
                 return true;
             case ItemType.Weapon:
                 return EquipItem(item, equippedWeapons, maxWeaponSlots);
@@ -219,9 +239,10 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
 
     public bool UnEquipItem(ItemSO item)
     {
-        Logger.Log($"[Inventory] Tentando desequipar item: {item.itemName}");
         if (item == null)
             return false;
+
+        Logger.Log($"[Inventory] Tentando desequipar item: {item.itemName}");
 
         if (TryUnequipFromSlots(item, equippedWeapons))
             return true;
@@ -234,9 +255,10 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
 
     public bool DeschardItem(ItemSO item)
     {
-        Logger.Log($"[Inventory] Tentando descartar item: {item.itemName}");
         if (item == null)
             return false;
+
+        Logger.Log($"[Inventory] Tentando descartar item: {item.itemName}");
 
         if (items.Remove(item))
             return true;
@@ -256,9 +278,15 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
         if (slots.Count >= maxSlots || !items.Remove(item))
             return false;
 
+        if (HasEquippedItems())
+            EnsureCoreStatBaseInitialized();
+        else
+            CaptureCurrentCoreStatsAsBase();
+
         EquippedItemInstance instance = new(item);
         slots.Add(instance);
-        ApplyStatBonus(item.statBonus);
+        ApplyNonCoreStatBonus(item.statBonus, 1);
+        RecalculateCoreStatsFromEquipment();
 
         if (!string.IsNullOrWhiteSpace(item.specialEffect) && !string.Equals(item.specialEffect, "none", StringComparison.OrdinalIgnoreCase))
             Debug.Log($"[Inventory] Efeito especial ativo: {item.specialEffect} ({item.itemName})");
@@ -274,7 +302,7 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             if (!equippedItem.ConsumeTurn())
                 continue;
 
-            RemoveStatBonus(equippedItem.SourceItem.statBonus);
+            ApplyNonCoreStatBonus(equippedItem.SourceItem.statBonus, -1);
             ItemSO brokenVersion = ScriptableObject.CreateInstance<ItemSO>();
             brokenVersion.id = equippedItem.SourceItem.id;
             brokenVersion.itemName = $"{equippedItem.SourceItem.itemName} (Broken)";
@@ -284,22 +312,47 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             brokenVersion.type = ItemType.Broken;
             brokenVersion.weight = equippedItem.SourceItem.weight;
             slots.RemoveAt(i);
+            RecalculateCoreStatsFromEquipment();
             items.Add(brokenVersion);
         }
     }
 
-    private void ApplyStatBonus(string statBonus)
+    private void ApplyConsumableStatBonus(string statBonus)
     {
-        Logger.Log($"[Inventory] Aplicando stat bonus: {statBonus}");
+        Logger.Log($"[Inventory] Aplicando stat bonus consumível: {statBonus}");
         foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
+        {
+            string statName = NormalizeStatName(stat.statName);
+            if (IsCoreStat(statName))
+            {
+                if (HasEquippedItems())
+                {
+                    EnsureCoreStatBaseInitialized();
+                    SetCoreStatBase(statName, GetCoreStatBase(statName) + stat.value);
+                    RecalculateCoreStatsFromEquipment();
+                }
+                else
+                {
+                    playerStatusManager.ApplyStatDelta(stat.statName, stat.value);
+                    CaptureCurrentCoreStatsAsBase();
+                }
+                continue;
+            }
+
             playerStatusManager.ApplyStatDelta(stat.statName, stat.value);
+        }
     }
 
-    private void RemoveStatBonus(string statBonus)
+    private void ApplyNonCoreStatBonus(string statBonus, int multiplier)
     {
-        Logger.Log($"[Inventory] Removendo stat bonus: {statBonus}");
+        Logger.Log($"[Inventory] Aplicando stat bonus de equipamento: {statBonus} x{multiplier}");
         foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(statBonus))
-            playerStatusManager.ApplyStatDelta(stat.statName, -stat.value);
+        {
+            if (IsCoreStat(NormalizeStatName(stat.statName)))
+                continue;
+
+            playerStatusManager.ApplyStatDelta(stat.statName, stat.value * multiplier);
+        }
     }
 
     private bool TryUnequipFromSlots(ItemSO item, List<EquippedItemInstance> slots)
@@ -309,7 +362,9 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             if (slots[i].SourceItem != item)
                 continue;
 
+            ApplyNonCoreStatBonus(item.statBonus, -1);
             slots.RemoveAt(i);
+            RecalculateCoreStatsFromEquipment();
             items.Add(item);
             return true;
         }
@@ -324,11 +379,166 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             if (slots[i].SourceItem != item)
                 continue;
 
-            RemoveStatBonus(item.statBonus);
+            ApplyNonCoreStatBonus(item.statBonus, -1);
             slots.RemoveAt(i);
+            RecalculateCoreStatsFromEquipment();
             return true;
         }
 
         return false;
+    }
+
+    private void RestoreCoreStatBase(PlayerInventorySnapshot snapshot)
+    {
+        if (snapshot.hasCoreStatBase)
+        {
+            baseHeart = ClampCoreStat(snapshot.baseHeart);
+            baseBody = ClampCoreStat(snapshot.baseBody);
+            baseMind = ClampCoreStat(snapshot.baseMind);
+            hasCoreStatBase = true;
+            return;
+        }
+
+        EnsureCoreStatBaseInitialized();
+    }
+
+    private void EnsureCoreStatBaseInitialized()
+    {
+        if (hasCoreStatBase || playerStatusManager == null)
+            return;
+
+        baseHeart = ClampCoreStat(playerStatusManager.GetStatValue("heart") - GetTotalEquippedCoreBonus("heart"));
+        baseBody = ClampCoreStat(playerStatusManager.GetStatValue("body") - GetTotalEquippedCoreBonus("body"));
+        baseMind = ClampCoreStat(playerStatusManager.GetStatValue("mind") - GetTotalEquippedCoreBonus("mind"));
+        hasCoreStatBase = true;
+    }
+
+    private void CaptureCurrentCoreStatsAsBase()
+    {
+        if (playerStatusManager == null)
+            return;
+
+        baseHeart = ClampCoreStat(playerStatusManager.GetStatValue("heart"));
+        baseBody = ClampCoreStat(playerStatusManager.GetStatValue("body"));
+        baseMind = ClampCoreStat(playerStatusManager.GetStatValue("mind"));
+        hasCoreStatBase = true;
+    }
+
+    private bool HasEquippedItems()
+    {
+        return equippedWeapons.Count > 0 || equippedRelics.Count > 0;
+    }
+
+    private void RecalculateCoreStatsFromEquipment()
+    {
+        EnsureCoreStatBaseInitialized();
+        ApplyCoreStatTarget("heart", baseHeart + GetTotalEquippedCoreBonus("heart"));
+        ApplyCoreStatTarget("body", baseBody + GetTotalEquippedCoreBonus("body"));
+        ApplyCoreStatTarget("mind", baseMind + GetTotalEquippedCoreBonus("mind"));
+    }
+
+    private void ApplyCoreStatTarget(string statName, int targetValue)
+    {
+        int clampedTarget = ClampCoreStat(targetValue);
+        int currentValue = playerStatusManager.GetStatValue(statName);
+        int delta = clampedTarget - currentValue;
+        if (delta != 0)
+            playerStatusManager.ApplyStatDelta(statName, delta);
+    }
+
+    private int GetTotalEquippedCoreBonus(string statName)
+    {
+        return GetTotalEquippedCoreBonus(statName, equippedWeapons) + GetTotalEquippedCoreBonus(statName, equippedRelics);
+    }
+
+    private static int GetTotalEquippedCoreBonus(string statName, List<EquippedItemInstance> slots)
+    {
+        int total = 0;
+        for (int i = 0; i < slots.Count; i++)
+        {
+            ItemSO item = slots[i]?.SourceItem;
+            if (item == null)
+                continue;
+
+            foreach (ItemStatBonus stat in ItemStatBonusParser.Parse(item.statBonus))
+            {
+                if (NormalizeStatName(stat.statName) == statName)
+                    total += stat.value;
+            }
+        }
+
+        return total;
+    }
+
+    private int GetCoreStatBase(string statName)
+    {
+        return statName switch
+        {
+            "heart" => baseHeart,
+            "body" => baseBody,
+            "mind" => baseMind,
+            _ => 0,
+        };
+    }
+
+    private void SetCoreStatBase(string statName, int value)
+    {
+        int clampedValue = ClampCoreStat(value);
+        switch (statName)
+        {
+            case "heart":
+                baseHeart = clampedValue;
+                break;
+            case "body":
+                baseBody = clampedValue;
+                break;
+            case "mind":
+                baseMind = clampedValue;
+                break;
+        }
+    }
+
+    private static bool IsCoreStat(string statName)
+    {
+        return statName == "heart" || statName == "body" || statName == "mind";
+    }
+
+    private static int ClampCoreStat(int value)
+    {
+        return Mathf.Clamp(value, 0, CoreStatCap);
+    }
+
+    private static string NormalizeStatName(string statName)
+    {
+        string normalized = string.IsNullOrWhiteSpace(statName)
+            ? string.Empty
+            : statName.Trim().ToLowerInvariant();
+
+        return normalized switch
+        {
+            "life" => "heart",
+            "vida" => "heart",
+            "coracao" => "heart",
+            "coração" => "heart",
+            "physical" => "body",
+            "fisico" => "body",
+            "físico" => "body",
+            "corpo" => "body",
+            "strength" => "strength",
+            "força" => "strength",
+            "forca" => "strength",
+            "power" => "strength",
+            "mental" => "mind",
+            "sanity" => "mind",
+            "sanidade" => "mind",
+            "mente" => "mind",
+            "iniciativa" => "initiative",
+            "speed" => "initiative",
+            "focus" => "focus",
+            "foco" => "focus",
+            "agility" => "agility",
+            "agilidade" => "agility",
+            _ => normalized,
+        };
     }
 }

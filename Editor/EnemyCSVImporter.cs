@@ -71,6 +71,9 @@ public class EnemyCSVImporter
             enemy.attack = BuildRange(values[20], values[21]);
             enemy.defense = BuildRange(values[22], values[23]);
             enemy.initiative = BuildRange(values[24], values[25]);
+            enemy.focus = values.Length > 27 ? BuildRange(values[26], values[27]) : new StatRange { min = 0, max = 0 };
+            enemy.strength = values.Length > 29 ? BuildRange(values[28], values[29]) : new StatRange { min = 0, max = 0 };
+            enemy.agility = values.Length > 31 ? BuildRange(values[30], values[31]) : new StatRange { min = 0, max = 0 };
 
             Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Creatures/Enemies/" + values[17] + ".png");
             enemy.image = sprite;

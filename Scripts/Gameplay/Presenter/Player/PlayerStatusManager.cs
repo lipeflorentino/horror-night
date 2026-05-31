@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerInventory))]
 public class PlayerStatusManager : MonoBehaviour
 {
+    private const float CoreStatCap = 20f;
 
     [Header("Archetype")]
     [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.NT;
@@ -19,6 +20,9 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
     [SerializeField] private int initiative = 10;
+    [SerializeField] private int focus = 0;
+    [SerializeField] private int strength = 0;
+    [SerializeField] private int agility = 0;
     [SerializeField] private int level = 1;
     [SerializeField] private int currentXp = 0;
     [SerializeField] private int maxXp = 10;
@@ -49,9 +53,12 @@ public class PlayerStatusManager : MonoBehaviour
             playerInventory = GetComponent<PlayerInventory>();
             
         currentArchetype = initialArchetype;
-        currentHeart = Mathf.Clamp(currentHeart, 0f, maxHeart);
-        currentBody = Mathf.Clamp(currentBody, 0f, maxBody);
-        currentMind = Mathf.Clamp(currentMind, 0f, maxMind);
+        maxHeart = ClampCoreStatMax(maxHeart);
+        maxBody = ClampCoreStatMax(maxBody);
+        maxMind = ClampCoreStatMax(maxMind);
+        currentHeart = ClampCoreStat(currentHeart, maxHeart);
+        currentBody = ClampCoreStat(currentBody, maxBody);
+        currentMind = ClampCoreStat(currentMind, maxMind);
         currentHp = Mathf.Clamp(currentHp, 0f, maxHp);
 
         RefreshAllBars();
@@ -100,37 +107,37 @@ public class PlayerStatusManager : MonoBehaviour
 
     public void IncreaseHeart(float amount)
     {
-        currentHeart = Mathf.Clamp(currentHeart + amount, 0f, maxHeart);
+        currentHeart = ClampCoreStat(currentHeart + amount, maxHeart);
         heartHud?.SetValue(currentHeart, maxHeart);
     }
 
     public void DecreaseHeart(float amount)
     {
-        currentHeart = Mathf.Clamp(currentHeart - amount, 0f, maxHeart);
+        currentHeart = ClampCoreStat(currentHeart - amount, maxHeart);
         heartHud?.SetValue(currentHeart, maxHeart);
     }
 
     public void IncreaseBody(float amount)
     {
-        currentBody = Mathf.Clamp(currentBody + amount, 0f, maxBody);
+        currentBody = ClampCoreStat(currentBody + amount, maxBody);
         bodyHud?.SetValue(currentBody, maxBody);
     }
 
     public void DecreaseBody(float amount)
     {
-        currentBody = Mathf.Clamp(currentBody - amount, 0f, maxBody);
+        currentBody = ClampCoreStat(currentBody - amount, maxBody);
         bodyHud?.SetValue(currentBody, maxBody);
     }
 
     public void IncreaseMind(float amount)
     {
-        currentMind = Mathf.Clamp(currentMind + amount, 0f, maxMind);
+        currentMind = ClampCoreStat(currentMind + amount, maxMind);
         mindHud?.SetValue(currentMind, maxMind);
     }
 
     public void DecreaseMind(float amount)
     {
-        currentMind = Mathf.Clamp(currentMind - amount, 0f, maxMind);
+        currentMind = ClampCoreStat(currentMind - amount, maxMind);
         mindHud?.SetValue(currentMind, maxMind);
     }
 
@@ -154,6 +161,9 @@ public class PlayerStatusManager : MonoBehaviour
             "body" => Mathf.RoundToInt(currentBody),
             "mind" => Mathf.RoundToInt(currentMind),
             "initiative" => initiative,
+            "focus" => focus,
+            "strength" => strength,
+            "agility" => agility,
             "attack" => attack,
             "defense" => defense,
             _ => 0,
@@ -163,6 +173,9 @@ public class PlayerStatusManager : MonoBehaviour
     public int GetAttack() => attack;
     public int GetDefense() => defense;
     public int GetInitiative() => initiative;
+    public int GetFocus() => focus;
+    public int GetStrength() => strength;
+    public int GetAgility() => agility;
 
     public void ApplyStatDelta(string statName, int value)
     {
@@ -187,6 +200,15 @@ public class PlayerStatusManager : MonoBehaviour
             case "initiative":
                 initiative = Mathf.Max(0, initiative + value);
                 return;
+            case "focus":
+                focus = Mathf.Max(0, focus + value);
+                return;
+            case "strength":
+                strength = Mathf.Max(0, strength + value);
+                return;
+            case "agility":
+                agility = Mathf.Max(0, agility + value);
+                return;
             case "attack":
                 attack = Mathf.Max(0, attack + value);
                 return;
@@ -203,19 +225,22 @@ public class PlayerStatusManager : MonoBehaviour
     {
         return new PlayerStatusSnapshot
         {
-            heart = currentHeart,
-            body = currentBody,
-            mind = currentMind,
+            heart = ClampCoreStat(currentHeart, maxHeart),
+            body = ClampCoreStat(currentBody, maxBody),
+            mind = ClampCoreStat(currentMind, maxMind),
             attack = attack,
             defense = defense,
             initiative = initiative,
+            focus = focus,
+            strength = strength,
+            agility = agility,
             level = GetLevel(),
             currentXp = Mathf.Max(0, currentXp),
             maxXp = Mathf.Max(1, maxXp),
             hp = currentHp,
-            maxHeart = maxHeart,
-            maxBody = maxBody,
-            maxMind = maxMind,
+            maxHeart = ClampCoreStatMax(maxHeart),
+            maxBody = ClampCoreStatMax(maxBody),
+            maxMind = ClampCoreStatMax(maxMind),
             maxHp = maxHp,
             powerDices = currentPowerDices,
             accuracyDices = currentAccuracyDices,
@@ -229,20 +254,23 @@ public class PlayerStatusManager : MonoBehaviour
 
     public void RestoreSnapshot(PlayerStatusSnapshot snapshot)
     {
-        maxHeart = Mathf.Max(1f, snapshot.maxHeart > 0f ? snapshot.maxHeart : maxHeart);
-        maxBody = Mathf.Max(1f, snapshot.maxBody > 0f ? snapshot.maxBody : maxBody);
-        maxMind = Mathf.Max(1f, snapshot.maxMind > 0f ? snapshot.maxMind : maxMind);
+        maxHeart = ClampCoreStatMax(snapshot.maxHeart > 0f ? snapshot.maxHeart : maxHeart);
+        maxBody = ClampCoreStatMax(snapshot.maxBody > 0f ? snapshot.maxBody : maxBody);
+        maxMind = ClampCoreStatMax(snapshot.maxMind > 0f ? snapshot.maxMind : maxMind);
         maxHp = Mathf.Max(1f, snapshot.maxHp > 0f ? snapshot.maxHp : maxHp);
 
-        currentHeart = Mathf.Clamp(snapshot.heart, 0f, maxHeart);
-        currentBody = Mathf.Clamp(snapshot.body, 0f, maxBody);
-        currentMind = Mathf.Clamp(snapshot.mind, 0f, maxMind);
+        currentHeart = ClampCoreStat(snapshot.heart, maxHeart);
+        currentBody = ClampCoreStat(snapshot.body, maxBody);
+        currentMind = ClampCoreStat(snapshot.mind, maxMind);
         if (snapshot.attack > 0f)
             attack = Mathf.Max(0, Mathf.RoundToInt(snapshot.attack));
         if (snapshot.defense > 0f)
             defense = Mathf.Max(0, Mathf.RoundToInt(snapshot.defense));
         if (snapshot.initiative > 0f)
             initiative = Mathf.Max(0, Mathf.RoundToInt(snapshot.initiative));
+        focus = Mathf.Max(0, Mathf.RoundToInt(snapshot.focus));
+        strength = Mathf.Max(0, Mathf.RoundToInt(snapshot.strength));
+        agility = Mathf.Max(0, Mathf.RoundToInt(snapshot.agility));
         if (snapshot.level > 0)
             level = Mathf.Max(1, snapshot.level);
         currentXp = Mathf.Max(0, snapshot.currentXp);
@@ -268,6 +296,16 @@ public class PlayerStatusManager : MonoBehaviour
         mindHud?.SetValue(currentMind, maxMind);
     }
 
+    private static float ClampCoreStat(float value, float maxValue)
+    {
+        return Mathf.Clamp(value, 0f, Mathf.Min(CoreStatCap, Mathf.Max(1f, maxValue)));
+    }
+
+    private static float ClampCoreStatMax(float maxValue)
+    {
+        return Mathf.Clamp(maxValue, 1f, CoreStatCap);
+    }
+
     private static string NormalizeStatName(string statName)
     {
         string normalized = string.IsNullOrWhiteSpace(statName)
@@ -283,12 +321,16 @@ public class PlayerStatusManager : MonoBehaviour
             case "coração":
                 return "heart";
             case "body":
+            case "physical":
+            case "fisico":
+            case "físico":
+            case "corpo":
+                return "body";
             case "strength":
             case "força":
             case "forca":
             case "power":
-            case "corpo":
-                return "body";
+                return "strength";
             case "mind":
             case "mental":
             case "sanity":
@@ -298,8 +340,13 @@ public class PlayerStatusManager : MonoBehaviour
             case "initiative":
             case "iniciativa":
             case "speed":
-            case "agility":
                 return "initiative";
+            case "focus":
+            case "foco":
+                return "focus";
+            case "agility":
+            case "agilidade":
+                return "agility";
             default:
                 return normalized;
         }

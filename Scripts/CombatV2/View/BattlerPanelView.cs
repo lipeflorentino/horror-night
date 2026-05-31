@@ -17,6 +17,9 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text AttackText;
     public TMP_Text DefenseText;
     public TMP_Text InitiativeText;
+    public TMP_Text FocusText;
+    public TMP_Text StrengthText;
+    public TMP_Text AgilityText;
     // TODO: implementar effects (buff e debuff)
 
     public void Bind(Battler battler)
@@ -62,6 +65,15 @@ public class BattlerPanelView : MonoBehaviour
 
         if (InitiativeText != null)
             InitiativeText.text = battler.Initiative.ToString();
+
+        if (FocusText != null)
+            FocusText.text = battler.Focus.ToString();
+
+        if (StrengthText != null)
+            StrengthText.text = battler.Strength.ToString();
+
+        if (AgilityText != null)
+            AgilityText.text = battler.Agility.ToString();
 
     }
 }

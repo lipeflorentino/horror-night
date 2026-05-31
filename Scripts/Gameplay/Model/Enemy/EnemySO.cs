@@ -51,6 +51,9 @@ public class EnemySO : ScriptableObject
     public StatRange attack;
     public StatRange defense;
     public StatRange initiative;
+    public StatRange focus = new() { min = 0, max = 0 };
+    public StatRange strength = new() { min = 0, max = 0 };
+    public StatRange agility = new() { min = 0, max = 0 };
 
     [Header("Optional")]
     [TextArea] public string specialRule;
@@ -79,6 +82,9 @@ public class EnemySO : ScriptableObject
         int rolledAttack = attack.Roll(difficulty);
         int rolledDefense = defense.Roll(difficulty);
         int rolledInitiative = initiative.Roll(difficulty);
+        int rolledFocus = focus.Roll(difficulty);
+        int rolledStrength = strength.Roll(difficulty);
+        int rolledAgility = agility.Roll(difficulty);
 
         return new EnemyInstance
         {
@@ -90,6 +96,9 @@ public class EnemySO : ScriptableObject
             attack = rolledAttack,
             defense = rolledDefense,
             initiative = rolledInitiative,
+            focus = rolledFocus,
+            strength = rolledStrength,
+            agility = rolledAgility,
             runTier = context != null ? context.tier : 0
         };
     }

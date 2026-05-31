@@ -6,6 +6,10 @@ public class PlayerInventorySnapshot
 {
     public List<int> itemIds;
     public List<int> itemQuantities;
+    public bool hasCoreStatBase;
+    public int baseHeart;
+    public int baseBody;
+    public int baseMind;
     public List<EquippedItemSnapshot> equippedWeapons;
     public List<EquippedItemSnapshot> equippedRelics;
 }
