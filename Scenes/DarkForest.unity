@@ -5774,6 +5774,7 @@ MonoBehaviour:
   levelUpUI: {fileID: 6311030688338888689}
   playerMovement: {fileID: 8128930221019054240}
   fadeEffect: {fileID: 0}
+  currentLevel: {fileID: 0}
 --- !u!1 &1711072588
 GameObject:
   m_ObjectHideFlags: 0
@@ -7681,6 +7682,9 @@ MonoBehaviour:
   attack: 12
   defense: 4
   initiative: 5
+  focus: 0
+  strength: 0
+  agility: 0
   level: 1
   currentXp: 0
   maxXp: 10
@@ -9559,6 +9563,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ItemDatabase
       objectReference: {fileID: 0}
+    - target: {fileID: 3394124518725151001, guid: 8e32f9fd23f5031499983f8808396bf5, type: 3}
+      propertyPath: allItems.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10540,6 +10548,10 @@ MonoBehaviour:
   playerStatusManager: {fileID: 0}
   maxWeaponSlots: 2
   maxRelicSlots: 2
+  baseHeart: -1
+  baseBody: -1
+  baseMind: -1
+  hasCoreStatBase: 0
   items: []
   equippedWeapons: []
   equippedRelics: []
