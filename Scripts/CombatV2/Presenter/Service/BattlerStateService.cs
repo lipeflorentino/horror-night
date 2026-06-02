@@ -152,14 +152,14 @@ public class BattlerStateService
         for (int i = 0; i < owner.States.Count; i++)
         {
             BattlerStateInstance state = owner.States[i];
-            if (state?.Definition?.StatModifiers == null)
+            if (state?.Definition?.BattlerStatModifiers == null)
                 continue;
 
             int stacks = Mathf.Max(1, state.Stacks);
-            IReadOnlyList<StatModifier> modifiers = state.Definition.StatModifiers;
+            IReadOnlyList<BattlerStatModifier> modifiers = state.Definition.BattlerStatModifiers;
             for (int j = 0; j < modifiers.Count; j++)
             {
-                StatModifier modifier = modifiers[j];
+                BattlerStatModifier modifier = modifiers[j];
                 if (modifier == null || !modifier.MatchesStat(context, statType) || !IsRoleMatch(owner, context, modifier.Role))
                     continue;
 

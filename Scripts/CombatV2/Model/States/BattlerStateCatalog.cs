@@ -15,7 +15,7 @@ public static class BattlerStateCatalog
             DiceRollType.Accuracy,
             ThresholdBand.High,
             -0.15f));
-        state.StatModifiers.Add(CreateStatModifier(
+        state.BattlerStatModifiers.Add(CreateStatModifier(
             BattlerStateRole.OwnerAsDefender,
             ActionType.Defense,
             BattlerStateStatType.Defense,
@@ -32,7 +32,7 @@ public static class BattlerStateCatalog
     public static BattlerStateDefinition CreateAngry()
     {
         BattlerStateDefinition state = CreateState(AngryId, "Angry");
-        state.StatModifiers.Add(CreateStatModifier(
+        state.BattlerStatModifiers.Add(CreateStatModifier(
             BattlerStateRole.OwnerAsAttacker,
             ActionType.Attack,
             BattlerStateStatType.Attack,
@@ -49,7 +49,7 @@ public static class BattlerStateCatalog
             DiceRollType.Power,
             ThresholdBand.Low,
             -0.15f));
-        state.StatModifiers.Add(CreateStatModifier(
+        state.BattlerStatModifiers.Add(CreateStatModifier(
             BattlerStateRole.OwnerAsDefender,
             ActionType.Defense,
             BattlerStateStatType.Defense,
@@ -107,9 +107,9 @@ public static class BattlerStateCatalog
         };
     }
 
-    private static StatModifier CreateStatModifier(BattlerStateRole role, ActionType actionType, BattlerStateStatType statType, float multiplier)
+    private static BattlerStatModifier CreateStatModifier(BattlerStateRole role, ActionType actionType, BattlerStateStatType statType, float multiplier)
     {
-        return new StatModifier
+        return new BattlerStatModifier
         {
             Role = role,
             FilterByActionType = true,

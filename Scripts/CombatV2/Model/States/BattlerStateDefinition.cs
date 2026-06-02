@@ -11,5 +11,5 @@ public class BattlerStateDefinition : ScriptableObject
     public int MaxStacks = 1;
     public BattlerStateStackMode StackMode = BattlerStateStackMode.RefreshDuration;
     public List<ThresholdModifier> ThresholdModifiers = new();
-    public List<StatModifier> StatModifiers = new();
+    public List<BattlerStatModifier> BattlerStatModifiers = new();
 }

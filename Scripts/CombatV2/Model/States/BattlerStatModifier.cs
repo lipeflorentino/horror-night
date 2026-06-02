@@ -1,7 +1,7 @@
 using System;
 
 [Serializable]
-public class StatModifier : BattlerStateModifier
+public class BattlerStatModifier : BattlerStateModifier
 {
     public BattlerStateStatType StatType;
     public ModifierOperation Operation = ModifierOperation.Multiply;
