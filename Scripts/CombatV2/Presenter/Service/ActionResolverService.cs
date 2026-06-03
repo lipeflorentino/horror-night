@@ -2,6 +2,12 @@ using System;
 
 public class ActionResolverService
 {
+    private readonly PerkService perkService;
+
+    public ActionResolverService(PerkService perkService = null)
+    {
+        this.perkService = perkService;
+    }
     public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
         ActionAccuracy attackAccuracy = CalculateAccuracy(attack);
@@ -24,9 +30,10 @@ public class ActionResolverService
             FinalTarget = target
         };
 
-        int attackPower = ignoreAttack ? 0 : (int)CalculatePower(attack);
-        int defensePower = ignoreDefense ? 0 : (int)CalculatePower(defense);
+        int attackPower = ignoreAttack ? 0 : CalculatePower(attack, attacker, target, ActionType.Attack);
+        int defensePower = ignoreDefense ? 0 : CalculatePower(defense, target, attacker, ActionType.Defense);
         int damage = attackPower - defensePower;
+        damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack) ?? damage;
 
         Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
         
@@ -121,11 +128,17 @@ public class ActionResolverService
 
     public int CalculatePower(ActionInstance action)
     {
+        return CalculatePower(action, null, null, action?.Definition != null ? action.Definition.Type : ActionType.Attack);
+    }
+
+    public int CalculatePower(ActionInstance action, Battler actor, Battler opponent, ActionType actionType)
+    {
         if (action == null || action.PowerDice == null)
             return 0;
 
         float multiplier = GetMultiplier(action.PowerDice.Tier);
-        return action.Definition.BasePower * (int)multiplier;
+        multiplier = perkService?.GetPowerMultiplier(multiplier, action, actor, opponent, actionType) ?? multiplier;
+        return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * multiplier);
     }
 
     private void TriggerPowerMaxPlaceholder(Battler attacker)
