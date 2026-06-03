@@ -53,5 +53,4 @@ TO DO
 FIXES
     - Corrigir tela de Loot 
     - Ajustar recompensa Xp (icone)
-    - Não persistiu incremento na stat mind apos uso de item durante combate 
-    - Restart apos morte voltou para o snapshot do ultimo combate
+    
