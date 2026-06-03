@@ -19,6 +19,7 @@ public class Battler
     public int MaxPowerDices, MaxAccuracyDices;
     public bool IsPlayer;
     public List<BattlerStateInstance> States = new();
+    public List<PerkRuntimeInstance> Perks = new();
 
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
     {
@@ -85,5 +86,15 @@ public class Battler
     public bool HasState(string stateId)
     {
         return new BattlerStateService().HasState(this, stateId);
+    }
+
+    public void ApplyPerk(PerkDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    {
+        new PerkService().ApplyPerk(this, definition, source, durationTurns, stacks);
+    }
+
+    public void ApplyPerk(string perkId, Battler source = null, int durationTurns = -1, int stacks = 1)
+    {
+        new PerkService().ApplyPerk(this, perkId, source, durationTurns, stacks);
     }
 }
