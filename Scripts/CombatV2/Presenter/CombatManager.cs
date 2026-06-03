@@ -20,6 +20,8 @@ public class CombatManager : MonoBehaviour
 
     private DiceService DiceService;
     private BattlerStateService BattlerStateService;
+    private PerkDatabase perkDatabase;
+    private PerkService PerkService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
     private EnemyActionSelector EnemyActionSelector;
@@ -51,8 +53,10 @@ public class CombatManager : MonoBehaviour
     {
         Logger.Log("[CombatManager] Starting combat...");
         BattlerStateService = new BattlerStateService();
-        DiceService = new DiceService(BattlerStateService);
-        Resolver = new ActionResolverService();
+        perkDatabase = FindObjectOfType<PerkDatabase>() ?? PerkDatabase.GetOrCreateRuntimeDatabase();
+        PerkService = new PerkService(perkDatabase);
+        DiceService = new DiceService(BattlerStateService, PerkService);
+        Resolver = new ActionResolverService(PerkService);
         InitiativeResolverService = new InitiativeResolverService();
         EnemyActionSelector = new EnemyActionSelector();
         EnemyTurnPlanner = new EnemyTurnPlanner(EnemyActionSelector);
@@ -335,6 +339,8 @@ public class CombatManager : MonoBehaviour
         Enemy.RecoverDices(1);
         BattlerStateService.TickTurnEnd(Player);
         BattlerStateService.TickTurnEnd(Enemy);
+        PerkService.TickTurnEnd(Player);
+        PerkService.TickTurnEnd(Enemy);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
 

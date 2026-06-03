@@ -1,0 +1,6 @@
+Id,Name,Description,IsPermanentIdentity,Scope,Trigger,DurationTurns,OwnerRole,ActionFilter,RollFilter,StatFilter,TierFilter,ConditionKey,ConditionValue,ModifierTarget,Operation,Value,MaxStacks,StackMode,Tags
+mind_min_accuracy_30,Mind: Precisão Analítica,Dados de accuracy de mind nunca rolam abaixo de 30%.,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Accuracy,Mind,Any,Always,,MinRollPercent,Override,0.30,1,RefreshDuration,identity;mind
+heart_extra_die,Heart: Instinto Vivo,Ao rolar heart adiciona 1 dado extra.,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Any,Heart,Any,Always,,ExtraDice,Add,1,1,RefreshDuration,identity;heart
+body_high_power_x2,Body: Força Brutal High,High power de body vale x2.,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,High,Always,,PowerMultiplier,Override,2,1,RefreshDuration,identity;body
+body_medium_power_x1_5,Body: Força Brutal Medium,Medium power de body vale x1.5.,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,Medium,Always,,PowerMultiplier,Override,1.5,1,RefreshDuration,identity;body
+lucky_numbers,Lucky Numbers,Se o dado de power tirar 6 ganha 30% de bônus de dano.,false,Dice,AfterResolve,2,OwnerAsActor,Attack,Power,Any,Any,RollValueEquals,6,DamagePercent,Multiply,0.30,1,RefreshDuration,temporary;example
