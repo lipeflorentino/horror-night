@@ -22,6 +22,7 @@ public class EnemyTagSet
     }
 }
 
+[CreateAssetMenu(menuName = "Game/Enemy")]
 public class EnemySO : ScriptableObject
 {
     [Header("Identity")]

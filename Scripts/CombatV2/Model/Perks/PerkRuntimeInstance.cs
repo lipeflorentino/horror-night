@@ -1,11 +1,11 @@
 public class PerkRuntimeInstance
 {
-    public PerkDefinition Definition;
+    public PerkSO Definition;
     public Battler Source;
     public int RemainingTurns;
     public int Stacks;
 
-    public PerkRuntimeInstance(PerkDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    public PerkRuntimeInstance(PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
     {
         Definition = definition;
         Source = source;

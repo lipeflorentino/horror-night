@@ -53,8 +53,7 @@ public class CombatManager : MonoBehaviour
     {
         Logger.Log("[CombatManager] Starting combat...");
         BattlerStateService = new BattlerStateService();
-        perkDatabase = FindObjectOfType<PerkDatabase>() ?? PerkDatabase.GetOrCreateRuntimeDatabase();
-        PerkService = new PerkService(perkDatabase);
+        PerkService = new PerkService();
         DiceService = new DiceService(BattlerStateService, PerkService);
         Resolver = new ActionResolverService(PerkService);
         InitiativeResolverService = new InitiativeResolverService();
@@ -63,8 +62,8 @@ public class CombatManager : MonoBehaviour
         RewardService = new RewardService();
         AttackDef = new ActionDefinition("attack", ActionType.Attack, 0);
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
-
         SessionData = CombatSessionStore.Consume();
+
         InitializeBattlers(SessionData);
         DefineStartingTurnByInitiative();
 
@@ -72,14 +71,13 @@ public class CombatManager : MonoBehaviour
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = BuildCombatInventory(SessionData);
-
         InventoryInputHandler.Init(this, CombatPlayerInventory);
 
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
+        
         RefreshCombatUI();
-
         UpdateTurnRoleUI();
     }
 
@@ -144,9 +142,6 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
             Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
         }
-
-        Dictionary<ItemSO, int> Loot = RewardService.GetRandomLoot(Enemy.Level);
-        Logger.Log("[CombatManager] Enemy Loot: " + string.Join(", ", Loot.Select(kvp => $"{kvp.Key.itemName}: {kvp.Value}")));
     }
 
     public void RefreshCombatUI()

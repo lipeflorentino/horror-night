@@ -9,7 +9,7 @@ public class PerkDatabase : MonoBehaviour
 
     private static PerkDatabase runtimeInstance;
 
-    public List<PerkDefinition> allPerks = new List<PerkDefinition>();
+    public List<PerkSO> allPerks = new();
 
     private void Awake()
     {
@@ -31,8 +31,10 @@ public class PerkDatabase : MonoBehaviour
             return runtimeInstance;
         }
 
-        GameObject databaseObject = new("PerkDatabase(Runtime)");
-        databaseObject.hideFlags = HideFlags.HideAndDontSave;
+        GameObject databaseObject = new("PerkDatabase(Runtime)")
+        {
+            hideFlags = HideFlags.HideAndDontSave
+        };
         runtimeInstance = databaseObject.AddComponent<PerkDatabase>();
         runtimeInstance.LoadAll();
         return runtimeInstance;
@@ -46,18 +48,14 @@ public class PerkDatabase : MonoBehaviour
 
     public void LoadAll()
     {
-        PerkDefinition[] loaded = Resources.LoadAll<PerkDefinition>(PerkResourceFolder);
-        if (allPerks == null)
-            allPerks = new List<PerkDefinition>();
+        PerkSO[] loaded = Resources.LoadAll<PerkSO>(PerkResourceFolder);
+        allPerks ??= new List<PerkSO>();
 
         allPerks.Clear();
         allPerks.AddRange(loaded);
-
-        if (allPerks.Count == 0)
-            LoadFromCsvFallback();
     }
 
-    public PerkDefinition GetById(string perkId)
+    public PerkSO GetById(string perkId)
     {
         if (string.IsNullOrWhiteSpace(perkId))
             return null;
@@ -66,28 +64,28 @@ public class PerkDatabase : MonoBehaviour
         return allPerks.Find(perk => perk != null && !string.IsNullOrWhiteSpace(perk.Id) && perk.Id.Equals(perkId, StringComparison.OrdinalIgnoreCase));
     }
 
-    public bool TryGetById(string perkId, out PerkDefinition perk)
+    public bool TryGetById(string perkId, out PerkSO perk)
     {
         perk = GetById(perkId);
         return perk != null;
     }
 
-    public List<PerkDefinition> GetIdentityPerks()
+    public List<PerkSO> GetIdentityPerks()
     {
         EnsureLoaded();
         return allPerks.FindAll(perk => perk != null && perk.IsPermanentIdentity);
     }
 
-    public List<PerkDefinition> FilterByTag(string tag)
+    public List<PerkSO> FilterByTag(string tag)
     {
         EnsureLoaded();
-        List<PerkDefinition> matches = new();
+        List<PerkSO> matches = new();
         if (string.IsNullOrWhiteSpace(tag))
             return matches;
 
         for (int i = 0; i < allPerks.Count; i++)
         {
-            PerkDefinition perk = allPerks[i];
+            PerkSO perk = allPerks[i];
             if (perk == null || string.IsNullOrWhiteSpace(perk.Tags))
                 continue;
 
@@ -103,15 +101,5 @@ public class PerkDatabase : MonoBehaviour
         }
 
         return matches;
-    }
-
-    private void LoadFromCsvFallback()
-    {
-        TextAsset table = Resources.Load<TextAsset>(PerkTableResourcePath);
-        if (table == null)
-            return;
-
-        List<PerkDefinition> parsedPerks = PerkCsvParser.Parse(table.text);
-        allPerks.AddRange(parsedPerks);
     }
 }

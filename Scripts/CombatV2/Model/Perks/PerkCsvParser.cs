@@ -5,9 +5,9 @@ using System.Text;
 
 public static class PerkCsvParser
 {
-    public static List<PerkDefinition> Parse(string csvText)
+    public static List<PerkSO> Parse(string csvText)
     {
-        List<PerkDefinition> perks = new();
+        List<PerkSO> perks = new();
         List<List<string>> rows = ParseRows(csvText);
         if (rows.Count <= 1)
             return perks;
@@ -20,7 +20,7 @@ public static class PerkCsvParser
             if (string.IsNullOrWhiteSpace(id))
                 continue;
 
-            PerkDefinition perk = UnityEngine.ScriptableObject.CreateInstance<PerkDefinition>();
+            PerkSO perk = UnityEngine.ScriptableObject.CreateInstance<PerkSO>();
             perk.Id = id;
             perk.DisplayName = Get(row, columns, "Name");
             perk.Description = Get(row, columns, "Description");

@@ -5,13 +5,13 @@ public class PerkService
 {
     private readonly PerkDatabase database;
 
-    public PerkService(PerkDatabase database = null)
+    public PerkService()
     {
-        this.database = database != null ? database : PerkDatabase.GetOrCreateRuntimeDatabase();
-        this.database.EnsureLoaded();
+        database = PerkDatabase.GetOrCreateRuntimeDatabase();
+        database.EnsureLoaded();
     }
 
-    public PerkDefinition GetPerkDefinition(string perkId)
+    public PerkSO GetPerkDefinition(string perkId)
     {
         return database.GetById(perkId);
     }
@@ -21,7 +21,7 @@ public class PerkService
         ApplyPerk(target, GetPerkDefinition(perkId), source, durationTurns, stacks);
     }
 
-    public void ApplyPerk(Battler target, PerkDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    public void ApplyPerk(Battler target, PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
     {
         if (target == null || definition == null)
             return;
@@ -176,7 +176,7 @@ public class PerkService
     private List<PerkRuntimeInstance> GetEffectivePerks(Battler battler)
     {
         List<PerkRuntimeInstance> perks = new();
-        List<PerkDefinition> identityPerks = database.GetIdentityPerks();
+        List<PerkSO> identityPerks = database.GetIdentityPerks();
         for (int i = 0; i < identityPerks.Count; i++)
             perks.Add(new PerkRuntimeInstance(identityPerks[i], null, -1, 1));
 
@@ -220,7 +220,7 @@ public class PerkService
         };
     }
 
-    private static int ResolveDuration(PerkDefinition definition, int durationTurns, int currentDuration)
+    private static int ResolveDuration(PerkSO definition, int durationTurns, int currentDuration)
     {
         int newDuration = durationTurns >= 0 ? durationTurns : definition.DefaultDurationTurns;
         if (currentDuration < 0 || newDuration < 0)

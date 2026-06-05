@@ -88,7 +88,7 @@ public class Battler
         return new BattlerStateService().HasState(this, stateId);
     }
 
-    public void ApplyPerk(PerkDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    public void ApplyPerk(PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
     {
         new PerkService().ApplyPerk(this, definition, source, durationTurns, stacks);
     }

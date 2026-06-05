@@ -20,18 +20,18 @@ public static class PerkCSVImporter
 
         EnsureFolder(OutputFolder);
         string csvText = File.ReadAllText(CsvPath);
-        List<PerkDefinition> parsedPerks = PerkCsvParser.Parse(csvText);
+        List<PerkSO> parsedPerks = PerkCsvParser.Parse(csvText);
         for (int i = 0; i < parsedPerks.Count; i++)
         {
-            PerkDefinition parsed = parsedPerks[i];
+            PerkSO parsed = parsedPerks[i];
             if (parsed == null || string.IsNullOrWhiteSpace(parsed.Id))
                 continue;
 
             string assetPath = $"{OutputFolder}/{SanitizeFileName(parsed.Id)}.asset";
-            PerkDefinition asset = AssetDatabase.LoadAssetAtPath<PerkDefinition>(assetPath);
+            PerkSO asset = AssetDatabase.LoadAssetAtPath<PerkSO>(assetPath);
             if (asset == null)
             {
-                asset = ScriptableObject.CreateInstance<PerkDefinition>();
+                asset = ScriptableObject.CreateInstance<PerkSO>();
                 AssetDatabase.CreateAsset(asset, assetPath);
             }
 
@@ -44,7 +44,7 @@ public static class PerkCSVImporter
         Debug.Log($"[PerkCSVImporter] Imported {parsedPerks.Count} perks.");
     }
 
-    private static void Copy(PerkDefinition source, PerkDefinition target)
+    private static void Copy(PerkSO source, PerkSO target)
     {
         target.Id = source.Id;
         target.DisplayName = source.DisplayName;

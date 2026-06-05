@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class ItemDatabase : MonoBehaviour
 {
-    public List<ItemSO> allItems = new List<ItemSO>();
+    public List<ItemSO> allItems = new();
 
     private void Awake()
     {

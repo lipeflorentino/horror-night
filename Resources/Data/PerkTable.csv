@@ -1,6 +1,9 @@
-Id,Name,Description,IsPermanentIdentity,Scope,Trigger,DurationTurns,OwnerRole,ActionFilter,RollFilter,StatFilter,TierFilter,ConditionKey,ConditionValue,ModifierTarget,Operation,Value,MaxStacks,StackMode,Tags
-mind_min_accuracy_30,Mind: Precisão Analítica,Dados de accuracy de mind nunca rolam abaixo de 30%.,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Accuracy,Mind,Any,Always,,MinRollPercent,Override,0.30,1,RefreshDuration,identity;mind
-heart_extra_die,Heart: Instinto Vivo,Ao rolar heart adiciona 1 dado extra.,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Any,Heart,Any,Always,,ExtraDice,Add,1,1,RefreshDuration,identity;heart
-body_high_power_x2,Body: Força Brutal High,High power de body vale x2.,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,High,Always,,PowerMultiplier,Override,2,1,RefreshDuration,identity;body
-body_medium_power_x1_5,Body: Força Brutal Medium,Medium power de body vale x1.5.,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,Medium,Always,,PowerMultiplier,Override,1.5,1,RefreshDuration,identity;body
-lucky_numbers,Lucky Numbers,Se o dado de power tirar 6 ganha 30% de bônus de dano.,false,Dice,AfterResolve,2,OwnerAsActor,Attack,Power,Any,Any,RollValueEquals,6,DamagePercent,Multiply,0.30,1,RefreshDuration,temporary;example
+Id,Name,Description,IconName,Scope,Trigger,DurationTurns,OwnerRole,ActionFilter,RollFilter,StatFilter,TierFilter,ConditionKey,ConditionValue,ModifierTarget,Operation,Value,MaxStacks,StackMode,Tags
+mind_min_accuracy_30,Precisão Analítica,Dados de accuracy de mind nunca rolam abaixo de 30%.,analytic_precision,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Accuracy,Mind,Any,Always,,MinRollPercent,Override,0.30,1,RefreshDuration,identity;mind
+heart_extra_die,Instinto Vivo,Ao rolar heart adiciona 1 dado extra.,live_instinct,true,Dice,BeforeRoll,-1,OwnerAsActor,Any,Any,Heart,Any,Always,,ExtraDice,Add,1,1,RefreshDuration,identity;heart
+body_high_power_x2,Força Brutal High,High power de body vale x2.,brutal_strength,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,High,Always,,PowerMultiplier,Override,2,1,RefreshDuration,identity;body
+body_medium_power_x1_5,Força Brutal Medium,Medium power de body vale x1.5.,brutal_strength,true,Dice,PowerMultiplier,-1,OwnerAsActor,Any,Power,Body,Medium,Always,,PowerMultiplier,Override,1.5,1,RefreshDuration,identity;body
+six_feet_under,Six Feet Under,Se o dado de power tirar 6 ganha 30% de bônus de dano.,six_feet_under,false,Dice,AfterResolve,-1,OwnerAsActor,Attack,Power,Any,Any,RollValueEquals,6,DamagePercent,Multiply,0.30,1,RefreshDuration,permanent;power;attack
+lucky_number,Numero da Sorte,Se a soma dos dados for 7 ganha 1 ponto de momentum.,lucky_number,false,Dice,AfterResolve,-1,OwnerAsActor,Attack,Any,Any,Any,RollSumEquals,7,MomentumPoints,Add,1,1,RefreshDuration,permanent;luck;attack
+equal_share,Divisão Igualitária,Se a soma dos dados for igual a soma dos dados do atacante o dano será dividido pelos combatentes envolvidos.,equal_share,false,Dice,AfterResolve,-1,OwnerAsActor,Defense,Any,Any,Any,RollSumEqualsAttackersRollSum,,DamagePercent,Multiply,0.50,1,RefreshDuration,permanent;equal_share;defense
+ 
