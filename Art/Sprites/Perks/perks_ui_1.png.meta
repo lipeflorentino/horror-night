@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 35b032ca667068349a72ccbe7982f8ba
+guid: 995d45704a109de4ea51b50b3a5f7cb8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CombatUI_New_2_0
+      name: analytic_precision
       rect:
         serializedVersion: 2
-        x: 62
-        y: 817
-        width: 937
-        height: 167
+        x: 68
+        y: 396
+        width: 300
+        height: 318
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 06af553dc2a113648923406fbfc7e704
-      internalID: 1127234831
+      spriteID: eed576c4aa7284744bda1b2982e363f5
+      internalID: 1946877424
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CombatUI_New_2_1
+      name: living_instinct
       rect:
         serializedVersion: 2
-        x: 1027
-        y: 810
-        width: 453
-        height: 181
+        x: 386
+        y: 396
+        width: 298
+        height: 318
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +145,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f7fcb0b0fffdb3b43a83dc0f7d783cdd
-      internalID: 888515684
+      spriteID: 3d57d1f5cd90640488e4d24dd69ffa52
+      internalID: 2007668822
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CombatUI_New_2_5
+      name: brutal_force
       rect:
         serializedVersion: 2
-        x: 569
-        y: 423
-        width: 920
-        height: 145
+        x: 701
+        y: 396
+        width: 298
+        height: 318
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a3c863bc39bd5d7489c9b9e7515625b1
-      internalID: 538889956
+      spriteID: d8d3d55ad92f3ce4b90a324788b12a67
+      internalID: -1545690821
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CombatUI_New_2_6
+      name: six_feet_under
       rect:
         serializedVersion: 2
-        x: 1307
-        y: 29
-        width: 188
-        height: 111
+        x: 68
+        y: 54
+        width: 298
+        height: 318
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,8 +187,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 23b0e4205356cfe4ab7b45641f65d615
-      internalID: 98275460
+      spriteID: aca62a89629b00644adb54238c106c6c
+      internalID: -619194056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lucky_number
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 55
+        width: 298
+        height: 318
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19e76b809a3eda442845430451d861a7
+      internalID: -1929129157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: equal_share
+      rect:
+        serializedVersion: 2
+        x: 1021
+        y: 55
+        width: 298
+        height: 318
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 143b93da36aac344a84dac442fea7b82
+      internalID: -1369023906
       vertices: []
       indices: 
       edges: []
@@ -204,14 +246,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CombatUI_New_2_0: 1127234831
-      CombatUI_New_2_1: 888515684
-      CombatUI_New_2_2: 1464699249
-      CombatUI_New_2_3: -688806845
-      CombatUI_New_2_4: 761914249
-      CombatUI_New_2_5: 538889956
-      CombatUI_New_2_6: 98275460
-      CombatUI_New_2_7: -249064366
+      analytic_precision: 1946877424
+      brutal_force: -1545690821
+      equal_share: -1369023906
+      living_instinct: 2007668822
+      lucky_number: -1929129157
+      six_feet_under: -619194056
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

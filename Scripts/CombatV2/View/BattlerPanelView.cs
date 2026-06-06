@@ -20,10 +20,22 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text FocusText;
     public TMP_Text StrengthText;
     public TMP_Text AgilityText;
-    // TODO: implementar effects (buff e debuff)
+
+    [SerializeField] private PerkDisplayView perkDisplayView;
+
+    void Start()
+    {
+        perkDisplayView = FindObjectOfType<PerkDisplayView>();
+    }
 
     public void Bind(Battler battler)
     {
+        if (perkDisplayView != null)
+        {
+            PerkService perkService = new();
+            perkDisplayView.Initialize(battler, perkService);
+        }
+        
         // Bind Stats
         currentHp = battler.HP;
         maxHp = battler.MaxHp;

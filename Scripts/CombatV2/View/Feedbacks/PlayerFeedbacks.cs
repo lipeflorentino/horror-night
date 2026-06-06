@@ -7,6 +7,7 @@ public class PlayerFeedbacks : MonoBehaviour
 {
     public Canvas screenFlashCanvas;
     public Image playerFlashImage;
+    [SerializeField] private GameObject actionLogPanel;
     [SerializeField] private TextMeshProUGUI playerStatusText;
     private const float PlayerFlashDuration = 0.15f;
     private const float PlayerFlashAlpha = 0.45f;
@@ -23,7 +24,7 @@ public class PlayerFeedbacks : MonoBehaviour
             return;
         }
 
-        playerStatusText.gameObject.SetActive(false);
+        actionLogPanel.gameObject.SetActive(false);
     }
 
     public void ShowPlayerDamageFlash()
@@ -34,7 +35,7 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowStatusText(string text)
     {
-        playerStatusText.gameObject.SetActive(true);
+        actionLogPanel.gameObject.SetActive(true);
         if (playerStatusText == null)
         {
             Debug.Log($"[Feedback] {text}");
@@ -70,7 +71,7 @@ public class PlayerFeedbacks : MonoBehaviour
     private IEnumerator AnimatePlayerStatusText(string text)
     {
         playerStatusText.text = text;
-        playerStatusText.gameObject.SetActive(true);
+        actionLogPanel.SetActive(true);
         Color color = playerStatusText.color;
         color.a = 1f;
         playerStatusText.color = color;
@@ -85,6 +86,6 @@ public class PlayerFeedbacks : MonoBehaviour
             yield return null;
         }
 
-        playerStatusText.gameObject.SetActive(false);
+        actionLogPanel.SetActive(false);
     }
 }

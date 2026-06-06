@@ -4,11 +4,17 @@ using UnityEngine;
 public class PerkService
 {
     private readonly PerkDatabase database;
+    public event System.Action<Battler, PerkRuntimeInstance> OnPerkApplied;
+    public event System.Action<Battler, string> OnPerkRemoved;
+    public event System.Action<Battler, string, PerkTrigger> OnPerkTriggered;
 
     public PerkService()
     {
         database = PerkDatabase.GetOrCreateRuntimeDatabase();
         database.EnsureLoaded();
+        OnPerkApplied += (b, p) => Debug.Log($"Perk {p.Definition.Id} aplicado!");
+        OnPerkRemoved += (b, id) => Debug.Log($"Perk {id} removido!");
+        OnPerkTriggered += (b, id, trigger) => Debug.Log($"Perk {id} acionado com trigger {trigger}!");
     }
 
     public PerkSO GetPerkDefinition(string perkId)
@@ -30,7 +36,9 @@ public class PerkService
         PerkRuntimeInstance existing = target.Perks.Find(perk => perk.Definition == definition || perk.Definition?.Id == definition.Id);
         if (existing == null)
         {
-            target.Perks.Add(new PerkRuntimeInstance(definition, source, durationTurns, Mathf.Clamp(stacks, 1, maxStacks)));
+            PerkRuntimeInstance newPerk = new(definition, source, durationTurns, Mathf.Clamp(stacks, 1, maxStacks));
+            target.Perks.Add(newPerk);
+            OnPerkApplied?.Invoke(target, newPerk);
             return;
         }
 
@@ -70,7 +78,10 @@ public class PerkService
 
             perk.RemainingTurns--;
             if (perk.RemainingTurns <= 0)
+            {
                 battler.Perks.RemoveAt(i);
+                OnPerkRemoved?.Invoke(battler, perk.Definition.Id);
+            }
         }
     }
 

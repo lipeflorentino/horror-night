@@ -40,6 +40,8 @@ TAREFA
     - Ter a possibilidade de habilidades que dão buffs/debuffs caso certos valores no dados sejam tirados
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
+    - Ter uma forma de mostrar visualmente a eficacia da ação (power, accuracy)
+    - Fazer as inforçaões do Player virem de um Scriptable Object (multi personagens)
 
 TO DO 
     - Criar NPCEncounterSystem
@@ -55,3 +57,7 @@ FIXES
     - Corrigir tela de Loot 
     - Ajustar recompensa Xp (icone)
     
+HOT 
+    - colocar OnPerkTriggered nos locais adequados 
+    - colocar o perkId no fluxo de trigger 
+    - estabelecer um local centralizado para verificar trigger do perk

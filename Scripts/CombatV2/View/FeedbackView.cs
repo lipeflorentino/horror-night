@@ -9,6 +9,7 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private ActionLogView actionLogView;
+    [SerializeField] private PerkActivationFeedback perkActivationFeedback;
 
     [Header("Attack Effect")]
     [SerializeField] private GameObject playerAttackEffectPrefab;
@@ -24,12 +25,19 @@ public class FeedbackView : MonoBehaviour
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
         enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
         actionLogView = FindObjectOfType<ActionLogView>();
+        perkActivationFeedback = FindObjectOfType<PerkActivationFeedback>();
 
         if (playerFeedbacks == null)
             Debug.LogError("FeedbackView: PlayerFeedbacks component is missing.");
 
         if (enemyFeedbacks == null)
             Debug.LogError("FeedbackView: EnemyFeedbacks component is missing.");
+
+        if (perkActivationFeedback != null)
+        {
+            PerkService perkService = new();
+            perkActivationFeedback.Initialize(perkService);
+        }
     }
     public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
     {
