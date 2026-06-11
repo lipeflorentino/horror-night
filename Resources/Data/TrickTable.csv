@@ -1,0 +1,7 @@
+Id,DisplayName,Description,Level,MindCost,BodyCost,HeartCost,Timing,DurationTurns,PerkIds,Rarity,Tags,FlavorText,IconName
+analytic_precision,Precisão Analítica,Dados de accuracy de mind nunca rolam abaixo de 30%.,1,0,0,0,Instant,-1,analytic_precision,Common,identity;mind,A mente aguçada percebe cada movimento com precisão cirúrgica.,analytic_precision
+live_instinct,Instinto Vivo,Ao rolar heart adiciona 1 dado extra.,1,0,0,0,Instant,-1,live_instinct,Common,identity;heart,O coração acelerado traz reações instintivas e impulsivas.,live_instinct
+brutal_force,Força Brutal,High power de body vale x2 e medium power vale x1.5.,1,0,0,0,Instant,-1,brutal_force_x2;brutal_force_x1_5,Common,identity;body,O corpo desperta sua força primária com força brutal.,brutal_force
+six_feet_under,Six Feet Under,Se o dado de power tirar 6 ganha 30% de bônus de dano.,2,2,1,0,Instant,-1,six_feet_under,Rare,permanent;power;attack,Um golpe perfeito com força devastadora.,six_feet_under
+lucky_number,Número da Sorte,Se a soma dos dados for 7 ganha 1 ponto de momentum.,3,1,0,2,Instant,-1,lucky_number,Rare,permanent;luck;attack,A sorte sorri para quem acredita.,lucky_number
+equal_share,Divisão Igualitária,Se a soma dos dados for igual a soma dos dados do atacante o dano será dividido pelos combatentes envolvidos.,2,1,1,1,Instant,-1,equal_share,Rare,permanent;equal_share;defense,Equilibrio perfeito entre defesa e ofensa.,equal_share

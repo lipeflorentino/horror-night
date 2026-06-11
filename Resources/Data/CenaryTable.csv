@@ -1,0 +1,11 @@
+ID,Name,Tier_Min,Tier_Max,Spawn_Weight,Base_Difficulty,Base_Tension_Modifier,Presence_Growth_Modifier,Encounter_Risk_Modifier,Reward_Min_Value,Reward_Max_Value,Tags,Special_Rule
+1,Silêncio Denso,1,3,10,1,0.5,1.0,0.8,1,3,"mental,respiro,memoria",Tensão cresce 50% mais devagar
+2,Raízes que se Movem,1,4,9,2,1.0,1.2,1.2,2,4,"ofensivo,sangramento,agressivo",Chance extra de encounter a cada 4 movimentos
+3,Névoa Pulsante,2,5,8,2,1.0,1.0,1.1,2,5,"mental,instavel,ilusão",Aumenta chance de evento psicológico
+4,Clareira Morta,1,5,7,3,1.2,1.0,1.0,2,3,"previsivel,resistente,neutro",Sem eventos até primeiro encounter
+5,Sussurros Distantes,2,6,8,3,1.0,1.1,1.2,3,6,"culpa,decisao,mental",Evento obrigatório após 6 movimentos
+6,Eco da Última Batalha,3,6,6,3,1.0,1.0,1.3,3,6,"eco,combate,refino",Chance de reaparecer último inimigo
+7,Círculo Quebrado,3,7,5,4,1.0,1.0,1.4,4,7,"sacrificio,raro,upgrade",Sacrifício necessário para recompensa
+8,Sombra Imóvel,2,6,7,3,1.0,1.3,1.3,3,5,"controle,tensao,sombra",Presença cresce mais rápido ao se mover
+9,Vento Contrário,2,7,6,3,1.2,1.0,1.1,3,6,"progressao,chave,forcado",Movimento horizontal consome +1 tensão
+10,Reflexo Distorcido,4,8,4,5,1.0,1.0,1.5,5,8,"boss,reflexo,permanente",Mini-encounter especial com recompensa permanente

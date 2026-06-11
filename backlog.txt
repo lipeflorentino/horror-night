@@ -31,8 +31,6 @@ BACKLOG
 
 
 TAREFA
-    - Implementar DiceStatEffects
-    - As skills ao serem habilitadas, são inseridas nos dados.
     - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
     - Cartas de estado de combate são habilitadas (com custo) e podem ser ativadas durante combate mediante a rolagem de dados ou condição especial. 
         O estado de combate pode alterar significativamente as stats e ações do combatente
@@ -51,6 +49,12 @@ TO DO
     - Implementar TreasureSystem 
         - Drop de artefatos lendarios, epicos
         - Drop de Perks e CombatStateCards
+    - lucky_strike abre input de dado para player decidir qual será o numero da sorte
+        - adicionar parametro no trick/perk
+    - UI para selecionar Tricks (CombatView/CombatInputHandler)
+        Precisa de método em CombatInputHandler para carregar tricks disponíveis
+        Precisa de botões/UI no CombatView para exibir tricks castáveis
+        Integração com OnPlayerSelectTrick()
     
 
 FIXES
@@ -58,6 +62,4 @@ FIXES
     - Ajustar recompensa Xp (icone)
     
 HOT 
-    - colocar OnPerkTriggered nos locais adequados 
-    - colocar o perkId no fluxo de trigger 
-    - estabelecer um local centralizado para verificar trigger do perk
+    - Próximo: UI para seleção de tricks (CombatView/CombatInputHandler)

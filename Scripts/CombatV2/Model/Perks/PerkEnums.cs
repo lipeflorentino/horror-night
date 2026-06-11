@@ -17,14 +17,17 @@ public enum PerkModifierTarget
     MinRollPercent,
     ExtraDice,
     PowerMultiplier,
-    DamagePercent
+    DamagePercent,
+    MomentumPoints
 }
 
 public enum PerkConditionKey
 {
     Always,
     RollValueEquals,
-    RollTierEquals
+    RollTierEquals,
+    RollSumEquals,
+    RollSumEqualsAttackersRollSum
 }
 
 public enum PerkOperation

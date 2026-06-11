@@ -5,14 +5,17 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-public static class PerkCsvParser
+/// <summary>
+/// Parser para carregar Tricks do CSV e gerar TrickSO
+/// </summary>
+public static class TrickCsvParser
 {
-    public static List<PerkSO> Parse(string csvText)
+    public static List<TrickSO> Parse(string csvText)
     {
-        List<PerkSO> perks = new();
+        List<TrickSO> tricks = new();
         List<List<string>> rows = ParseRows(csvText);
         if (rows.Count <= 1)
-            return perks;
+            return tricks;
 
         Dictionary<string, int> columns = BuildColumnMap(rows[0]);
         for (int i = 1; i < rows.Count; i++)
@@ -22,52 +25,30 @@ public static class PerkCsvParser
             if (string.IsNullOrWhiteSpace(id))
                 continue;
 
-            PerkSO perk = ScriptableObject.CreateInstance<PerkSO>();
+            TrickSO trick = ScriptableObject.CreateInstance<TrickSO>();
             
-            perk.Id = id;
-            perk.IsPermanentIdentity = ParseBool(Get(row, columns, "IsPermanentIdentity"));
-            perk.DefaultDurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
-            perk.MaxStacks = Math.Max(1, ParseInt(Get(row, columns, "MaxStacks"), 1));
-            perk.StackMode = ParseEnum(Get(row, columns, "StackMode"), BattlerStateStackMode.RefreshDuration);
-            perk.Tags = Get(row, columns, "Tags");
-            perk.Rules.Add(ParseRule(row, columns));
-            perks.Add(perk);
+            string iconName = Get(row, columns, "IconName");
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Tricks/" + iconName + ".png");
+            
+            trick.Id = id;
+            trick.DisplayName = Get(row, columns, "DisplayName");
+            trick.Description = Get(row, columns, "Description");
+            trick.Icon = sprite;
+            trick.Level = ParseInt(Get(row, columns, "Level"), 1);
+            trick.MindCost = ParseInt(Get(row, columns, "MindCost"), 0);
+            trick.BodyCost = ParseInt(Get(row, columns, "BodyCost"), 0);
+            trick.HeartCost = ParseInt(Get(row, columns, "HeartCost"), 0);
+            trick.Timing = ParseEnum(Get(row, columns, "Timing"), TrickTiming.Instant);
+            trick.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
+            trick.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
+            trick.Rarity = ParseEnum(Get(row, columns, "Rarity"), TrickRarity.Common);
+            trick.Tags = ParseStringList(Get(row, columns, "Tags"), ";");
+            trick.FlavorText = Get(row, columns, "FlavorText");
+            
+            tricks.Add(trick);
         }
 
-        return perks;
-    }
-
-    private static PerkRule ParseRule(List<string> row, Dictionary<string, int> columns)
-    {
-        string actionFilter = Get(row, columns, "ActionFilter");
-        string rollFilter = Get(row, columns, "RollFilter");
-        string statFilter = Get(row, columns, "StatFilter");
-        string tierFilter = Get(row, columns, "TierFilter");
-
-        return new PerkRule
-        {
-            Scope = ParseEnum(Get(row, columns, "Scope"), PerkScope.Dice),
-            Trigger = ParseEnum(Get(row, columns, "Trigger"), PerkTrigger.BeforeRoll),
-            ModifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice),
-            Operation = ParseEnum(Get(row, columns, "Operation"), PerkOperation.Add),
-            OwnerRole = ParseEnum(Get(row, columns, "OwnerRole"), BattlerStateRole.OwnerAsActor),
-            ActionType = ParseEnum(actionFilter, ActionType.Attack),
-            FilterByActionType = HasFilter(actionFilter),
-            RollType = ParseEnum(rollFilter, DiceRollType.Power),
-            FilterByRollType = HasFilter(rollFilter),
-            StatType = ParseEnum(statFilter, DiceStatType.Body),
-            FilterByStatType = HasFilter(statFilter),
-            Tier = ParseEnum(tierFilter, DiceTier.Low),
-            FilterByTier = HasFilter(tierFilter),
-            ConditionKey = ParseEnum(Get(row, columns, "ConditionKey"), PerkConditionKey.Always),
-            ConditionValue = Get(row, columns, "ConditionValue"),
-            Value = ParseFloat(Get(row, columns, "Value"), 0f)
-        };
-    }
-
-    private static bool HasFilter(string value)
-    {
-        return !string.IsNullOrWhiteSpace(value) && !value.Equals("Any", StringComparison.OrdinalIgnoreCase) && !value.Equals("None", StringComparison.OrdinalIgnoreCase);
+        return tricks;
     }
 
     private static Dictionary<string, int> BuildColumnMap(List<string> headers)
@@ -93,7 +74,7 @@ public static class PerkCsvParser
 
     private static T ParseEnum<T>(string value, T fallback) where T : struct
     {
-        if (string.IsNullOrWhiteSpace(value) || value.Equals("Any", StringComparison.OrdinalIgnoreCase) || value.Equals("None", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(value))
             return fallback;
 
         return Enum.TryParse(value, true, out T parsed) ? parsed : fallback;
@@ -104,14 +85,22 @@ public static class PerkCsvParser
         return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed) ? parsed : fallback;
     }
 
-    private static float ParseFloat(string value, float fallback)
+    private static List<string> ParseStringList(string value, string separator = ";")
     {
-        return float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsed) ? parsed : fallback;
-    }
-
-    private static bool ParseBool(string value)
-    {
-        return value.Equals("true", StringComparison.OrdinalIgnoreCase) || value == "1" || value.Equals("yes", StringComparison.OrdinalIgnoreCase);
+        List<string> result = new();
+        
+        if (string.IsNullOrWhiteSpace(value))
+            return result;
+        
+        string[] parts = value.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < parts.Length; i++)
+        {
+            string trimmed = parts[i].Trim();
+            if (!string.IsNullOrWhiteSpace(trimmed))
+                result.Add(trimmed);
+        }
+        
+        return result;
     }
 
     private static List<List<string>> ParseRows(string csvText)

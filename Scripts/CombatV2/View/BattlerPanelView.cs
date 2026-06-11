@@ -21,19 +21,19 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text StrengthText;
     public TMP_Text AgilityText;
 
-    [SerializeField] private PerkDisplayView perkDisplayView;
+    [SerializeField] private TrickDisplayView trickDisplayView;
 
     void Start()
     {
-        perkDisplayView = FindObjectOfType<PerkDisplayView>();
+        trickDisplayView = FindObjectOfType<TrickDisplayView>();
     }
 
     public void Bind(Battler battler)
     {
-        if (perkDisplayView != null)
+        if (trickDisplayView != null)
         {
-            PerkService perkService = new();
-            perkDisplayView.Initialize(battler, perkService);
+            TrickService trickService = new();
+            trickDisplayView.Initialize(battler, trickService);
         }
         
         // Bind Stats

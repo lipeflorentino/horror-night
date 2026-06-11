@@ -20,8 +20,8 @@ public class CombatManager : MonoBehaviour
 
     private DiceService DiceService;
     private BattlerStateService BattlerStateService;
-    private PerkDatabase perkDatabase;
     private PerkService PerkService;
+    private TrickService TrickService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
     private EnemyActionSelector EnemyActionSelector;
@@ -54,6 +54,7 @@ public class CombatManager : MonoBehaviour
         Logger.Log("[CombatManager] Starting combat...");
         BattlerStateService = new BattlerStateService();
         PerkService = new PerkService();
+        TrickService = new TrickService(PerkService);
         DiceService = new DiceService(BattlerStateService, PerkService);
         Resolver = new ActionResolverService(PerkService);
         InitiativeResolverService = new InitiativeResolverService();
@@ -198,6 +199,16 @@ public class CombatManager : MonoBehaviour
         StartCoroutine(SkipTurnRoutine());
     }
 
+    // TODO: implement UI to select trick and pass trickId to this method
+    public void ReceivePlayerSelectTrick(string trickId)
+    {
+        if (CombatEnded)
+            return;
+
+        TrickService.TryCastTrick(Player, trickId, null);
+        RefreshCombatUI();
+    }
+
     private IEnumerator SkipTurnRoutine()
     {
         yield return WaitForSeconds0_5;
@@ -336,6 +347,8 @@ public class CombatManager : MonoBehaviour
         BattlerStateService.TickTurnEnd(Enemy);
         PerkService.TickTurnEnd(Player);
         PerkService.TickTurnEnd(Enemy);
+        TrickService.TickTrickEnd(Player);
+        TrickService.TickTrickEnd(Enemy);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
 

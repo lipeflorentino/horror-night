@@ -4,17 +4,23 @@ using UnityEngine;
 public class PerkService
 {
     private readonly PerkDatabase database;
+    private readonly PerkTriggerEvaluator triggerEvaluator;
+
     public event System.Action<Battler, PerkRuntimeInstance> OnPerkApplied;
     public event System.Action<Battler, string> OnPerkRemoved;
-    public event System.Action<Battler, string, PerkTrigger> OnPerkTriggered;
+    public event System.Action<PerkTriggeredEvent> OnPerkTriggered;
 
     public PerkService()
     {
         database = PerkDatabase.GetOrCreateRuntimeDatabase();
         database.EnsureLoaded();
+        
+        triggerEvaluator = new PerkTriggerEvaluator(database);
+        triggerEvaluator.OnPerkTriggered += (evt) => OnPerkTriggered?.Invoke(evt);
+        
         OnPerkApplied += (b, p) => Debug.Log($"Perk {p.Definition.Id} aplicado!");
         OnPerkRemoved += (b, id) => Debug.Log($"Perk {id} removido!");
-        OnPerkTriggered += (b, id, trigger) => Debug.Log($"Perk {id} acionado com trigger {trigger}!");
+        OnPerkTriggered += (evt) => Debug.Log($"Perk {evt.PerkId} acionado com trigger {evt.Trigger}!");
     }
 
     public PerkSO GetPerkDefinition(string perkId)
@@ -87,6 +93,11 @@ public class PerkService
 
     public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context)
     {
+        // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
+        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll);
+        if (opponent != null)
+            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll);
+        
         float value = 0f;
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.ExtraDice, ref value);
         return Mathf.Max(0, Mathf.RoundToInt(value));
@@ -94,6 +105,11 @@ public class PerkService
 
     public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue)
     {
+        // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
+        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll);
+        if (opponent != null)
+            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll);
+        
         float minValue = currentMinValue;
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MinRollPercent, ref minValue, context.MaxValue);
         return Mathf.Clamp(Mathf.CeilToInt(minValue), 1, Mathf.Max(1, context.MaxValue));
@@ -105,6 +121,12 @@ public class PerkService
             return baseMultiplier;
 
         CombatActionContext actionContext = new(actor, opponent, actionType);
+        
+        // ✅ Dispara triggers quando dado é resolvido (PowerMultiplier)
+        triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier);
+        if (opponent != null)
+            triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier);
+        
         float multiplier = baseMultiplier;
         ApplyDiceModifiers(actor, opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, PerkModifierTarget.PowerMultiplier, ref multiplier);
         return Mathf.Max(0f, multiplier);
@@ -116,6 +138,22 @@ public class PerkService
             return damage;
 
         CombatActionContext actionContext = new(actor, opponent, actionType);
+        
+        // ✅ Dispara triggers quando dados são analisados para dano (AfterResolve)
+        if (action.PowerDice != null)
+        {
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve);
+            if (opponent != null)
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve);
+        }
+        
+        if (action.AccuracyDice != null)
+        {
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve);
+            if (opponent != null)
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve);
+        }
+        
         float modifiedDamage = damage;
         ApplyDiceModifiers(actor, opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage);
         ApplyDiceModifiers(actor, opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage);
@@ -238,5 +276,20 @@ public class PerkService
             return -1;
 
         return Mathf.Max(currentDuration, newDuration);
+    }
+
+    public void RemovePerk(Battler target, string perkId)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(perkId))
+            return;
+
+        PerkRuntimeInstance instance = target.Perks.Find(perk => perk != null && 
+            perk.Definition != null && 
+            !string.IsNullOrWhiteSpace(perk.Definition.Id) && 
+            perk.Definition.Id.Equals(perkId, System.StringComparison.OrdinalIgnoreCase));
+        if (instance == null)
+            return;
+        
+        target.Perks.Remove(instance);
     }
 }

@@ -20,6 +20,7 @@ public class Battler
     public bool IsPlayer;
     public List<BattlerStateInstance> States = new();
     public List<PerkRuntimeInstance> Perks = new();
+    public List<TrickRuntimeInstance> Tricks = new();
 
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
     {
@@ -96,5 +97,49 @@ public class Battler
     public void ApplyPerk(string perkId, Battler source = null, int durationTurns = -1, int stacks = 1)
     {
         new PerkService().ApplyPerk(this, perkId, source, durationTurns, stacks);
+    }
+
+    /// <summary>
+    /// Retorna todos os Perks efetivos (diretos + de Tricks)
+    /// </summary>
+    public List<PerkRuntimeInstance> GetEffectivePerks()
+    {
+        List<PerkRuntimeInstance> perks = new();
+        
+        // Perks diretos (legado)
+        perks.AddRange(Perks);
+        
+        // Perks de Tricks
+        for (int i = 0; i < Tricks.Count; i++)
+        {
+            if (Tricks[i]?.ActivePerks != null)
+                perks.AddRange(Tricks[i].ActivePerks);
+        }
+        
+        return perks;
+    }
+
+    /// <summary>
+    /// Verifica se o battler tem um trick ativo
+    /// </summary>
+    public bool HasTrick(string trickId)
+    {
+        return Tricks.Find(t => t != null && t.Definition != null && t.Definition.Id == trickId) != null;
+    }
+
+    /// <summary>
+    /// Retorna um trick pelo ID
+    /// </summary>
+    public TrickRuntimeInstance GetTrick(string trickId)
+    {
+        return Tricks.Find(t => t != null && t.Definition != null && t.Definition.Id == trickId);
+    }
+
+    /// <summary>
+    /// Retorna todos os tricks ativos (ainda com duração > 0 ou permanentes)
+    /// </summary>
+    public List<TrickRuntimeInstance> GetActiveTricks()
+    {
+        return Tricks.FindAll(t => t != null && t.IsActive());
     }
 }
