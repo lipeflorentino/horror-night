@@ -34,6 +34,8 @@ public class TrickSO : ScriptableObject
     public TrickTiming Timing = TrickTiming.Instant;
     [Tooltip("-1 = Permanente (identity trick), 0+ = Número de turnos")]
     public int DurationTurns = -1;
+    [Tooltip("Quantidade de turnos até que o trick possa ser castado novamente.")]
+    public int CooldownTurns = 0;
 
     [Header("Efeitos")]
     [Tooltip("IDs dos Perks que este Trick ativa. Devem ser encontrados em PerkDatabase.")]
@@ -86,6 +88,6 @@ public class TrickSO : ScriptableObject
     /// </summary>
     public string GetFormattedDescription()
     {
-        return $"{Description}\n\nLevel: {Level} | Custo: Mind {MindCost}, Body {BodyCost}, Heart {HeartCost}";
+        return $"{Description}\n\nLevel: {Level} | Custo: Mind {MindCost}, Body {BodyCost}, Heart {HeartCost} | Cooldown: {CooldownTurns}";
     }
 }
