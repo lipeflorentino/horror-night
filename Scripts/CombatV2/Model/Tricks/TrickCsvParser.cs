@@ -40,6 +40,7 @@ public static class TrickCsvParser
             trick.HeartCost = ParseInt(Get(row, columns, "HeartCost"), 0);
             trick.Timing = ParseEnum(Get(row, columns, "Timing"), TrickTiming.Instant);
             trick.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
+            trick.CooldownTurns = ParseInt(Get(row, columns, "CooldownTurns"), 0);
             trick.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
             trick.Rarity = ParseEnum(Get(row, columns, "Rarity"), TrickRarity.Common);
             trick.Tags = ParseStringList(Get(row, columns, "Tags"), ";");

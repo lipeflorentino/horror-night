@@ -21,3 +21,12 @@ public enum TrickRarity
     Epic,
     Legendary
 }
+
+/// <summary>
+/// Define os grupos de slots suportados pelo TrickInventory.
+/// </summary>
+public enum TrickSlotType
+{
+    Identity,
+    Casted
+}

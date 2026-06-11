@@ -10,6 +10,7 @@ public class TrickRuntimeInstance
     public TrickSO Definition { get; private set; }
     public Battler Owner { get; private set; }
     public int RemainingTurns { get; set; }
+    public int CooldownTurnsRemaining { get; set; }
     public float CastTime { get; private set; }
     
     /// <summary>
@@ -17,11 +18,12 @@ public class TrickRuntimeInstance
     /// </summary>
     public List<PerkRuntimeInstance> ActivePerks { get; set; }
     
-    public TrickRuntimeInstance(TrickSO definition, Battler owner, int durationTurns)
+    public TrickRuntimeInstance(TrickSO definition, Battler owner, int durationTurns, int cooldownTurnsRemaining = 0)
     {
         Definition = definition;
         Owner = owner;
         RemainingTurns = durationTurns;
+        CooldownTurnsRemaining = Mathf.Max(0, cooldownTurnsRemaining);
         CastTime = Time.time;
         ActivePerks = new List<PerkRuntimeInstance>();
     }
@@ -33,6 +35,14 @@ public class TrickRuntimeInstance
     {
         return RemainingTurns < 0 || RemainingTurns > 0;
     }
+
+    /// <summary>
+    /// Retorna true quando o trick ainda está em cooldown.
+    /// </summary>
+    public bool IsCoolingDown()
+    {
+        return CooldownTurnsRemaining > 0;
+    }
     
     /// <summary>
     /// Reduz a duração em 1 turno
@@ -41,6 +51,15 @@ public class TrickRuntimeInstance
     {
         if (RemainingTurns > 0)
             RemainingTurns--;
+    }
+
+    /// <summary>
+    /// Reduz o cooldown em 1 turno.
+    /// </summary>
+    public void DecreaseCooldown()
+    {
+        if (CooldownTurnsRemaining > 0)
+            CooldownTurnsRemaining--;
     }
     
     /// <summary>
