@@ -63,3 +63,11 @@ FIXES
     
 HOT 
     - Próximo: UI para seleção de tricks (CombatView/CombatInputHandler)
+
+    TrickSlot.cs (30-40 linhas)
+    ITrickInventory.cs (30 linhas - interface)
+    TrickInventory.cs (150-180 linhas)
+    TrickInventoryInputHandler.cs (140-180 linhas)
+    TrickInventoryView.cs (200-250 linhas - refactored)
+    TrickSlotUI.cs (150-180 linhas)
+    TrickContextMenu.cs (80-120 linhas)

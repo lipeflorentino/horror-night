@@ -5833,7 +5833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 575397962}
   m_Layer: 5
-  m_Name: PerkPanel
+  m_Name: TricksPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5948,7 +5948,7 @@ GameObject:
   - component: {fileID: 600805037}
   - component: {fileID: 600805038}
   m_Layer: 5
-  m_Name: PerksContainer
+  m_Name: TricksContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6326,7 +6326,7 @@ GameObject:
   - component: {fileID: 655366621}
   - component: {fileID: 655366622}
   m_Layer: 0
-  m_Name: PerkDisplayView
+  m_Name: TrickDisplayView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6356,11 +6356,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 655366620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb0b91eaa74b8c943912656ea063b25d, type: 3}
+  m_Script: {fileID: 11500000, guid: 28a6de712e5ef0b44963ab5ccc049b5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perkIconPrefab: {fileID: 1835758377008194682, guid: 25d7177e8c098b34ab7253530dedc529, type: 3}
+  trickIconPrefab: {fileID: 0}
   container: {fileID: 600805038}
+  castTrickButton: {fileID: 0}
 --- !u!1 &664833446
 GameObject:
   m_ObjectHideFlags: 0
@@ -26178,7 +26179,7 @@ MonoBehaviour:
   FocusText: {fileID: 0}
   StrengthText: {fileID: 0}
   AgilityText: {fileID: 0}
-  perkDisplayView: {fileID: 0}
+  trickDisplayView: {fileID: 0}
 --- !u!114 &3873325271730742034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29061,7 +29062,7 @@ MonoBehaviour:
   FocusText: {fileID: 0}
   StrengthText: {fileID: 0}
   AgilityText: {fileID: 0}
-  perkDisplayView: {fileID: 0}
+  trickDisplayView: {fileID: 0}
 --- !u!1 &8766488522727681693
 GameObject:
   m_ObjectHideFlags: 0
