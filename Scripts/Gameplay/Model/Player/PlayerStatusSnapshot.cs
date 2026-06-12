@@ -27,4 +27,5 @@ public struct PlayerStatusSnapshot
     [SerializeField] public PlayerArchetype currentArchetype;
     [SerializeField] public ArchetypePoints archetypePoints;
     [SerializeField] public PlayerInventorySnapshot inventory;
+    [SerializeField] public TrickInventorySnapshot trickInventory;
 }
