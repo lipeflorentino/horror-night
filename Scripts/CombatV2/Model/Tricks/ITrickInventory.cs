@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 public interface ITrickInventory
 {
+    event System.Action OnChanged;
     IReadOnlyList<TrickSlot> IdentitySlots { get; }
     IReadOnlyList<TrickSO> LearnedTricks { get; }
     IReadOnlyList<TrickSlot> CastedSlots { get; }

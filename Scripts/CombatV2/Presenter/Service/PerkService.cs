@@ -28,24 +28,46 @@ public class PerkService
         return database.GetById(perkId);
     }
 
-    public void ApplyPerk(Battler target, string perkId, Battler source = null, int durationTurns = -1, int stacks = 1)
+    public PerkRuntimeInstance ApplyPerk(Battler target, string perkId, Battler source = null, int durationTurns = -1, int stacks = 1)
     {
-        ApplyPerk(target, GetPerkDefinition(perkId), source, durationTurns, stacks);
+        return ApplyPerk(target, GetPerkDefinition(perkId), source, durationTurns, stacks);
     }
 
-    public void ApplyPerk(Battler target, PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    public PerkRuntimeInstance ApplyPerk(Battler target, PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
+    {
+        return ApplyPerkInternal(target, definition, source, durationTurns, stacks, null);
+    }
+
+    public PerkRuntimeInstance ApplyPerkFromTrick(
+        Battler target,
+        string perkId,
+        TrickRuntimeInstance sourceTrick,
+        Battler source = null,
+        int durationTurns = -1,
+        int stacks = 1)
+    {
+        return ApplyPerkInternal(target, GetPerkDefinition(perkId), source, durationTurns, stacks, sourceTrick);
+    }
+
+    private PerkRuntimeInstance ApplyPerkInternal(
+        Battler target,
+        PerkSO definition,
+        Battler source,
+        int durationTurns,
+        int stacks,
+        TrickRuntimeInstance sourceTrick)
     {
         if (target == null || definition == null)
-            return;
+            return null;
 
         int maxStacks = Mathf.Max(1, definition.MaxStacks);
-        PerkRuntimeInstance existing = target.Perks.Find(perk => perk.Definition == definition || perk.Definition?.Id == definition.Id);
+        PerkRuntimeInstance existing = target.Perks.Find(perk => IsSamePerkInstance(perk, definition, sourceTrick));
         if (existing == null)
         {
-            PerkRuntimeInstance newPerk = new(definition, source, durationTurns, Mathf.Clamp(stacks, 1, maxStacks));
+            PerkRuntimeInstance newPerk = new(definition, source, durationTurns, Mathf.Clamp(stacks, 1, maxStacks), sourceTrick);
             target.Perks.Add(newPerk);
             OnPerkApplied?.Invoke(target, newPerk);
-            return;
+            return newPerk;
         }
 
         switch (definition.StackMode)
@@ -56,13 +78,18 @@ public class PerkService
                 break;
             case BattlerStateStackMode.Replace:
                 existing.Source = source;
+                existing.SetSourceTrick(sourceTrick);
                 existing.Stacks = Mathf.Clamp(stacks, 1, maxStacks);
                 existing.RemainingTurns = ResolveDuration(definition, durationTurns, existing.RemainingTurns);
                 break;
             default:
                 existing.RemainingTurns = ResolveDuration(definition, durationTurns, existing.RemainingTurns);
+                if (sourceTrick != null)
+                    existing.SetSourceTrick(sourceTrick);
                 break;
         }
+
+        return existing;
     }
 
     public void TickTurnEnd(Battler battler)
@@ -79,6 +106,9 @@ public class PerkService
                 continue;
             }
 
+            if (perk.SourceTrick != null)
+                continue;
+
             if (perk.RemainingTurns < 0)
                 continue;
 
@@ -94,9 +124,9 @@ public class PerkService
     public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context)
     {
         // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
-        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll);
+        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll, GetEffectivePerks(actor));
         if (opponent != null)
-            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll);
+            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll, GetEffectivePerks(opponent));
         
         float value = 0f;
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.ExtraDice, ref value);
@@ -106,9 +136,9 @@ public class PerkService
     public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue)
     {
         // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
-        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll);
+        triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll, GetEffectivePerks(actor));
         if (opponent != null)
-            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll);
+            triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll, GetEffectivePerks(opponent));
         
         float minValue = currentMinValue;
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MinRollPercent, ref minValue, context.MaxValue);
@@ -123,9 +153,9 @@ public class PerkService
         CombatActionContext actionContext = new(actor, opponent, actionType);
         
         // ✅ Dispara triggers quando dado é resolvido (PowerMultiplier)
-        triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier);
+        triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, GetEffectivePerks(actor));
         if (opponent != null)
-            triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier);
+            triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, GetEffectivePerks(opponent));
         
         float multiplier = baseMultiplier;
         ApplyDiceModifiers(actor, opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, PerkModifierTarget.PowerMultiplier, ref multiplier);
@@ -142,16 +172,16 @@ public class PerkService
         // ✅ Dispara triggers quando dados são analisados para dano (AfterResolve)
         if (action.PowerDice != null)
         {
-            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve);
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor));
             if (opponent != null)
-                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve);
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent));
         }
         
         if (action.AccuracyDice != null)
         {
-            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve);
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor));
             if (opponent != null)
-                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve);
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent));
         }
         
         float modifiedDamage = damage;
@@ -222,17 +252,58 @@ public class PerkService
         }
     }
 
-    private List<PerkRuntimeInstance> GetEffectivePerks(Battler battler)
+    public List<PerkRuntimeInstance> GetEffectivePerks(Battler battler)
     {
         List<PerkRuntimeInstance> perks = new();
+        HashSet<string> addedKeys = new();
+
+        // Convivência temporária: Identity Perks globais continuam como fonte legada
+        // até a migração completa para Identity Tricks por battler.
         List<PerkSO> identityPerks = database.GetIdentityPerks();
         for (int i = 0; i < identityPerks.Count; i++)
-            perks.Add(new PerkRuntimeInstance(identityPerks[i], null, -1, 1));
+        {
+            if (identityPerks[i] != null)
+                AddEffectivePerk(perks, addedKeys, new PerkRuntimeInstance(identityPerks[i], battler, -1, 1));
+        }
 
-        if (battler?.Perks != null)
-            perks.AddRange(battler.Perks);
+        if (battler == null)
+            return perks;
+
+        List<PerkRuntimeInstance> battlerPerks = battler.GetEffectivePerks();
+        for (int i = 0; i < battlerPerks.Count; i++)
+            AddEffectivePerk(perks, addedKeys, battlerPerks[i]);
 
         return perks;
+    }
+
+    private static void AddEffectivePerk(List<PerkRuntimeInstance> perks, HashSet<string> addedKeys, PerkRuntimeInstance perk)
+    {
+        if (perk?.Definition == null)
+            return;
+
+        string key = GetEffectivePerkKey(perk);
+        if (addedKeys.Add(key))
+            perks.Add(perk);
+    }
+
+    private static string GetEffectivePerkKey(PerkRuntimeInstance perk)
+    {
+        string perkId = perk.Definition?.Id ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(perk.SourceTrickInstanceId))
+            return $"trick:{perk.SourceTrickInstanceId}:{perkId}";
+
+        return $"direct:{perkId}";
+    }
+
+    private static bool IsSamePerkInstance(PerkRuntimeInstance perk, PerkSO definition, TrickRuntimeInstance sourceTrick)
+    {
+        if (perk == null || definition == null || !(perk.Definition == definition || perk.Definition?.Id == definition.Id))
+            return false;
+
+        if (sourceTrick == null)
+            return perk.SourceTrick == null;
+
+        return perk.SourceTrickInstanceId == sourceTrick.InstanceId;
     }
 
     private static float ApplyModifier(float current, PerkOperation operation, float value, int stacks)
@@ -283,13 +354,24 @@ public class PerkService
         if (target == null || string.IsNullOrWhiteSpace(perkId))
             return;
 
-        PerkRuntimeInstance instance = target.Perks.Find(perk => perk != null && 
-            perk.Definition != null && 
-            !string.IsNullOrWhiteSpace(perk.Definition.Id) && 
+        PerkRuntimeInstance instance = target.Perks.Find(perk => perk != null &&
+            perk.SourceTrick == null &&
+            perk.Definition != null &&
+            !string.IsNullOrWhiteSpace(perk.Definition.Id) &&
             perk.Definition.Id.Equals(perkId, System.StringComparison.OrdinalIgnoreCase));
         if (instance == null)
             return;
-        
+
         target.Perks.Remove(instance);
+        OnPerkRemoved?.Invoke(target, perkId);
+    }
+
+    public void RemovePerkInstance(Battler target, PerkRuntimeInstance instance)
+    {
+        if (target == null || instance == null)
+            return;
+
+        if (target.Perks.Remove(instance))
+            OnPerkRemoved?.Invoke(target, instance.Definition?.Id);
     }
 }

@@ -36,6 +36,7 @@ public class TrickSlot
 
         RuntimeInstance = runtimeInstance;
         Definition = runtimeInstance?.Definition;
+        RuntimeInstance?.BindSlot(SlotType, SlotIndex);
     }
 
     public void Clear()

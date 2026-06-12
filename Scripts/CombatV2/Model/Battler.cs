@@ -105,17 +105,29 @@ public class Battler
     public List<PerkRuntimeInstance> GetEffectivePerks()
     {
         List<PerkRuntimeInstance> perks = new();
-        
+        HashSet<PerkRuntimeInstance> added = new();
+
         // Perks diretos (legado)
-        perks.AddRange(Perks);
-        
+        for (int i = 0; i < Perks.Count; i++)
+        {
+            if (Perks[i] != null && added.Add(Perks[i]))
+                perks.Add(Perks[i]);
+        }
+
         // Perks de Tricks
         for (int i = 0; i < Tricks.Count; i++)
         {
-            if (Tricks[i]?.ActivePerks != null)
-                perks.AddRange(Tricks[i].ActivePerks);
+            if (Tricks[i]?.ActivePerks == null || !Tricks[i].IsActive())
+                continue;
+
+            for (int j = 0; j < Tricks[i].ActivePerks.Count; j++)
+            {
+                PerkRuntimeInstance perk = Tricks[i].ActivePerks[j];
+                if (perk != null && added.Add(perk))
+                    perks.Add(perk);
+            }
         }
-        
+
         return perks;
     }
 

@@ -53,6 +53,12 @@ public class CombatView : MonoBehaviour
         ActionPanel.BindInput(inputHandler);
     }
 
+    public void BindPlayerTricks(Battler player, TrickService trickService, ITrickInventory trickInventory)
+    {
+        if (PlayerPanel != null)
+            PlayerPanel.BindTricks(player, trickService, trickInventory);
+    }
+
     public void UpdateView(Battler player, Battler enemy)
     {
         PlayerPanel.Bind(player);
