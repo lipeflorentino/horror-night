@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,44 +13,50 @@ public class TrickIconUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI costText;
     [SerializeField] private Image rarityBorder;
-    
+
     private TrickSO trickDefinition;
     private TrickTooltip tooltip;
     [SerializeField] private GameObject tooltipPrefab;
-    
+
     public TrickSO TrickDefinition => trickDefinition;
-    
+    public event Action<TrickSO> TrickClicked;
+
     /// <summary>
     /// Configura o ícone com dados do trick
     /// </summary>
     public void Setup(TrickSO definition)
     {
         trickDefinition = definition;
-        
+
         if (icon != null && definition.Icon != null)
             icon.sprite = definition.Icon;
-        
+
         if (levelText != null)
             levelText.text = $"Lvl {definition.Level}";
-        
+
         if (costText != null)
             costText.text = FormatCost(definition);
-        
+
         if (rarityBorder != null)
             rarityBorder.color = GetRarityColor(definition.Rarity);
-        
-        GetComponent<Button>().onClick.AddListener(OnClicked);
+
+        Button button = GetComponent<Button>();
+        button.onClick.RemoveListener(OnClicked);
+        button.onClick.AddListener(OnClicked);
     }
-    
+
     /// <summary>
     /// Callback quando o ícone é clicado
     /// </summary>
     private void OnClicked()
     {
-        // TODO: Disparar evento para CombatManager tentar casticar o trick
+        if (trickDefinition == null)
+            return;
+
+        TrickClicked?.Invoke(trickDefinition);
         Debug.Log($"[TrickIconUI] Clicked: {trickDefinition.DisplayName}");
     }
-    
+
     /// <summary>
     /// Formata o custo para exibição (ex: "2M 1B")
     /// </summary>
@@ -62,10 +69,10 @@ public class TrickIconUI : MonoBehaviour
             cost += $"{trick.BodyCost}B ";
         if (trick.HeartCost > 0)
             cost += $"{trick.HeartCost}H";
-        
+
         return string.IsNullOrWhiteSpace(cost) ? "Free" : cost.Trim();
     }
-    
+
     /// <summary>
     /// Retorna cor baseada na raridade
     /// </summary>
@@ -81,17 +88,24 @@ public class TrickIconUI : MonoBehaviour
             _ => Color.white
         };
     }
-    
+
+    private void OnDestroy()
+    {
+        Button button = GetComponent<Button>();
+        if (button != null)
+            button.onClick.RemoveListener(OnClicked);
+    }
+
     public void PlayEnterAnimation()
     {
         // TODO: Implementar animação de entrada
     }
-    
+
     public void PlayExitAnimation()
     {
         // TODO: Implementar animação de saída
     }
-    
+
     void OnMouseEnter()
     {
         if (tooltipPrefab != null && trickDefinition != null)
@@ -101,7 +115,7 @@ public class TrickIconUI : MonoBehaviour
                 tooltip.Show(trickDefinition);
         }
     }
-    
+
     void OnMouseExit()
     {
         if (tooltip != null)

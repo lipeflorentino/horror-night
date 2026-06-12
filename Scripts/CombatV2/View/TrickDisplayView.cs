@@ -87,8 +87,7 @@ public class TrickDisplayView : MonoBehaviour
         icon.Setup(trickDefinition);
         icon.PlayEnterAnimation();
         
-        // Adicionar callback para seleção
-        icon.GetComponent<Button>().onClick.AddListener(() => SelectTrick(trickDefinition));
+        icon.TrickClicked += SelectTrick;
         
         activeTrickIcons[trickDefinition.Id] = icon;
     }

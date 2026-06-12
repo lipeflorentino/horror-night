@@ -46,6 +46,7 @@ public class CombatManager : MonoBehaviour
     private CombatSessionData SessionData;
     private RewardService RewardService;
     private InventoryInputHandler InventoryInputHandler;
+    private TrickInventoryInputHandler TrickInventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
     private ITrickInventory PlayerTrickInventory;
     [SerializeField] private EnemyVisuals EnemyVisuals;
@@ -70,11 +71,19 @@ public class CombatManager : MonoBehaviour
         DefineStartingTurnByInitiative();
 
         InventoryInputHandler = FindObjectOfType<InventoryInputHandler>();
+        TrickInventoryInputHandler = FindObjectOfType<TrickInventoryInputHandler>();
+        if (TrickInventoryInputHandler == null && FindObjectOfType<TrickInventoryView>() != null)
+            TrickInventoryInputHandler = gameObject.AddComponent<TrickInventoryInputHandler>();
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = BuildCombatInventory(SessionData);
         PlayerTrickInventory = BuildPlayerTrickInventory(Player);
-        InventoryInputHandler.Init(this, CombatPlayerInventory);
+
+        if (InventoryInputHandler != null)
+            InventoryInputHandler.Init(this, CombatPlayerInventory);
+
+        if (TrickInventoryInputHandler != null)
+            TrickInventoryInputHandler.Init(this, PlayerTrickInventory);
 
         Input.Init(this);
         View.Init();
@@ -202,14 +211,30 @@ public class CombatManager : MonoBehaviour
         StartCoroutine(SkipTurnRoutine());
     }
 
-    // TODO: implement UI to select trick and pass trickId to this method
+    // TODO: keep string entry point for legacy UI and UnityEvents.
     public void ReceivePlayerSelectTrick(string trickId)
     {
-        if (CombatEnded)
-            return;
+        TryCastPlayerTrick(trickId);
+    }
 
-        TrickService.TryCastTrick(Player, PlayerTrickInventory, trickId, null);
+    public bool TryCastPlayerTrick(string trickId)
+    {
+        if (CombatEnded || string.IsNullOrWhiteSpace(trickId))
+            return false;
+
+        bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trickId, null);
         RefreshCombatUI();
+        return casted;
+    }
+
+    public bool TryCastPlayerTrick(TrickSO trick)
+    {
+        if (CombatEnded || trick == null)
+            return false;
+
+        bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
+        RefreshCombatUI();
+        return casted;
     }
 
     private IEnumerator SkipTurnRoutine()
@@ -490,6 +515,8 @@ public class CombatManager : MonoBehaviour
         snapshot.accuracyDices = Player.CurrentAccuracyDices;
         if (CombatPlayerInventory != null)
             snapshot.inventory = CombatPlayerInventory.GetSnapshot();
+        if (PlayerTrickInventory != null)
+            snapshot.trickInventory = PlayerTrickInventory.GetSnapshot();
         return snapshot;
     }
     
@@ -501,16 +528,20 @@ public class CombatManager : MonoBehaviour
     private ITrickInventory BuildPlayerTrickInventory(Battler owner)
     {
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
-        TrickInventory trickInventory = new(owner, trickDatabase);
+        TrickInventorySnapshot snapshot = SessionData != null ? SessionData.PlayerSnapshot.trickInventory : null;
+        TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
 
-        // Compatibilidade temporária: enquanto a persistência de Tricks aprendidas não chega,
-        // a cena mantém o comportamento anterior de disponibilizar todos os Tricks válidos,
-        // mas agora passando pelo fluxo único de TrickInventory + TrickService.
-        for (int i = 0; i < trickDatabase.allTricks.Count; i++)
+        if (snapshot == null || snapshot.learnedTrickIds == null || snapshot.learnedTrickIds.Count == 0)
         {
-            TrickSO trick = trickDatabase.allTricks[i];
-            if (trick != null && trick.IsValid())
-                trickInventory.LearnTrick(trick);
+            // Compatibilidade temporária: enquanto a persistência de Tricks aprendidas não chega,
+            // a cena mantém o comportamento anterior de disponibilizar todos os Tricks válidos,
+            // mas agora passando pelo fluxo único de TrickInventory + TrickService.
+            for (int i = 0; i < trickDatabase.allTricks.Count; i++)
+            {
+                TrickSO trick = trickDatabase.allTricks[i];
+                if (trick != null && trick.IsValid())
+                    trickInventory.LearnTrick(trick);
+            }
         }
 
         return trickInventory;
