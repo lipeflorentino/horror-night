@@ -15,6 +15,7 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private StatHudBinding bodyHud;
     [SerializeField] private StatHudBinding mindHud;
     [SerializeField] private PlayerInventory playerInventory;
+    [SerializeField] private TrickInventorySnapshot trickInventorySnapshot = new();
 
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
@@ -248,7 +249,8 @@ public class PlayerStatusManager : MonoBehaviour
             maxAccuracyDices = maxAccuracyDices,
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints,
-            inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot()
+            inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot(),
+            trickInventory = TrickInventorySnapshot.CreatePersistentSnapshot(trickInventorySnapshot)
         };
     }
 
@@ -285,6 +287,8 @@ public class PlayerStatusManager : MonoBehaviour
         
         if (playerInventory != null)
             playerInventory.RestoreSnapshot(snapshot.inventory);
+            
+        trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(snapshot.trickInventory);
         Logger.Log($"[PlayerStatusManager] Snapshot restaurado.");
         RefreshAllBars();
     }

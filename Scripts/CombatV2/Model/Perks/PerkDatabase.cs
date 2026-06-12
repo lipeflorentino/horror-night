@@ -70,12 +70,6 @@ public class PerkDatabase : MonoBehaviour
         return perk != null;
     }
 
-    public List<PerkSO> GetIdentityPerks()
-    {
-        EnsureLoaded();
-        return allPerks.FindAll(perk => perk != null && perk.IsPermanentIdentity);
-    }
-
     public List<PerkSO> FilterByTag(string tag)
     {
         EnsureLoaded();

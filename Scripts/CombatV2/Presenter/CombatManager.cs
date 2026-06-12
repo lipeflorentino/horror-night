@@ -492,7 +492,10 @@ public class CombatManager : MonoBehaviour
                 maxBody = ClampCoreStat(Player.Body),
                 maxHp = Player.MaxHp,
                 powerDices = Player.CurrentPowerDices,
-                accuracyDices = Player.CurrentAccuracyDices
+                accuracyDices = Player.CurrentAccuracyDices,
+                trickInventory = PlayerTrickInventory != null
+                    ? TrickInventorySnapshot.CreatePersistentSnapshot(PlayerTrickInventory.GetSnapshot())
+                    : new TrickInventorySnapshot()
             };
         }
 
@@ -516,7 +519,7 @@ public class CombatManager : MonoBehaviour
         if (CombatPlayerInventory != null)
             snapshot.inventory = CombatPlayerInventory.GetSnapshot();
         if (PlayerTrickInventory != null)
-            snapshot.trickInventory = PlayerTrickInventory.GetSnapshot();
+            snapshot.trickInventory = TrickInventorySnapshot.CreatePersistentSnapshot(PlayerTrickInventory.GetSnapshot());
         return snapshot;
     }
     
@@ -530,19 +533,6 @@ public class CombatManager : MonoBehaviour
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         TrickInventorySnapshot snapshot = SessionData != null ? SessionData.PlayerSnapshot.trickInventory : null;
         TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
-
-        if (snapshot == null || snapshot.learnedTrickIds == null || snapshot.learnedTrickIds.Count == 0)
-        {
-            // Compatibilidade temporária: enquanto a persistência de Tricks aprendidas não chega,
-            // a cena mantém o comportamento anterior de disponibilizar todos os Tricks válidos,
-            // mas agora passando pelo fluxo único de TrickInventory + TrickService.
-            for (int i = 0; i < trickDatabase.allTricks.Count; i++)
-            {
-                TrickSO trick = trickDatabase.allTricks[i];
-                if (trick != null && trick.IsValid())
-                    trickInventory.LearnTrick(trick);
-            }
-        }
 
         return trickInventory;
     }

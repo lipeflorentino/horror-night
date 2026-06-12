@@ -13,7 +13,6 @@ public class TrickDisplayView : MonoBehaviour
     [SerializeField] private Button castTrickButton; // Button que chama OnTrickSelected
     
     private TrickService trickService;
-    private TrickDatabase trickDatabase;
     private ITrickInventory trickInventory;
     private Battler currentBattler;
     private readonly Dictionary<string, TrickIconUI> activeTrickIcons = new();
@@ -33,7 +32,6 @@ public class TrickDisplayView : MonoBehaviour
         currentBattler = battler;
         trickService = service;
         trickInventory = inventory;
-        trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         
         if (trickService != null)
         {
@@ -58,24 +56,16 @@ public class TrickDisplayView : MonoBehaviour
         activeTrickIcons.Clear();
         
         IReadOnlyList<TrickSO> availableTricks = trickInventory?.LearnedTricks;
-        if (availableTricks != null)
+        if (availableTricks == null)
         {
-            for (int i = 0; i < availableTricks.Count; i++)
-            {
-                TrickSO trickDef = availableTricks[i];
-                if (trickDef != null && trickDef.IsValid())
-                    CreateTrickIcon(trickDef);
-            }
-
             return;
         }
-
-        // Compatibilidade temporária para cenas que ainda não injetam TrickInventory.
-        trickDatabase.allTricks.ForEach(trickDef =>
+        for (int i = 0; i < availableTricks.Count; i++)
         {
+            TrickSO trickDef = availableTricks[i];
             if (trickDef != null && trickDef.IsValid())
                 CreateTrickIcon(trickDef);
-        });
+        }
     }
     
     /// <summary>
@@ -86,9 +76,7 @@ public class TrickDisplayView : MonoBehaviour
         var icon = Instantiate(trickIconPrefab, container.transform);
         icon.Setup(trickDefinition);
         icon.PlayEnterAnimation();
-        
         icon.TrickClicked += SelectTrick;
-        
         activeTrickIcons[trickDefinition.Id] = icon;
     }
     

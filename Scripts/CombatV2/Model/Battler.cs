@@ -89,16 +89,6 @@ public class Battler
         return new BattlerStateService().HasState(this, stateId);
     }
 
-    public void ApplyPerk(PerkSO definition, Battler source = null, int durationTurns = -1, int stacks = 1)
-    {
-        new PerkService().ApplyPerk(this, definition, source, durationTurns, stacks);
-    }
-
-    public void ApplyPerk(string perkId, Battler source = null, int durationTurns = -1, int stacks = 1)
-    {
-        new PerkService().ApplyPerk(this, perkId, source, durationTurns, stacks);
-    }
-
     /// <summary>
     /// Retorna todos os Perks efetivos (diretos + de Tricks)
     /// </summary>
@@ -107,11 +97,11 @@ public class Battler
         List<PerkRuntimeInstance> perks = new();
         HashSet<PerkRuntimeInstance> added = new();
 
-        // Perks diretos (legado)
         for (int i = 0; i < Perks.Count; i++)
         {
-            if (Perks[i] != null && added.Add(Perks[i]))
-                perks.Add(Perks[i]);
+            PerkRuntimeInstance perk = Perks[i];
+            if (perk?.SourceTrick != null && perk.SourceTrick.IsActive() && added.Add(perk))
+                perks.Add(perk);
         }
 
         // Perks de Tricks

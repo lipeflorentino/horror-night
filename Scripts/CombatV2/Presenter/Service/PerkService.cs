@@ -257,15 +257,6 @@ public class PerkService
         List<PerkRuntimeInstance> perks = new();
         HashSet<string> addedKeys = new();
 
-        // Convivência temporária: Identity Perks globais continuam como fonte legada
-        // até a migração completa para Identity Tricks por battler.
-        List<PerkSO> identityPerks = database.GetIdentityPerks();
-        for (int i = 0; i < identityPerks.Count; i++)
-        {
-            if (identityPerks[i] != null)
-                AddEffectivePerk(perks, addedKeys, new PerkRuntimeInstance(identityPerks[i], battler, -1, 1));
-        }
-
         if (battler == null)
             return perks;
 

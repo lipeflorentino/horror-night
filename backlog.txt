@@ -1,5 +1,4 @@
 HISTÓRIAS 
-
     1. Estrutura de Clareiras (prefabs + conexões)
     2. Variável global de Tensão
     3. Variável global de Corrupção
@@ -8,29 +7,16 @@ HISTÓRIAS
     6. Sistema simples de perda parcial
     7. Sistema de combate em turnos
     8. Sistemas do personagem (hp, inventory, progressão, controles)
-
-1. Épicos (Grandes entregas)
-Os Épicos são as grandes funcionalidades que definem o jogo. 
-Exemplos para seu RPG:
-
-    Épico 1: Core Gameplay (Movimentação e Combate)
-    Épico 2: Sistema de Progressão (XP, Level e Skills)
-    Épico 3: Mundo e Narrativa (Diálogos e Quests)
-    Épico 4: Polimento e UI (Menus e Efeitos Sonoros)
-
-
+    
     
 BACKLOG 
     - Implementar sistemas que faltam
-        - Presence, Treasure, NPC
+        - Presence, Treasure, NPC, Class
     - Ajustar painel de infos (fechamento)
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
-
     - Fazer painel de resultados (total damage, total kills, total xp, etc)
     - Fazer galeria  (monstros, itens, reliquias, etc.)
 
-
-TAREFA
     - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
     - Cartas de estado de combate são habilitadas (com custo) e podem ser ativadas durante combate mediante a rolagem de dados ou condição especial. 
         O estado de combate pode alterar significativamente as stats e ações do combatente
@@ -51,23 +37,15 @@ TO DO
         - Drop de Perks e CombatStateCards
     - lucky_strike abre input de dado para player decidir qual será o numero da sorte
         - adicionar parametro no trick/perk
-    - UI para selecionar Tricks (CombatView/CombatInputHandler)
-        Precisa de método em CombatInputHandler para carregar tricks disponíveis
-        Precisa de botões/UI no CombatView para exibir tricks castáveis
-        Integração com OnPlayerSelectTrick()
+    - Tricks são aprendidos por meio de pergaminhos
+        - pergaminhos podem ter varios tricks 
+        - adquiridos por loot ou NPCs 
     
 
 FIXES
-    - Corrigir tela de Loot 
-    - Ajustar recompensa Xp (icone)
+    - Corrigir tela de Loot (textos, alinhamento, etc)
+    - Ajustar recompensa Xp (icone?, text?)
     
 HOT 
-    - Próximo: UI para seleção de tricks (CombatView/CombatInputHandler)
-
-    TrickSlot.cs (30-40 linhas)
-    ITrickInventory.cs (30 linhas - interface)
-    TrickInventory.cs (150-180 linhas)
-    TrickInventoryInputHandler.cs (140-180 linhas)
-    TrickInventoryView.cs (200-250 linhas - refactored)
-    TrickSlotUI.cs (150-180 linhas)
-    TrickContextMenu.cs (80-120 linhas)
+    - 
+    
