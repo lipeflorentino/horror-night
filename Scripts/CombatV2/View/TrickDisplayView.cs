@@ -14,18 +14,35 @@ public class TrickDisplayView : MonoBehaviour
     
     private TrickService trickService;
     private TrickDatabase trickDatabase;
+    private ITrickInventory trickInventory;
     private Battler currentBattler;
     private readonly Dictionary<string, TrickIconUI> activeTrickIcons = new();
     private TrickSO selectedTrick;
     
-    public void Initialize(Battler battler, TrickService service)
+    public void Initialize(Battler battler, TrickService service, ITrickInventory inventory = null)
     {
+        if (trickService != null)
+        {
+            trickService.OnTrickCasted -= HandleTrickCasted;
+            trickService.OnTrickRemoved -= HandleTrickRemoved;
+        }
+
+        if (trickInventory != null)
+            trickInventory.OnChanged -= RefreshDisplay;
+
         currentBattler = battler;
         trickService = service;
+        trickInventory = inventory;
         trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         
-        trickService.OnTrickCasted += HandleTrickCasted;
-        trickService.OnTrickRemoved += HandleTrickRemoved;
+        if (trickService != null)
+        {
+            trickService.OnTrickCasted += HandleTrickCasted;
+            trickService.OnTrickRemoved += HandleTrickRemoved;
+        }
+
+        if (trickInventory != null)
+            trickInventory.OnChanged += RefreshDisplay;
         
         RefreshDisplay();
     }
@@ -40,13 +57,24 @@ public class TrickDisplayView : MonoBehaviour
         
         activeTrickIcons.Clear();
         
-        // Carregar todos os tricks disponíveis
+        IReadOnlyList<TrickSO> availableTricks = trickInventory?.LearnedTricks;
+        if (availableTricks != null)
+        {
+            for (int i = 0; i < availableTricks.Count; i++)
+            {
+                TrickSO trickDef = availableTricks[i];
+                if (trickDef != null && trickDef.IsValid())
+                    CreateTrickIcon(trickDef);
+            }
+
+            return;
+        }
+
+        // Compatibilidade temporária para cenas que ainda não injetam TrickInventory.
         trickDatabase.allTricks.ForEach(trickDef =>
         {
             if (trickDef != null && trickDef.IsValid())
-            {
                 CreateTrickIcon(trickDef);
-            }
         });
     }
     
@@ -83,9 +111,12 @@ public class TrickDisplayView : MonoBehaviour
     /// </summary>
     public void CastSelectedTrick()
     {
-        if (selectedTrick != null && currentBattler != null)
+        if (selectedTrick != null && currentBattler != null && trickService != null)
         {
-            trickService.TryCastTrick(currentBattler, selectedTrick.Id, null);
+            if (trickInventory != null)
+                trickService.TryCastTrick(currentBattler, trickInventory, selectedTrick, null);
+            else
+                Debug.LogWarning("[TrickDisplayView] TrickInventory não configurado; cast bloqueado para evitar fluxo legado sem slots.");
         }
     }
     
@@ -114,5 +145,8 @@ public class TrickDisplayView : MonoBehaviour
             trickService.OnTrickCasted -= HandleTrickCasted;
             trickService.OnTrickRemoved -= HandleTrickRemoved;
         }
+
+        if (trickInventory != null)
+            trickInventory.OnChanged -= RefreshDisplay;
     }
 }

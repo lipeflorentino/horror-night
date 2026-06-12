@@ -15,30 +15,29 @@ public class PerkTriggerEvaluator
 {
     public event System.Action<PerkTriggeredEvent> OnPerkTriggered;
 
-    private readonly PerkDatabase database;
-    private readonly Dictionary<string, float> perkLastTriggerTime = new();
-
-    public PerkTriggerEvaluator(PerkDatabase database)
+    public PerkTriggerEvaluator(PerkDatabase database = null)
     {
-        this.database = database ?? PerkDatabase.GetOrCreateRuntimeDatabase();
+        // O database é mantido apenas para compatibilidade de construtor.
+        // A partir da Fase 3, a fonte única de perks efetivos vem do PerkService.
     }
 
     /// <summary>
-    /// Avalia perks acionados por roll (BeforeRoll trigger).
+    /// Avalia perks efetivos acionados por roll (BeforeRoll trigger).
     /// Chama esta função ANTES de aplicar modificadores de roll.
     /// </summary>
     public void EvaluateRollTriggers(
         Battler owner,
         CombatRollContext context,
         PerkTrigger expectedTrigger,
+        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
         List<DiceResult> rolledDices = null)
     {
-        if (owner?.Perks == null || owner.Perks.Count == 0)
+        if (owner == null || effectivePerks == null || effectivePerks.Count == 0)
             return;
 
-        for (int i = 0; i < owner.Perks.Count; i++)
+        for (int i = 0; i < effectivePerks.Count; i++)
         {
-            PerkRuntimeInstance perk = owner.Perks[i];
+            PerkRuntimeInstance perk = effectivePerks[i];
             if (perk?.Definition?.Rules == null)
                 continue;
 
@@ -48,29 +47,22 @@ public class PerkTriggerEvaluator
                 if (rule == null || rule.Trigger != expectedTrigger)
                     continue;
 
-                // Validação 1: Role check (actor/opponent/defender/attacker)
                 if (!IsRoleMatch(owner, context, rule.OwnerRole))
                     continue;
 
-                // Validação 2: Filtros de contexto (action type, roll type, stat type)
                 if (!rule.MatchesRoll(context))
                     continue;
 
-                // Validação 3: Condição específica (Always, RollValueEquals, etc)
                 if (!ValidateCondition(rule, context))
                     continue;
 
-                // ✅ TRIGGER! Dispara o evento
                 NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
             }
         }
-
-        // Avalia Identity Perks (sempre acionados)
-        EvaluateIdentityPerks(owner, context, expectedTrigger);
     }
 
     /// <summary>
-    /// Avalia perks acionados por dados (PowerMultiplier e AfterResolve triggers).
+    /// Avalia perks efetivos acionados por dados (PowerMultiplier e AfterResolve triggers).
     /// Chama esta função com os dados já rolados.
     /// </summary>
     public void EvaluateDiceTriggers(
@@ -78,17 +70,15 @@ public class PerkTriggerEvaluator
         CombatActionContext context,
         DiceResult dice,
         PerkTrigger expectedTrigger,
+        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
         List<DiceResult> allDices = null)
     {
-        if (owner?.Perks == null || owner.Perks.Count == 0)
+        if (owner == null || dice == null || effectivePerks == null || effectivePerks.Count == 0)
             return;
 
-        if (dice == null)
-            return;
-
-        for (int i = 0; i < owner.Perks.Count; i++)
+        for (int i = 0; i < effectivePerks.Count; i++)
         {
-            PerkRuntimeInstance perk = owner.Perks[i];
+            PerkRuntimeInstance perk = effectivePerks[i];
             if (perk?.Definition?.Rules == null)
                 continue;
 
@@ -98,96 +88,19 @@ public class PerkTriggerEvaluator
                 if (rule == null || rule.Trigger != expectedTrigger)
                     continue;
 
-                // Validação 1: Role check
                 if (!IsRoleMatch(owner, context, rule.OwnerRole))
                     continue;
 
-                // Validação 2: Filtros de ação
                 if (!rule.MatchesAction(context))
                     continue;
 
-                // Validação 3: Filtros de dado (tipo, stat, tier)
                 if (!rule.MatchesDice(dice))
                     continue;
 
-                // Validação 4: Condição específica para dice
                 if (!ValidateDiceCondition(rule, dice, allDices))
                     continue;
 
-                // ✅ TRIGGER! Dispara o evento
                 NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
-            }
-        }
-
-        // Avalia Identity Perks
-        EvaluateIdentityPerksForDice(owner, context, dice, expectedTrigger, allDices);
-    }
-
-    /// <summary>
-    /// Avalia perks de identidade que são sempre ativos.
-    /// </summary>
-    private void EvaluateIdentityPerks(Battler owner, CombatRollContext context, PerkTrigger expectedTrigger)
-    {
-        if (owner == null)
-            return;
-
-        List<PerkSO> identityPerks = database.GetIdentityPerks();
-        for (int i = 0; i < identityPerks.Count; i++)
-        {
-            PerkSO definition = identityPerks[i];
-            if (definition?.Rules == null)
-                continue;
-
-            for (int j = 0; j < definition.Rules.Count; j++)
-            {
-                PerkRule rule = definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger)
-                    continue;
-
-                if (!rule.MatchesRoll(context))
-                    continue;
-
-                // Identity perks com Always condition são sempre acionados
-                if (rule.ConditionKey != PerkConditionKey.Always)
-                    continue;
-
-                var tempPerk = new PerkRuntimeInstance(definition, null, -1, 1);
-                NotifyPerkTriggered(owner, tempPerk, rule, context, rule.Value);
-            }
-        }
-    }
-
-    private void EvaluateIdentityPerksForDice(
-        Battler owner,
-        CombatActionContext context,
-        DiceResult dice,
-        PerkTrigger expectedTrigger,
-        List<DiceResult> allDices)
-    {
-        if (owner == null)
-            return;
-
-        List<PerkSO> identityPerks = database.GetIdentityPerks();
-        for (int i = 0; i < identityPerks.Count; i++)
-        {
-            PerkSO definition = identityPerks[i];
-            if (definition?.Rules == null)
-                continue;
-
-            for (int j = 0; j < definition.Rules.Count; j++)
-            {
-                PerkRule rule = definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger)
-                    continue;
-
-                if (!rule.MatchesDice(dice))
-                    continue;
-
-                if (rule.ConditionKey != PerkConditionKey.Always)
-                    continue;
-
-                var tempPerk = new PerkRuntimeInstance(definition, null, -1, 1);
-                NotifyPerkTriggered(owner, tempPerk, rule, context, rule.Value);
             }
         }
     }
@@ -260,6 +173,8 @@ public class PerkTriggerEvaluator
         {
             PerkId = perk.Definition.Id,
             Owner = owner,
+            SourceTrickId = perk.SourceTrickId,
+            SourceTrickInstanceId = perk.SourceTrickInstanceId,
             Trigger = rule.Trigger,
             ModifierTarget = rule.ModifierTarget,
             AppliedValue = appliedValue,
@@ -268,6 +183,7 @@ public class PerkTriggerEvaluator
             TriggerTime = Time.time
         };
 
+        perk.SourceTrick?.MarkTriggered();
         OnPerkTriggered?.Invoke(triggerEvent);
 
         // Debug log

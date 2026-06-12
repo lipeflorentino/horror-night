@@ -28,14 +28,18 @@ public class BattlerPanelView : MonoBehaviour
         trickDisplayView = FindObjectOfType<TrickDisplayView>();
     }
 
+
+    public void BindTricks(Battler battler, TrickService trickService, ITrickInventory trickInventory = null)
+    {
+        if (trickDisplayView == null)
+            trickDisplayView = FindObjectOfType<TrickDisplayView>();
+
+        if (trickDisplayView != null)
+            trickDisplayView.Initialize(battler, trickService, trickInventory);
+    }
+
     public void Bind(Battler battler)
     {
-        if (trickDisplayView != null)
-        {
-            TrickService trickService = new();
-            trickDisplayView.Initialize(battler, trickService);
-        }
-        
         // Bind Stats
         currentHp = battler.HP;
         maxHp = battler.MaxHp;

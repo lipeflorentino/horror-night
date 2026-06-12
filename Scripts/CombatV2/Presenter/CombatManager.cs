@@ -47,6 +47,7 @@ public class CombatManager : MonoBehaviour
     private RewardService RewardService;
     private InventoryInputHandler InventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
+    private ITrickInventory PlayerTrickInventory;
     [SerializeField] private EnemyVisuals EnemyVisuals;
 
     void Start()
@@ -72,11 +73,13 @@ public class CombatManager : MonoBehaviour
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = BuildCombatInventory(SessionData);
+        PlayerTrickInventory = BuildPlayerTrickInventory(Player);
         InventoryInputHandler.Init(this, CombatPlayerInventory);
 
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
+        View.BindPlayerTricks(Player, TrickService, PlayerTrickInventory);
         
         RefreshCombatUI();
         UpdateTurnRoleUI();
@@ -205,7 +208,7 @@ public class CombatManager : MonoBehaviour
         if (CombatEnded)
             return;
 
-        TrickService.TryCastTrick(Player, trickId, null);
+        TrickService.TryCastTrick(Player, PlayerTrickInventory, trickId, null);
         RefreshCombatUI();
     }
 
@@ -493,6 +496,24 @@ public class CombatManager : MonoBehaviour
     private static int ClampCoreStat(float value)
     {
         return Mathf.Clamp(Mathf.RoundToInt(value), 0, CoreStatCap);
+    }
+
+    private ITrickInventory BuildPlayerTrickInventory(Battler owner)
+    {
+        TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
+        TrickInventory trickInventory = new(owner, trickDatabase);
+
+        // Compatibilidade temporária: enquanto a persistência de Tricks aprendidas não chega,
+        // a cena mantém o comportamento anterior de disponibilizar todos os Tricks válidos,
+        // mas agora passando pelo fluxo único de TrickInventory + TrickService.
+        for (int i = 0; i < trickDatabase.allTricks.Count; i++)
+        {
+            TrickSO trick = trickDatabase.allTricks[i];
+            if (trick != null && trick.IsValid())
+                trickInventory.LearnTrick(trick);
+        }
+
+        return trickInventory;
     }
 
     private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)

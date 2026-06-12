@@ -16,6 +16,16 @@ public struct PerkTriggeredEvent
     public Battler Owner { get; set; }
 
     /// <summary>
+    /// ID do Trick que originou o perk, quando existir.
+    /// </summary>
+    public string SourceTrickId { get; set; }
+
+    /// <summary>
+    /// ID runtime da instância de Trick que originou o perk, quando existir.
+    /// </summary>
+    public string SourceTrickInstanceId { get; set; }
+
+    /// <summary>
     /// Trigger que causou o disparo do perk.
     /// </summary>
     public PerkTrigger Trigger { get; set; }

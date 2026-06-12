@@ -13,6 +13,8 @@ public class TrickInventory : ITrickInventory
     private readonly List<TrickSO> learnedTricks = new();
     private readonly List<TrickSlot> castedSlots = new();
 
+    public event Action OnChanged;
+
     public TrickInventory(
         Battler owner,
         TrickDatabase trickDatabase,
@@ -36,6 +38,7 @@ public class TrickInventory : ITrickInventory
             return false;
 
         learnedTricks.Add(trick);
+        NotifyChanged();
         return true;
     }
 
@@ -44,13 +47,17 @@ public class TrickInventory : ITrickInventory
         if (trick == null || HasIdentityTrick(trick.Id) || IsTrickCasted(trick.Id))
             return false;
 
-        return learnedTricks.Remove(trick) || learnedTricks.RemoveAll(t => IsSameTrick(t, trick.Id)) > 0;
+        bool removed = learnedTricks.Remove(trick) || learnedTricks.RemoveAll(t => IsSameTrick(t, trick.Id)) > 0;
+        if (removed)
+            NotifyChanged();
+
+        return removed;
     }
 
     public bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance)
     {
         instance = null;
-        if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || !trick.CanCast(owner))
+        if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || IsTrickCoolingDown(trick.Id) || !trick.CanCast(owner))
             return false;
 
         TrickSlot freeSlot = castedSlots.Find(slot => slot != null && slot.IsEmpty && !slot.IsLocked);
@@ -61,12 +68,12 @@ public class TrickInventory : ITrickInventory
         owner.Body -= trick.BodyCost;
         owner.Heart -= trick.HeartCost;
 
-        // TODO: Na fase de serviço, delegar a ativação de Perks/cooldown events ao TrickService.
-        instance = new TrickRuntimeInstance(trick, owner, trick.DurationTurns, trick.CooldownTurns);
+        instance = new TrickRuntimeInstance(trick, owner, trick.DurationTurns, trick.CooldownTurns, TrickSlotType.Casted, freeSlot.SlotIndex, owner);
         freeSlot.BindRuntimeInstance(instance);
         if (owner.Tricks != null && !owner.Tricks.Contains(instance))
             owner.Tricks.Add(instance);
 
+        NotifyChanged();
         return true;
     }
 
@@ -79,10 +86,19 @@ public class TrickInventory : ITrickInventory
         if (slot == null || slot.IsEmpty || slot.IsLocked)
             return false;
 
+        if (owner?.Perks != null && slot.RuntimeInstance?.ActivePerks != null)
+        {
+            for (int i = slot.RuntimeInstance.ActivePerks.Count - 1; i >= 0; i--)
+                owner.Perks.Remove(slot.RuntimeInstance.ActivePerks[i]);
+
+            slot.RuntimeInstance.ActivePerks.Clear();
+        }
+
         if (owner?.Tricks != null && slot.RuntimeInstance != null)
             owner.Tricks.Remove(slot.RuntimeInstance);
 
         slot.Clear();
+        NotifyChanged();
         return true;
     }
 
@@ -191,7 +207,7 @@ public class TrickInventory : ITrickInventory
             if (trick == null)
                 continue;
 
-            TrickRuntimeInstance instance = new(trick, owner, slotSnapshot.remainingTurns, slotSnapshot.cooldownTurnsRemaining);
+            TrickRuntimeInstance instance = new(trick, owner, slotSnapshot.remainingTurns, slotSnapshot.cooldownTurnsRemaining, TrickSlotType.Casted, slotSnapshot.slotIndex, owner);
             castedSlots[slotSnapshot.slotIndex].BindRuntimeInstance(instance);
             if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
                 owner.Tricks.Add(instance);
@@ -219,6 +235,16 @@ public class TrickInventory : ITrickInventory
     private bool IsTrickCasted(string trickId)
     {
         return castedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId));
+    }
+
+    private bool IsTrickCoolingDown(string trickId)
+    {
+        return castedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
+    }
+
+    private void NotifyChanged()
+    {
+        OnChanged?.Invoke();
     }
 
     private static bool IsSameTrick(TrickSO trick, string trickId)
