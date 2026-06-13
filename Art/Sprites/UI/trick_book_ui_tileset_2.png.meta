@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: dc9e329a0ddeb184aa1be098affb4148
+guid: 4f5266a0f4a6e8a4c8e53e1746c285fc
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: alt_combat_ui_0
+      name: trick_book_ui_tileset_2_0
       rect:
         serializedVersion: 2
-        x: 39
-        y: 627
-        width: 77
-        height: 76
+        x: 29
+        y: 332
+        width: 57
+        height: 263
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,19 +124,145 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8260164158dfa604a9185c16866f4d50
-      internalID: -1581704321
+      spriteID: e04d7f7382a7dd64fa1493fbd3b31db7
+      internalID: 232416296
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alt_combat_ui_1
+      name: trick_book_ui_tileset_2_1
       rect:
         serializedVersion: 2
-        x: 745
-        y: 97
-        width: 264
+        x: 193
+        y: 411
+        width: 104
+        height: 163
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1010f85ab17328e44a4425d10bfe39bc
+      internalID: -942399166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_2
+      rect:
+        serializedVersion: 2
+        x: 446
+        y: 332
+        width: 238
+        height: 261
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfb42ec5822488a4998ffa57feb8cc98
+      internalID: -1404281413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_3
+      rect:
+        serializedVersion: 2
+        x: 658
+        y: 20
+        width: 161
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d5cd49a06683114bbab81635a22a0df
+      internalID: -798198692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_4
+      rect:
+        serializedVersion: 2
+        x: 221
+        y: 143
+        width: 164
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d003bdd8949f7824e93aaf49e3c6ff84
+      internalID: 897930584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 83
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 152b2f3ec85cd164ea56e060f2797e7a
+      internalID: -1864023304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_6
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 256
+        width: 57
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67f1fcafff0f2f743b05cf23c3aa9b35
+      internalID: 820032538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trick_book_ui_tileset_2_7
+      rect:
+        serializedVersion: 2
+        x: 222
+        y: 255
+        width: 50
         height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -145,20 +271,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c8d64cb4525f8114a9808e9b24b7cfd6
-      internalID: 776462641
+      spriteID: 3e96fcd122e9579449b6170bfed6ff16
+      internalID: -1809887458
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alt_combat_ui_2
+      name: trick_book_ui_tileset_2_8
       rect:
         serializedVersion: 2
-        x: 746
-        y: 31
-        width: 263
-        height: 57
+        x: 491
+        y: 244
+        width: 61
+        height: 59
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,167 +292,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2c3c261667b2ba9458a6a2b48085d797
-      internalID: 1225496685
+      spriteID: d1bf6c75ff699cc48bb6586e4b8cbc10
+      internalID: 829012682
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alt_combat_ui_3
+      name: trick_book_ui_tileset_2_9
       rect:
         serializedVersion: 2
-        x: 1033
-        y: 274
-        width: 74
-        height: 72
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: beb2eb5890b9291439eab89d4e0cafe4
-      internalID: -1901275651
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_4
-      rect:
-        serializedVersion: 2
-        x: 1033
-        y: 35
-        width: 75
-        height: 75
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 980c7223af1fae344aa37d24fa1205a3
-      internalID: -1306185196
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_5
-      rect:
-        serializedVersion: 2
-        x: 1197
-        y: 35
-        width: 75
-        height: 74
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 71e87b61a9dff9646b8ca4247d71341d
-      internalID: 238045336
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_6
-      rect:
-        serializedVersion: 2
-        x: 1194
-        y: 197
-        width: 77
-        height: 74
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 77069cc46a17a8042b3711750527059c
-      internalID: -116235793
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_7
-      rect:
-        serializedVersion: 2
-        x: 1278
-        y: 196
-        width: 73
-        height: 75
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 82948dbfc139efd46a21b0cdc8657506
-      internalID: 1896108726
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_8
-      rect:
-        serializedVersion: 2
-        x: 19
-        y: 749
-        width: 1355
-        height: 7
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9983494aa446a0f4aaee8c27f571ad51
-      internalID: 1079155722
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_9
-      rect:
-        serializedVersion: 2
-        x: 733
-        y: 635
-        width: 68
-        height: 69
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 16b78322e74a49d4c83fc917ac7ac3d7
-      internalID: 1358806517
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: alt_combat_ui_10
-      rect:
-        serializedVersion: 2
-        x: 884
-        y: 558
+        x: 724
+        y: 229
         width: 66
-        height: 73
+        height: 67
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -334,20 +313,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 03e19bf2794f3c945ae7d68e9ff8843a
-      internalID: 16180991
+      spriteID: 674be991bc1f6d54295e2d7b0287e07c
+      internalID: 237824231
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alt_combat_ui_11
+      name: trick_book_ui_tileset_2_10
       rect:
         serializedVersion: 2
-        x: 1122
-        y: 674
-        width: 68
-        height: 25
+        x: 721
+        y: 389
+        width: 43
+        height: 44
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -355,20 +334,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f8d10ae30e819c64b807d83672978ae0
-      internalID: -1139535493
+      spriteID: e65eef485d71fef4a86f1df9adb11038
+      internalID: 1720078803
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alt_combat_ui_12
+      name: trick_book_ui_tileset_2_11
       rect:
         serializedVersion: 2
-        x: 744
-        y: 250
-        width: 80
-        height: 81
+        x: 132
+        y: 53
+        width: 48
+        height: 47
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -376,8 +355,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: df0873830a7772a4098ce75c50db814e
-      internalID: -1540191052
+      spriteID: 48f1795fb33f6d342a1fd8f6a0edf489
+      internalID: 1805680743
       vertices: []
       indices: 
       edges: []
@@ -393,19 +372,18 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      alt_combat_ui_0: -1581704321
-      alt_combat_ui_1: 776462641
-      alt_combat_ui_10: 16180991
-      alt_combat_ui_11: -1139535493
-      alt_combat_ui_12: -1540191052
-      alt_combat_ui_2: 1225496685
-      alt_combat_ui_3: -1901275651
-      alt_combat_ui_4: -1306185196
-      alt_combat_ui_5: 238045336
-      alt_combat_ui_6: -116235793
-      alt_combat_ui_7: 1896108726
-      alt_combat_ui_8: 1079155722
-      alt_combat_ui_9: 1358806517
+      trick_book_ui_tileset_2_0: 232416296
+      trick_book_ui_tileset_2_1: -942399166
+      trick_book_ui_tileset_2_10: 1720078803
+      trick_book_ui_tileset_2_11: 1805680743
+      trick_book_ui_tileset_2_2: -1404281413
+      trick_book_ui_tileset_2_3: -798198692
+      trick_book_ui_tileset_2_4: 897930584
+      trick_book_ui_tileset_2_5: -1864023304
+      trick_book_ui_tileset_2_6: 820032538
+      trick_book_ui_tileset_2_7: -1809887458
+      trick_book_ui_tileset_2_8: 829012682
+      trick_book_ui_tileset_2_9: 237824231
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
