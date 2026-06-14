@@ -64,6 +64,11 @@ public class TrickInventoryView : MonoBehaviour
         SpawnSlots(boundInventory.IdentitySlots, identitySlotsRoot, TrickInventoryLocation.IdentitySlot);
         SpawnLearnedTricks();
         SpawnSlots(boundInventory.CastedSlots, castedSlotsRoot, TrickInventoryLocation.CastedSlot);
+
+        if (IsInventoryOpen())
+            SelectDefaultTrick();
+        else if (trickInfoPanel != null)
+            trickInfoPanel.HideTooltip();
     }
 
     public void SetStatus(string message)
@@ -144,6 +149,35 @@ public class TrickInventoryView : MonoBehaviour
         trickSlotView.OnInteractWithTrick += HandleTrickInteraction;
         trickSlotView.ShowInteractionPanel(false);
         spawnedSlots.Add(trickSlotView);
+    }
+
+    private bool IsInventoryOpen()
+    {
+        return trickInventoryPanel == null || trickInventoryPanel.activeInHierarchy;
+    }
+
+    private void SelectDefaultTrick()
+    {
+        TrickSlotUI defaultSlot = FindFirstSelectableSlot(TrickInventoryLocation.IdentitySlot)
+            ?? FindFirstSelectableSlot(TrickInventoryLocation.LearnedTricks)
+            ?? FindFirstSelectableSlot(TrickInventoryLocation.CastedSlot);
+
+        if (defaultSlot != null)
+            HandleTrickSelected(defaultSlot);
+        else if (trickInfoPanel != null)
+            trickInfoPanel.HideTooltip();
+    }
+
+    private TrickSlotUI FindFirstSelectableSlot(TrickInventoryLocation location)
+    {
+        for (int i = 0; i < spawnedSlots.Count; i++)
+        {
+            TrickSlotUI view = spawnedSlots[i];
+            if (view != null && view.HasTrick && view.Location.Location == location)
+                return view;
+        }
+
+        return null;
     }
 
     private void HandleTrickSelected(TrickSlotUI selectedView)

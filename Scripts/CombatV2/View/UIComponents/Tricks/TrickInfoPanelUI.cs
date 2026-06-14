@@ -73,10 +73,15 @@ public class TrickInfoPanelUI : MonoBehaviour
         ConfigureActions(trick, runtimeInstance, location);
     }
 
-    public void ShowTooltip(Vector3 position)
+    public void ShowPanel()
     {
         if (trickInfoPanel != null)
             trickInfoPanel.SetActive(true);
+    }
+
+    public void ShowTooltip(Vector3 position)
+    {
+        ShowPanel();
 
         if (rectTransform != null)
             rectTransform.position = position;

@@ -23,6 +23,8 @@ public class TrickSlotUI : MonoBehaviour
     private TrickRuntimeInstance boundRuntimeInstance;
     private TrickInventoryItemLocation location;
     private bool isPanelOpen;
+    public bool HasTrick => boundTrick != null;
+    public TrickInventoryItemLocation Location => location;
 
     public event Action<TrickSlotUI> TrickSelected;
     public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithTrick;
@@ -83,7 +85,7 @@ public class TrickSlotUI : MonoBehaviour
 
             trickInfoPanelUI.SetTrickInfo(boundTrick, boundRuntimeInstance, location);
             trickInfoPanelUI.OnRaiseInteraction += OnRaiseInteraction;
-            trickInfoPanelUI.ShowTooltip(transform.position);
+            trickInfoPanelUI.ShowPanel();
             isPanelOpen = true;
         }
         else if (!visible && isPanelOpen)
