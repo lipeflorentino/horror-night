@@ -9,7 +9,7 @@ public class TrickInventoryView : MonoBehaviour
     [SerializeField] private Transform identitySlotsRoot;
     [SerializeField] private Transform learnedTricksRoot;
     [SerializeField] private Transform castedSlotsRoot;
-    [SerializeField] private TrickSlotUI trickSlotPrefab;
+    [SerializeField] private TrickSlotUI learnedTrickSlotPrefab, castedTrickSlotPrefab, identityTrickSlotPrefab;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button closeButton;
     [SerializeField] private GameObject trickInventoryPanel;
@@ -138,6 +138,20 @@ public class TrickInventoryView : MonoBehaviour
 
     private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false)
     {
+        TrickSlotUI trickSlotPrefab;
+        switch (runtimeInstance.SlotType)
+        {
+            case TrickSlotType.Identity:
+                trickSlotPrefab = identityTrickSlotPrefab != null ? identityTrickSlotPrefab : null;
+                break;
+            case TrickSlotType.Casted:
+                trickSlotPrefab = castedTrickSlotPrefab != null ? castedTrickSlotPrefab : null;
+                break;
+            default:
+                trickSlotPrefab = learnedTrickSlotPrefab != null ? learnedTrickSlotPrefab : null;
+                break;
+        }
+
         if (trickSlotPrefab == null || parent == null)
             return;
 
