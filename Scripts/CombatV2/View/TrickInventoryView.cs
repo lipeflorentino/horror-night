@@ -138,19 +138,12 @@ public class TrickInventoryView : MonoBehaviour
 
     private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false)
     {
-        TrickSlotUI trickSlotPrefab;
-        switch (runtimeInstance.SlotType)
+        TrickSlotUI trickSlotPrefab = location.Location switch
         {
-            case TrickSlotType.Identity:
-                trickSlotPrefab = identityTrickSlotPrefab != null ? identityTrickSlotPrefab : null;
-                break;
-            case TrickSlotType.Casted:
-                trickSlotPrefab = castedTrickSlotPrefab != null ? castedTrickSlotPrefab : null;
-                break;
-            default:
-                trickSlotPrefab = learnedTrickSlotPrefab != null ? learnedTrickSlotPrefab : null;
-                break;
-        }
+            TrickInventoryLocation.IdentitySlot => identityTrickSlotPrefab != null ? identityTrickSlotPrefab : null,
+            TrickInventoryLocation.CastedSlot => castedTrickSlotPrefab != null ? castedTrickSlotPrefab : null,
+            _ => learnedTrickSlotPrefab != null ? learnedTrickSlotPrefab : null,
+        };
 
         if (trickSlotPrefab == null || parent == null)
             return;
@@ -179,7 +172,10 @@ public class TrickInventoryView : MonoBehaviour
         if (defaultSlot != null)
             HandleTrickSelected(defaultSlot);
         else if (trickInfoPanel != null)
+        {
             trickInfoPanel.HideTooltip();
+            ClearSlotSelections();
+        }
     }
 
     private TrickSlotUI FindFirstSelectableSlot(TrickInventoryLocation location)
@@ -202,7 +198,9 @@ public class TrickInventoryView : MonoBehaviour
             if (view == null)
                 continue;
 
-            view.ShowInteractionPanel(view == selectedView);
+            bool isSelected = view == selectedView;
+            view.SetSelected(isSelected);
+            view.ShowInteractionPanel(isSelected);
         }
     }
 
@@ -220,6 +218,7 @@ public class TrickInventoryView : MonoBehaviour
             {
                 slotView.TrickSelected -= HandleTrickSelected;
                 slotView.OnInteractWithTrick -= HandleTrickInteraction;
+                slotView.SetSelected(false);
                 Destroy(slotView.gameObject);
             }
         }
@@ -231,6 +230,16 @@ public class TrickInventoryView : MonoBehaviour
     {
         for (int i = 0; i < spawnedSlots.Count; i++)
             if (spawnedSlots[i] != null)
+            {
                 spawnedSlots[i].ShowInteractionPanel(false);
+                spawnedSlots[i].SetSelected(false);
+            }
+    }
+
+    private void ClearSlotSelections()
+    {
+        for (int i = 0; i < spawnedSlots.Count; i++)
+            if (spawnedSlots[i] != null)
+                spawnedSlots[i].SetSelected(false);
     }
 }

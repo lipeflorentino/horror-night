@@ -8,8 +8,10 @@ public class TrickSlotUI : MonoBehaviour
     [Header("Trick Info")]
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text nameText;
+    [SerializeField] private TMP_Text inputKeyText;
     [SerializeField] private GameObject emptyState;
     [SerializeField] private GameObject lockedState;
+    [SerializeField] private GameObject highlightState;
 
     [Header("Interaction")]
     [SerializeField] private Button interactButton;
@@ -30,6 +32,7 @@ public class TrickSlotUI : MonoBehaviour
         if (interactButton != null)
             interactButton.onClick.AddListener(HandleSelectClick);
 
+        SetSelected(false);
         ShowInteractionPanel(false);
     }
 
@@ -60,9 +63,11 @@ public class TrickSlotUI : MonoBehaviour
         }
 
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
+        UpdateInputKeyText(itemLocation);
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
         if (interactButton != null) interactButton.interactable = trick != null && !isLocked;
+        SetSelected(false);
     }
 
     public void ShowInteractionPanel(bool visible)
@@ -86,6 +91,38 @@ public class TrickSlotUI : MonoBehaviour
             trickInfoPanelUI.OnRaiseInteraction -= OnRaiseInteraction;
             isPanelOpen = false;
         }
+    }
+
+    private void UpdateInputKeyText(TrickInventoryItemLocation itemLocation)
+    {
+        if (inputKeyText == null)
+            return;
+
+        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedSlot
+            ? GetCastedSlotInputKey(itemLocation.SlotIndex)
+            : "";
+
+        inputKeyText.text = inputKey;
+        inputKeyText.gameObject.SetActive(!string.IsNullOrEmpty(inputKey));
+    }
+
+    public void SetSelected(bool selected)
+    {
+        if (highlightState != null)
+            highlightState.SetActive(selected && boundTrick != null);
+    }
+
+    private string GetCastedSlotInputKey(int slotIndex)
+    {
+        return slotIndex switch
+        {
+            0 => "Q",
+            1 => "W",
+            2 => "E",
+            3 => "R",
+            4 => "R",
+            _ => ""
+        };
     }
 
     private void HandleSelectClick()

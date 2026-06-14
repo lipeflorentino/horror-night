@@ -9850,6 +9850,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 815014144}
+  - component: {fileID: 815014145}
   m_Layer: 0
   m_Name: TrickBook
   m_TagString: Untagged
@@ -9878,6 +9879,31 @@ RectTransform:
   m_AnchoredPosition: {x: 87, y: 26}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &815014145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 815014143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3f365fdd17c499a8473d67ab8f43f07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trickInfoPanel: {fileID: 1474713570}
+  nameText: {fileID: 1273445408}
+  levelText: {fileID: 0}
+  costText: {fileID: 0}
+  cooldownText: {fileID: 0}
+  durationText: {fileID: 0}
+  rarityText: {fileID: 0}
+  descriptionText: {fileID: 260933474}
+  tagsText: {fileID: 1887454049}
+  slotText: {fileID: 0}
+  castButton: {fileID: 0}
+  dischardButton: {fileID: 0}
+  closeButton: {fileID: 0}
 --- !u!1 &835659063
 GameObject:
   m_ObjectHideFlags: 0
@@ -18601,11 +18627,13 @@ MonoBehaviour:
   identitySlotsRoot: {fileID: 581722183}
   learnedTricksRoot: {fileID: 92124242}
   castedSlotsRoot: {fileID: 940290512}
-  trickSlotPrefab: {fileID: 0}
-  statusText: {fileID: 0}
-  closeButton: {fileID: 0}
-  trickInventoryPanel: {fileID: 0}
-  trickInfoPanel: {fileID: 0}
+  learnedTrickSlotPrefab: {fileID: 3854644336338892197, guid: c04b6105509f648448feec4b81f1d46b, type: 3}
+  castedTrickSlotPrefab: {fileID: 1649153283760076769, guid: f6da92ce07f452b478967846e3258965, type: 3}
+  identityTrickSlotPrefab: {fileID: 9185628420703314075, guid: cc0ac98fbdab94640977afb2dfbacbc9, type: 3}
+  statusText: {fileID: 1526861991}
+  closeButton: {fileID: 1332021353}
+  trickInventoryPanel: {fileID: 58324999}
+  trickInfoPanel: {fileID: 815014145}
 --- !u!1 &1600810956
 GameObject:
   m_ObjectHideFlags: 0
