@@ -3,6 +3,8 @@ using UnityEngine;
 [System.Serializable]
 public struct PlayerStatusSnapshot
 {
+    [SerializeField] public string characterId;
+    [SerializeField] public string characterName;
     [SerializeField] public float heart;
     [SerializeField] public float body;
     [SerializeField] public float mind;

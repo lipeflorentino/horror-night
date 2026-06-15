@@ -5,9 +5,12 @@ public class PlayerStatusManager : MonoBehaviour
 {
     private const float CoreStatCap = 20f;
 
+    [Header("Character")]
+    [SerializeField] private CharacterSO character;
+
     [Header("Archetype")]
-    [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.NT;
-    [SerializeField] private PlayerArchetype currentArchetype = PlayerArchetype.NT;
+    [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.Standard;
+    [SerializeField] private PlayerArchetype currentArchetype = PlayerArchetype.Standard;
     [SerializeField] private ArchetypePoints archetypePoints;
 
     [Header("Status HUD (Horizontal Bar + Text)")]
@@ -53,6 +56,7 @@ public class PlayerStatusManager : MonoBehaviour
         if (playerInventory == null)
             playerInventory = GetComponent<PlayerInventory>();
             
+        ApplyCharacterDefaults();
         currentArchetype = initialArchetype;
         maxHeart = ClampCoreStatMax(maxHeart);
         maxBody = ClampCoreStatMax(maxBody);
@@ -85,6 +89,8 @@ public class PlayerStatusManager : MonoBehaviour
             AddInventoryItem(kvp.Key.itemName, kvp.Value);
         }
     }
+
+    public CharacterSO GetCharacter() => character;
 
     public PlayerArchetype GetCurrentArchetype() => currentArchetype;
 
@@ -226,6 +232,8 @@ public class PlayerStatusManager : MonoBehaviour
     {
         return new PlayerStatusSnapshot
         {
+            characterId = character != null ? character.Id : string.Empty,
+            characterName = character != null ? character.DisplayName : string.Empty,
             heart = ClampCoreStat(currentHeart, maxHeart),
             body = ClampCoreStat(currentBody, maxBody),
             mind = ClampCoreStat(currentMind, maxMind),
@@ -291,6 +299,38 @@ public class PlayerStatusManager : MonoBehaviour
         trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(snapshot.trickInventory);
         Logger.Log($"[PlayerStatusManager] Snapshot restaurado.");
         RefreshAllBars();
+    }
+
+
+    private void ApplyCharacterDefaults()
+    {
+        if (character == null)
+            return;
+
+        initialArchetype = PlayerArchetype.Standard;
+        archetypePoints = new ArchetypePoints();
+        level = 1;
+        currentXp = Mathf.Max(0, character.Xp);
+        maxXp = Mathf.Max(0, character.Xp);
+        maxHeart = Mathf.Max(1f, character.Heart);
+        currentHeart = maxHeart;
+        maxBody = Mathf.Max(1f, character.Body);
+        currentBody = maxBody;
+        maxMind = Mathf.Max(1f, character.Mind);
+        currentMind = maxMind;
+        maxHp = Mathf.Max(1f, character.Hp);
+        currentHp = maxHp;
+        attack = Mathf.Max(0, character.Attack);
+        defense = Mathf.Max(0, character.Defense);
+        initiative = Mathf.Max(0, character.Initiative);
+        focus = Mathf.Max(0, character.Focus);
+        strength = Mathf.Max(0, character.Strength);
+        agility = Mathf.Max(0, character.Agility);
+        maxPowerDices = Mathf.Max(1, character.PowerDices);
+        maxAccuracyDices = Mathf.Max(1, character.AccuracyDices);
+        currentPowerDices = maxPowerDices;
+        currentAccuracyDices = maxAccuracyDices;
+        trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(character.CreateInitialTrickSnapshot());
     }
 
     private void RefreshAllBars()
@@ -367,6 +407,7 @@ public class PlayerStatusManager : MonoBehaviour
         if (xpAmount <= 0)
             return;
 
+        maxXp = Mathf.Max(1, maxXp);
         currentXp += xpAmount;
 
         while (currentXp >= maxXp)
