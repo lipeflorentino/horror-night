@@ -62,3 +62,12 @@ public enum ItemType
     Relic,
     Broken
 }
+
+public enum PlayerArchetype
+{
+    Standard = -1,
+    NT = 0,
+    NF,
+    SJ,
+    SP
+}

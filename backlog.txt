@@ -25,7 +25,6 @@ BACKLOG
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
     - Ter uma forma de mostrar visualmente a eficacia da ação (power, accuracy)
-    - Fazer as inforçaões do Player virem de um Scriptable Object (multi personagens)
 
 TO DO 
     - Criar NPCEncounterSystem

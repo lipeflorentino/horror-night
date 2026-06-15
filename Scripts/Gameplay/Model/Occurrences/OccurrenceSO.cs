@@ -1,14 +1,5 @@
 using UnityEngine;
 
-public enum PlayerArchetype
-{
-    Standard = -1,
-    NT = 0,
-    NF,
-    SJ,
-    SP
-}
-
 [CreateAssetMenu(menuName = "Game/Occurrence")]
 public class OccurrenceSO : ScriptableObject
 {

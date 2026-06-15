@@ -1,1 +1,3 @@
-ID,DisplayName,Description,Xp,Heart,Body,Mind,Hp,Attack,Defense,Initiative,Focus,Strength,Agility,PowerDices,AccuracyDices,IdentityTrickIds
+ID,DisplayName,Description,Xp,Heart,Body,Mind,Hp,Attack,Defense,Initiative,Focus,Strength,Agility,PowerDices,AccuracyDices,IdentityTrickIds,IconName
+nicolas,Nicolas,A timid and gentle soul,0,5,2,3,25,3,2,1,2,1,1,1,2,brutal_force;live_instinct;analytic_precision,nicolas
+alica,Alica,A fierce and determined warrior,0,3,4,3,30,4,3,2,1,2,2,2,1,six_feet_under;lucky_number;equal_share,alica
