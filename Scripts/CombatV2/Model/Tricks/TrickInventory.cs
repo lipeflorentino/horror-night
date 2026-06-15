@@ -158,8 +158,6 @@ public class TrickInventory : ITrickInventory
         ClearSlots(identitySlots);
         ClearSlots(castedSlots);
 
-        // TODO: Identity Tricks serão definidos por classe/personagem. Quando essa fonte existir,
-        // preencher identitySlots a partir do arquétipo/classe do personagem antes de aplicar snapshots.
         RestoreIdentitySlots(snapshot?.identityTrickIds);
         RestoreLearnedTricks(snapshot?.learnedTrickIds);
         RestoreCastedSlots(snapshot?.castedSlots);
@@ -175,7 +173,12 @@ public class TrickInventory : ITrickInventory
         {
             TrickSO trick = FindTrick(trickIds[i]);
             if (trick != null)
-                identitySlots[i].BindDefinition(trick);
+            {
+                TrickRuntimeInstance instance = new(trick, owner, trick.DurationTurns, 0, TrickSlotType.Identity, i, owner);
+                identitySlots[i].BindRuntimeInstance(instance);
+                if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
+                    owner.Tricks.Add(instance);
+            }
         }
     }
 

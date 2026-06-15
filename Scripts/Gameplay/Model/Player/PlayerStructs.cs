@@ -14,6 +14,7 @@ public struct ArchetypePoints
     {
         return archetype switch
         {
+            PlayerArchetype.Standard => 0,
             PlayerArchetype.NF => nf,
             PlayerArchetype.SJ => sj,
             PlayerArchetype.SP => sp,
@@ -25,6 +26,8 @@ public struct ArchetypePoints
     {
         switch (archetype)
         {
+            case PlayerArchetype.Standard:
+                return;
             case PlayerArchetype.NF:
                 nf += amount;
                 break;

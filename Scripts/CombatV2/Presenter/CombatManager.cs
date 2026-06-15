@@ -78,6 +78,7 @@ public class CombatManager : MonoBehaviour
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = BuildCombatInventory(SessionData);
         PlayerTrickInventory = BuildPlayerTrickInventory(Player);
+        ActivatePlayerIdentityTricks();
 
         if (InventoryInputHandler != null)
             InventoryInputHandler.Init(this, CombatPlayerInventory);
@@ -110,7 +111,7 @@ public class CombatManager : MonoBehaviour
         EnemyVisuals.SetEnemyVisual(enemySnapshot ?? null);
 
         Player = new Battler(
-            "Player",
+            string.IsNullOrWhiteSpace(playerSnapshot.characterName) ? "Player" : playerSnapshot.characterName,
             Mathf.Max(1, playerSnapshot.level),
             Mathf.RoundToInt(playerSnapshot.hp),
             ClampCoreStat(playerSnapshot.heart),
@@ -526,6 +527,19 @@ public class CombatManager : MonoBehaviour
     private static int ClampCoreStat(float value)
     {
         return Mathf.Clamp(Mathf.RoundToInt(value), 0, CoreStatCap);
+    }
+
+    private void ActivatePlayerIdentityTricks()
+    {
+        if (Player == null || PlayerTrickInventory?.IdentitySlots == null)
+            return;
+
+        for (int i = 0; i < PlayerTrickInventory.IdentitySlots.Count; i++)
+        {
+            TrickRuntimeInstance instance = PlayerTrickInventory.IdentitySlots[i]?.RuntimeInstance;
+            if (instance?.Definition != null)
+                TrickService.ApplyTrick(Player, instance, Player);
+        }
     }
 
     private ITrickInventory BuildPlayerTrickInventory(Battler owner)

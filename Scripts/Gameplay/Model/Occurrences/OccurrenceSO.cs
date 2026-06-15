@@ -2,7 +2,8 @@ using UnityEngine;
 
 public enum PlayerArchetype
 {
-    NT,
+    Standard = -1,
+    NT = 0,
     NF,
     SJ,
     SP
