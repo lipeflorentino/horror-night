@@ -32,7 +32,7 @@ public class TrickRuntimeInstance
         TrickSO definition,
         Battler owner,
         int durationTurns,
-        int cooldownTurnsRemaining = 0,
+        int? cooldownTurnsRemaining = null,
         TrickSlotType slotType = TrickSlotType.Casted,
         int slotIndex = -1,
         Battler source = null,
@@ -43,7 +43,7 @@ public class TrickRuntimeInstance
         Owner = owner;
         Source = source;
         RemainingTurns = durationTurns;
-        CooldownTurnsRemaining = Mathf.Max(0, cooldownTurnsRemaining);
+        CooldownTurnsRemaining = Mathf.Max(0, cooldownTurnsRemaining != null ? cooldownTurnsRemaining.Value : definition.CooldownTurns > 0 ? definition.CooldownTurns : 0);
         SlotType = slotType;
         SlotIndex = slotIndex;
         CastTime = Time.time;

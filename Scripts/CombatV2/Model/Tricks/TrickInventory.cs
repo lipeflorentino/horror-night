@@ -9,6 +9,7 @@ public class TrickInventory : ITrickInventory
 
     private readonly Battler owner;
     private readonly TrickDatabase trickDatabase;
+    private readonly PerkService perkService;
     private readonly List<TrickSlot> identitySlots = new();
     private readonly List<TrickSO> learnedTricks = new();
     private readonly List<TrickSlot> castedSlots = new();
@@ -20,10 +21,12 @@ public class TrickInventory : ITrickInventory
         TrickDatabase trickDatabase,
         TrickInventorySnapshot snapshot = null,
         int identitySlotCount = DefaultIdentitySlotCount,
-        int castedSlotCount = DefaultCastedSlotCount)
+        int castedSlotCount = DefaultCastedSlotCount,
+        PerkService perkService = null)
     {
         this.owner = owner;
         this.trickDatabase = trickDatabase ?? TrickDatabase.GetOrCreateRuntimeDatabase();
+        this.perkService = perkService;
         InitializeSlots(Mathf.Max(1, identitySlotCount), Mathf.Max(1, castedSlotCount));
         RestoreSnapshot(snapshot);
     }
@@ -72,6 +75,9 @@ public class TrickInventory : ITrickInventory
         freeSlot.BindRuntimeInstance(instance);
         if (owner.Tricks != null && !owner.Tricks.Contains(instance))
             owner.Tricks.Add(instance);
+
+        // Aplicar os perks da trick aqui para garantir efeito gameplay
+        ApplyPerksToInstance(instance);
 
         NotifyChanged();
         return true;
@@ -214,6 +220,9 @@ public class TrickInventory : ITrickInventory
             castedSlots[slotSnapshot.slotIndex].BindRuntimeInstance(instance);
             if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
                 owner.Tricks.Add(instance);
+            
+            // Aplicar perks ao restaurar um trick castado do snapshot
+            ApplyPerksToInstance(instance);
         }
     }
 
@@ -259,5 +268,30 @@ public class TrickInventory : ITrickInventory
     {
         for (int i = 0; i < slots.Count; i++)
             slots[i]?.Clear();
+    }
+
+    /// <summary>
+    /// Aplica os perks de uma trick à instância, garantindo que efeitos gameplay sejam ativados.
+    /// Chamado tanto em CastTrick quanto em RestoreCastedSlots para manter consistência.
+    /// NOTA: O cooldown já está definido no construtor via nullable default, não precisa chamar StartCooldown aqui.
+    /// </summary>
+    private void ApplyPerksToInstance(TrickRuntimeInstance instance)
+    {
+        if (instance == null || instance.Definition == null)
+            return;
+
+        instance.ActivePerks.Clear();
+
+        if (perkService != null)
+        {
+            for (int i = 0; i < instance.Definition.PerkIds.Count; i++)
+            {
+                string perkId = instance.Definition.PerkIds[i];
+                PerkRuntimeInstance perk = perkService.ApplyPerkFromTrick(
+                    owner, perkId, instance, instance.Source ?? owner, instance.Definition.DurationTurns);
+                if (perk != null && !instance.ActivePerks.Contains(perk))
+                    instance.ActivePerks.Add(perk);
+            }
+        }
     }
 }

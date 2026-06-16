@@ -562,7 +562,7 @@ public class CombatManager : MonoBehaviour
     {
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         TrickInventorySnapshot snapshot = SessionData != null ? SessionData.PlayerSnapshot.trickInventory : null;
-        TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
+        TrickInventory trickInventory = new(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, PerkService);
 
         return trickInventory;
     }
@@ -579,7 +579,7 @@ public class CombatManager : MonoBehaviour
         }
 
         // Criar inventário (se snapshot for null, cria vazio - isso é seguro)
-        TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
+        TrickInventory trickInventory = new(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, PerkService);
 
         return trickInventory;
     }
