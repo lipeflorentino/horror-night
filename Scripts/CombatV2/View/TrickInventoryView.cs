@@ -17,6 +17,7 @@ public class TrickInventoryView : MonoBehaviour
 
     private readonly List<TrickSlotUI> spawnedSlots = new();
     private ITrickInventory boundInventory;
+    private TrickSlotUI lastSelectedView;
 
     public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithInventoryTrick;
 
@@ -192,16 +193,30 @@ public class TrickInventoryView : MonoBehaviour
 
     private void HandleTrickSelected(TrickSlotUI selectedView)
     {
+        if (lastSelectedView != null && lastSelectedView != selectedView)
+        {
+            lastSelectedView.SetSelected(false);
+            lastSelectedView.ShowInteractionPanel(false);
+        }
+        
         for (int i = 0; i < spawnedSlots.Count; i++)
         {
             TrickSlotUI view = spawnedSlots[i];
             if (view == null)
                 continue;
 
-            bool isSelected = view == selectedView;
-            view.SetSelected(isSelected);
-            view.ShowInteractionPanel(isSelected);
+            if (view == selectedView)
+            {
+                view.SetSelected(true);
+                view.ShowInteractionPanel(true);
+            }
+            else if (view != lastSelectedView)
+            {
+                view.SetSelected(false);
+            }
         }
+
+        lastSelectedView = selectedView;
     }
 
     private void HandleTrickInteraction(TrickSO trick, TrickInventoryAction action, TrickInventoryItemLocation location)
@@ -224,6 +239,7 @@ public class TrickInventoryView : MonoBehaviour
         }
 
         spawnedSlots.Clear();
+        lastSelectedView = null;
     }
 
     private void CloseAllInteractionPanels()

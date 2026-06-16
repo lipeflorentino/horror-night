@@ -39,6 +39,9 @@ TO DO
     - Tricks são aprendidos por meio de pergaminhos
         - pergaminhos podem ter varios tricks 
         - adquiridos por loot ou NPCs 
+    - Estabelecer tricks para os inimigos
+        - identity tricks 
+        - criar feedback para o uso de tricks pelo inimigo
     
 
 FIXES
@@ -46,5 +49,29 @@ FIXES
     - Ajustar recompensa Xp (icone?, text?)
     
 HOT 
-    - 
+    - Ajustar as views de Tricks 
+        - falta dados de custo, cooldown,etc 
+        - ajustar ui de triggered / cooldown / casted 
+    - Criar CharacterSO (Nicolas)
+        - gerar icone do Character 
+    - Verificar e corrigir bugs apontados pelo codex
     
+
+
+CHAT  
+    Verifique se esse bug foi completamente corrigido, senao, corrija em #sym:TickTrickEnd e #sym:TickTrickEnd 
+
+    When a duration-limited trick reaches zero turns, this path now only removes its perks and marks it expired; the runtime instance remains in the battler/inventory slot. Because `TrickInventory.CastTrick` rejects any trick whose id is still present in a casted slot, the first expired trick permanently consumes that slot and can never be cast again for the rest of the combat, even after cooldown reaches zero.
+
+    Não devem existir overrides do metodo, consolide apenas uma versão segura (livre de bug), faça modificações onde necessário. Analise o caso de uso onde o parametro  trickInventory é chamado com null e se for de fato necessário esse tipo de chamada, verifique uma correção no metodo TickTrickEnd que evite o bug ocorrer.
+
+    Considere o fluxo de um trick casted.
+    Ele fica no slot, quando player casta o trick ele fica bloqueado, quando o tempo de duração do trick chega ao fim, sai de bloqueado para cooldown, quando termina o cooldown deve ser possivel ativar o trick de novo. 
+
+
+
+
+BUGS
+    - When a learned trick is cast through the new `ITrickInventory.CastTrick` path, this creates a runtime instance, spends resources, and adds it to `owner.Tricks`, but it never applies the trick's `PerkIds` or populates `ActivePerks` like `TrickService.ApplyTrick` does. Any UI or combat flow migrated to the inventory API will therefore occupy a casted slot and charge the player while the trick has no gameplay effect; route this through `TrickService` or otherwise activate the perks here before reporting success.
+    - Current combat/UI entry points still cast through `TrickService.TryCastTrick` (`CombatManager.ReceivePlayerSelectTrick` and `TrickDisplayView.CastSelectedTrick`), and that service's existing `new TrickRuntimeInstance(definition, target, definition.DurationTurns)` call omits this new argument. Because the constructor now defaults omitted cooldowns to `0`, any trick cast through the current flow gets `CooldownTurnsRemaining == 0` even when the CSV/imported `TrickSO.CooldownTurns` is nonzero, so the imported cooldown data is never reflected in runtime state unless callers are updated or the constructor derives the default from `definition.CooldownTurns`.
+

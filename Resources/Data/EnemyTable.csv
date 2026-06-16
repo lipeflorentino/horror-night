@@ -1,38 +1,38 @@
-ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,HeartMin,HeartMax,BodyMin,BodyMax,MindMin,MindMax,SpecialRule,IconName,hpMin,hpMax,AttackMin,AttackMax,DefenseMin,DefenseMax,InitiativeMin,InitiativeMax
-1,Fantasma,Uma presença que se move nas sombras,Normal,10,2,5,Aggressive,Stealthy,Flying,3,10,0,7,6,11,none,ghost,12,18,5,8,2,4,7,11
-2,Demônio,Criatura nefasta que ronda clareiras,Normal,6,1,4,Cautious,Brutal,Creature,0,6,0,5,0,5,fear,demon,18,28,6,10,4,7,5,9
-3,Demônio Guerreiro,Um demonio guerreiro nascido para pelejar,Normal,2,3,6,Aggressive,Brutal,Creature,7,14,5,11,1,8,none,demon_warrior,40,60,12,18,8,13,4,7
-4,Planta Carnivora,De longe uma flor inofensiva de perto um apetite voraz,Normal,9,1,3,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,none,killer_plant,12,18,4,8,5,9,5,9
-5,Geleia,Uma criatura gelatinosa que se move em silêncio,Normal,8,1,3,Cautious,Stealthy,Hybrid,0,6,0,5,0,5,none,slime,10,16,3,5,4,7,2,4
-6,Zumbi,Alma condenada que vaga entre as árvores,Normal,7,1,3,Erratic,Brutal,Creature,0,6,0,5,0,5,none,zombie,14,22,4,7,5,8,4,8
-7,Baú Amaldiçoado,Pequena aberração que parece um baú de tesouro,Normal,10,1,3,Aggressive,Frenetic,Inanimate,0,6,0,5,0,5,none,cursed_chest,10,15,5,10,5,10,6,12
-8,Lobisomem,Um ser que se transforma em lobo durante a noite,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,fear,werewolf,40,55,16,24,5,9,10,14
-9,Troll da Floresta,Uma criatura enorme e poderosa que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,8,16,8,16,0,8,none,forest_troll,45,65,10,15,8,14,2,4
-10,Aranha Gigante,Uma aranha enorme que tece suas teias entre as árvores,Normal,8,4,8,Cautious,Stealthy,Creature,5,14,4,12,3,11,none,giant_spider,20,30,7,11,4,7,8,12
-11,Monstro do Pântano,Uma criatura grotesca que habita os pântanos,Normal,5,4,8,Aggressive,Brutal,Hybrid,5,14,4,12,3,11,fear,swamp_monster,30,45,8,14,6,10,3,6
-12,Esqueleto,Restos animados de um ser humano,Normal,7,1,4,Erratic,Brutal,Creature,0,6,0,5,0,5,none,skeleton,10,16,3,5,2,4,4,8
-13,Bruxa da Floresta,Uma bruxa que habita as profundezas da floresta,Normal,6,4,8,Cautious,Stealthy,Creature,5,14,2,9,8,15,none,forest_witch,20,30,8,12,3,5,8,12
-14,Vampiro,Um ser noturno que se alimenta de sangue,Normal,5,6,10,Aggressive,Stealthy,Flying,5,14,0,10,6,14,fear,vampire,35,50,12,18,7,11,10,15
-15,Minotauro,Um ser híbrido entre humano e touro,Special,5,6,10,Aggressive,Brutal,Creature,8,16,8,16,0,8,none,minotaur,50,70,14,20,8,12,4,7
-16,Golem de Pedra,Uma criatura feita de pedra animada por magia,Special,4,8,12,Aggressive,Brutal,Creature,8,20,8,20,0,8,none,stone_golem,70,100,12,18,18,26,1,3
-17,Espectro,Uma entidade fantasmagórica que assombra as florestas,Normal,6,1,4,Cautious,Stealthy,Creature,0,6,0,5,6,8,fear,specter,14,22,5,9,3,5,7,11
-18,Abominação,Uma criatura grotesca e deformada que se esconde nas sombras,Boss,5,6,10,Aggressive,Brutal,Hybrid,5,14,4,12,3,11,fear,abomination,70,95,14,20,8,14,3,6
-19,Elfo Corrompido,Um elfo que foi corrompido por forças malignas,Special,6,6,10,Cautious,Stealthy,Creature,5,14,4,12,3,11,fear,dark_elf,30,45,10,15,6,10,8,12
-20,Necromante,Um mago que manipula os mortos para seus próprios fins,Special,5,10,14,Cautious,Stealthy,Creature,8,18,4,13,8,20,fear,necromancer,30,45,10,15,5,8,8,12
-21,Esqueleto com Armadura,Restos animados de um ser humano usando armadura,Normal,7,4,8,Erratic,Brutal,Creature,5,14,4,12,3,11,none,armored_skeleton,25,35,4,6,7,11,4,8
-22,Aranha Gigante com Ninhada,Uma aranha enorme que tece suas teias entre as árvores,Boss,8,4,8,Cautious,Stealthy,Creature,5,14,4,12,3,11,none,giant_spider_nest,40,60,10,15,6,10,4,8
-23,Espectro Vingativo,Uma entidade fantasmagórica que assombra as florestas,Special,6,8,12,Cautious,Stealthy,Flying,8,18,0,14,6,19,fear,vengeful_specter,40,60,12,18,8,12,4,8
-24,Orque,Uma criatura selvagem e agressiva que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,none,orc,25,40,8,13,6,10,3,6
-25,Goblin,Uma criatura pequena e astuta que vive nas florestas,Normal,6,1,4,Cautious,Stealthy,Creature,0,6,0,5,0,5,none,goblin,8,14,4,7,3,5,7,11
-26,Esqueleto Arqueiro,Restos animados de um ser humano usando armadura e arco,Normal,7,4,8,Erratic,Brutal,Creature,5,14,4,12,3,11,none,archer_skeleton,20,30,7,11,3,5,4,8
-27,Orque Pálido,Uma criatura selvagem e agressiva que habita as florestas,Boss,5,12,16,Aggressive,Brutal,Creature,10,20,8,20,8,20,fear,pale_orc,80,120,18,28,12,18,6,10
-28,Barbárvore,Uma criatura monstruosa em forma de árvore que guarda rancor de invasores,Boss,5,12,16,Aggressive,Brutal,Inanimate,10,20,8,20,0,8,fear,treebeard,100,140,16,24,16,24,2,4
-29,Lesma Gosmenta,Uma lesma enorme e pegajosa que habita as florestas,Normal,7,1,4,Cautious,Stealthy,Creature,0,6,0,5,0,5,none,slimy_slug,10,18,3,6,4,8,3,6
-30,Abóbora Amaldiçoada,Uma abóbora animada por magia negra,Normal,8,4,8,Aggressive,Brutal,Inanimate,5,14,4,12,3,11,none,cursed_pumpkin,18,28,6,10,6,10,5,9
-31,Esqueleto Mago,Restos animados de um ser humano usando armadura e magias,Special,7,4,8,Erratic,Brutal,Creature,5,14,2,9,8,15,fear,skeleton_mage,22,32,8,12,4,7,4,8
-32,Mariposa Venenosa,Uma mariposa gigante com asas cobertas de veneno,Normal,6,1,4,Cautious,Stealthy,Flying,0,6,0,5,0,5,fear,poison_moth,8,12,4,7,2,5,8,12
-33,Cogumelos Venenosos,Um grupo de cogumelos venenosos que crescem em áreas sombrias,Normal,7,1,4,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,fear,poison_mushrooms,12,18,4,8,5,9,5,9
-34,Lagarto Guerreiro,Um lagarto enorme e agressivo que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,fear,warg_lizard,28,42,9,14,6,10,3,6
-35,Lagarto Arqueiro,Um lagarto enorme e agressivo que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,5,14,4,12,3,11,fear,warg_lizard_archer,22,34,8,12,3,5,7,11
-36,Espantalho,Uma figura de espantalho animada por magia negra,Normal,6,1,4,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,fear,cursed_scarecrow,12,18,5,8,3,5,4,8
-37,Ceifador,Uma entidade sombria que ceifa as almas dos vivos,Special,5,8,12,Aggressive,Stealthy,Creature,8,18,0,14,6,19,fear,reaper,45,65,15,22,8,12,10,14
+ID,Name,Description,Archetype,Weight,TierMin,TierMax,Behavior,Style,Type,HeartMin,HeartMax,BodyMin,BodyMax,MindMin,MindMax,SpecialRule,IconName,hpMin,hpMax,AttackMin,AttackMax,DefenseMin,DefenseMax,InitiativeMin,InitiativeMax,FocusMin,FocusMax,StrengthMin,StrengthMax,AgilityMin,AgilityMax,Tricks
+1,Fantasma,Uma presença que se move nas sombras,Normal,10,2,5,Aggressive,Stealthy,Flying,3,10,0,7,6,11,none,ghost,12,18,5,8,2,4,7,11,1,1,1,1,1,1,
+2,Demônio,Criatura nefasta que ronda clareiras,Normal,6,1,4,Cautious,Brutal,Creature,0,6,0,5,0,5,fear,demon,18,28,6,10,4,7,5,9,1,1,1,1,1,1,
+3,Demônio Guerreiro,Um demonio guerreiro nascido para pelejar,Normal,2,3,6,Aggressive,Brutal,Creature,7,14,5,11,1,8,none,demon_warrior,40,60,12,18,8,13,4,7,1,1,1,1,1,1,
+4,Planta Carnivora,De longe uma flor inofensiva de perto um apetite voraz,Normal,9,1,3,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,none,killer_plant,12,18,4,8,5,9,5,9,1,1,1,1,1,1,
+5,Geleia,Uma criatura gelatinosa que se move em silêncio,Normal,8,1,3,Cautious,Stealthy,Hybrid,0,6,0,5,0,5,none,slime,10,16,3,5,4,7,2,4,1,1,1,1,1,1,
+6,Zumbi,Alma condenada que vaga entre as árvores,Normal,7,1,3,Erratic,Brutal,Creature,0,6,0,5,0,5,none,zombie,14,22,4,7,5,8,4,8,1,1,1,1,1,1,
+7,Baú Amaldiçoado,Pequena aberração que parece um baú de tesouro,Normal,10,1,3,Aggressive,Frenetic,Inanimate,0,6,0,5,0,5,none,cursed_chest,10,15,5,10,5,10,6,12,1,1,1,1,1,1,
+8,Lobisomem,Um ser que se transforma em lobo durante a noite,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,fear,werewolf,40,55,16,24,5,9,10,14,1,1,1,1,1,1,
+9,Troll da Floresta,Uma criatura enorme e poderosa que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,8,16,8,16,0,8,none,forest_troll,45,65,10,15,8,14,2,4,1,1,1,1,1,1,
+10,Aranha Gigante,Uma aranha enorme que tece suas teias entre as árvores,Normal,8,4,8,Cautious,Stealthy,Creature,5,14,4,12,3,11,none,giant_spider,20,30,7,11,4,7,8,12,1,1,1,1,1,1,
+11,Monstro do Pântano,Uma criatura grotesca que habita os pântanos,Normal,5,4,8,Aggressive,Brutal,Hybrid,5,14,4,12,3,11,fear,swamp_monster,30,45,8,14,6,10,3,6,1,1,1,1,1,1,
+12,Esqueleto,Restos animados de um ser humano,Normal,7,1,4,Erratic,Brutal,Creature,0,6,0,5,0,5,none,skeleton,10,16,3,5,2,4,4,8,1,1,1,1,1,1,
+13,Bruxa da Floresta,Uma bruxa que habita as profundezas da floresta,Normal,6,4,8,Cautious,Stealthy,Creature,5,14,2,9,8,15,none,forest_witch,20,30,8,12,3,5,8,12,1,1,1,1,1,1,
+14,Vampiro,Um ser noturno que se alimenta de sangue,Normal,5,6,10,Aggressive,Stealthy,Flying,5,14,0,10,6,14,fear,vampire,35,50,12,18,7,11,10,15,1,1,1,1,1,1,
+15,Minotauro,Um ser híbrido entre humano e touro,Special,5,6,10,Aggressive,Brutal,Creature,8,16,8,16,0,8,none,minotaur,50,70,14,20,8,12,4,7,1,1,1,1,1,1,
+16,Golem de Pedra,Uma criatura feita de pedra animada por magia,Special,4,8,12,Aggressive,Brutal,Creature,8,20,8,20,0,8,none,stone_golem,70,100,12,18,18,26,1,3,1,1,1,1,1,1,
+17,Espectro,Uma entidade fantasmagórica que assombra as florestas,Normal,6,1,4,Cautious,Stealthy,Creature,0,6,0,5,6,8,fear,specter,14,22,5,9,3,5,7,11,1,1,1,1,1,1,
+18,Abominação,Uma criatura grotesca e deformada que se esconde nas sombras,Boss,5,6,10,Aggressive,Brutal,Hybrid,5,14,4,12,3,11,fear,abomination,70,95,14,20,8,14,3,6,1,1,1,1,1,1,
+19,Elfo Corrompido,Um elfo que foi corrompido por forças malignas,Special,6,6,10,Cautious,Stealthy,Creature,5,14,4,12,3,11,fear,dark_elf,30,45,10,15,6,10,8,12,1,1,1,1,1,1,
+20,Necromante,Um mago que manipula os mortos para seus próprios fins,Special,5,10,14,Cautious,Stealthy,Creature,8,18,4,13,8,20,fear,necromancer,30,45,10,15,5,8,8,12,1,1,1,1,1,1,
+21,Esqueleto com Armadura,Restos animados de um ser humano usando armadura,Normal,7,4,8,Erratic,Brutal,Creature,5,14,4,12,3,11,none,armored_skeleton,25,35,4,6,7,11,4,8,1,1,1,1,1,1,
+22,Aranha Gigante com Ninhada,Uma aranha enorme que tece suas teias entre as árvores,Boss,8,4,8,Cautious,Stealthy,Creature,5,14,4,12,3,11,none,giant_spider_nest,40,60,10,15,6,10,4,8,1,1,1,1,1,1,
+23,Espectro Vingativo,Uma entidade fantasmagórica que assombra as florestas,Special,6,8,12,Cautious,Stealthy,Flying,8,18,0,14,6,19,fear,vengeful_specter,40,60,12,18,8,12,4,8,1,1,1,1,1,1,
+24,Orque,Uma criatura selvagem e agressiva que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,none,orc,25,40,8,13,6,10,3,6,1,1,1,1,1,1,
+25,Goblin,Uma criatura pequena e astuta que vive nas florestas,Normal,6,1,4,Cautious,Stealthy,Creature,0,6,0,5,0,5,none,goblin,8,14,4,7,3,5,7,11,1,1,1,1,1,1,
+26,Esqueleto Arqueiro,Restos animados de um ser humano usando armadura e arco,Normal,7,4,8,Erratic,Brutal,Creature,5,14,4,12,3,11,none,archer_skeleton,20,30,7,11,3,5,4,8,1,1,1,1,1,1,
+27,Orque Pálido,Uma criatura selvagem e agressiva que habita as florestas,Boss,5,12,16,Aggressive,Brutal,Creature,10,20,8,20,8,20,fear,pale_orc,80,120,18,28,12,18,6,11,1,1,1,1,1,0,
+28,Barbárvore,Uma criatura monstruosa em forma de árvore que guarda rancor de invasores,Boss,5,12,16,Aggressive,Brutal,Inanimate,10,20,8,20,0,8,fear,treebeard,100,140,16,24,16,24,2,4,1,1,1,1,1,1,
+29,Lesma Gosmenta,Uma lesma enorme e pegajosa que habita as florestas,Normal,7,1,4,Cautious,Stealthy,Creature,0,6,0,5,0,5,none,slimy_slug,10,18,3,6,4,8,3,6,1,1,1,1,1,1,
+30,Abóbora Amaldiçoada,Uma abóbora animada por magia negra,Normal,8,4,8,Aggressive,Brutal,Inanimate,5,14,4,12,3,11,none,cursed_pumpkin,18,28,6,10,6,10,5,9,1,1,1,1,1,1,
+31,Esqueleto Mago,Restos animados de um ser humano usando armadura e magias,Special,7,4,8,Erratic,Brutal,Creature,5,14,2,9,8,15,fear,skeleton_mage,22,32,8,12,4,7,4,8,1,1,1,1,1,1,
+32,Mariposa Venenosa,Uma mariposa gigante com asas cobertas de veneno,Normal,6,1,4,Cautious,Stealthy,Flying,0,6,0,5,0,5,fear,poison_moth,8,12,4,7,2,5,8,12,1,1,1,1,1,1,
+33,Cogumelos Venenosos,Um grupo de cogumelos venenosos que crescem em áreas sombrias,Normal,7,1,4,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,fear,poison_mushrooms,12,18,4,8,5,9,5,9,1,1,1,1,1,1,
+34,Lagarto Guerreiro,Um lagarto enorme e agressivo que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,7,18,5,14,3,11,fear,warg_lizard,28,42,9,14,6,10,3,6,1,1,1,1,1,1,
+35,Lagarto Arqueiro,Um lagarto enorme e agressivo que habita as florestas,Normal,5,4,8,Aggressive,Brutal,Creature,5,14,4,12,3,11,fear,warg_lizard_archer,22,34,8,12,3,5,7,11,1,1,1,1,1,1,
+36,Espantalho,Uma figura de espantalho animada por magia negra,Normal,6,1,4,Aggressive,Brutal,Inanimate,0,6,0,5,0,5,fear,cursed_scarecrow,12,18,5,8,3,5,4,8,1,1,1,1,1,1,
+37,Ceifador,Uma entidade sombria que ceifa as almas dos vivos,Special,5,8,12,Aggressive,Stealthy,Creature,8,18,0,14,6,19,fear,reaper,45,65,15,22,8,12,10,14,1,1,1,1,1,1,

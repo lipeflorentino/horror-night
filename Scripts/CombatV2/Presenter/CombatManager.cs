@@ -49,6 +49,7 @@ public class CombatManager : MonoBehaviour
     private TrickInventoryInputHandler TrickInventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
     private ITrickInventory PlayerTrickInventory;
+    private ITrickInventory EnemyTrickInventory;
     [SerializeField] private EnemyVisuals EnemyVisuals;
 
     void Start()
@@ -78,7 +79,9 @@ public class CombatManager : MonoBehaviour
         View = FindObjectOfType<CombatView>();
         CombatPlayerInventory = BuildCombatInventory(SessionData);
         PlayerTrickInventory = BuildPlayerTrickInventory(Player);
+        EnemyTrickInventory = BuildEnemyTrickInventory(Enemy);
         ActivatePlayerIdentityTricks();
+        ActivateEnemyIdentityTricks();
 
         if (InventoryInputHandler != null)
             InventoryInputHandler.Init(this, CombatPlayerInventory);
@@ -376,8 +379,8 @@ public class CombatManager : MonoBehaviour
         BattlerStateService.TickTurnEnd(Enemy);
         PerkService.TickTurnEnd(Player);
         PerkService.TickTurnEnd(Enemy);
-        TrickService.TickTrickEnd(Player);
-        TrickService.TickTrickEnd(Enemy);
+        TrickService.TickTrickEnd(Player, PlayerTrickInventory);
+        TrickService.TickTrickEnd(Enemy, EnemyTrickInventory);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
 
@@ -542,10 +545,40 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    private void ActivateEnemyIdentityTricks()
+    {
+        if (Enemy == null || EnemyTrickInventory?.IdentitySlots == null)
+            return;
+
+        for (int i = 0; i < EnemyTrickInventory.IdentitySlots.Count; i++)
+        {
+            TrickRuntimeInstance instance = EnemyTrickInventory.IdentitySlots[i]?.RuntimeInstance;
+            if (instance?.Definition != null)
+                TrickService.ApplyTrick(Enemy, instance, Enemy);
+        }
+    }
+
     private ITrickInventory BuildPlayerTrickInventory(Battler owner)
     {
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         TrickInventorySnapshot snapshot = SessionData != null ? SessionData.PlayerSnapshot.trickInventory : null;
+        TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
+
+        return trickInventory;
+    }
+
+    private ITrickInventory BuildEnemyTrickInventory(Battler owner)
+    {
+        TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
+        TrickInventorySnapshot snapshot = null;
+
+        // Obter tricks do EnemySO se disponível
+        if (SessionData?.EnemyInstance?.source != null)
+        {
+            snapshot = SessionData.EnemyInstance.source.GetTrickInventorySnapshot();
+        }
+
+        // Criar inventário (se snapshot for null, cria vazio - isso é seguro)
         TrickInventory trickInventory = new(owner, trickDatabase, snapshot);
 
         return trickInventory;

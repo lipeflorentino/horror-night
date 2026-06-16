@@ -318,7 +318,7 @@ public class PlayerStatusManager : MonoBehaviour
         currentBody = maxBody;
         maxMind = Mathf.Max(1f, character.Mind);
         currentMind = maxMind;
-        maxHp = Mathf.Max(1f, character.Hp);
+        maxHp = Mathf.Max(1f, CalculateMaxXpForLevel(level));
         currentHp = maxHp;
         attack = Mathf.Max(0, character.Attack);
         defense = Mathf.Max(0, character.Defense);

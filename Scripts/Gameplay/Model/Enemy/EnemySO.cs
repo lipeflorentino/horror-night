@@ -56,6 +56,10 @@ public class EnemySO : ScriptableObject
     public StatRange strength = new() { min = 0, max = 0 };
     public StatRange agility = new() { min = 0, max = 0 };
 
+    [Header("Tricks")]
+    [SerializeField] private List<string> trickIds = new();
+    public IReadOnlyList<string> TrickIds => trickIds;
+
     [Header("Optional")]
     [TextArea] public string specialRule;
 
@@ -102,5 +106,30 @@ public class EnemySO : ScriptableObject
             agility = rolledAgility,
             runTier = context != null ? context.tier : 0
         };
+    }
+
+    /// <summary>
+    /// Gera um TrickInventorySnapshot com as tricks deste inimigo.
+    /// Se não houver tricks, retorna um snapshot vazio (seguro).
+    /// </summary>
+    public TrickInventorySnapshot GetTrickInventorySnapshot()
+    {
+        TrickInventorySnapshot snapshot = new();
+        
+        if (trickIds == null || trickIds.Count == 0)
+            return snapshot;
+
+        foreach (string trickId in trickIds)
+        {
+            if (!string.IsNullOrWhiteSpace(trickId))
+                snapshot.learnedTrickIds.Add(trickId.Trim());
+        }
+
+        return snapshot;
+    }
+
+    public void SetTrickIds(List<string> ids)
+    {
+        trickIds = ids ?? new List<string>();
     }
 }

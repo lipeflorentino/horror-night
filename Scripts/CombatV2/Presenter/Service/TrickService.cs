@@ -27,6 +27,79 @@ public class TrickService
     }
 
     /// <summary>
+    /// Processa fim de turno: reduz duração/cooldown e expira perks quando necessário.
+    /// Precisa receber o inventário para limpar corretamente slots castados quando tricks expiram.
+    /// É OBRIGATÓRIO passar o inventário para evitar que tricks castados bloqueiem slots permanentemente.
+    /// </summary>
+    public void TickTrickEnd(Battler battler, ITrickInventory trickInventory)
+    {
+        if (battler == null || battler.Tricks.Count == 0)
+            return;
+
+        if (trickInventory == null)
+        {
+            Logger.Log($"[TrickService] TickTrickEnd chamado para {battler.Name} sem inventário. Slots castados não serão limpos quando tricks expirarem!");
+        }
+
+        for (int i = battler.Tricks.Count - 1; i >= 0; i--)
+        {
+            TrickRuntimeInstance trick = battler.Tricks[i];
+            if (trick == null || trick.Definition == null)
+            {
+                battler.Tricks.RemoveAt(i);
+                continue;
+            }
+
+            bool changed = false;
+
+            if (trick.WasTriggeredThisTurn)
+            {
+                trick.ClearTriggeredState();
+                changed = true;
+            }
+
+            if (trick.IsCoolingDown)
+            {
+                trick.DecreaseCooldown();
+                changed = true;
+            }
+
+            if (trick.RemainingTurns > 0)
+            {
+                trick.DecreaseDuration();
+                changed = true;
+            }
+            
+            if (trick.RemainingTurns == 0 && !trick.WasExpired)
+            {
+                RemoveActivePerks(battler, trick);
+                trick.MarkExpired();
+                changed = true;
+
+                if (trick.SlotType == TrickSlotType.Casted && trick.SlotIndex >= 0)
+                {
+                    if (trickInventory != null)
+                    {
+                        trickInventory.RemoveCastedTrick(trick.SlotIndex);
+                    }
+                    else
+                    {
+                        Logger.Log($"[TrickService] Trick castado '{trick.Definition.DisplayName}' expirou para {battler.Name} mas inventário é null. Slot {trick.SlotIndex} permanecerá bloqueado!");
+                    }
+                }
+                
+                battler.Tricks.RemoveAt(i);
+
+                OnTrickExpired?.Invoke(battler, trick);
+                continue;
+            }
+
+            if (changed)
+                OnTrickChanged?.Invoke(battler, trick);
+        }
+    }
+
+    /// <summary>
     /// Tenta fazer cast usando o TrickInventory, respeitando slots castados, recursos e cooldown.
     /// </summary>
     public bool TryCastTrick(Battler target, ITrickInventory trickInventory, string trickId, Battler source = null)
@@ -105,55 +178,7 @@ public class TrickService
         Debug.Log($"[TrickService] Trick '{instance.Definition.DisplayName}' removido de {target.Name}");
     }
 
-    /// <summary>
-    /// Processa fim de turno: reduz duração/cooldown e expira perks quando necessário.
-    /// </summary>
-    public void TickTrickEnd(Battler battler)
-    {
-        if (battler == null || battler.Tricks.Count == 0)
-            return;
 
-        for (int i = battler.Tricks.Count - 1; i >= 0; i--)
-        {
-            TrickRuntimeInstance trick = battler.Tricks[i];
-            if (trick == null || trick.Definition == null)
-            {
-                battler.Tricks.RemoveAt(i);
-                continue;
-            }
-
-            bool changed = false;
-
-            if (trick.WasTriggeredThisTurn)
-            {
-                trick.ClearTriggeredState();
-                changed = true;
-            }
-
-            if (trick.IsCoolingDown)
-            {
-                trick.DecreaseCooldown();
-                changed = true;
-            }
-
-            if (trick.RemainingTurns > 0)
-            {
-                trick.DecreaseDuration();
-                changed = true;
-            }
-
-            if (trick.RemainingTurns == 0 && !trick.WasExpired)
-            {
-                RemoveActivePerks(battler, trick);
-                trick.MarkExpired();
-                changed = true;
-                OnTrickExpired?.Invoke(battler, trick);
-            }
-
-            if (changed)
-                OnTrickChanged?.Invoke(battler, trick);
-        }
-    }
 
     /// <summary>
     /// Retorna todos os tricks ativos do battler.

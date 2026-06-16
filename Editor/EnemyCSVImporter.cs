@@ -78,6 +78,24 @@ public class EnemyCSVImporter
             Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Creatures/Enemies/" + values[17] + ".png");
             enemy.image = sprite;
 
+            // Importar tricks (coluna 32, opcional e separada por "|")
+            List<string> trickIds = new();
+            if (values.Length > 32)
+            {
+                string tricksRaw = values[32].Trim();
+                if (!string.IsNullOrWhiteSpace(tricksRaw))
+                {
+                    string[] tricks = tricksRaw.Split('|');
+                    foreach (string trick in tricks)
+                    {
+                        string trimmedTrick = trick.Trim();
+                        if (!string.IsNullOrWhiteSpace(trimmedTrick))
+                            trickIds.Add(trimmedTrick);
+                    }
+                }
+            }
+            enemy.SetTrickIds(trickIds);
+
             EditorUtility.SetDirty(enemy);
         }
 
