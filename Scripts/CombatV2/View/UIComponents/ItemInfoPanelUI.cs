@@ -39,6 +39,8 @@ public class ItemInfoPanelUI : MonoBehaviour
         if (unequipButton != null) unequipButton.onClick.AddListener(() => RaiseInteraction(InventoryItemAction.Unequip));
         if (dischardButton != null) dischardButton.onClick.AddListener(() => RaiseInteraction(InventoryItemAction.Discard));
         if (closeButton != null) closeButton.onClick.AddListener(() => RaiseInteraction(InventoryItemAction.Close));
+
+        itemInfoPanel.SetActive(false);
     }
 
     private void OnDestroy()

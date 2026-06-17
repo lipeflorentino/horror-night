@@ -11,14 +11,12 @@ public class InventoryInputHandler : MonoBehaviour
     {
         Combat = cm;
         inventoryView = FindObjectOfType<InventoryView>();
-        Logger.Log($"[InventoryInputHandler] Inicializando com inventário do jogador: {inventory}");
         playerInventory = inventory;
         playerInventorySource = inventory as MonoBehaviour;
         if (inventoryView != null)
         {
             inventoryView.BindInventory(playerInventory);
             inventoryView.OnInteractWithInventoryItem += HandleItemInteraction;
-            Logger.Log($"[InventoryInputHandler] Subscribed to inventoryView.OnInteractWithInventoryItem");
         }
     }
 

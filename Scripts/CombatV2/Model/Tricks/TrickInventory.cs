@@ -28,12 +28,8 @@ public class TrickInventory : ITrickInventory
         this.trickDatabase = trickDatabase ?? TrickDatabase.GetOrCreateRuntimeDatabase();
         this.perkService = perkService;
         
-        Logger.Log($"[TrickInventory] Inicializando para {owner?.Name}. IdentitySlotCount={identitySlotCount}, CastedSlotCount={castedSlotCount}");
-        
         InitializeSlots(Mathf.Max(1, identitySlotCount), Mathf.Max(1, castedSlotCount));
         RestoreSnapshot(snapshot);
-        
-        Logger.Log($"[TrickInventory] Inicialização concluída. IdentitySlots={identitySlots.Count}, LearnedTricks={learnedTricks.Count}, CastedSlots={castedSlots.Count}");
     }
 
     public IReadOnlyList<TrickSlot> IdentitySlots => identitySlots;
@@ -193,11 +189,8 @@ public class TrickInventory : ITrickInventory
     {
         if (trickIds == null)
         {
-            Logger.Log($"[TrickInventory] RestoreIdentitySlots: trickIds é null. Nenhum Identity Trick será restaurado.");
             return;
         }
-
-        Logger.Log($"[TrickInventory] RestoreIdentitySlots: Restaurando {trickIds.Count} identity tricks para {owner?.Name}");
         
         int count = Math.Min(trickIds.Count, identitySlots.Count);
         for (int i = 0; i < count; i++)
@@ -205,46 +198,29 @@ public class TrickInventory : ITrickInventory
             TrickSO trick = FindTrick(trickIds[i]);
             if (trick != null)
             {
-                Logger.Log($"[TrickInventory] IdentitySlot[{i}]: Restaurado trick '{trick.DisplayName}' (ID: {trick.Id})");
                 TrickRuntimeInstance instance = new(trick, owner, trick.DurationTurns, 0, TrickSlotType.Identity, i, owner);
                 identitySlots[i].BindRuntimeInstance(instance);
                 if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
                     owner.Tricks.Add(instance);
             }
-            else
-            {
-                Logger.Log($"[TrickInventory] IdentitySlot[{i}]: Trick com ID '{trickIds[i]}' não encontrado no database.");
-            }
-        }
-        
-        Logger.Log($"[TrickInventory] RestoreIdentitySlots concluído. IdentitySlots preenchidos: {identitySlots.FindAll(s => !s.IsEmpty).Count}/{identitySlots.Count}");
+        }        
     }
 
     private void RestoreLearnedTricks(List<string> trickIds)
     {
         if (trickIds == null)
         {
-            Logger.Log($"[TrickInventory] RestoreLearnedTricks: trickIds é null. Nenhum learned trick será restaurado.");
             return;
         }
 
-        Logger.Log($"[TrickInventory] RestoreLearnedTricks: Restaurando {trickIds.Count} learned tricks para {owner?.Name}");
-        
         for (int i = 0; i < trickIds.Count; i++)
         {
             TrickSO trick = FindTrick(trickIds[i]);
             if (trick != null)
             {
-                bool learned = LearnTrick(trick);
-                Logger.Log($"[TrickInventory] LearnedTrick[{i}]: Trick '{trick.DisplayName}' (ID: {trick.Id}) - Aprendido: {learned}");
-            }
-            else
-            {
-                Logger.Log($"[TrickInventory] LearnedTrick[{i}]: Trick com ID '{trickIds[i]}' não encontrado no database.");
+                LearnTrick(trick);
             }
         }
-        
-        Logger.Log($"[TrickInventory] RestoreLearnedTricks concluído. Total de learned tricks: {learnedTricks.Count}");
     }
 
     private void RestoreCastedSlots(List<CastedTrickSlotSnapshot> snapshots)
@@ -267,7 +243,6 @@ public class TrickInventory : ITrickInventory
             if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
                 owner.Tricks.Add(instance);
             
-            // Aplicar perks ao restaurar um trick castado do snapshot
             ApplyPerksToInstance(instance);
         }
     }

@@ -12,13 +12,14 @@ public class TrickInfoPanelUI : MonoBehaviour
     [SerializeField] private GameObject trickInfoPanel;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text levelText;
-    [SerializeField] private TMP_Text costText;
     [SerializeField] private TMP_Text cooldownText;
     [SerializeField] private TMP_Text durationText;
     [SerializeField] private TMP_Text rarityText;
+    [SerializeField] private TMP_Text mindCostText;
+    [SerializeField] private TMP_Text bodyCostText;
+    [SerializeField] private TMP_Text heartCostText;
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private TMP_Text tagsText;
-    [SerializeField] private TMP_Text slotText;
 
     [Header("Interaction Buttons")]
     [SerializeField] private Button castButton;
@@ -61,14 +62,15 @@ public class TrickInfoPanelUI : MonoBehaviour
             return;
 
         if (nameText != null) nameText.text = trick.DisplayName;
-        if (levelText != null) levelText.text = $"Level: {trick.Level}";
-        if (costText != null) costText.text = $"Cost: {FormatCost(trick)}";
-        if (cooldownText != null) cooldownText.text = runtimeInstance != null ? $"Cooldown: {runtimeInstance.CooldownTurnsRemaining}/{trick.CooldownTurns}" : $"Cooldown: {trick.CooldownTurns}";
+        if (levelText != null) levelText.text = $"{trick.Level}";
+        if (cooldownText != null) cooldownText.text = runtimeInstance != null ? $"{runtimeInstance.CooldownTurnsRemaining}/{trick.CooldownTurns}" : $"{trick.CooldownTurns}";
         if (durationText != null) durationText.text = FormatDuration(trick, runtimeInstance);
-        if (rarityText != null) rarityText.text = $"Rarity: {trick.Rarity}";
+        if (rarityText != null) rarityText.text = $"{trick.Rarity}";
         if (descriptionText != null) descriptionText.text = trick.Description;
-        if (tagsText != null) tagsText.text = trick.Tags != null && trick.Tags.Count > 0 ? $"Tags: {string.Join(", ", trick.Tags.ToArray())}" : "Tags: -";
-        if (slotText != null) slotText.text = FormatSlot(location);
+        if (tagsText != null) tagsText.text = trick.Tags != null && trick.Tags.Count > 0 ? $"{string.Join(", ", trick.Tags.ToArray())}" : "-";
+        if (mindCostText != null) mindCostText.text = trick.MindCost > 0 ? $"{trick.MindCost}" : "-";
+        if (bodyCostText != null) bodyCostText.text = trick.BodyCost > 0 ? $"{trick.BodyCost}" : "-";
+        if (heartCostText != null) heartCostText.text = trick.HeartCost > 0 ? $"{trick.HeartCost}" : "-";
 
         ConfigureActions(trick, runtimeInstance, location);
     }
@@ -109,36 +111,14 @@ public class TrickInfoPanelUI : MonoBehaviour
         if (closeButton != null) closeButton.gameObject.SetActive(hasTrick);
     }
 
-    private static string FormatCost(TrickSO trick)
+    private static string FormatDuration(TrickSO trick, TrickRuntimeInstance runtimeInstance)
     {
         if (trick == null)
             return "-";
 
-        string cost = string.Empty;
-        if (trick.MindCost > 0) cost += $"{trick.MindCost} Mind ";
-        if (trick.BodyCost > 0) cost += $"{trick.BodyCost} Body ";
-        if (trick.HeartCost > 0) cost += $"{trick.HeartCost} Heart";
-        return string.IsNullOrWhiteSpace(cost) ? "Free" : cost.Trim();
-    }
-
-    private static string FormatDuration(TrickSO trick, TrickRuntimeInstance runtimeInstance)
-    {
-        if (trick == null)
-            return "Duration: -";
-
         if (trick.DurationTurns < 0)
-            return "Duration: Permanent";
+            return "Permanent";
 
-        return runtimeInstance != null ? $"Duration: {runtimeInstance.RemainingTurns}/{trick.DurationTurns}" : $"Duration: {trick.DurationTurns}";
-    }
-
-    private static string FormatSlot(TrickInventoryItemLocation location)
-    {
-        return location.Location switch
-        {
-            TrickInventoryLocation.IdentitySlot => $"Identity Slot {location.SlotIndex + 1}",
-            TrickInventoryLocation.CastedSlot => $"Casted Slot {location.SlotIndex + 1}",
-            _ => "Learned Trick"
-        };
+        return runtimeInstance != null ? $"{runtimeInstance.RemainingTurns}/{trick.DurationTurns}" : $"{trick.DurationTurns}";
     }
 }

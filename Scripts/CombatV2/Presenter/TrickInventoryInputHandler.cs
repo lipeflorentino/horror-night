@@ -10,25 +10,15 @@ public class TrickInventoryInputHandler : MonoBehaviour
 
     public void Init(CombatManager combatManager, ITrickInventory trickInventory)
     {
-        Logger.Log($"[TrickInventoryInputHandler] Init: Iniciando TrickInventoryInputHandler.");
-        
         Combat = combatManager;
-        trickInventoryView = trickInventoryView != null ? trickInventoryView : FindObjectOfType<TrickInventoryView>();
-        Logger.Log($"[TrickInventoryInputHandler] Init: Inventário de Tricks do jogador: {(trickInventory != null ? "encontrado" : "null")}. TrickInventoryView: {(trickInventoryView != null ? "encontrada" : "null")}.");
-        
+        trickInventoryView = trickInventoryView != null ? trickInventoryView : FindObjectOfType<TrickInventoryView>();        
         playerTrickInventory = trickInventory;
         playerTrickInventorySource = trickInventory as MonoBehaviour;
 
         if (trickInventoryView != null)
         {
-            Logger.Log($"[TrickInventoryInputHandler] Init: Vinculando inventário à TrickInventoryView...");
             trickInventoryView.BindInventory(playerTrickInventory);
             trickInventoryView.OnInteractWithInventoryTrick += HandleTrickInteraction;
-            Logger.Log("[TrickInventoryInputHandler] Init: Inscrito a OnInteractWithInventoryTrick com sucesso.");
-        }
-        else
-        {
-            Logger.Log("[TrickInventoryInputHandler] Init: TrickInventoryView não encontrada! Tricks UI não será funcional.");
         }
     }
 

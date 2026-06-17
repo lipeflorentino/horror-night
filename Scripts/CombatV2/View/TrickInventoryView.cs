@@ -59,24 +59,17 @@ public class TrickInventoryView : MonoBehaviour
 
     public void Refresh()
     {
-        Logger.Log($"[TrickInventoryView] Refresh: Atualizando display de tricks. boundInventory null: {boundInventory == null}");
-        
         ClearSpawnedSlots();
 
         if (boundInventory == null)
         {
-            Logger.Log($"[TrickInventoryView] Refresh: boundInventory é null, não será possível renderizar tricks.");
             return;
         }
 
-        Logger.Log($"[TrickInventoryView] Refresh: Iniciando spawn de slots. IdentitySlots={boundInventory.IdentitySlots.Count}, LearnedTricks={boundInventory.LearnedTricks.Count}, CastedSlots={boundInventory.CastedSlots.Count}");
-        
         SpawnSlots(boundInventory.IdentitySlots, identitySlotsRoot, TrickInventoryLocation.IdentitySlot);
         SpawnLearnedTricks();
         SpawnSlots(boundInventory.CastedSlots, castedSlotsRoot, TrickInventoryLocation.CastedSlot);
 
-        Logger.Log($"[TrickInventoryView] Refresh: Spawn concluído. Total de slots renderizados: {spawnedSlots.Count}");
-        
         if (IsInventoryOpen())
             SelectDefaultTrick();
         else if (trickInfoPanel != null)
@@ -109,26 +102,19 @@ public class TrickInventoryView : MonoBehaviour
     {
         if (boundInventory?.LearnedTricks == null)
         {
-            Logger.Log($"[TrickInventoryView] SpawnLearnedTricks: LearnedTricks é null!");
             return;
         }
 
-        Logger.Log($"[TrickInventoryView] SpawnLearnedTricks: Renderizando {boundInventory.LearnedTricks.Count} learned tricks.");
-        
         for (int i = 0; i < boundInventory.LearnedTricks.Count; i++)
         {
             TrickSO trick = boundInventory.LearnedTricks[i];
             if (trick == null)
             {
-                Logger.Log($"[TrickInventoryView] SpawnLearnedTricks[{i}]: Trick é null!");
                 continue;
             }
 
-            Logger.Log($"[TrickInventoryView] SpawnLearnedTricks[{i}]: Renderizando learned trick '{trick.DisplayName}' (ID: {trick.Id})");
             SpawnTrickView(trick, FindCastedRuntime(trick), learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks));
         }
-        
-        Logger.Log($"[TrickInventoryView] SpawnLearnedTricks: Conclusão. LearnedTricksRoot children count: {(learnedTricksRoot != null ? learnedTricksRoot.childCount : -1)}");
     }
 
     private TrickRuntimeInstance FindCastedRuntime(TrickSO trick)
@@ -150,43 +136,19 @@ public class TrickInventoryView : MonoBehaviour
     {
         if (slots == null)
         {
-            Logger.Log($"[TrickInventoryView] SpawnSlots: Slots é null para location {location}!");
             return;
         }
         
-        Logger.Log($"[TrickInventoryView] SpawnSlots: Renderizando {slots.Count} slots para {location}. Parent: {(parent != null ? parent.name : "null")}");
-
         for (int i = 0; i < slots.Count; i++)
         {
             TrickSlot slot = slots[i];
             int slotIndex = slot?.SlotIndex ?? i;
-            
-            if (slot?.Definition != null)
-            {
-                Logger.Log($"[TrickInventoryView] SpawnSlots[{i}] ({location}): Renderizando slot com trick '{slot.Definition.DisplayName}' (ID: {slot.Definition.Id}). IsLocked: {slot.IsLocked}");
-            }
-            else
-            {
-                Logger.Log($"[TrickInventoryView] SpawnSlots[{i}] ({location}): Slot vazio.");
-            }
-            
             SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, parent, new TrickInventoryItemLocation(location, slotIndex), slot != null && slot.IsLocked);
-        }
-        
-        Logger.Log($"[TrickInventoryView] SpawnSlots: Conclusão para {location}. Parent children count: {(parent != null ? parent.childCount : -1)}");
+        }    
     }
 
     private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false)
     {
-        if (trick == null && runtimeInstance == null)
-        {
-            Logger.Log($"[TrickInventoryView] SpawnTrickView: Criando UI para slot vazio em {location}.");
-        }
-        else if (trick != null)
-        {
-            Logger.Log($"[TrickInventoryView] SpawnTrickView: Criando UI para trick '{trick.DisplayName}' (ID: {trick.Id}) em {location}. IsLocked: {isLocked}");
-        }
-        
         TrickSlotUI trickSlotPrefab = location.Location switch
         {
             TrickInventoryLocation.IdentitySlot => identityTrickSlotPrefab != null ? identityTrickSlotPrefab : null,
@@ -196,13 +158,11 @@ public class TrickInventoryView : MonoBehaviour
 
         if (trickSlotPrefab == null)
         {
-            Logger.Log($"[TrickInventoryView] SpawnTrickView: Prefab é null para location {location}!");
             return;
         }
         
         if (parent == null)
         {
-            Logger.Log($"[TrickInventoryView] SpawnTrickView: Parent é null para location {location}!");
             return;
         }
 
@@ -213,9 +173,7 @@ public class TrickInventoryView : MonoBehaviour
         trickSlotView.TrickSelected += HandleTrickSelected;
         trickSlotView.OnInteractWithTrick += HandleTrickInteraction;
         trickSlotView.ShowInteractionPanel(false);
-        spawnedSlots.Add(trickSlotView);
-        
-        Logger.Log($"[TrickInventoryView] SpawnTrickView: UI criada com sucesso. Total de spawned slots: {spawnedSlots.Count}");
+        spawnedSlots.Add(trickSlotView);    
     }
 
     private bool IsInventoryOpen()

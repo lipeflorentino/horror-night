@@ -398,17 +398,11 @@ public class ActionPanelView : MonoBehaviour
 
     private void HandleTricksClick()
     {
-        Logger.Log("[ActionPanelView] HandleTricksClick: Abrindo TrickInventoryView...");
-        
         if (trickInventoryView != null)
         {
-            Logger.Log("[ActionPanelView] HandleTricksClick: TrickInventoryView encontrada. Chamando Open().");
             trickInventoryView.Open();
         }
-        else
-        {
-            Logger.Log("[ActionPanelView] HandleTricksClick: TrickInventoryView é null!");
-        }
+        
     }
 
     private void HandleAddMindPowerDiceClick()
