@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b65086a4ec284c7698bd8eeed77d6b44, type: 3}
+  m_Name: nicolas
+  m_EditorClassIdentifier: 
+  Id: nicolas
+  DisplayName: Nicolas
+  Description: A timid and gentle soul
+  Xp: 0
+  Heart: 5
+  Body: 2
+  Mind: 3
+  Hp: 25
+  Attack: 3
+  Defense: 2
+  Initiative: 1
+  Focus: 2
+  Strength: 1
+  Agility: 1
+  PowerDices: 1
+  AccuracyDices: 2
+  IdentityTricks:
+  - {fileID: 11400000, guid: bfc3bc31bcfb74b43815f71856ededbc, type: 2}
+  - {fileID: 11400000, guid: aa33636fb73d76144a1dcc3235af0ba5, type: 2}
+  - {fileID: 11400000, guid: b48c1b21a6ad443469d54441fd65619f, type: 2}

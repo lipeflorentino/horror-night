@@ -84,8 +84,6 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
     public PlayerInventorySnapshot GetSnapshot()
     {
         Dictionary<int, int> countsByItemId = new();
-        
-        Logger.Log($"[PlayerInventory] Criando snapshot de inventário... Itens atuais: {items.Count}");
 
         for (int i = 0; i < items.Count; i++)
         {

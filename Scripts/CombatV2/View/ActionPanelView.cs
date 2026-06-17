@@ -11,7 +11,8 @@ public class ActionPanelView : MonoBehaviour
     public Button AddMindPowerDiceButton, AddHeartPowerDiceButton, AddBodyPowerDiceButton, AddMindAccuracyDiceButton, AddHeartAccuracyDiceButton, AddBodyAccuracyDiceButton;
     public Button RemoveMindPowerDiceButton, RemoveHeartPowerDiceButton, RemoveBodyPowerDiceButton, RemoveMindAccuracyDiceButton, RemoveHeartAccuracyDiceButton, RemoveBodyAccuracyDiceButton;
     public Button EndTurnButton;
-    public Button ItemsButton;
+    public Button SelectItemsButton;
+    public Button SelectTricksButton;
     public Toggle InfoToggle;
 
     [Header("Confirm Action Panel")]
@@ -22,6 +23,7 @@ public class ActionPanelView : MonoBehaviour
     [Header("Dice Allocation")]
     [SerializeField] private DiceAllocationView diceAllocationView;
     [SerializeField] private InventoryView inventoryView;
+    [SerializeField] private TrickInventoryView trickInventoryView;
 
     public event Action SelectAttackClicked;
     public event Action SelectDefendClicked;
@@ -35,6 +37,7 @@ public class ActionPanelView : MonoBehaviour
     private void Awake()
     {
         inventoryView = FindObjectOfType<InventoryView>();
+        trickInventoryView = FindObjectOfType<TrickInventoryView>();
 
         if (SelectAttackButton != null)
             SelectAttackButton.onClick.AddListener(HandleSelectAttackClick);
@@ -45,8 +48,11 @@ public class ActionPanelView : MonoBehaviour
         if (EndTurnButton != null)
             EndTurnButton.onClick.AddListener(HandleSkipTurnClick);
 
-        if (ItemsButton != null)
-            ItemsButton.onClick.AddListener(HandleItemsClick);
+        if (SelectItemsButton != null)
+            SelectItemsButton.onClick.AddListener(HandleItemsClick);
+
+        if (SelectTricksButton != null)
+            SelectTricksButton.onClick.AddListener(HandleTricksClick);
 
         if (ConfirmButton != null)
             ConfirmButton.onClick.AddListener(HandleConfirmClick);
@@ -114,8 +120,11 @@ public class ActionPanelView : MonoBehaviour
         if (EndTurnButton != null)
             EndTurnButton.onClick.RemoveListener(HandleSkipTurnClick);
 
-        if (ItemsButton != null)
-            ItemsButton.onClick.RemoveListener(HandleItemsClick);
+        if (SelectItemsButton != null)
+            SelectItemsButton.onClick.RemoveListener(HandleItemsClick);
+
+        if (SelectTricksButton != null)
+            SelectTricksButton.onClick.RemoveListener(HandleTricksClick);
 
         if (ConfirmButton != null)
             ConfirmButton.onClick.RemoveListener(HandleConfirmClick);
@@ -385,6 +394,21 @@ public class ActionPanelView : MonoBehaviour
     {
         if (inventoryView != null)
             inventoryView.Open();
+    }
+
+    private void HandleTricksClick()
+    {
+        Logger.Log("[ActionPanelView] HandleTricksClick: Abrindo TrickInventoryView...");
+        
+        if (trickInventoryView != null)
+        {
+            Logger.Log("[ActionPanelView] HandleTricksClick: TrickInventoryView encontrada. Chamando Open().");
+            trickInventoryView.Open();
+        }
+        else
+        {
+            Logger.Log("[ActionPanelView] HandleTricksClick: TrickInventoryView é null!");
+        }
     }
 
     private void HandleAddMindPowerDiceClick()

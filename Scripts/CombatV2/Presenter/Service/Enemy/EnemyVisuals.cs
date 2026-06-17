@@ -56,7 +56,6 @@ public class EnemyVisuals : MonoBehaviour
     public void SetEnemyVisual(EnemyInstance enemySnapshot = null)
     {
         Sprite enemySprite = null;
-        Logger.Log("[Combat] Setting enemy visuals.");
         if (enemySnapshot != null)
         {
             enemyTypeTag = enemySnapshot.source.tags.type;
@@ -90,8 +89,6 @@ public class EnemyVisuals : MonoBehaviour
         {
             sprite = defaultSprite;
         }
-
-        Logger.Log("[Combat] Resizing enemy sprite to fit target dimensions.");
         spriteRenderer.gameObject.transform.localScale = Vector3.one;
         Vector2 spriteSize = sprite.bounds.size;
 

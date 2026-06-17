@@ -65,8 +65,6 @@ public class TrickDatabase : MonoBehaviour
         
         allTricks.Clear();
         allTricks.AddRange(loaded);
-        
-        Debug.Log($"[TrickDatabase] Carregados {allTricks.Count} tricks");
     }
     
     /// <summary>

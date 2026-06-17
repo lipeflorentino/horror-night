@@ -28,7 +28,7 @@ public List<DiceResult> RollMany(Battler battler, IReadOnlyList<DiceStatType> di
 
     if (diceTypes == null || diceTypes.Count == 0)
     {
-        Logger.LogWarning($"[DiceService.RollMany] {battler.Name} called RollMany with null or empty diceTypes");
+        Logger.Log($"[DiceService.RollMany] {battler.Name} called RollMany with null or empty diceTypes");
         return new List<DiceResult>();
     }
 
@@ -37,7 +37,7 @@ public List<DiceResult> RollMany(Battler battler, IReadOnlyList<DiceStatType> di
     // ✅ Melhor tratamento quando nenhum dado pode ser criado
     if (diceSpecs.Count == 0)
     {
-        Logger.LogWarning($"[DiceService.RollMany] {battler.Name} has no valid dice specs. " +
+        Logger.Log($"[DiceService.RollMany] {battler.Name} has no valid dice specs. " +
             $"Requested types: {string.Join(", ", diceTypes)}. " +
             $"Stats - Mind: {battler.Mind}, Heart: {battler.Heart}, Body: {battler.Body}");
         // Retornar lista vazia em vez de d1 falso

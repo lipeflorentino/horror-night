@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab22c90c89400c74c990f72e53088905, type: 3}
+  m_Name: lucky_number
+  m_EditorClassIdentifier: 
+  Id: lucky_number
+  DisplayName: "N\xFAmero da Sorte"
+  Description: Se a soma dos dados for 7 ganha 1 ponto de momentum.
+  Icon: {fileID: 21300000, guid: e894a34faf7dac9479e6382214ef968e, type: 3}
+  Level: 3
+  MindCost: 1
+  BodyCost: 0
+  HeartCost: 2
+  Timing: 0
+  DurationTurns: -1
+  CooldownTurns: 0
+  PerkIds:
+  - lucky_number
+  Rarity: 2
+  Tags:
+  - permanent
+  - luck
+  - attack
+  FlavorText: A sorte sorri para quem acredita.

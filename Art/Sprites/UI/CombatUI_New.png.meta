@@ -319,6 +319,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Dice_single
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 24
+        width: 153
+        height: 185
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a1004dd8c09467449dcba51a76be6cc
+      internalID: 1775856459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -340,12 +361,12 @@ TextureImporter:
       CombatUI_New_15: -650670837
       CombatUI_New_2: -1436756075
       CombatUI_New_3: -1381891710
-      CombatUI_New_4: -1994872087
       CombatUI_New_5: 12121593
       CombatUI_New_6: 1840181746
       CombatUI_New_7: 88316612
       CombatUI_New_8: 1819784729
       CombatUI_New_9: 2133987229
+      Dice_single: -1994872087
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

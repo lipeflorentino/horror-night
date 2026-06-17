@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab22c90c89400c74c990f72e53088905, type: 3}
+  m_Name: six_feet_under
+  m_EditorClassIdentifier: 
+  Id: six_feet_under
+  DisplayName: Six Feet Under
+  Description: "Se o dado de power tirar 6 ganha 30% de b\xF4nus de dano."
+  Icon: {fileID: 21300000, guid: b52cfc76eae547747acfefb6834d83bf, type: 3}
+  Level: 2
+  MindCost: 2
+  BodyCost: 1
+  HeartCost: 0
+  Timing: 0
+  DurationTurns: -1
+  CooldownTurns: 0
+  PerkIds:
+  - six_feet_under
+  Rarity: 2
+  Tags:
+  - permanent
+  - power
+  - attack
+  FlavorText: "Um golpe perfeito com for\xE7a devastadora."

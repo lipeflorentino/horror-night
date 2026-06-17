@@ -117,7 +117,7 @@ Na camada que chama `RollMany`, validar:
 ```csharp
 if (battler.CurrentPowerDices <= 0 && rollType == DiceRollType.Power)
 {
-    Logger.LogWarning($"{battler.Name} has no Power Dices available");
+    Logger.Log($"{battler.Name} has no Power Dices available");
     return GetDefaultEmptyResult();
 }
 ```

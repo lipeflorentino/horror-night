@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab22c90c89400c74c990f72e53088905, type: 3}
+  m_Name: brutal_force
+  m_EditorClassIdentifier: 
+  Id: brutal_force
+  DisplayName: "For\xE7a Brutal"
+  Description: High power de body vale x2 e medium power vale x1.5.
+  Icon: {fileID: 21300000, guid: b3d9803ff6299304ba5b4717d4fb72df, type: 3}
+  Level: 1
+  MindCost: 0
+  BodyCost: 0
+  HeartCost: 0
+  Timing: 0
+  DurationTurns: -1
+  CooldownTurns: 0
+  PerkIds:
+  - brutal_force_x2
+  - brutal_force_x1_5
+  Rarity: 0
+  Tags:
+  - identity
+  - body
+  FlavorText: "O corpo desperta sua for\xE7a prim\xE1ria com for\xE7a brutal."
