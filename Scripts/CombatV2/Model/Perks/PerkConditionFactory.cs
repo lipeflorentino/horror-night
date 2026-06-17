@@ -28,10 +28,7 @@ public static class PerkConditionFactory
     /// </summary>
     public static void Register(PerkConditionKey key, IPerkCondition condition)
     {
-        if (condition == null)
-            throw new ArgumentNullException(nameof(condition));
-
-        conditionRegistry[key] = condition;
+        conditionRegistry[key] = condition ?? throw new ArgumentNullException(nameof(condition));
     }
 
     /// <summary>
@@ -73,7 +70,7 @@ public class RollValueEqualsCondition : IPerkCondition
 
     public bool Evaluate(object context, string conditionValue)
     {
-        if (!(context is DiceResult dice))
+        if (context is not DiceResult dice)
             return false;
 
         return int.TryParse(conditionValue, out int expectedValue) && dice.Value == expectedValue;
@@ -89,7 +86,7 @@ public class RollTierEqualsCondition : IPerkCondition
 
     public bool Evaluate(object context, string conditionValue)
     {
-        if (!(context is DiceResult dice))
+        if (context is not DiceResult dice)
             return false;
 
         return Enum.TryParse(conditionValue, true, out DiceTier expectedTier) && dice.Tier == expectedTier;
@@ -107,7 +104,7 @@ public class RollSumEqualsCondition : IPerkCondition
     public bool Evaluate(object context, string conditionValue)
     {
         // Context deve ser um DiceRollSumContext que contém a soma
-        if (!(context is DiceRollSumContext sumContext))
+        if (context is not DiceRollSumContext sumContext)
             return false;
 
         return int.TryParse(conditionValue, out int expectedSum) && sumContext.TotalSum == expectedSum;
@@ -123,7 +120,7 @@ public class RollSumEqualsAttackersCondition : IPerkCondition
 
     public bool Evaluate(object context, string conditionValue)
     {
-        if (!(context is DefenseRollComparisonContext compContext))
+        if (context is not DefenseRollComparisonContext compContext)
             return false;
 
         return compContext.DefenderRollSum == compContext.AttackerRollSum;

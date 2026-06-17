@@ -12,7 +12,6 @@ HISTÓRIAS
 BACKLOG 
     - Implementar sistemas que faltam
         - Presence, Treasure, NPC, Class
-    - Ajustar painel de infos (fechamento)
     - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
     - Fazer painel de resultados (total damage, total kills, total xp, etc)
     - Fazer galeria  (monstros, itens, reliquias, etc.)
@@ -42,19 +41,18 @@ TO DO
     - Estabelecer tricks para os inimigos
         - identity tricks 
         - criar feedback para o uso de tricks pelo inimigo
-    
-
-FIXES
     - Corrigir tela de Loot (textos, alinhamento, etc)
     - Ajustar recompensa Xp (icone?, text?)
-    
-HOTFIXES 
-    - Criar botão para abrir TrickInventory
-    - Ajustar as views de Tricks 
-        - falta dados de custo, cooldown,etc 
-        - ajustar ui de triggered / cooldown / casted 
     - Criar CharacterSO (Nicolas)
-        - gerar icone do Character 
+        - gerar icone do Character
+    - Implementar Tricks que forçam "testes" escolhidos pelo jogador
+        - Uma rolagem antes de accuracy/power 
+        - teste igual classicos de RPG 
+
+HOTFIXES 
+    - Ajustar as views de Tricks 
+        - ajustar ui de triggered / cooldown / casted 
+    - Ajustar painel de infos (fechamento, tamanho)
 
 
 BUGS
@@ -62,5 +60,4 @@ BUGS
 
 
 CHAT 
-    - Analise o fluxo de Tricks, principalmente relacionado a UI. Preciso garantir que os IdentityTricks estão sendo inicializados e que eles apareçam nos IdentitySlots, coloque logs para que eu identifique o fluxo até chegar na UI. COnsidere o fluxo completo vindo da scene de gameplay até iniciar o combate (encounter system)
-
+    - 

@@ -27,7 +27,8 @@ public enum PerkConditionKey
     RollValueEquals,
     RollTierEquals,
     RollSumEquals,
-    RollSumEqualsAttackersRollSum
+    RollSumEqualsAttackersRollSum,
+    BlockedAttack
 }
 
 public enum PerkOperation
