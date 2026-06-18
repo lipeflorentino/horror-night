@@ -162,31 +162,33 @@ public class PerkService
         return Mathf.Max(0f, multiplier);
     }
 
-    public int ApplyDamageModifiers(int damage, ActionInstance action, Battler actor, Battler opponent, ActionType actionType)
+    public int ApplyDamageModifiers(int damage, ActionInstance action, Battler actor, Battler opponent, ActionType actionType, ActionInstance opposingAction = null)
     {
         if (damage <= 0 || action == null)
             return damage;
 
         CombatActionContext actionContext = new(actor, opponent, actionType);
+        List<DiceResult> actionDice = GetActionDice(action);
+        List<DiceResult> opposingActionDice = GetActionDice(opposingAction);
         
         // ✅ Dispara triggers quando dados são analisados para dano (AfterResolve)
         if (action.PowerDice != null)
         {
-            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor));
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor), actionDice, opposingActionDice);
             if (opponent != null)
-                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent));
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent), actionDice, opposingActionDice);
         }
         
         if (action.AccuracyDice != null)
         {
-            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor));
+            triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor), actionDice, opposingActionDice);
             if (opponent != null)
-                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent));
+                triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, GetEffectivePerks(opponent), actionDice, opposingActionDice);
         }
         
         float modifiedDamage = damage;
-        ApplyDiceModifiers(actor, opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage);
-        ApplyDiceModifiers(actor, opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage);
+        ApplyDiceModifiers(actor, opponent, actionContext, action.PowerDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage, actionDice, opposingActionDice);
+        ApplyDiceModifiers(actor, opponent, actionContext, action.AccuracyDice, PerkTrigger.AfterResolve, PerkModifierTarget.DamagePercent, ref modifiedDamage, actionDice, opposingActionDice);
         return Mathf.Max(0, Mathf.RoundToInt(modifiedDamage));
     }
 
@@ -221,13 +223,13 @@ public class PerkService
         }
     }
 
-    private void ApplyDiceModifiers(Battler actor, Battler opponent, CombatActionContext context, DiceResult dice, PerkTrigger trigger, PerkModifierTarget target, ref float value)
+    private void ApplyDiceModifiers(Battler actor, Battler opponent, CombatActionContext context, DiceResult dice, PerkTrigger trigger, PerkModifierTarget target, ref float value, List<DiceResult> actionDice = null, List<DiceResult> opposingActionDice = null)
     {
-        ApplyDiceModifiersFromOwner(actor, context, dice, trigger, target, ref value);
-        ApplyDiceModifiersFromOwner(opponent, context, dice, trigger, target, ref value);
+        ApplyDiceModifiersFromOwner(actor, context, dice, trigger, target, ref value, actionDice, opposingActionDice);
+        ApplyDiceModifiersFromOwner(opponent, context, dice, trigger, target, ref value, actionDice, opposingActionDice);
     }
 
-    private void ApplyDiceModifiersFromOwner(Battler owner, CombatActionContext context, DiceResult dice, PerkTrigger trigger, PerkModifierTarget target, ref float value)
+    private void ApplyDiceModifiersFromOwner(Battler owner, CombatActionContext context, DiceResult dice, PerkTrigger trigger, PerkModifierTarget target, ref float value, List<DiceResult> actionDice = null, List<DiceResult> opposingActionDice = null)
     {
         if (owner == null || dice == null)
             return;
@@ -243,13 +245,52 @@ public class PerkService
             for (int j = 0; j < rules.Count; j++)
             {
                 PerkRule rule = rules[j];
-                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !rule.MatchesDice(dice) || !IsRoleMatch(owner, context, rule.OwnerRole))
+                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !rule.MatchesDice(dice) || !MatchesDiceCondition(rule, dice, actionDice, opposingActionDice) || !IsRoleMatch(owner, context, rule.OwnerRole))
                     continue;
 
                 float ruleValue = target == PerkModifierTarget.DamagePercent ? 1f + rule.Value : rule.Value;
                 value = ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks));
             }
         }
+    }
+
+    private static bool MatchesDiceCondition(PerkRule rule, DiceResult dice, List<DiceResult> actionDice, List<DiceResult> opposingActionDice)
+    {
+        if (rule.ConditionKey == PerkConditionKey.RollValueEquals || rule.ConditionKey == PerkConditionKey.RollTierEquals)
+            return true;
+
+        if (actionDice == null || actionDice.Count == 0 || dice != actionDice[0])
+            return false;
+
+        if (rule.ConditionKey == PerkConditionKey.RollSumEquals)
+            return PerkConditionFactory.Evaluate(rule.ConditionKey, new DiceRollSumContext { TotalSum = SumDice(actionDice), Dices = actionDice }, rule.ConditionValue);
+
+        if (rule.ConditionKey == PerkConditionKey.RollSumEqualsAttackersRollSum)
+            return PerkConditionFactory.Evaluate(rule.ConditionKey, new DefenseRollComparisonContext { DefenderRollSum = SumDice(actionDice), AttackerRollSum = SumDice(opposingActionDice) }, rule.ConditionValue);
+
+        return rule.ConditionKey == PerkConditionKey.Always;
+    }
+
+    private static List<DiceResult> GetActionDice(ActionInstance action)
+    {
+        List<DiceResult> dices = new();
+        if (action?.PowerDice != null)
+            dices.Add(action.PowerDice);
+        if (action?.AccuracyDice != null)
+            dices.Add(action.AccuracyDice);
+        return dices;
+    }
+
+    private static int SumDice(List<DiceResult> dices)
+    {
+        int sum = 0;
+        if (dices == null)
+            return sum;
+
+        for (int i = 0; i < dices.Count; i++)
+            sum += dices[i]?.Value ?? 0;
+
+        return sum;
     }
 
     public List<PerkRuntimeInstance> GetEffectivePerks(Battler battler)

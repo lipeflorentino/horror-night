@@ -33,7 +33,8 @@ public class ActionResolverService
         int attackPower = ignoreAttack ? 0 : CalculatePower(attack, attacker, target, ActionType.Attack);
         int defensePower = ignoreDefense ? 0 : CalculatePower(defense, target, attacker, ActionType.Defense);
         int damage = attackPower - defensePower;
-        damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack) ?? damage;
+        damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
+        damage = perkService?.ApplyDamageModifiers(damage, defense, target, attacker, ActionType.Defense, attack) ?? damage;
 
         Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
         
