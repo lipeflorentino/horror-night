@@ -3,7 +3,6 @@ using System;
 [Serializable]
 public class PerkRule
 {
-    public PerkScope Scope = PerkScope.Dice;
     public PerkTrigger Trigger = PerkTrigger.BeforeRoll;
     public PerkModifierTarget ModifierTarget = PerkModifierTarget.ExtraDice;
     public PerkOperation Operation = PerkOperation.Add;

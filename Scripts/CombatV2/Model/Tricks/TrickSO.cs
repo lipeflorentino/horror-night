@@ -10,7 +10,7 @@ using UnityEngine;
 /// - Requisitos: Level, Custo em stats (Mind/Body/Heart)
 /// - Efeitos: Lista de Perks que ativa
 /// - Duração: Por quantos turnos o trick permanece ativo
-/// - Timing: Instant ou NextTurn
+/// - TimingTurns: quantos turnos após o cast o trick leva para ser aplicado
 /// </summary>
 [CreateAssetMenu(fileName = "Trick", menuName = "Combat/Trick")]
 public class TrickSO : ScriptableObject
@@ -31,11 +31,18 @@ public class TrickSO : ScriptableObject
     public int HeartCost = 0;
 
     [Header("Timing e Duração")]
-    public TrickTiming Timing = TrickTiming.Instant;
+    [Min(0)]
+    public int TimingTurns = 0;
     [Tooltip("-1 = Permanente (identity trick), 0+ = Número de turnos")]
     public int DurationTurns = -1;
     [Tooltip("Quantidade de turnos até que o trick possa ser castado novamente.")]
     public int CooldownTurns = 0;
+
+    [Header("Acionamento")]
+    public TrickActivationMode ActivationMode = TrickActivationMode.Active;
+
+    public bool IsPassive => ActivationMode == TrickActivationMode.Passive;
+    public bool IsActive => ActivationMode == TrickActivationMode.Active;
 
     [Header("Efeitos")]
     [Tooltip("IDs dos Perks que este Trick ativa. Devem ser encontrados em PerkDatabase.")]

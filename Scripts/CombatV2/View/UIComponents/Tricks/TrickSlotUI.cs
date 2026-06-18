@@ -50,7 +50,7 @@ public class TrickSlotUI : MonoBehaviour
         trickInfoPanelUI = panel;
     }
 
-    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false)
+    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "")
     {
         boundTrick = trick;
         boundRuntimeInstance = runtimeInstance;
@@ -63,7 +63,7 @@ public class TrickSlotUI : MonoBehaviour
         }
 
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
-        UpdateInputKeyText(itemLocation);
+        UpdateInputKeyText(itemLocation, inputKeyOverride);
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
         if (interactButton != null) interactButton.interactable = trick != null && !isLocked;
@@ -93,13 +93,13 @@ public class TrickSlotUI : MonoBehaviour
         }
     }
 
-    private void UpdateInputKeyText(TrickInventoryItemLocation itemLocation)
+    private void UpdateInputKeyText(TrickInventoryItemLocation itemLocation, string inputKeyOverride)
     {
         if (inputKeyText == null)
             return;
 
-        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedSlot
-            ? GetCastedSlotInputKey(itemLocation.SlotIndex)
+        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedSlot && boundTrick != null && boundTrick.IsActive
+            ? inputKeyOverride
             : "";
 
         inputKeyText.text = inputKey;
@@ -110,19 +110,6 @@ public class TrickSlotUI : MonoBehaviour
     {
         if (highlightState != null)
             highlightState.SetActive(selected && boundTrick != null);
-    }
-
-    private string GetCastedSlotInputKey(int slotIndex)
-    {
-        return slotIndex switch
-        {
-            0 => "Q",
-            1 => "W",
-            2 => "E",
-            3 => "R",
-            4 => "R",
-            _ => ""
-        };
     }
 
     private void HandleSelectClick()

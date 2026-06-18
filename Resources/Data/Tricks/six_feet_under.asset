@@ -20,11 +20,12 @@ MonoBehaviour:
   MindCost: 2
   BodyCost: 1
   HeartCost: 0
-  Timing: 0
+  TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
   PerkIds:
   - six_feet_under
+  ActivationMode: 0
   Rarity: 2
   Tags:
   - permanent

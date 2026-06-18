@@ -38,10 +38,11 @@ public static class TrickCsvParser
             trick.MindCost = ParseInt(Get(row, columns, "MindCost"), 0);
             trick.BodyCost = ParseInt(Get(row, columns, "BodyCost"), 0);
             trick.HeartCost = ParseInt(Get(row, columns, "HeartCost"), 0);
-            trick.Timing = ParseEnum(Get(row, columns, "Timing"), TrickTiming.Instant);
+            trick.TimingTurns = ParseInt(GetFirst(row, columns, "TimingTurns", "Timing"), 0);
             trick.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
             trick.CooldownTurns = ParseInt(Get(row, columns, "CooldownTurns"), 0);
             trick.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
+            trick.ActivationMode = ParseEnum(Get(row, columns, "ActivationMode"), TrickActivationMode.Active);
             trick.Rarity = ParseEnum(Get(row, columns, "Rarity"), TrickRarity.Common);
             trick.Tags = ParseStringList(Get(row, columns, "Tags"), ";");
             trick.FlavorText = Get(row, columns, "FlavorText");
@@ -71,6 +72,18 @@ public static class TrickCsvParser
             return string.Empty;
 
         return row[index]?.Trim() ?? string.Empty;
+    }
+
+    private static string GetFirst(List<string> row, Dictionary<string, int> columns, params string[] keys)
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            string value = Get(row, columns, keys[i]);
+            if (!string.IsNullOrWhiteSpace(value))
+                return value;
+        }
+
+        return string.Empty;
     }
 
     private static T ParseEnum<T>(string value, T fallback) where T : struct

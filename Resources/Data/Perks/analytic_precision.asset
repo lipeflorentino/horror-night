@@ -19,8 +19,7 @@ MonoBehaviour:
   StackMode: 0
   Tags: identity;mind
   Rules:
-  - Scope: 0
-    Trigger: 0
+  - Trigger: 0
     ModifierTarget: 0
     Operation: 2
     OwnerRole: 0

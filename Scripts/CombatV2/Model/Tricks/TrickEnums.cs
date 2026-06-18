@@ -2,12 +2,12 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Define quando um Trick é aplicado ao battler
+/// Define o modo de acionamento de um Trick.
 /// </summary>
-public enum TrickTiming
+public enum TrickActivationMode
 {
-    Instant,        // Aplicado imediatamente no mesmo turno
-    NextTurn        // Aplicado no próximo turno
+    Passive,
+    Active
 }
 
 /// <summary>

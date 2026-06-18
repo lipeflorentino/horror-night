@@ -58,9 +58,10 @@ public static class TrickCsvImporter
         target.MindCost = source.MindCost;
         target.BodyCost = source.BodyCost;
         target.HeartCost = source.HeartCost;
-        target.Timing = source.Timing;
+        target.TimingTurns = source.TimingTurns;
         target.DurationTurns = source.DurationTurns;
         target.CooldownTurns = source.CooldownTurns;
+        target.ActivationMode = source.ActivationMode;
         target.PerkIds = new List<string>(source.PerkIds);
         target.Rarity = source.Rarity;
         target.Tags = new List<string>(source.Tags);

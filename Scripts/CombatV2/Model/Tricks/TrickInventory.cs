@@ -298,7 +298,7 @@ public class TrickInventory : ITrickInventory
     /// </summary>
     private void ApplyPerksToInstance(TrickRuntimeInstance instance)
     {
-        if (instance == null || instance.Definition == null)
+        if (instance == null || instance.Definition == null || instance.ActivationDelayTurnsRemaining > 0)
             return;
 
         instance.ActivePerks.Clear();
@@ -313,6 +313,8 @@ public class TrickInventory : ITrickInventory
                 if (perk != null && !instance.ActivePerks.Contains(perk))
                     instance.ActivePerks.Add(perk);
             }
+
+            instance.MarkPerksApplied();
         }
     }
 }

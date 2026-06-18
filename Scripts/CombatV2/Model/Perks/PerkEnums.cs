@@ -1,10 +1,3 @@
-public enum PerkScope
-{
-    Dice,
-    Battler,
-    Action
-}
-
 public enum PerkTrigger
 {
     BeforeRoll,

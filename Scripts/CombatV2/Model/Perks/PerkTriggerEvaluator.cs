@@ -71,7 +71,8 @@ public class PerkTriggerEvaluator
         DiceResult dice,
         PerkTrigger expectedTrigger,
         IReadOnlyList<PerkRuntimeInstance> effectivePerks,
-        List<DiceResult> allDices = null)
+        List<DiceResult> allDices = null,
+        List<DiceResult> opposingDices = null)
     {
         if (owner == null || dice == null || effectivePerks == null || effectivePerks.Count == 0)
             return;
@@ -97,7 +98,7 @@ public class PerkTriggerEvaluator
                 if (!rule.MatchesDice(dice))
                     continue;
 
-                if (!ValidateDiceCondition(rule, dice, allDices))
+                if (!ValidateDiceCondition(rule, dice, allDices, opposingDices))
                     continue;
 
                 NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
@@ -124,7 +125,7 @@ public class PerkTriggerEvaluator
     /// <summary>
     /// Valida condição de dice (análises de valores, tiers, somas).
     /// </summary>
-    private bool ValidateDiceCondition(PerkRule rule, DiceResult dice, List<DiceResult> allDices = null)
+    private bool ValidateDiceCondition(PerkRule rule, DiceResult dice, List<DiceResult> allDices = null, List<DiceResult> opposingDices = null)
     {
         try
         {
@@ -138,12 +139,24 @@ public class PerkTriggerEvaluator
             // Para RollSumEquals, precisa de contexto com a soma
             if (rule.ConditionKey == PerkConditionKey.RollSumEquals && allDices != null)
             {
-                int totalSum = 0;
-                for (int i = 0; i < allDices.Count; i++)
-                    totalSum += allDices[i].Value;
+                if (allDices.Count == 0 || dice != allDices[0])
+                    return false;
 
-                var sumContext = new DiceRollSumContext { TotalSum = totalSum, Dices = allDices };
+                var sumContext = new DiceRollSumContext { TotalSum = SumDice(allDices), Dices = allDices };
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, sumContext, rule.ConditionValue);
+            }
+
+            if (rule.ConditionKey == PerkConditionKey.RollSumEqualsAttackersRollSum && allDices != null && opposingDices != null)
+            {
+                if (allDices.Count == 0 || dice != allDices[0])
+                    return false;
+
+                var comparisonContext = new DefenseRollComparisonContext
+                {
+                    DefenderRollSum = SumDice(allDices),
+                    AttackerRollSum = SumDice(opposingDices)
+                };
+                return PerkConditionFactory.Evaluate(rule.ConditionKey, comparisonContext, rule.ConditionValue);
             }
 
             // Para Always
@@ -154,6 +167,18 @@ public class PerkTriggerEvaluator
             Debug.LogWarning($"Erro ao validar condição de dice {rule.ConditionKey}: {ex.Message}");
             return false;
         }
+    }
+
+    private static int SumDice(List<DiceResult> dices)
+    {
+        int sum = 0;
+        if (dices == null)
+            return sum;
+
+        for (int i = 0; i < dices.Count; i++)
+            sum += dices[i]?.Value ?? 0;
+
+        return sum;
     }
 
     /// <summary>

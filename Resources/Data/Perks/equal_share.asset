@@ -19,8 +19,7 @@ MonoBehaviour:
   StackMode: 0
   Tags: permanent;defense
   Rules:
-  - Scope: 0
-    Trigger: 0
+  - Trigger: 2
     ModifierTarget: 3
     Operation: 1
     OwnerRole: 0

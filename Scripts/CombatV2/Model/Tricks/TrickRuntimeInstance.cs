@@ -19,6 +19,8 @@ public class TrickRuntimeInstance
     public bool WasTriggeredThisTurn { get; private set; }
     public float LastTriggeredTime { get; private set; }
     public bool WasExpired { get; private set; }
+    public int ActivationDelayTurnsRemaining { get; private set; }
+    public bool HasAppliedPerks { get; private set; }
     public float CastTime { get; private set; }
 
     /// <summary>
@@ -44,6 +46,7 @@ public class TrickRuntimeInstance
         Source = source;
         RemainingTurns = durationTurns;
         CooldownTurnsRemaining = Mathf.Max(0, cooldownTurnsRemaining != null ? cooldownTurnsRemaining.Value : definition.CooldownTurns > 0 ? definition.CooldownTurns : 0);
+        ActivationDelayTurnsRemaining = Mathf.Max(0, definition != null ? definition.TimingTurns : 0);
         SlotType = slotType;
         SlotIndex = slotIndex;
         CastTime = Time.time;
@@ -94,6 +97,18 @@ public class TrickRuntimeInstance
     public void MarkExpired()
     {
         WasExpired = true;
+    }
+
+    public void MarkPerksApplied()
+    {
+        HasAppliedPerks = true;
+        ActivationDelayTurnsRemaining = 0;
+    }
+
+    public void DecreaseActivationDelay()
+    {
+        if (ActivationDelayTurnsRemaining > 0)
+            ActivationDelayTurnsRemaining--;
     }
 
     /// <summary>
