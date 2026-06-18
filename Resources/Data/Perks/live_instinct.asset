@@ -19,8 +19,7 @@ MonoBehaviour:
   StackMode: 0
   Tags: identity;heart
   Rules:
-  - Scope: 0
-    Trigger: 0
+  - Trigger: 0
     ModifierTarget: 1
     Operation: 0
     OwnerRole: 0

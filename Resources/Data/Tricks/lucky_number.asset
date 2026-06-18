@@ -20,11 +20,12 @@ MonoBehaviour:
   MindCost: 1
   BodyCost: 0
   HeartCost: 2
-  Timing: 0
+  TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
   PerkIds:
   - lucky_number
+  ActivationMode: 0
   Rarity: 2
   Tags:
   - permanent

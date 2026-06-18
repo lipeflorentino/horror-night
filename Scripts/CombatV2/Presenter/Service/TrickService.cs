@@ -64,6 +64,18 @@ public class TrickService
                 changed = true;
             }
 
+            if (!trick.HasAppliedPerks && trick.ActivationDelayTurnsRemaining > 0)
+            {
+                trick.DecreaseActivationDelay();
+                changed = true;
+            }
+
+            if (!trick.HasAppliedPerks && trick.ActivationDelayTurnsRemaining == 0)
+            {
+                ApplyPerks(target: battler, trickInstance: trick, source: trick.Source ?? battler);
+                changed = true;
+            }
+
             if (trick.RemainingTurns > 0)
             {
                 trick.DecreaseDuration();
@@ -132,19 +144,10 @@ public class TrickService
         if (target == null || trickInstance?.Definition == null)
             return null;
 
-        trickInstance.ActivePerks.Clear();
         trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
 
-        if (perkService != null)
-        {
-            for (int i = 0; i < trickInstance.Definition.PerkIds.Count; i++)
-            {
-                string perkId = trickInstance.Definition.PerkIds[i];
-                PerkRuntimeInstance perk = perkService.ApplyPerkFromTrick(target, perkId, trickInstance, source ?? target, trickInstance.Definition.DurationTurns);
-                if (perk != null && !trickInstance.ActivePerks.Contains(perk))
-                    trickInstance.ActivePerks.Add(perk);
-            }
-        }
+        if (trickInstance.ActivationDelayTurnsRemaining == 0)
+            ApplyPerks(target, trickInstance, source ?? target);
 
         if (target.Tricks != null && !target.Tricks.Contains(trickInstance))
             target.Tricks.Add(trickInstance);
@@ -153,7 +156,7 @@ public class TrickService
         OnTrickChanged?.Invoke(target, trickInstance);
 
         Debug.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
-                  $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, Timing: {trickInstance.Definition.Timing}");
+                  $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, TimingTurns: {trickInstance.Definition.TimingTurns}");
 
         return trickInstance;
     }
@@ -208,6 +211,27 @@ public class TrickService
         }
 
         return perks;
+    }
+
+    private void ApplyPerks(Battler target, TrickRuntimeInstance trickInstance, Battler source)
+    {
+        if (target == null || trickInstance?.Definition == null || trickInstance.HasAppliedPerks)
+            return;
+
+        trickInstance.ActivePerks.Clear();
+
+        if (perkService != null)
+        {
+            for (int i = 0; i < trickInstance.Definition.PerkIds.Count; i++)
+            {
+                string perkId = trickInstance.Definition.PerkIds[i];
+                PerkRuntimeInstance perk = perkService.ApplyPerkFromTrick(target, perkId, trickInstance, source ?? target, trickInstance.Definition.DurationTurns);
+                if (perk != null && !trickInstance.ActivePerks.Contains(perk))
+                    trickInstance.ActivePerks.Add(perk);
+            }
+        }
+
+        trickInstance.MarkPerksApplied();
     }
 
     private void RemoveActivePerks(Battler target, TrickRuntimeInstance trick)

@@ -20,11 +20,12 @@ MonoBehaviour:
   MindCost: 0
   BodyCost: 0
   HeartCost: 0
-  Timing: 0
+  TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
   PerkIds:
   - live_instinct
+  ActivationMode: 0
   Rarity: 0
   Tags:
   - identity

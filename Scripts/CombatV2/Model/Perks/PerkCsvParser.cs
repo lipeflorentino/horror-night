@@ -46,8 +46,7 @@ public static class PerkCsvParser
 
         return new PerkRule
         {
-            Scope = ParseEnum(Get(row, columns, "Scope"), PerkScope.Dice),
-            Trigger = ParseEnum(Get(row, columns, "Trigger"), PerkTrigger.BeforeRoll),
+            Trigger = InferTrigger(ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice)),
             ModifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice),
             Operation = ParseEnum(Get(row, columns, "Operation"), PerkOperation.Add),
             OwnerRole = ParseEnum(Get(row, columns, "OwnerRole"), BattlerStateRole.OwnerAsActor),
@@ -63,6 +62,17 @@ public static class PerkCsvParser
             ConditionValue = Get(row, columns, "ConditionValue"),
             Value = ParseFloat(Get(row, columns, "Value"), 0f)
         };
+    }
+
+    private static PerkTrigger InferTrigger(PerkModifierTarget target)
+    {
+        if (target == PerkModifierTarget.PowerMultiplier)
+            return PerkTrigger.PowerMultiplier;
+
+        if (target == PerkModifierTarget.DamagePercent || target == PerkModifierTarget.MomentumPoints)
+            return PerkTrigger.AfterResolve;
+
+        return PerkTrigger.BeforeRoll;
     }
 
     private static bool HasFilter(string value)

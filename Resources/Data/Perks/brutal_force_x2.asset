@@ -19,8 +19,7 @@ MonoBehaviour:
   StackMode: 0
   Tags: identity;body
   Rules:
-  - Scope: 0
-    Trigger: 0
+  - Trigger: 1
     ModifierTarget: 2
     Operation: 2
     OwnerRole: 0
