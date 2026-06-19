@@ -41,10 +41,9 @@ Implementar o fluxo de Tricks como habilidades adquiríveis, guardadas em um `Tr
 
 ### UI de Tricks atual
 
-- `TrickDisplayView` exibe todos os Tricks válidos do database como disponíveis para cast, sem filtrar por inventário do jogador.
 - O clique em `TrickIconUI` só loga seleção/click e não abre um painel de ações equivalente ao inventário de combate.
 - `TrickTooltip` é apenas informativo, sem ações `cast`, `dischard` e `close`.
-- A cena `Combat.unity` já tem objetos relacionados a Tricks (`TricksPanel`, `TricksContainer`, `TrickDisplayView`), mas o wiring atual ainda não cumpre o fluxo de inventário + slots castados.
+- A cena `Combat.unity` já tem objetos relacionados a Tricks (`TricksPanel`, `TricksContainer`), mas o wiring atual ainda não cumpre o fluxo de inventário + slots castados.
 
 ### Inventário de combate como base
 
@@ -210,7 +209,6 @@ Criar ou separar `CastedTricksView`:
 ## Melhorias de organização recomendadas
 
 - Mover todo o domínio de Tricks para `Scripts/CombatV2/Model/Tricks` e os presenters para `Scripts/CombatV2/Presenter/Tricks` ou `Presenter/Service` conforme responsabilidade.
-- Evitar que `TrickDisplayView` acesse `TrickDatabase.allTricks` diretamente; a fonte deve ser `ITrickInventory`.
 - Padronizar nomes: corrigir `Deschard` para `Discard` em APIs novas; manter adapters temporários para compatibilidade se necessário.
 - Separar “definitions” (`TrickSO`, `PerkSO`) de “runtime state” (`TrickRuntimeInstance`, `TrickSlot`, `PerkRuntimeInstance`) e “persistence snapshot”.
 - Escrever testes de domínio para `TrickInventory` e `TrickService`, já que a maior parte das regras pode ser testada sem UI.

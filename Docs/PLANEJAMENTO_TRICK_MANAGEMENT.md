@@ -1,7 +1,7 @@
 # 📋 PLANEJAMENTO: Sistema Completo de Gestão de Tricks
 
 > **Status:** Planejamento Fase de Design  
-> **Objetivo:** Transformar TrickDisplayView atual em sistema robusto de gerenciamento com slots, cooldown e feedback visual  
+> **Objetivo:** Transformar TrickView atual em sistema robusto de gerenciamento com slots, cooldown e feedback visual  
 > **Referência:** Sistema de Inventário de Itens (InventoryView + InventoryInputHandler)
 
 ---
@@ -226,7 +226,6 @@ Ready
 ├─ TrickInventoryView.cs (REFATORADO - 200 linhas)
 ├─ TrickSlotUI.cs (150 linhas)
 ├─ TrickContextMenu.cs (100 linhas)
-└─ TrickDisplayView.cs (REFATORADO - agora apenas display)
 ```
 
 **Total estimado:** ~800 linhas de código novo + refatoração

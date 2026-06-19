@@ -21,23 +21,6 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text StrengthText;
     public TMP_Text AgilityText;
 
-    [SerializeField] private TrickDisplayView trickDisplayView;
-
-    void Start()
-    {
-        trickDisplayView = FindObjectOfType<TrickDisplayView>();
-    }
-
-
-    public void BindTricks(Battler battler, TrickService trickService, ITrickInventory trickInventory = null)
-    {
-        if (trickDisplayView == null)
-            trickDisplayView = FindObjectOfType<TrickDisplayView>();
-
-        if (trickDisplayView != null)
-            trickDisplayView.Initialize(battler, trickService, trickInventory);
-    }
-
     public void Bind(Battler battler)
     {
         // Bind Stats

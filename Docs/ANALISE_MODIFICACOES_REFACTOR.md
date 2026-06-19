@@ -70,29 +70,10 @@ Perks e Tricks foram separados: Perks são apenas **mecânicas puras** (sem meta
 - Usa TrickSO.DisplayName, Description, Icon
 - **Status:** ✅ Completo
 
-#### TrickDisplayView.cs (Novo)
-- Grid de Tricks disponíveis para cast
-- Integra com TrickService e TrickDatabase
-- **Status:** ✅ Completo
-- **Integração Faltante:** Precisa ser adicionado a CombatView/BattlerPanelView
-
 ---
 
 ## Modificações Necessárias (Próximas Tarefas)
 
-### 1. BattlerPanelView.cs - ⏳ PENDENTE
-```csharp
-// Adicionar:
-[SerializeField] private TrickDisplayView trickDisplayView;
-
-// Em Bind():
-if (trickDisplayView != null)
-    trickDisplayView.Initialize(battler, TrickService); // Obter TrickService de CombatManager
-```
-
-### 2. TrickDisplayView Integration - ⏳ PENDENTE
-- Adicionar listener no TrickIconUI para chamar CombatManager.OnPlayerSelectTrick()
-- Conectar botão de cast (castTrickButton) ao método CastSelectedTrick()
 
 ### 3. Debug Logs - ⏳ Opcional
 - **Impacto Atual:** Logs mostram PerkId em vez de DisplayName (menos legível)
@@ -104,7 +85,6 @@ if (trickDisplayView != null)
   ```
 
 ### 4. CombatView Setup - ⏳ PENDENTE
-- Inicializar TrickDisplayView em Start()
 - Passar referência a TrickService de CombatManager
 
 ---
@@ -131,10 +111,7 @@ Trick System (Interface + Metadados):
 ├─ TrickService.cs [Existente]
 ├─ TrickIconUI.cs [Novo] ✅
 ├─ TrickTooltip.cs [Novo] ✅
-└─ TrickDisplayView.cs [Novo] ✅
 
-Integração:
-└─ CombatView / BattlerPanelView [Pendente adição de TrickDisplayView]
 ```
 
 ---
@@ -157,7 +134,7 @@ Integração:
 2. ✅ Verificar se PerkSO assets foram criados sem erros
 3. ⏳ Testar gameplay com perks funcionando (triggers, stacks)
 4. ⏳ Verificar tooltips de perks
-5. ⏳ Testar TrickDisplayView renderizando tricks
+
 6. ⏳ Testar casting de tricks
 7. ⏳ Verificar feedback visual de trigger de perks
 
