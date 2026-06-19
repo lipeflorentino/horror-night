@@ -62,6 +62,73 @@ public class PerkTriggerEvaluator
     }
 
     /// <summary>
+    /// Avalia perks AfterAccuracyRoll: disparados após o resultado de Accuracy ser conhecido,
+    /// antes dos dados de Poder serem rolados.
+    /// Retorna a quantidade total de dados extras de Poder a adicionar e o StatType a usar.
+    /// </summary>
+    public int EvaluateAfterAccuracyTriggers(
+        Battler owner,
+        DiceResult accuracyResult,
+        ActionType actionType,
+        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
+        out DiceStatType extraDiceStatType)
+    {
+        extraDiceStatType = DiceStatType.Body;
+        int totalExtraDice = 0;
+
+        if (owner == null || accuracyResult == null || effectivePerks == null || effectivePerks.Count == 0)
+            return 0;
+
+        CombatActionContext actionContext = new(owner, null, actionType);
+
+        for (int i = 0; i < effectivePerks.Count; i++)
+        {
+            PerkRuntimeInstance perk = effectivePerks[i];
+            if (perk?.Definition?.Rules == null)
+                continue;
+
+            for (int j = 0; j < perk.Definition.Rules.Count; j++)
+            {
+                PerkRule rule = perk.Definition.Rules[j];
+                if (rule == null || rule.Trigger != PerkTrigger.AfterAccuracyRoll)
+                    continue;
+
+                if (rule.ModifierTarget != PerkModifierTarget.ExtraDice)
+                    continue;
+
+                if (!IsRoleMatch(owner, actionContext, rule.OwnerRole))
+                    continue;
+
+                if (rule.FilterByActionType && rule.ActionType != actionType)
+                    continue;
+
+                if (rule.FilterByTier && rule.Tier != accuracyResult.Tier)
+                    continue;
+
+                if (rule.FilterByStatType && rule.StatType != accuracyResult.StatType)
+                    continue;
+
+                int extraDice = Mathf.Max(0, Mathf.RoundToInt(rule.Value * Mathf.Max(1, perk.Stacks)));
+                if (extraDice <= 0)
+                    continue;
+
+                // O StatType dos dados extras é o StatType do filtro do perk (ex: Mind)
+                if (rule.FilterByStatType)
+                    extraDiceStatType = rule.StatType;
+                else
+                    extraDiceStatType = accuracyResult.StatType;
+
+                totalExtraDice += extraDice;
+
+                NotifyPerkTriggered(owner, perk, rule, actionContext, rule.Value);
+            }
+        }
+
+        return totalExtraDice;
+    }
+
+
+    /// <summary>
     /// Avalia perks efetivos acionados por dados (PowerMultiplier e AfterResolve triggers).
     /// Chama esta função com os dados já rolados.
     /// </summary>

@@ -294,15 +294,38 @@ public class CombatManager : MonoBehaviour
         ActionDefinition playerAction = BuildDefinitionFromBattler(Player, Enemy, action);
         ActionType enemyActionType = PlayerIsAttacker ? CurrentTurn.DefenseAction.Definition.Type : CurrentTurn.AttackAction.Definition.Type;
 
-        PendingPlayerPowerRolls = DiceService.RollMany(Player, Enemy, powerDiceTypes, action, DiceRollType.Power, Player.Level, Enemy.Level);
         PendingPlayerAccuracyRolls = DiceService.RollMany(Player, Enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, Player.Level, Enemy.Level);
-        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, Player, PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, Enemy.Level, Player.Level);
         PendingEnemyAccuracyRolls = DiceService.RollMany(Enemy, Player, PendingEnemyAccuracyDiceTypes, enemyActionType, DiceRollType.Accuracy, Enemy.Level, Player.Level);
 
-        DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
         DiceResult playerAccuracyDice = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
-        DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
         DiceResult enemyAccuracyDice = DiceService.GetBestResult(PendingEnemyAccuracyRolls);
+
+        // ── AfterAccuracyRoll: avaliar perks que dependem do tier do Accuracy (ex: adrenaline_surge)
+        int playerExtraPowerDice = PerkService.GetExtraPowerDiceAfterAccuracy(
+            Player, Enemy, playerAccuracyDice, action, out DiceStatType playerExtraStatType);
+        int enemyExtraPowerDice = PerkService.GetExtraPowerDiceAfterAccuracy(
+            Enemy, Player, enemyAccuracyDice, enemyActionType, out DiceStatType enemyExtraStatType);
+
+        PendingPlayerPowerRolls = DiceService.RollMany(Player, Enemy, powerDiceTypes, action, DiceRollType.Power, Player.Level, Enemy.Level);
+        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, Player, PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, Enemy.Level, Player.Level);
+
+        // Adicionar dados extras de Poder (sem consumir pool)
+        if (playerExtraPowerDice > 0)
+        {
+            PendingPlayerPowerRolls.AddRange(
+                RollExtraPowerDiceWithoutPool(Player, Enemy, playerExtraPowerDice, playerExtraStatType, action, Player.Level, Enemy.Level));
+            Debug.Log($"[Adrenaline Surge] Player ganhou {playerExtraPowerDice} dado(s) extra(s) de Poder ({playerExtraStatType}) pelo Accuracy tier {playerAccuracyDice?.Tier}.");
+        }
+
+        if (enemyExtraPowerDice > 0)
+        {
+            PendingEnemyPowerRolls.AddRange(
+                RollExtraPowerDiceWithoutPool(Enemy, Player, enemyExtraPowerDice, enemyExtraStatType, enemyActionType, Enemy.Level, Player.Level));
+            Debug.Log($"[Adrenaline Surge] Enemy ganhou {enemyExtraPowerDice} dado(s) extra(s) de Poder ({enemyExtraStatType}) pelo Accuracy tier {enemyAccuracyDice?.Tier}.");
+        }
+
+        DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
+        DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
 
         ActionInstance playerActionInstance = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
         ActionInstance enemyActionInstance = PlayerIsAttacker ? CurrentTurn.DefenseAction : CurrentTurn.AttackAction;
@@ -320,8 +343,28 @@ public class CombatManager : MonoBehaviour
             CurrentTurn.DefenseAction = playerActionInstance;
         }
 
-        Debug.Log($"[Flow] Player rolled POWER best:{playerPowerDice.Value} | ACCURACY best:{playerAccuracyDice.Value} using {PendingPlayerPowerRolls.Count + PendingPlayerAccuracyRolls.Count} dice.");
-        Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice.Value} | ACCURACY best:{enemyAccuracyDice.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
+        Debug.Log($"[Flow] Player rolled POWER best:{playerPowerDice?.Value} | ACCURACY best:{playerAccuracyDice?.Value} using {PendingPlayerPowerRolls.Count + PendingPlayerAccuracyRolls.Count} dice.");
+        Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice?.Value} | ACCURACY best:{enemyAccuracyDice?.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
+    }
+
+    /// <summary>
+    /// Rola dados extras de Poder SEM consumir a pool de dados do battler.
+    /// Usado por efeitos como adrenaline_surge que concedem dados bônus.
+    /// </summary>
+    private List<DiceResult> RollExtraPowerDiceWithoutPool(Battler actor, Battler opponent, int count, DiceStatType statType, ActionType actionType, int actorLevel, int opponentLevel)
+    {
+        List<DiceResult> extras = new();
+        int maxValue = DiceService.GetDiceMaxValueForType(actor, statType);
+        if (maxValue <= 0 || count <= 0)
+            return extras;
+
+        for (int i = 0; i < count; i++)
+        {
+            DiceResult extra = DiceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power);
+            extras.Add(extra);
+        }
+
+        return extras;
     }
 
     private void Resolve()

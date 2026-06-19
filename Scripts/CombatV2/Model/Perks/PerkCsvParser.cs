@@ -43,11 +43,13 @@ public static class PerkCsvParser
         string rollFilter = Get(row, columns, "RollFilter");
         string statFilter = Get(row, columns, "StatFilter");
         string tierFilter = Get(row, columns, "TierFilter");
+        PerkModifierTarget modifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice);
+        bool filterByTier = HasFilter(tierFilter);
 
         return new PerkRule
         {
-            Trigger = InferTrigger(ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice)),
-            ModifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice),
+            Trigger = InferTrigger(modifierTarget, filterByTier),
+            ModifierTarget = modifierTarget,
             Operation = ParseEnum(Get(row, columns, "Operation"), PerkOperation.Add),
             OwnerRole = ParseEnum(Get(row, columns, "OwnerRole"), BattlerStateRole.OwnerAsActor),
             ActionType = ParseEnum(actionFilter, ActionType.Attack),
@@ -57,14 +59,14 @@ public static class PerkCsvParser
             StatType = ParseEnum(statFilter, DiceStatType.Body),
             FilterByStatType = HasFilter(statFilter),
             Tier = ParseEnum(tierFilter, DiceTier.Low),
-            FilterByTier = HasFilter(tierFilter),
+            FilterByTier = filterByTier,
             ConditionKey = ParseEnum(Get(row, columns, "ConditionKey"), PerkConditionKey.Always),
             ConditionValue = Get(row, columns, "ConditionValue"),
             Value = ParseFloat(Get(row, columns, "Value"), 0f)
         };
     }
 
-    private static PerkTrigger InferTrigger(PerkModifierTarget target)
+    private static PerkTrigger InferTrigger(PerkModifierTarget target, bool filterByTier = false)
     {
         if (target == PerkModifierTarget.PowerMultiplier)
             return PerkTrigger.PowerMultiplier;
@@ -74,6 +76,9 @@ public static class PerkCsvParser
 
         if (target == PerkModifierTarget.Strength || target == PerkModifierTarget.Focus)
             return PerkTrigger.OnActionResolved;
+
+        if (target == PerkModifierTarget.ExtraDice && filterByTier)
+            return PerkTrigger.AfterAccuracyRoll;
 
         return PerkTrigger.BeforeRoll;
     }

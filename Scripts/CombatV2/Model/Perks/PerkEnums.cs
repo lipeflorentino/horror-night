@@ -1,6 +1,7 @@
 public enum PerkTrigger
 {
     BeforeRoll,
+    AfterAccuracyRoll,
     PowerMultiplier,
     AfterResolve,
     OnActionResolved  

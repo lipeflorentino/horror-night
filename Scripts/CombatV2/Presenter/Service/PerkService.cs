@@ -133,6 +133,36 @@ public class PerkService
         return Mathf.Max(0, Mathf.RoundToInt(value));
     }
 
+    /// <summary>
+    /// Avalia e retorna dados extras de Poder concedidos por perks AfterAccuracyRoll
+    /// (ex: adrenaline_surge). Chamado APÓS o roll de Accuracy, ANTES do roll de Power.
+    /// Os dados extras não consomem pool.
+    /// </summary>
+    /// <param name="actor">Battler que realizou a ação.</param>
+    /// <param name="opponent">Oponente (pode ser null).</param>
+    /// <param name="accuracyResult">Melhor resultado do dado de Accuracy já rolado.</param>
+    /// <param name="actionType">Tipo de ação (Attack/Defense).</param>
+    /// <param name="extraDiceStatType">StatType dos dados extras a rolar (out).</param>
+    /// <returns>Quantidade de dados extras de Poder a adicionar.</returns>
+    public int GetExtraPowerDiceAfterAccuracy(
+        Battler actor,
+        Battler opponent,
+        DiceResult accuracyResult,
+        ActionType actionType,
+        out DiceStatType extraDiceStatType)
+    {
+        extraDiceStatType = DiceStatType.Body;
+        if (accuracyResult == null)
+            return 0;
+
+        int count = triggerEvaluator.EvaluateAfterAccuracyTriggers(
+            actor, accuracyResult, actionType, GetEffectivePerks(actor), out extraDiceStatType);
+
+        return Mathf.Max(0, count);
+    }
+
+
+
     public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue)
     {
         // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)

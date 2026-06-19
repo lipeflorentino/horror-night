@@ -63,3 +63,14 @@ BUGS
 
 CHAT 
     - 
+
+Como testar
+
+    1. Equipar a trick adrenaline_surge no slot de identidade do Player
+    2. Alocar dados de Mind no Accuracy
+    3. Realizar um Ataque
+    4. Verificar no Console:
+    
+        [Perk Triggered] adrenaline_surge - Trigger: AfterAccuracyRoll, Target: ExtraDice, Value: 2 (quando tier for High)
+        [Adrenaline Surge] Player ganhou 2 dado(s) extra(s) de Poder (Mind) pelo Accuracy tier High.
+        [Flow] Player rolled POWER best:X | ACCURACY best:Y using Z dice. — Z inclui os dados extras
