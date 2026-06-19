@@ -3,7 +3,6 @@ using UnityEngine;
 public class TrickInventoryInputHandler : MonoBehaviour
 {
     [SerializeField] private TrickInventoryView trickInventoryView;
-    [SerializeField] private MonoBehaviour playerTrickInventorySource;
     [SerializeField] private CombatManager Combat;
 
     private ITrickInventory playerTrickInventory;
@@ -13,7 +12,6 @@ public class TrickInventoryInputHandler : MonoBehaviour
         Combat = combatManager;
         trickInventoryView = trickInventoryView != null ? trickInventoryView : FindObjectOfType<TrickInventoryView>();        
         playerTrickInventory = trickInventory;
-        playerTrickInventorySource = trickInventory as MonoBehaviour;
 
         if (trickInventoryView != null)
         {

@@ -66,7 +66,7 @@ CHAT
 
 Como testar
 
-    1. Equipar a trick adrenaline_surge no slot de identidade do Player
+    1. Equipar a trick adrenaline_surge no slot do Player
     2. Alocar dados de Mind no Accuracy
     3. Realizar um Ataque
     4. Verificar no Console:

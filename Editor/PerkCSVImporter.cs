@@ -47,7 +47,6 @@ public static class PerkCSVImporter
     private static void Copy(PerkSO source, PerkSO target)
     {
         target.Id = source.Id;
-        target.IsPermanentIdentity = source.IsPermanentIdentity;
         target.DefaultDurationTurns = source.DefaultDurationTurns;
         target.MaxStacks = source.MaxStacks;
         target.StackMode = source.StackMode;

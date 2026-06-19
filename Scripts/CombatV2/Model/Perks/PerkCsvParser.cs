@@ -25,7 +25,6 @@ public static class PerkCsvParser
             PerkSO perk = ScriptableObject.CreateInstance<PerkSO>();
             
             perk.Id = id;
-            perk.IsPermanentIdentity = ParseBool(Get(row, columns, "IsPermanentIdentity"));
             perk.DefaultDurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
             perk.MaxStacks = Math.Max(1, ParseInt(Get(row, columns, "MaxStacks"), 1));
             perk.StackMode = ParseEnum(Get(row, columns, "StackMode"), BattlerStateStackMode.RefreshDuration);
@@ -43,8 +42,8 @@ public static class PerkCsvParser
         string rollFilter = Get(row, columns, "RollFilter");
         string statFilter = Get(row, columns, "StatFilter");
         string tierFilter = Get(row, columns, "TierFilter");
-        PerkModifierTarget modifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice);
         bool filterByTier = HasFilter(tierFilter);
+        PerkModifierTarget modifierTarget = ParseEnum(Get(row, columns, "ModifierTarget"), PerkModifierTarget.ExtraDice);
 
         return new PerkRule
         {
