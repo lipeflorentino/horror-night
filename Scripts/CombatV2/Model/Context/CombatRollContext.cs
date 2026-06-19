@@ -1,4 +1,4 @@
-public readonly struct CombatRollContext
+public readonly struct CombatRollContext : ICombatContext
 {
     public readonly Battler Actor;
     public readonly Battler Opponent;

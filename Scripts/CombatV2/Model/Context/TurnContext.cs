@@ -1,4 +1,4 @@
-public class TurnContext
+public class TurnContext : ICombatContext
 {
     public Battler Attacker;
     public Battler Defender;

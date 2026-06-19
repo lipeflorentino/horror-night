@@ -24,6 +24,8 @@ BACKLOG
     - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
     - Ter builds baseadas nas stats (mind, heart, body)
     - Ter uma forma de mostrar visualmente a eficacia da ação (power, accuracy)
+    - Delegar responsabilidades do CombatManager 
+        - TurnManager, TrickManager, EnemyActionManager
 
 TO DO 
     - Criar NPCEncounterSystem

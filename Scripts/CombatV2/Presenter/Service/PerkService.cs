@@ -191,6 +191,21 @@ public class PerkService
         return Mathf.Max(0, Mathf.RoundToInt(modifiedDamage));
     }
 
+    public void EvaluateActionResolutionTriggers(Battler actor, Battler opponent, ActionType actionType, ActionOutcome outcome)
+    {
+        ActionResolutionContext actionResolutionContext = new()
+        {
+            Actor = actor,
+            Opponent = opponent,
+            ActionType = actionType,
+            Outcome = outcome
+        };
+
+        triggerEvaluator.EvaluateActionResolutionTriggers(actor, actionResolutionContext, GetEffectivePerks(actor));
+        if (opponent != null)
+            triggerEvaluator.EvaluateActionResolutionTriggers(opponent, actionResolutionContext, GetEffectivePerks(opponent));
+    }
+
     private void ApplyRollModifiers(Battler actor, Battler opponent, CombatRollContext context, PerkTrigger trigger, PerkModifierTarget target, ref float value, int maxValue = 0)
     {
         ApplyRollModifiersFromOwner(actor, actor, context, trigger, target, ref value, maxValue);

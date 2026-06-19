@@ -31,9 +31,8 @@ public class CombatManager : MonoBehaviour
     private ActionDefinition DefenseDef;
 
     private bool PlayerIsAttacker = true;
+    private TurnContext CurrentTurn;
 
-    private ActionInstance PendingPlayerAction;
-    private ActionInstance PendingEnemyAction;
     private List<DiceResult> PendingPlayerPowerRolls = new();
     private List<DiceResult> PendingPlayerAccuracyRolls = new();
     private List<DiceResult> PendingEnemyPowerRolls = new();
@@ -197,6 +196,7 @@ public class CombatManager : MonoBehaviour
     {
         Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
         PlayerIsAttacker = firstBattler == Player;
+        CurrentTurn = PlayerIsAttacker ? new TurnContext(Player, Enemy) : new TurnContext(Enemy, Player);
     }
 
     public void ReceivePlayerInput(ActionType type, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
@@ -220,22 +220,6 @@ public class CombatManager : MonoBehaviour
             return;
 
         StartCoroutine(SkipTurnRoutine());
-    }
-
-    // TODO: keep string entry point for legacy UI and UnityEvents.
-    public void ReceivePlayerSelectTrick(string trickId)
-    {
-        TryCastPlayerTrick(trickId);
-    }
-
-    public bool TryCastPlayerTrick(string trickId)
-    {
-        if (CombatEnded || string.IsNullOrWhiteSpace(trickId))
-            return false;
-
-        bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trickId, null);
-        RefreshCombatUI();
-        return casted;
     }
 
     public bool TryCastPlayerTrick(TrickSO trick)
@@ -296,7 +280,11 @@ public class CombatManager : MonoBehaviour
     private void GenerateEnemyAction()
     {
         EnemyTurnPlan plan = EnemyTurnPlanner.BuildPlan(Enemy, SessionData?.EnemyInstance, AttackDef, DefenseDef);
-        PendingEnemyAction = plan.Action;
+        if (PlayerIsAttacker)
+            CurrentTurn.DefenseAction = plan.Action;
+        else
+            CurrentTurn.AttackAction = plan.Action;
+
         PendingEnemyPowerDiceTypes = plan.PowerDiceTypes;
         PendingEnemyAccuracyDiceTypes = plan.AccuracyDiceTypes;
     }
@@ -304,7 +292,7 @@ public class CombatManager : MonoBehaviour
     private void RollActions(ActionType action, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
         ActionDefinition playerAction = BuildDefinitionFromBattler(Player, Enemy, action);
-        ActionType enemyActionType = PendingEnemyAction.Definition.Type;
+        ActionType enemyActionType = PlayerIsAttacker ? CurrentTurn.DefenseAction.Definition.Type : CurrentTurn.AttackAction.Definition.Type;
 
         PendingPlayerPowerRolls = DiceService.RollMany(Player, Enemy, powerDiceTypes, action, DiceRollType.Power, Player.Level, Enemy.Level);
         PendingPlayerAccuracyRolls = DiceService.RollMany(Player, Enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, Player.Level, Enemy.Level);
@@ -316,9 +304,21 @@ public class CombatManager : MonoBehaviour
         DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
         DiceResult enemyAccuracyDice = DiceService.GetBestResult(PendingEnemyAccuracyRolls);
 
-        PendingPlayerAction = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
-        PendingEnemyAction.Definition = BuildDefinitionFromBattler(Enemy, Player, PendingEnemyAction.Definition.Type);
-        PendingEnemyAction = new ActionInstance(PendingEnemyAction.Definition, enemyPowerDice, enemyAccuracyDice);
+        ActionInstance playerActionInstance = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
+        ActionInstance enemyActionInstance = PlayerIsAttacker ? CurrentTurn.DefenseAction : CurrentTurn.AttackAction;
+        enemyActionInstance.Definition = BuildDefinitionFromBattler(Enemy, Player, enemyActionInstance.Definition.Type);
+        enemyActionInstance = new ActionInstance(enemyActionInstance.Definition, enemyPowerDice, enemyAccuracyDice);
+
+        if (PlayerIsAttacker)
+        {
+            CurrentTurn.AttackAction = playerActionInstance;
+            CurrentTurn.DefenseAction = enemyActionInstance;
+        }
+        else
+        {
+            CurrentTurn.AttackAction = enemyActionInstance;
+            CurrentTurn.DefenseAction = playerActionInstance;
+        }
 
         Debug.Log($"[Flow] Player rolled POWER best:{playerPowerDice.Value} | ACCURACY best:{playerAccuracyDice.Value} using {PendingPlayerPowerRolls.Count + PendingPlayerAccuracyRolls.Count} dice.");
         Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice.Value} | ACCURACY best:{enemyAccuracyDice.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
@@ -326,27 +326,12 @@ public class CombatManager : MonoBehaviour
 
     private void Resolve()
     {
-        ActionInstance attack;
-        ActionInstance defense;
-        Battler attacker;
-        Battler target;
-
-        if (PlayerIsAttacker)
-        {
-            attack = PendingPlayerAction;
-            defense = PendingEnemyAction;
-            attacker = Player;
-            target = Enemy;
-        }
-        else
-        {
-            attack = PendingEnemyAction;
-            defense = PendingPlayerAction;
-            attacker = Enemy;
-            target = Player;
-        }
-
-        ActionResolutionResult result = Resolver.Resolve(attack, defense, attacker, target);
+        ActionResolutionResult result = Resolver.Resolve(
+            CurrentTurn.AttackAction,
+            CurrentTurn.DefenseAction,
+            CurrentTurn.Attacker,
+            CurrentTurn.Defender
+        );
         Debug.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | Feedback: {result.FeedbackText}");
         View.ShowAttackEffect(PlayerIsAttacker);
 
@@ -365,13 +350,13 @@ public class CombatManager : MonoBehaviour
 
     private bool ResolveAttackAccuracy()
     {
-        ActionInstance attack = PlayerIsAttacker ? PendingPlayerAction : PendingEnemyAction;
+        ActionInstance attack = CurrentTurn.AttackAction;
         return attack != null && attack.AccuracyDice != null && attack.AccuracyDice.Tier != DiceTier.Low;
     }
 
     public bool ResolveDefenseAccuracy()
     {
-        ActionInstance defense = PlayerIsAttacker ? PendingEnemyAction : PendingPlayerAction;
+        ActionInstance defense = CurrentTurn.DefenseAction;
         return defense != null && defense.AccuracyDice != null && defense.AccuracyDice.Tier != DiceTier.Low;
     }
 
@@ -390,6 +375,7 @@ public class CombatManager : MonoBehaviour
         TrickService.TickTrickEnd(Enemy, EnemyTrickInventory);
         View.UpdateView(Player, Enemy);
         PlayerIsAttacker = !PlayerIsAttacker;
+        CurrentTurn = PlayerIsAttacker ? new TurnContext(Player, Enemy) : new TurnContext(Enemy, Player);
 
         UpdateTurnRoleUI();
     }

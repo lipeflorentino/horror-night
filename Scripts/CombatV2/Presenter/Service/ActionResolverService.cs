@@ -48,6 +48,7 @@ public class ActionResolverService
             result.Damage = 0;
             result.Outcome = ActionOutcome.Missed;
             result.FeedbackText = "MISSED";
+            EvaluateTriggers(attacker, target, attack, defense, result.Outcome);
             return result;
         }
 
@@ -67,6 +68,7 @@ public class ActionResolverService
         {
             result.Outcome = ActionOutcome.Evaded;
             result.FeedbackText = "EVADED";
+            EvaluateTriggers(attacker, target, attack, defense, result.Outcome);
             return result;
         }
 
@@ -81,6 +83,7 @@ public class ActionResolverService
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;
             result.FeedbackText = "BLOCKED";
+            EvaluateTriggers(attacker, target, attack, defense, result.Outcome);
             return result;
         }
 
@@ -110,7 +113,17 @@ public class ActionResolverService
                 : $"{result.FeedbackText} | POWER MAX";
         }
 
+        EvaluateTriggers(attacker, target, attack, defense, result.Outcome);
         return result;
+    }
+
+    private void EvaluateTriggers(Battler attacker, Battler target, ActionInstance attack, ActionInstance defense, ActionOutcome outcome)
+    {
+        if (perkService != null)
+        {
+            perkService.EvaluateActionResolutionTriggers(attacker, target, attack.Definition?.Type ?? ActionType.Attack, outcome);
+            perkService.EvaluateActionResolutionTriggers(target, attacker, defense?.Definition?.Type ?? ActionType.Defense, outcome);
+        }
     }
 
     private ActionAccuracy CalculateAccuracy(ActionInstance action)

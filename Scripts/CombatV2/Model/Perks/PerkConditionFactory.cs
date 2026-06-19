@@ -104,7 +104,6 @@ public class RollSumEqualsCondition : IPerkCondition
 
     public bool Evaluate(object context, string conditionValue)
     {
-        // Context deve ser um DiceRollSumContext que contém a soma
         if (context is not DiceRollSumContext sumContext)
             return false;
 
@@ -138,31 +137,4 @@ public class BlockedAttackCondition : IPerkCondition
     }
 }
 
-/// <summary>
-/// Context para avaliação de soma de dados.
-/// </summary>
-public class DiceRollSumContext
-{
-    public int TotalSum { get; set; }
-    public List<DiceResult> Dices { get; set; }
-}
 
-/// <summary>
-/// Context para comparação de somas entre atacante e defensor.
-/// </summary>
-public class DefenseRollComparisonContext
-{
-    public int DefenderRollSum { get; set; }
-    public int AttackerRollSum { get; set; }
-}
-
-/// <summary>
-/// Context para avaliação de resolução de ação.
-/// </summary>
-public class ActionResolutionContext
-{
-    public Battler Actor;
-    public Battler Opponent;
-    public ActionType ActionType;
-    public ActionOutcome Outcome;
-}

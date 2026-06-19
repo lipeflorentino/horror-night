@@ -106,7 +106,6 @@ public class PerkTriggerEvaluator
         }
     }
 
-    // TODO: Avaliar triggers de resolução de ação (AfterResolve), como BlockedAttack, para aplicar efeitos pós-resolução. 
     public void EvaluateActionResolutionTriggers(
         Battler owner,
         ActionResolutionContext context,
@@ -120,6 +119,47 @@ public class PerkTriggerEvaluator
             PerkRuntimeInstance perk = effectivePerks[i];
             if (perk?.Definition?.Rules == null)
                 continue;
+
+            for (int j = 0; j < perk.Definition.Rules.Count; j++)
+            {
+                PerkRule rule = perk.Definition.Rules[j];
+                if (rule == null || rule.Trigger != PerkTrigger.OnActionResolved)
+                    continue;
+
+                if (!IsRoleMatch(owner, context, rule.OwnerRole))
+                    continue;
+
+                if (!rule.MatchesAction(context))
+                    continue;
+
+                if (!ValidateCondition(rule, context))
+                    continue;
+
+                int stacks = Mathf.Max(1, perk.Stacks);
+                if (rule.ModifierTarget == PerkModifierTarget.Focus)
+                {
+                    owner.Focus = Mathf.RoundToInt(ApplyModifier(owner.Focus, rule.Operation, rule.Value, stacks));
+                }
+                else if (rule.ModifierTarget == PerkModifierTarget.Strength)
+                {
+                    owner.Strength = Mathf.RoundToInt(ApplyModifier(owner.Strength, rule.Operation, rule.Value, stacks));
+                }
+
+                NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
+            }
+        }
+    }
+
+    private bool ValidateCondition(PerkRule rule, ActionResolutionContext context)
+    {
+        try
+        {
+            return PerkConditionFactory.Evaluate(rule.ConditionKey, context, rule.ConditionValue);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"Erro ao validar condição {rule.ConditionKey}: {ex.Message}");
+            return false;
         }
     }
 
@@ -202,7 +242,7 @@ public class PerkTriggerEvaluator
         Battler owner,
         PerkRuntimeInstance perk,
         PerkRule rule,
-        object context,
+        ICombatContext context,
         float appliedValue)
     {
         if (perk?.Definition == null)
@@ -259,5 +299,34 @@ public class PerkTriggerEvaluator
             BattlerStateRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
             _ => false
         };
+    }
+
+    private static bool IsRoleMatch(Battler owner, ActionResolutionContext context, BattlerStateRole role)
+    {
+        return role switch
+        {
+            BattlerStateRole.OwnerAsActor => owner == context.Actor,
+            BattlerStateRole.OwnerAsOpponent => owner == context.Opponent,
+            BattlerStateRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
+            BattlerStateRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
+            BattlerStateRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
+            _ => false
+        };
+    }
+
+    private static float ApplyModifier(float current, PerkOperation operation, float value, int stacks)
+    {
+        if (operation == PerkOperation.Override)
+            return value;
+
+        if (operation == PerkOperation.Multiply)
+        {
+            float multiplier = 1f;
+            for (int i = 0; i < stacks; i++)
+                multiplier *= value;
+            return current * multiplier;
+        }
+
+        return current + value * stacks;
     }
 }

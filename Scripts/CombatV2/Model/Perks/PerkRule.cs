@@ -38,6 +38,11 @@ public class PerkRule
         return !FilterByActionType || ActionType == context.ActionType;
     }
 
+    public bool MatchesAction(ActionResolutionContext context)
+    {
+        return !FilterByActionType || ActionType == context.ActionType;
+    }
+
     public bool MatchesDice(DiceResult dice)
     {
         if (dice == null)

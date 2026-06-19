@@ -49,7 +49,7 @@ public struct PerkTriggeredEvent
     /// Contexto completo do evento (CombatRollContext ou CombatActionContext).
     /// Permite análise detalhada de por que o perk foi acionado.
     /// </summary>
-    public object FullContext { get; set; }
+    public ICombatContext FullContext { get; set; }
 
     /// <summary>
     /// Timestamp de quando o perk foi acionado.
