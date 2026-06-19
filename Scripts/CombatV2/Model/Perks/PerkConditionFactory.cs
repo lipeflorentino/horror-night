@@ -21,6 +21,7 @@ public static class PerkConditionFactory
         Register(PerkConditionKey.RollTierEquals, new RollTierEqualsCondition());
         Register(PerkConditionKey.RollSumEquals, new RollSumEqualsCondition());
         Register(PerkConditionKey.RollSumEqualsAttackersRollSum, new RollSumEqualsAttackersCondition());
+        Register(PerkConditionKey.BlockedAttack, new BlockedAttackCondition());
     }
 
     /// <summary>
@@ -127,6 +128,16 @@ public class RollSumEqualsAttackersCondition : IPerkCondition
     }
 }
 
+public class BlockedAttackCondition : IPerkCondition
+{
+    public PerkConditionKey ConditionType => PerkConditionKey.BlockedAttack;
+    public bool Evaluate(object context, string conditionValue)
+    {
+        return context is ActionResolutionContext resolution
+            && resolution.Outcome == ActionOutcome.Blocked;
+    }
+}
+
 /// <summary>
 /// Context para avaliação de soma de dados.
 /// </summary>
@@ -143,4 +154,15 @@ public class DefenseRollComparisonContext
 {
     public int DefenderRollSum { get; set; }
     public int AttackerRollSum { get; set; }
+}
+
+/// <summary>
+/// Context para avaliação de resolução de ação.
+/// </summary>
+public class ActionResolutionContext
+{
+    public Battler Actor;
+    public Battler Opponent;
+    public ActionType ActionType;
+    public ActionOutcome Outcome;
 }

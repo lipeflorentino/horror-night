@@ -6,3 +6,4 @@ brutal_force_x1_5,OwnerAsActor,Any,Power,Body,Medium,Always,,PowerMultiplier,Ove
 six_feet_under,OwnerAsActor,Attack,Power,Any,Any,RollValueEquals,6,DamagePercent,Multiply,0.30,1,RefreshDuration
 lucky_number,OwnerAsActor,Attack,Any,Any,Any,RollSumEquals,7,MomentumPoints,Add,1,1,RefreshDuration
 equal_share,OwnerAsActor,Defense,Any,Any,Any,RollSumEqualsAttackersRollSum,,DamagePercent,Multiply,0.50,1,RefreshDuration
+unwavering_focus,OwnerAsDefender,Defense,Any,Any,Any,BlockedAttack,,Focus,Add,1,3,AddStack

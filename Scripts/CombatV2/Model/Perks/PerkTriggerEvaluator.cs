@@ -13,7 +13,7 @@ using UnityEngine;
 /// </summary>
 public class PerkTriggerEvaluator
 {
-    public event System.Action<PerkTriggeredEvent> OnPerkTriggered;
+    public event Action<PerkTriggeredEvent> OnPerkTriggered;
 
     public PerkTriggerEvaluator(PerkDatabase database = null)
     {
@@ -106,6 +106,23 @@ public class PerkTriggerEvaluator
         }
     }
 
+    // TODO: Avaliar triggers de resolução de ação (AfterResolve), como BlockedAttack, para aplicar efeitos pós-resolução. 
+    public void EvaluateActionResolutionTriggers(
+        Battler owner,
+        ActionResolutionContext context,
+        IReadOnlyList<PerkRuntimeInstance> effectivePerks)
+    {
+        if (owner == null || context == null || effectivePerks == null || effectivePerks.Count == 0)
+            return;
+
+        for (int i = 0; i < effectivePerks.Count; i++)
+        {
+            PerkRuntimeInstance perk = effectivePerks[i];
+            if (perk?.Definition?.Rules == null)
+                continue;
+        }
+    }
+
     /// <summary>
     /// Valida condição de roll (Always, RollValueEquals, RollTierEquals, etc).
     /// </summary>
@@ -129,14 +146,12 @@ public class PerkTriggerEvaluator
     {
         try
         {
-            // Para RollValueEquals e RollTierEquals, usa o dice diretamente
             if (rule.ConditionKey == PerkConditionKey.RollValueEquals ||
                 rule.ConditionKey == PerkConditionKey.RollTierEquals)
             {
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, dice, rule.ConditionValue);
             }
 
-            // Para RollSumEquals, precisa de contexto com a soma
             if (rule.ConditionKey == PerkConditionKey.RollSumEquals && allDices != null)
             {
                 if (allDices.Count == 0 || dice != allDices[0])
@@ -159,7 +174,6 @@ public class PerkTriggerEvaluator
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, comparisonContext, rule.ConditionValue);
             }
 
-            // Para Always
             return rule.ConditionKey == PerkConditionKey.Always;
         }
         catch (Exception ex)
@@ -211,7 +225,6 @@ public class PerkTriggerEvaluator
         perk.SourceTrick?.MarkTriggered();
         OnPerkTriggered?.Invoke(triggerEvent);
 
-        // Debug log
         Debug.Log($"[Perk Triggered] {perk.Definition.Id} " +
                   $"- Trigger: {rule.Trigger}, Target: {rule.ModifierTarget}, Value: {appliedValue}");
     }

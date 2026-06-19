@@ -2,7 +2,8 @@ public enum PerkTrigger
 {
     BeforeRoll,
     PowerMultiplier,
-    AfterResolve
+    AfterResolve,
+    OnActionResolved  
 }
 
 public enum PerkModifierTarget
@@ -11,7 +12,9 @@ public enum PerkModifierTarget
     ExtraDice,
     PowerMultiplier,
     DamagePercent,
-    MomentumPoints
+    MomentumPoints,
+    Focus,
+    Strength,
 }
 
 public enum PerkConditionKey

@@ -151,9 +151,8 @@ public class PerkService
             return baseMultiplier;
 
         CombatActionContext actionContext = new(actor, opponent, actionType);
-        
-        // ✅ Dispara triggers quando dado é resolvido (PowerMultiplier)
         triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, GetEffectivePerks(actor));
+        
         if (opponent != null)
             triggerEvaluator.EvaluateDiceTriggers(opponent, actionContext, action.PowerDice, PerkTrigger.PowerMultiplier, GetEffectivePerks(opponent));
         
