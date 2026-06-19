@@ -98,7 +98,6 @@ public class CombatManager : MonoBehaviour
         Input.Init(this);
         View.Init();
         View.BindInput(Input);
-        View.BindPlayerTricks(Player, TrickService, PlayerTrickInventory);
         
         RefreshCombatUI();
         UpdateTurnRoleUI();
