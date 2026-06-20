@@ -1,0 +1,3 @@
+Id,DisplayName,Description,Level,MindCost,BodyCost,HeartCost,TimingTurns,DurationTurns,CooldownTurns,PerkIds,ActivationMode,Rarity,Tags,FlavorText,IconName
+terrifying_presence,Presença Aterradora,Envolve o oponente em uma aura de pavor reduzindo a Força do alvo em 4 por 3 turnos.,3,2,0,2,0,3,3,terrifying_presence,Active,Epic,debuff;mind;heart,O medo paralisa o braço mais forte.,terrifying_presence
+channeler_trance,Trance do Conjurador,Entra em transe focado por 2 turnos e então ganha +2 dados de Precisão em testes de Mind porém reduzindo sua própria Defesa em 25%.,3,3,1,0,2,2,4,channeler_trance_buff;channeler_trance_debuff,Active,Rare,buff;mind;accuracy;extra_dices;defense,A mente se expande para além do plano físico deixando o corpo vulnerável.,channeler_trance
