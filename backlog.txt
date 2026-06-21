@@ -92,8 +92,6 @@ Active Tricks
     Deve funcionar assim:
         - O jogador decide castar a active trick com base em sua estrategia 
         - Alguns tricks podem ser triggados/ativados no turno (OnTrickActivation)
-        - Alguns tricks são ativados por meio de uma UI que é mostrada ao triggar o trick, 
-            nessa UI o jogador deve confirmar a ativação com base na sua estrategia e para esses tricks há um custo a mais para ativar além do custo de cast 
         - Os efeitos negativos (tradeoffs) devem ser aplicados por meio de BattlerStates (States)
         - Deve haver um limite para o acumulo de carga
         - Devem ter alto cooldown e alta janela de uso
@@ -112,3 +110,4 @@ Passive Tricks
     - Counter Stance, ao realizar um evade bem sucedido, o jogador pode fazer uma rolagem de dado para contratacar (causa exaustion)
     - Sheap Cheat, ao receber um ataque critico, transforme o ataque em um ataque normal (causa low morale - causa -15% de precisão)
     - Time Stop, não alterna o turno, você ataca duas vezes (causa exaustion)
+
