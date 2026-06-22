@@ -5,37 +5,37 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Importer que carrega o TrickTable.csv e cria TrickSO assets
+/// Importer que carrega o DrawbackTable.csv e cria DrawbackSO assets
 /// </summary>
-public static class TrickCsvImporter
+public static class DrawbackCsvImporter
 {
-    private static readonly string CsvPath = "Assets/Resources/Data/TrickTable.csv";
-    private static readonly string OutputFolder = "Assets/Resources/Data/Tricks";
+    private static readonly string CsvPath = "Assets/Resources/Data/DrawbackTable.csv";
+    private static readonly string OutputFolder = "Assets/Resources/Data/Drawbacks";
 
-    [MenuItem("Tools/Import Tricks CSV")]
+    [MenuItem("Tools/Import Drawbacks CSV")]
     public static void Import()
     {
         if (!File.Exists(CsvPath))
         {
-            Debug.LogWarning($"[TrickCsvImporter] CSV não encontrado em {CsvPath}");
+            Debug.LogWarning($"[DrawbackCsvImporter] CSV não encontrado em {CsvPath}");
             return;
         }
 
         EnsureFolder(OutputFolder);
         string csvText = File.ReadAllText(CsvPath);
-        List<TrickSO> parsedTricks = TrickCsvParser.Parse(csvText);
+        List<DrawbackSO> parsedDrawbacks = DrawbackCsvParser.Parse(csvText);
         
-        for (int i = 0; i < parsedTricks.Count; i++)
+        for (int i = 0; i < parsedDrawbacks.Count; i++)
         {
-            TrickSO parsed = parsedTricks[i];
+            DrawbackSO parsed = parsedDrawbacks[i];
             if (parsed == null || string.IsNullOrWhiteSpace(parsed.Id))
                 continue;
 
             string assetPath = $"{OutputFolder}/{SanitizeFileName(parsed.Id)}.asset";
-            TrickSO asset = AssetDatabase.LoadAssetAtPath<TrickSO>(assetPath);
+            DrawbackSO asset = AssetDatabase.LoadAssetAtPath<DrawbackSO>(assetPath);
             if (asset == null)
             {
-                asset = ScriptableObject.CreateInstance<TrickSO>();
+                asset = ScriptableObject.CreateInstance<DrawbackSO>();
                 AssetDatabase.CreateAsset(asset, assetPath);
             }
 
@@ -45,27 +45,17 @@ public static class TrickCsvImporter
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log($"[TrickCsvImporter] Importados {parsedTricks.Count} tricks.");
+        Debug.Log($"[DrawbackCsvImporter] Importados {parsedDrawbacks.Count} drawbacks.");
     }
 
-    private static void Copy(TrickSO source, TrickSO target)
+    private static void Copy(DrawbackSO source, DrawbackSO target)
     {
         target.Id = source.Id;
         target.DisplayName = source.DisplayName;
         target.Description = source.Description;
         target.Icon = source.Icon;
-        target.Level = source.Level;
-        target.MindCost = source.MindCost;
-        target.BodyCost = source.BodyCost;
-        target.HeartCost = source.HeartCost;
-        target.TimingTurns = source.TimingTurns;
         target.DurationTurns = source.DurationTurns;
-        target.CooldownTurns = source.CooldownTurns;
-        target.ActivationMode = source.ActivationMode;
         target.PerkIds = new List<string>(source.PerkIds);
-        target.DrawbackIds = new List<string>(source.DrawbackIds);
-        target.Rarity = source.Rarity;
-        target.Tags = new List<string>(source.Tags);
         target.FlavorText = source.FlavorText;
     }
 

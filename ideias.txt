@@ -54,3 +54,34 @@ Após encontro, surge escolha de caminho.
 Criar script que irá escutar evento dispardo quando player chega ao node.
 - sortear atividade 
 - chamar o handler adequado
+
+
+6) Active Tricks 
+    - São usadas para realizar ações poderosas em resposta a ações sofridas
+    - Trazem a sensação de "cheat" ou macete
+    - Sempre trazem efeitos negativos (tradeoffs) em contrapartida
+
+    Exemplos.
+        - Back stab, enquanto castado se o jogador sofreu dano ele guarda 30% do dano, ao ativar causa dano no inimigo (causa soreness - diminui poder -1)
+        - Endurance, enquanto castado se o jogador faz um bloqueio, acumula +1 carga, ao ser ativado cada carga adiciona +1 defense (causa exaustion -25% precisão e -25% poder)
+        - Vengence, enquanto castado acumula carga a cada dano sofrido, ao ser ativado cada carga adiciona +1 de power ao ataque
+        - Insight, enquanto castado acumula carga a cada teste de precisão Alto, ao ser ativado cada carga vira +1 Focus
+    
+
+    Deve funcionar assim:
+        - O jogador decide castar a active trick com base em sua estrategia 
+        - Alguns tricks podem ser triggados/ativados no turno (OnTrickActivation)
+        - Os efeitos negativos (tradeoffs) devem ser aplicados por meio de BattlerStates (States)
+        - Deve haver um limite para o acumulo de carga
+        - Devem ter alto cooldown e alta janela de uso
+
+7) Passive Tricks 
+    - Moral Elevada, Se você tiver um resultado melhor em um dado do que o oponente com dois ou mais dados ganhe +2 pontos de momentum
+    - Poder absoluto, QUalquer rolagem atinge o valor máximo
+    - O Dobro ou Nada, Você consome o dobro do custo em troca do dobro do resultado em todas as tricks ativadas no turno. 
+    
+    - Perfect Strike, modifica o resultado da accuracy de medium para high (causa numbness - rolagem de precisão -1)
+    - Last Chance, após um miss refaz a rolagem de accuracy (exposure - soma +25% ao dano recebido)
+    - Counter Stance, ao realizar um evade bem sucedido, o jogador pode fazer uma rolagem de dado para contratacar (causa exaustion)
+    - Sheap Cheat, ao receber um ataque critico, transforme o ataque em um ataque normal (causa low morale - causa -15% de precisão)
+    - Time Stop, não alterna o turno, você ataca duas vezes (causa exaustion)

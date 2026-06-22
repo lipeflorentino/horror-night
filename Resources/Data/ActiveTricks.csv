@@ -1,0 +1,2 @@
+Id,DisplayName,Description,Level,MindCost,BodyCost,HeartCost,TimingTurns,DurationTurns,CooldownTurns,PerkIds,ActivationMode,Rarity,Tags,FlavorText,IconName,DrawbackIds
+rage,Raiva Acumulada,"Quando seu ataque é bloqueado, você acumula +1 carga, ao ativar a habilidade, você ganha +1 de ataque e +1 de dano por cada carga acumulada.",2,0,0,0,0,1,3,rage_charge;rage_release,ActiveCharge,Rare,active_charge;attack;damage,A raiva é uma força que não pode ser contida.,accumulated_rage,flutter

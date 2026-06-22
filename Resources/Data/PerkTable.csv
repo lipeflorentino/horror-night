@@ -15,5 +15,14 @@ endurance_charge,OwnerAsActor,Defense,Any,Any,Any,BlockedAttack,,TrickCharges,Ad
 endurance_release,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Defense,AddPerCharge,1,3,RefreshDuration
 vengeance_charge,OwnerAsActor,Any,Any,Any,Any,OnDamageTaken,,TrickCharges,Add,1,3,AddStack
 vengeance_release,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Attack,AddPerCharge,1,3,RefreshDuration
-soreness,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-2,1,RefreshDuration
-exhaustion,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-4,1,RefreshDuration
+soreness_strength,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-2,1,RefreshDuration
+soreness_body,Any,Any,Any,Any,Any,OnApply,,Body,Add,-2,1,RefreshDuration
+soreness_heart,Any,Any,Any,Any,Any,OnApply,,Heart,Add,-2,1,RefreshDuration
+soreness_mind,Any,Any,Any,Any,Any,OnApply,,Mind,Add,-2,1,RefreshDuration
+exhaustion_strength,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-4,1,RefreshDuration
+exhaustion_body,Any,Any,Any,Any,Any,OnApply,,Body,Add,-4,1,RefreshDuration
+exhaustion_heart,Any,Any,Any,Any,Any,OnApply,,Heart,Add,-4,1,RefreshDuration
+exhaustion_mind,Any,Any,Any,Any,Any,OnApply,,Mind,Add,-4,1,RefreshDuration
+accumulated_rage_charge,OwnerAsActor,Any,Any,Any,Any,OnBlocked,,TrickCharges,Add,1,5,AddStack
+accumulated_rage_release_attack,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Attack,AddPerCharge,1,5,RefreshDuration
+accumulated_rage_release_damage,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Damage,AddPerCharge,1,5,RefreshDuration

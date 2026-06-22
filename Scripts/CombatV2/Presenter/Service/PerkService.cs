@@ -119,6 +119,28 @@ public class PerkService
                 OnPerkRemoved?.Invoke(battler, perk.Definition.Id);
             }
         }
+
+        if (battler.Drawbacks.Count > 0)
+        {
+            for (int i = battler.Drawbacks.Count - 1; i >= 0; i--)
+            {
+                DrawbackRuntimeInstance drawback = battler.Drawbacks[i];
+                if (drawback == null)
+                {
+                    battler.Drawbacks.RemoveAt(i);
+                    continue;
+                }
+
+                if (drawback.RemainingTurns < 0)
+                    continue;
+
+                drawback.DecreaseDuration();
+                if (drawback.RemainingTurns == 0) // Remove at exactly 0. 
+                {
+                    battler.Drawbacks.RemoveAt(i);
+                }
+            }
+        }
     }
 
     public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context)
@@ -496,9 +518,27 @@ public class PerkService
         }
 
         // ETAPA B: Drawback
-        if (!string.IsNullOrWhiteSpace(trickInstance.Definition.DrawbackPerkId))
+        if (trickInstance.Definition.DrawbackIds != null && trickInstance.Definition.DrawbackIds.Count > 0)
         {
-            ApplyPerk(battler, trickInstance.Definition.DrawbackPerkId, battler, -1, 1);
+            DrawbackDatabase drawbackDb = DrawbackDatabase.GetOrCreateRuntimeDatabase();
+            for (int i = 0; i < trickInstance.Definition.DrawbackIds.Count; i++)
+            {
+                DrawbackSO drawback = drawbackDb.GetById(trickInstance.Definition.DrawbackIds[i]);
+                if (drawback != null && drawback.PerkIds != null)
+                {
+                    DrawbackRuntimeInstance drawbackInstance = new(drawback, battler, drawback.DurationTurns, battler);
+                    battler.Drawbacks.Add(drawbackInstance);
+
+                    for (int j = 0; j < drawback.PerkIds.Count; j++)
+                    {
+                        PerkRuntimeInstance appliedPerk = ApplyPerk(battler, drawback.PerkIds[j], battler, drawback.DurationTurns, 1);
+                        if (appliedPerk != null)
+                        {
+                            drawbackInstance.ActivePerks.Add(appliedPerk);
+                        }
+                    }
+                }
+            }
         }
 
         // ETAPA C: Cleanup

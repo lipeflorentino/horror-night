@@ -1,0 +1,4 @@
+Id,DisplayName,IconName,DurantionTurns,PerkIds,Description,FlavorText
+soreness,Soreness,soreness,3,soreness_strength;soreness_body;soreness_heart;soreness_mind,"Você sente um desconforto muscular que reduz sua força mental, emocional e fisica em 2.",A dor é um lembrete de que você está vivo.
+exhaustion,Exhaustion,exhaustion,5,exhaustion_strength;exhaustion_body;exhaustion_heart;exhaustion_mind,"Você se sente exausto e sua força mental, emocional e fisica é reduzida em 4.",O cansaço é um fardo pesado de carregar.
+flutter,Flutter,flutter,4,,"Seu corpo está quente de raiva, seu coração está palpitando, sua respiração está acelerada, isso te impede de pensar claramente e agir de modo seguro",

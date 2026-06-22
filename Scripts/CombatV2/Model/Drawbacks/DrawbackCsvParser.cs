@@ -6,16 +6,16 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Parser para carregar Tricks do CSV e gerar TrickSO
+/// Parser para carregar Drawbacks do CSV e gerar DrawbackSO
 /// </summary>
-public static class TrickCsvParser
+public static class DrawbackCsvParser
 {
-    public static List<TrickSO> Parse(string csvText)
+    public static List<DrawbackSO> Parse(string csvText)
     {
-        List<TrickSO> tricks = new();
+        List<DrawbackSO> drawbacks = new();
         List<List<string>> rows = ParseRows(csvText);
         if (rows.Count <= 1)
-            return tricks;
+            return drawbacks;
 
         Dictionary<string, int> columns = BuildColumnMap(rows[0]);
         for (int i = 1; i < rows.Count; i++)
@@ -25,33 +25,29 @@ public static class TrickCsvParser
             if (string.IsNullOrWhiteSpace(id))
                 continue;
 
-            TrickSO trick = ScriptableObject.CreateInstance<TrickSO>();
+            DrawbackSO drawback = ScriptableObject.CreateInstance<DrawbackSO>();
             
             string iconName = Get(row, columns, "IconName");
-            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Tricks/" + iconName + ".png");
+            Sprite sprite = null;
+#if UNITY_EDITOR
+            if (!string.IsNullOrWhiteSpace(iconName))
+            {
+                sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Drawbacks/" + iconName + ".png");
+            }
+#endif
             
-            trick.Id = id;
-            trick.DisplayName = Get(row, columns, "DisplayName");
-            trick.Description = Get(row, columns, "Description");
-            trick.Icon = sprite;
-            trick.Level = ParseInt(Get(row, columns, "Level"), 1);
-            trick.MindCost = ParseInt(Get(row, columns, "MindCost"), 0);
-            trick.BodyCost = ParseInt(Get(row, columns, "BodyCost"), 0);
-            trick.HeartCost = ParseInt(Get(row, columns, "HeartCost"), 0);
-            trick.TimingTurns = ParseInt(GetFirst(row, columns, "TimingTurns", "Timing"), 0);
-            trick.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
-            trick.CooldownTurns = ParseInt(Get(row, columns, "CooldownTurns"), 0);
-            trick.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
-            trick.DrawbackIds = ParseStringList(Get(row, columns, "DrawbackIds"), ";");
-            trick.ActivationMode = ParseEnum(Get(row, columns, "ActivationMode"), TrickActivationMode.Active);
-            trick.Rarity = ParseEnum(Get(row, columns, "Rarity"), TrickRarity.Common);
-            trick.Tags = ParseStringList(Get(row, columns, "Tags"), ";");
-            trick.FlavorText = Get(row, columns, "FlavorText");
+            drawback.Id = id;
+            drawback.DisplayName = Get(row, columns, "DisplayName");
+            drawback.Description = Get(row, columns, "Description");
+            drawback.Icon = sprite;
+            drawback.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
+            drawback.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
+            drawback.FlavorText = Get(row, columns, "FlavorText");
             
-            tricks.Add(trick);
+            drawbacks.Add(drawback);
         }
 
-        return tricks;
+        return drawbacks;
     }
 
     private static Dictionary<string, int> BuildColumnMap(List<string> headers)
@@ -73,26 +69,6 @@ public static class TrickCsvParser
             return string.Empty;
 
         return row[index]?.Trim() ?? string.Empty;
-    }
-
-    private static string GetFirst(List<string> row, Dictionary<string, int> columns, params string[] keys)
-    {
-        for (int i = 0; i < keys.Length; i++)
-        {
-            string value = Get(row, columns, keys[i]);
-            if (!string.IsNullOrWhiteSpace(value))
-                return value;
-        }
-
-        return string.Empty;
-    }
-
-    private static T ParseEnum<T>(string value, T fallback) where T : struct
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return fallback;
-
-        return Enum.TryParse(value, true, out T parsed) ? parsed : fallback;
     }
 
     private static int ParseInt(string value, int fallback)

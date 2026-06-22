@@ -21,6 +21,7 @@ public class Battler
     public List<BattlerStateInstance> States = new();
     public List<PerkRuntimeInstance> Perks = new();
     public List<TrickRuntimeInstance> Tricks = new();
+    public List<DrawbackRuntimeInstance> Drawbacks = new();
 
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
     {
@@ -143,5 +144,13 @@ public class Battler
     public List<TrickRuntimeInstance> GetActiveTricks()
     {
         return Tricks.FindAll(t => t != null && t.IsActive());
+    }
+
+    /// <summary>
+    /// Retorna todos os drawbacks ativos
+    /// </summary>
+    public List<DrawbackRuntimeInstance> GetActiveDrawbacks()
+    {
+        return Drawbacks.FindAll(d => d != null && d.IsActive());
     }
 }
