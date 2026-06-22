@@ -4,7 +4,8 @@ public enum TrickInventoryAction
 {
     Cast,
     Dischard,
-    Close
+    Close,
+    ActivateCharge
 }
 
 public enum TrickInventoryLocation

@@ -47,7 +47,7 @@ public class CombatManager : MonoBehaviour
     private InventoryInputHandler InventoryInputHandler;
     private TrickInventoryInputHandler TrickInventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
-    private ITrickInventory PlayerTrickInventory;
+    public ITrickInventory PlayerTrickInventory { get; private set; }
     private ITrickInventory EnemyTrickInventory;
     [SerializeField] private EnemyVisuals EnemyVisuals;
 
@@ -96,7 +96,7 @@ public class CombatManager : MonoBehaviour
         }
 
         Input.Init(this);
-        View.Init();
+        View.Init(this);
         View.BindInput(Input);
         
         RefreshCombatUI();
@@ -229,6 +229,15 @@ public class CombatManager : MonoBehaviour
         bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
         RefreshCombatUI();
         return casted;
+    }
+
+    public void ExecuteManualTrickActivation(TrickRuntimeInstance instance)
+    {
+        if (CombatEnded || instance == null || instance.Owner == null || PerkService == null)
+            return;
+
+        PerkService.ExecuteManualActivation(instance.Owner, instance);
+        RefreshCombatUI();
     }
 
     private IEnumerator SkipTurnRoutine()

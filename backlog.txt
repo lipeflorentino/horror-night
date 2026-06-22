@@ -50,6 +50,8 @@ TO DO
     - Implementar Tricks que forçam "testes" escolhidos pelo jogador
         - Uma rolagem antes de accuracy/power 
         - teste igual classicos de RPG 
+    - Implementar o conceito/uso de momentum 
+        - Ativa habilidades especiais (poderes/stance/glitches?)
 
 HOTFIXES 
     - Ajustar as views de Tricks 

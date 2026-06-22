@@ -63,6 +63,7 @@ public static class TrickCsvImporter
         target.CooldownTurns = source.CooldownTurns;
         target.ActivationMode = source.ActivationMode;
         target.PerkIds = new List<string>(source.PerkIds);
+        target.DrawbackPerkId = source.DrawbackPerkId;
         target.Rarity = source.Rarity;
         target.Tags = new List<string>(source.Tags);
         target.FlavorText = source.FlavorText;

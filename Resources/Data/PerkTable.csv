@@ -11,3 +11,9 @@ adrenaline_surge,OwnerAsActor,Attack,Accuracy,Body,High,Always,,ExtraDice,Add,2,
 terrifying_presence,OwnerAsActor,Any,Any,Any,Any,OnApply,,Strength,Add,-4,1,RefreshDuration
 channeler_trance_buff,OwnerAsActor,Any,Accuracy,Mind,Any,OnApply,,ExtraDice,Add,2,1,RefreshDuration
 channeler_trance_debuff,OwnerAsActor,Any,Accuracy,Mind,Any,OnApply,,DefensePercent,Multiply,0.75,1,RefreshDuration
+endurance_charge,OwnerAsActor,Defense,Any,Any,Any,BlockedAttack,,TrickCharges,Add,1,5,AddStack
+endurance_release,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Defense,AddPerCharge,1,3,RefreshDuration
+vengeance_charge,OwnerAsActor,Any,Any,Any,Any,OnDamageTaken,,TrickCharges,Add,1,3,AddStack
+vengeance_release,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Attack,AddPerCharge,1,3,RefreshDuration
+soreness,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-2,1,RefreshDuration
+exhaustion,Any,Any,Any,Any,Any,OnApply,,Strength,Add,-4,1,RefreshDuration

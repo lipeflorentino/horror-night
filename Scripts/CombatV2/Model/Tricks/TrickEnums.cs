@@ -7,7 +7,8 @@ using UnityEngine;
 public enum TrickActivationMode
 {
     Passive,
-    Active
+    Active,
+    ActiveCharge
 }
 
 /// <summary>

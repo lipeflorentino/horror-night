@@ -22,6 +22,8 @@ public class TrickRuntimeInstance
     public int ActivationDelayTurnsRemaining { get; private set; }
     public bool HasAppliedPerks { get; private set; }
     public float CastTime { get; private set; }
+    public float CurrentCharges { get; private set; }
+    public bool IsReadyToTrigger => CurrentCharges >= 1f;
 
     /// <summary>
     /// Perks que foram ativados por este Trick.
@@ -62,6 +64,16 @@ public class TrickRuntimeInstance
     public bool IsActive()
     {
         return RemainingTurns < 0 || RemainingTurns > 0;
+    }
+
+    public void AddCharges(float amount)
+    {
+        CurrentCharges += amount;
+    }
+
+    public void ConsumeCharges()
+    {
+        CurrentCharges = 0;
     }
 
     /// <summary>

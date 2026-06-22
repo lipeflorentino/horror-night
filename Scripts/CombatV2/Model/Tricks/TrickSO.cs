@@ -48,6 +48,9 @@ public class TrickSO : ScriptableObject
     [Tooltip("IDs dos Perks que este Trick ativa. Devem ser encontrados em PerkDatabase.")]
     public List<string> PerkIds = new();
 
+    [Tooltip("ID do Perk que é aplicado como desvantagem na ativação manual (ex: exhaustion).")]
+    public string DrawbackPerkId;
+
     [Header("Metadados")]
     public TrickRarity Rarity = TrickRarity.Common;
     [Tooltip("Tags para filtro e categorização (ex: power, defense, attack, passive)")]

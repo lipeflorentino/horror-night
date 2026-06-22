@@ -221,7 +221,7 @@ GameObject:
   - component: {fileID: 1835758377008194682}
   - component: {fileID: 2019645729660872186}
   m_Layer: 5
-  m_Name: PerkUI
+  m_Name: PassiveTrickUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

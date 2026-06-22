@@ -10,67 +10,63 @@ using UnityEngine.UI;
 public class TrickIconUI : MonoBehaviour
 {
     [SerializeField] private Image icon;
-    [SerializeField] private TextMeshProUGUI levelText;
-    [SerializeField] private TextMeshProUGUI costText;
+    [SerializeField] private TextMeshProUGUI inputKeyText;
     [SerializeField] private Image rarityBorder;
+    [SerializeField] private Button releaseButton;
 
     private TrickSO trickDefinition;
+    private TrickRuntimeInstance runtimeInstance;
     private TrickTooltip tooltip;
     [SerializeField] private GameObject tooltipPrefab;
 
     public TrickSO TrickDefinition => trickDefinition;
+    public TrickRuntimeInstance RuntimeInstance => runtimeInstance;
     public event Action<TrickSO> TrickClicked;
+    public event Action<TrickRuntimeInstance> OnReleaseClicked;
 
     /// <summary>
     /// Configura o ícone com dados do trick
     /// </summary>
-    public void Setup(TrickSO definition)
+    public void Setup(TrickSO definition, string inputKeyOverride, TrickRuntimeInstance instance = null)
     {
         trickDefinition = definition;
+        runtimeInstance = instance;
 
         if (icon != null && definition.Icon != null)
             icon.sprite = definition.Icon;
 
-        if (levelText != null)
-            levelText.text = $"Lvl {definition.Level}";
-
-        if (costText != null)
-            costText.text = FormatCost(definition);
+        if (inputKeyText != null)
+        {
+            inputKeyText.text = inputKeyOverride;
+        }
 
         if (rarityBorder != null)
             rarityBorder.color = GetRarityColor(definition.Rarity);
 
-        Button button = GetComponent<Button>();
-        button.onClick.RemoveListener(OnClicked);
-        button.onClick.AddListener(OnClicked);
+        if (releaseButton != null)
+        {
+            releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
+            releaseButton.onClick.AddListener(OnReleaseClickedHandler);
+            UpdateReleaseButtonState();
+        }
     }
 
-    /// <summary>
-    /// Callback quando o ícone é clicado
-    /// </summary>
-    private void OnClicked()
+    public void UpdateReleaseButtonState()
     {
-        if (trickDefinition == null)
-            return;
+        if (releaseButton == null) return;
 
-        TrickClicked?.Invoke(trickDefinition);
-        Debug.Log($"[TrickIconUI] Clicked: {trickDefinition.DisplayName}");
+        bool canRelease = trickDefinition != null && 
+                          trickDefinition.ActivationMode == TrickActivationMode.ActiveCharge && 
+                          runtimeInstance != null && 
+                          runtimeInstance.IsReadyToTrigger;
+                          
+        releaseButton.gameObject.SetActive(canRelease);
     }
 
-    /// <summary>
-    /// Formata o custo para exibição (ex: "2M 1B")
-    /// </summary>
-    private string FormatCost(TrickSO trick)
+    private void OnReleaseClickedHandler()
     {
-        string cost = "";
-        if (trick.MindCost > 0)
-            cost += $"{trick.MindCost}M ";
-        if (trick.BodyCost > 0)
-            cost += $"{trick.BodyCost}B ";
-        if (trick.HeartCost > 0)
-            cost += $"{trick.HeartCost}H";
-
-        return string.IsNullOrWhiteSpace(cost) ? "Free" : cost.Trim();
+        if (runtimeInstance != null)
+            OnReleaseClicked?.Invoke(runtimeInstance);
     }
 
     /// <summary>
@@ -90,10 +86,9 @@ public class TrickIconUI : MonoBehaviour
     }
 
     private void OnDestroy()
-    {
-        Button button = GetComponent<Button>();
-        if (button != null)
-            button.onClick.RemoveListener(OnClicked);
+    {       
+        if (releaseButton != null)
+            releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
     }
 
     public void PlayEnterAnimation()

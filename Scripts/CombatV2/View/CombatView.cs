@@ -12,8 +12,9 @@ public class CombatView : MonoBehaviour
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
     public ActionLogView ActionLogView;
+    public ActiveTricksView ActiveTricksView;
 
-    public void Init()
+    public void Init(CombatManager combatManager)
     {
         BattlerPanelView[] panels = FindObjectsOfType<BattlerPanelView>();
         
@@ -44,8 +45,11 @@ public class CombatView : MonoBehaviour
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
         ActionLogView = FindObjectOfType<ActionLogView>();
+        ActiveTricksView = FindObjectOfType<ActiveTricksView>();
+            
         DicePanelView.HidePanel();
         InfoPanelView.Init();
+        ActiveTricksView.Init(combatManager);
     }
 
     public void BindInput(CombatInputHandler inputHandler)
@@ -63,6 +67,12 @@ public class CombatView : MonoBehaviour
     public void UpdateTurnOwner(bool isPlayerAttacker)
     {
         FeedbackView.ShowTurnStartFeedback(isPlayerAttacker);
+    }
+
+    public void RefreshActiveTricks()
+    {
+        if (ActiveTricksView != null)
+            ActiveTricksView.Refresh();
     }
 
     public IEnumerator PlayDiceResolution(

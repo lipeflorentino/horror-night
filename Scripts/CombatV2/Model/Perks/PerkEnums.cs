@@ -12,6 +12,7 @@ public enum PerkTrigger
     OnInitiativeResolve,
     OnCombatEnd,
     OnCombatVictory,
+    OnManualActivation,
 }
 
 public enum PerkModifierTarget
@@ -38,7 +39,7 @@ public enum PerkModifierTarget
     Agility,
     PowerDicesCount,
     AccuracyDicesCount,
-
+    TrickCharges,
 }
 
 public enum PerkConditionKey

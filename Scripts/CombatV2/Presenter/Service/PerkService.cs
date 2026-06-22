@@ -450,4 +450,59 @@ public class PerkService
         if (target.Perks.Remove(instance))
             OnPerkRemoved?.Invoke(target, instance.Definition?.Id);
     }
+
+    public void ExecuteManualActivation(Battler battler, TrickRuntimeInstance trickInstance)
+    {
+        if (battler == null || trickInstance == null || trickInstance.Definition == null)
+            return;
+
+        int charges = Mathf.FloorToInt(trickInstance.CurrentCharges);
+        if (charges <= 0)
+            return;
+
+        // ETAPA A: Positive Release & ETAPA C (partial): Cleanup charge perks
+        for (int i = 0; i < trickInstance.Definition.PerkIds.Count; i++)
+        {
+            string perkId = trickInstance.Definition.PerkIds[i];
+            PerkSO perkDef = GetPerkDefinition(perkId);
+            if (perkDef == null)
+                continue;
+
+            bool hasManualTrigger = false;
+            if (perkDef.Rules != null)
+            {
+                for (int j = 0; j < perkDef.Rules.Count; j++)
+                {
+                    if (perkDef.Rules[j].Trigger == PerkTrigger.OnManualActivation)
+                    {
+                        hasManualTrigger = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasManualTrigger)
+            {
+                ApplyPerk(battler, perkDef, battler, -1, charges);
+            }
+            else
+            {
+                PerkRuntimeInstance existing = battler.Perks.Find(p => p.Definition == perkDef && p.SourceTrickInstanceId == trickInstance.InstanceId);
+                if (existing != null)
+                {
+                    RemovePerkInstance(battler, existing);
+                }
+            }
+        }
+
+        // ETAPA B: Drawback
+        if (!string.IsNullOrWhiteSpace(trickInstance.Definition.DrawbackPerkId))
+        {
+            ApplyPerk(battler, trickInstance.Definition.DrawbackPerkId, battler, -1, 1);
+        }
+
+        // ETAPA C: Cleanup
+        trickInstance.ConsumeCharges();
+        trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
+    }
 }

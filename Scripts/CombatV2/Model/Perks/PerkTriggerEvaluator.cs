@@ -315,6 +315,11 @@ public class PerkTriggerEvaluator
         if (perk?.Definition == null)
             return;
 
+        if (rule.ModifierTarget == PerkModifierTarget.TrickCharges && perk.SourceTrick != null)
+        {
+            perk.SourceTrick.AddCharges(appliedValue * Mathf.Max(1, perk.Stacks));
+        }
+
         var triggerEvent = new PerkTriggeredEvent
         {
             PerkId = perk.Definition.Id,
