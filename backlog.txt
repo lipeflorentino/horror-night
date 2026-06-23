@@ -65,7 +65,9 @@ BUGS
 
 
 TASK 
-    - separar CastedTricks.csv e IdentityTricks.csv 
+    - Criar UI de Drawback 
+    - Testar fluxo completo de tricks / perks no combate 
+    - Criar nova perk usando a Skill criada
 
 TESTS
 
