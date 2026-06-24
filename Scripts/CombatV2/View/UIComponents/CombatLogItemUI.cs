@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ActionLogItemUI : MonoBehaviour
+public class CombatLogItemUI : MonoBehaviour
 {
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text text;

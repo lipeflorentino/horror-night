@@ -157,9 +157,9 @@ public class CombatInputHandler : MonoBehaviour
         NotifyConfirmAvailability();
     }
 
-    public void OnToggleInfoPanel(bool isVisible)
+    public void OnToggleInfoPanel()
     {
-        Combat.View.SetInfoPanelVisible(isVisible);
+        Combat.View.SetInfoPanelVisible();
     }
 
     private void NotifyConfirmAvailability()

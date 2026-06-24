@@ -6,10 +6,11 @@ public class CombatInfoPanelView : MonoBehaviour
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private TMP_Text playerInfoText;
     [SerializeField] private TMP_Text enemyInfoText;
+    [SerializeField] private bool isVisible = false;
 
     public void Init()
     {
-        SetVisible(false);
+        SetVisible();
     }
 
     public void Bind(Battler player, Battler enemy)
@@ -21,8 +22,13 @@ public class CombatInfoPanelView : MonoBehaviour
             enemyInfoText.text = BuildCombatInfo(enemy);
     }
 
-    public void SetVisible(bool isVisible)
+    public void SetVisible()
     {
+        if (isVisible)
+            isVisible = false;
+        else
+            isVisible = true;
+
         if (panelRoot != null)
             panelRoot.SetActive(isVisible);
         else

@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionLogView : MonoBehaviour
+public class CombatLogView : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private RectTransform contentRoot;
-    [SerializeField] private ActionLogItemUI logItemPrefab;
+    [SerializeField] private CombatLogItemUI logItemPrefab;
 
     [Header("Icons")]
     [SerializeField] private Sprite attackPowerIcon;
@@ -25,7 +25,7 @@ public class ActionLogView : MonoBehaviour
     [SerializeField, Min(0.01f)] private float slideDuration = 0.2f;
     [SerializeField] private float slideDistance = 40f;
 
-    private readonly Queue<ActionLogItemUI> _activeLogs = new();
+    private readonly Queue<CombatLogItemUI> _activeLogs = new();
 
     public void ShowFromResult(ActionResolutionResult result)
     {
@@ -40,7 +40,7 @@ public class ActionLogView : MonoBehaviour
         if (string.IsNullOrWhiteSpace(logText) || contentRoot == null || logItemPrefab == null)
             return;
 
-        ActionLogItemUI item = Instantiate(logItemPrefab, contentRoot);
+        CombatLogItemUI item = Instantiate(logItemPrefab, contentRoot);
         item.Bind(icon, logText, textColor);
 
         RectTransform rect = item.GetComponent<RectTransform>();
@@ -52,7 +52,7 @@ public class ActionLogView : MonoBehaviour
 
         if (_activeLogs.Count > maxLogs)
         {
-            ActionLogItemUI oldest = _activeLogs.Dequeue();
+            CombatLogItemUI oldest = _activeLogs.Dequeue();
             if (oldest != null)
                 Destroy(oldest.gameObject);
         }
@@ -60,7 +60,7 @@ public class ActionLogView : MonoBehaviour
         StartCoroutine(AnimateEntryAndExpire(item, rect, canvasGroup));
     }
 
-    private IEnumerator AnimateEntryAndExpire(ActionLogItemUI item, RectTransform rect, CanvasGroup canvasGroup)
+    private IEnumerator AnimateEntryAndExpire(CombatLogItemUI item, RectTransform rect, CanvasGroup canvasGroup)
     {
         if (item == null)
             yield break;
@@ -104,7 +104,7 @@ public class ActionLogView : MonoBehaviour
         RemoveAndDestroy(item); */
     }
 
-    private void RemoveAndDestroy(ActionLogItemUI item)
+    private void RemoveAndDestroy(CombatLogItemUI item)
     {
         if (item == null)
             return;
@@ -113,7 +113,7 @@ public class ActionLogView : MonoBehaviour
         int count = _activeLogs.Count;
         for (int i = 0; i < count; i++)
         {
-            ActionLogItemUI current = _activeLogs.Dequeue();
+            CombatLogItemUI current = _activeLogs.Dequeue();
             if (!removed && current == item)
             {
                 removed = true;

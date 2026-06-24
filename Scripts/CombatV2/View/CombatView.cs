@@ -11,7 +11,7 @@ public class CombatView : MonoBehaviour
     public DicePanelView DicePanelView;
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
-    public ActionLogView ActionLogView;
+    public CombatLogView CombatLogView;
     public ActiveTricksView ActiveTricksView;
 
     public void Init(CombatManager combatManager)
@@ -44,7 +44,7 @@ public class CombatView : MonoBehaviour
         DicePanelView = FindObjectOfType<DicePanelView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
-        ActionLogView = FindObjectOfType<ActionLogView>();
+        CombatLogView = FindObjectOfType<CombatLogView>();
         ActiveTricksView = FindObjectOfType<ActiveTricksView>();
             
         DicePanelView.HidePanel();
@@ -112,9 +112,9 @@ public class CombatView : MonoBehaviour
             ActionPanel.SetAllInteractable(isEnabled);
     }
 
-    public void SetInfoPanelVisible(bool isVisible)
+    public void SetInfoPanelVisible()
     {
         if (InfoPanelView != null)
-            InfoPanelView.SetVisible(isVisible);
+            InfoPanelView.SetVisible();
     }
 }

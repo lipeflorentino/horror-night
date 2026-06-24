@@ -4,41 +4,87 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Painel principal de ações do jogador em combate.
+///
+/// REFATORAÇÃO — DiceStatAllocatorUI:
+///   Os 12 campos de botões avulsos (AddMind/Heart/Body Power/Accuracy e seus
+///   correspondentes Remove) foram substituídos por 6 referências de
+///   DiceStatAllocatorUI. Cada componente encapsula internamente os botões
+///   "+ / -" e o contador de uma linha de dado.
+///
+///   Configure no Inspector:
+///     diceAllocators[0] → Mind   + Power    (DiceStatAllocatorUI no Prefab)
+///     diceAllocators[1] → Heart  + Power
+///     diceAllocators[2] → Body   + Power
+///     diceAllocators[3] → Mind   + Accuracy
+///     diceAllocators[4] → Heart  + Accuracy
+///     diceAllocators[5] → Body   + Accuracy
+/// </summary>
 public class ActionPanelView : MonoBehaviour
 {
+    // -------------------------------------------------------------------------
+    // Inspector — Botões de ação global
+    // -------------------------------------------------------------------------
+
     public Button SelectAttackButton;
     public Button SelectDefendButton;
-    public Button AddMindPowerDiceButton, AddHeartPowerDiceButton, AddBodyPowerDiceButton, AddMindAccuracyDiceButton, AddHeartAccuracyDiceButton, AddBodyAccuracyDiceButton;
-    public Button RemoveMindPowerDiceButton, RemoveHeartPowerDiceButton, RemoveBodyPowerDiceButton, RemoveMindAccuracyDiceButton, RemoveHeartAccuracyDiceButton, RemoveBodyAccuracyDiceButton;
     public Button EndTurnButton;
     public Button SelectItemsButton;
     public Button SelectTricksButton;
-    public Toggle InfoToggle;
+    public Button SelectInfoButton;
 
-    [Header("Confirm Action Panel")]
+    [Header("Painel de Confirmação")]
     public GameObject ConfirmPanel;
     public TMP_Text ConfirmActionText;
     public Button ConfirmButton;
 
-    [Header("Dice Allocation")]
+    [Header("Alocadores de Dado — 6 linhas (Mind/Heart/Body × Power/Accuracy)")]
+    [SerializeField] private DiceStatAllocatorUI[] diceAllocators;
+
+    [Header("Painéis Auxiliares")]
     [SerializeField] private DiceAllocationView diceAllocationView;
     [SerializeField] private InventoryView inventoryView;
     [SerializeField] private TrickInventoryView trickInventoryView;
+
+    // -------------------------------------------------------------------------
+    // Eventos públicos — ações de combate
+    // -------------------------------------------------------------------------
 
     public event Action SelectAttackClicked;
     public event Action SelectDefendClicked;
     public event Action SkipTurnClicked;
     public event Action ConfirmClicked;
-    public event Action<DiceStatType, DiceRollType> AddMindPowerDiceClicked, AddHeartPowerDiceClicked, AddBodyPowerDiceClicked, AddMindAccuracyDiceClicked, AddHeartAccuracyDiceClicked, AddBodyAccuracyDiceClicked;
-    public event Action<DiceStatType, DiceRollType> RemoveMindPowerDiceClicked, RemoveHeartPowerDiceClicked, RemoveBodyPowerDiceClicked, RemoveMindAccuracyDiceClicked, RemoveHeartAccuracyDiceClicked, RemoveBodyAccuracyDiceClicked;
-    public event Action<bool> InfoToggled;
-    private CombatInputHandler BoundInputHandler;
+    public event Action SelectInfoButtonClicked;
+
+    // Eventos unificados de dado: substituem os 12 eventos individuais anteriores.
+    // O DiceStatType e DiceRollType já identificam qual dado foi clicado.
+    public event Action<DiceStatType, DiceRollType> AddDiceClicked;
+    public event Action<DiceStatType, DiceRollType> RemoveDiceClicked;
+
+    // -------------------------------------------------------------------------
+    // Estado privado
+    // -------------------------------------------------------------------------
+
+    private CombatInputHandler boundInputHandler;
+
+    // -------------------------------------------------------------------------
+    // Ciclo de vida
+    // -------------------------------------------------------------------------
 
     private void Awake()
     {
-        inventoryView = FindObjectOfType<InventoryView>();
-        trickInventoryView = FindObjectOfType<TrickInventoryView>();
+        // Fallbacks de FindObjectOfType para referências não atribuídas no Inspector
+        if (inventoryView == null)
+            inventoryView = FindObjectOfType<InventoryView>();
 
+        if (trickInventoryView == null)
+            trickInventoryView = FindObjectOfType<TrickInventoryView>();
+
+        if (diceAllocationView == null)
+            diceAllocationView = FindObjectOfType<DiceAllocationView>();
+
+        // Botões de ação global
         if (SelectAttackButton != null)
             SelectAttackButton.onClick.AddListener(HandleSelectAttackClick);
 
@@ -57,55 +103,17 @@ public class ActionPanelView : MonoBehaviour
         if (ConfirmButton != null)
             ConfirmButton.onClick.AddListener(HandleConfirmClick);
 
-        // ADD
+        if (SelectInfoButton != null)
+            SelectInfoButton.onClick.AddListener(HandleInfoClick);
 
-        if (AddMindPowerDiceButton != null)
-            AddMindPowerDiceButton.onClick.AddListener(HandleAddMindPowerDiceClick);
+        // Alocadores de dado — um listener por componente, em vez de 12 blocos individuais
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator == null) continue;
+            allocator.OnAddPressed    += HandleAllocatorAddPressed;
+            allocator.OnRemovePressed += HandleAllocatorRemovePressed;
+        }
 
-        if (AddHeartPowerDiceButton != null)
-            AddHeartPowerDiceButton.onClick.AddListener(HandleAddHeartPowerDiceClick);
-
-        if (AddBodyPowerDiceButton != null)
-            AddBodyPowerDiceButton.onClick.AddListener(HandleAddBodyPowerDiceClick);
-
-        if (AddMindAccuracyDiceButton != null)
-            AddMindAccuracyDiceButton.onClick.AddListener(HandleAddMindAccuracyDiceClick);
-
-        if (AddHeartAccuracyDiceButton != null)
-            AddHeartAccuracyDiceButton.onClick.AddListener(HandleAddHeartAccuracyDiceClick);
-
-        if (AddBodyAccuracyDiceButton != null)
-            AddBodyAccuracyDiceButton.onClick.AddListener(HandleAddBodyAccuracyDiceClick);
-
-        // REMOVE
-
-        if (RemoveMindPowerDiceButton != null)
-            RemoveMindPowerDiceButton.onClick.AddListener(HandleRemoveMindPowerDiceClick);
-
-        if (RemoveHeartPowerDiceButton != null)
-            RemoveHeartPowerDiceButton.onClick.AddListener(HandleRemoveHeartPowerDiceClick);
-
-        if (RemoveBodyPowerDiceButton != null)
-            RemoveBodyPowerDiceButton.onClick.AddListener(HandleRemoveBodyPowerDiceClick);
-
-        if (RemoveMindAccuracyDiceButton != null)
-            RemoveMindAccuracyDiceButton.onClick.AddListener(HandleRemoveMindAccuracyDiceClick);
-
-        if (RemoveHeartAccuracyDiceButton != null)
-            RemoveHeartAccuracyDiceButton.onClick.AddListener(HandleRemoveHeartAccuracyDiceClick);
-
-        if (RemoveBodyAccuracyDiceButton != null)
-            RemoveBodyAccuracyDiceButton.onClick.AddListener(HandleRemoveBodyAccuracyDiceClick);
-
-        // TOGGLE
-
-        if (InfoToggle != null)
-            InfoToggle.onValueChanged.AddListener(HandleInfoToggleChanged);
-
-        if (BoundInputHandler != null)
-            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
-
-        diceAllocationView = FindObjectOfType<DiceAllocationView>();
         HideConfirmPanel();
     }
 
@@ -129,185 +137,73 @@ public class ActionPanelView : MonoBehaviour
         if (ConfirmButton != null)
             ConfirmButton.onClick.RemoveListener(HandleConfirmClick);
 
-        // ADD
+        if (SelectInfoButton != null)
+            SelectInfoButton.onClick.RemoveListener(HandleInfoClick);
 
-        if (AddMindPowerDiceButton != null)
-            AddMindPowerDiceButton.onClick.RemoveListener(HandleAddMindPowerDiceClick);
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator == null) continue;
+            allocator.OnAddPressed    -= HandleAllocatorAddPressed;
+            allocator.OnRemovePressed -= HandleAllocatorRemovePressed;
+        }
 
-        if (AddHeartPowerDiceButton != null)
-            AddHeartPowerDiceButton.onClick.RemoveListener(HandleAddHeartPowerDiceClick);
-
-        if (AddBodyPowerDiceButton != null)
-            AddBodyPowerDiceButton.onClick.RemoveListener(HandleAddBodyPowerDiceClick);
-
-        if (AddMindAccuracyDiceButton != null)
-            AddMindAccuracyDiceButton.onClick.RemoveListener(HandleAddMindAccuracyDiceClick);  
-
-        if (AddHeartAccuracyDiceButton != null)
-            AddHeartAccuracyDiceButton.onClick.RemoveListener(HandleAddHeartAccuracyDiceClick);
-
-        if (AddBodyAccuracyDiceButton != null)
-            AddBodyAccuracyDiceButton.onClick.RemoveListener(HandleAddBodyAccuracyDiceClick);
-
-        // REMOVE
-
-        if (RemoveMindPowerDiceButton != null)
-            RemoveMindPowerDiceButton.onClick.RemoveListener(HandleRemoveMindPowerDiceClick);
-
-        if (RemoveHeartPowerDiceButton != null)
-            RemoveHeartPowerDiceButton.onClick.RemoveListener(HandleRemoveHeartPowerDiceClick);
-
-        if (RemoveBodyPowerDiceButton != null)
-            RemoveBodyPowerDiceButton.onClick.RemoveListener(HandleRemoveBodyPowerDiceClick);
-
-        if (RemoveMindAccuracyDiceButton != null)
-            RemoveMindAccuracyDiceButton.onClick.RemoveListener(HandleRemoveMindAccuracyDiceClick);  
-
-        if (RemoveHeartAccuracyDiceButton != null)
-            RemoveHeartAccuracyDiceButton.onClick.RemoveListener(HandleRemoveHeartAccuracyDiceClick);
-
-        if (RemoveBodyAccuracyDiceButton != null)
-            RemoveBodyAccuracyDiceButton.onClick.RemoveListener(HandleRemoveBodyAccuracyDiceClick);
-
-        // TOGGLE
-
-        if (InfoToggle != null)
-            InfoToggle.onValueChanged.RemoveListener(HandleInfoToggleChanged);
-
-        if (BoundInputHandler != null)
-            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
+        if (boundInputHandler != null)
+            boundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
     }
+
+    // -------------------------------------------------------------------------
+    // Binding com o InputHandler
+    // -------------------------------------------------------------------------
 
     public void BindInput(CombatInputHandler inputHandler)
     {
-        if (BoundInputHandler != null)
+        // Remove bindings antigos
+        if (boundInputHandler != null)
         {
-            SelectAttackClicked -= BoundInputHandler.OnSelectAttack;
-            SelectDefendClicked -= BoundInputHandler.OnSelectDefend;
-            AddMindPowerDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveMindPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
-            AddHeartPowerDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveHeartPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
-            AddBodyPowerDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveBodyPowerDiceClicked -= BoundInputHandler.OnRemoveDice;
-            AddMindAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveMindAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
-            AddHeartAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveHeartAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
-            AddBodyAccuracyDiceClicked -= BoundInputHandler.OnAddDice;
-            RemoveBodyAccuracyDiceClicked -= BoundInputHandler.OnRemoveDice;
-            SkipTurnClicked -= BoundInputHandler.OnSkipTurn;
-            ConfirmClicked -= BoundInputHandler.OnConfirmAction;
-            InfoToggled -= BoundInputHandler.OnToggleInfoPanel;
+            SelectAttackClicked  -= boundInputHandler.OnSelectAttack;
+            SelectDefendClicked  -= boundInputHandler.OnSelectDefend;
+            AddDiceClicked       -= boundInputHandler.OnAddDice;
+            RemoveDiceClicked    -= boundInputHandler.OnRemoveDice;
+            SkipTurnClicked      -= boundInputHandler.OnSkipTurn;
+            ConfirmClicked       -= boundInputHandler.OnConfirmAction;
+            SelectInfoButtonClicked -= boundInputHandler.OnToggleInfoPanel;
+            boundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
         }
 
-        if (BoundInputHandler != null)
-            BoundInputHandler.ConfirmAvailabilityChanged -= SetConfirmInteractable;
+        boundInputHandler = inputHandler;
 
-        BoundInputHandler = inputHandler;
-
+        // Adiciona bindings novos — apenas 7 linhas no lugar das ~20 anteriores
         SelectAttackClicked += inputHandler.OnSelectAttack;
         SelectDefendClicked += inputHandler.OnSelectDefend;
-
-        // Power Dices
-        AddMindPowerDiceClicked += inputHandler.OnAddDice;
-        RemoveMindPowerDiceClicked += inputHandler.OnRemoveDice;
-        AddHeartPowerDiceClicked += inputHandler.OnAddDice;
-        RemoveHeartPowerDiceClicked += inputHandler.OnRemoveDice;
-        AddBodyPowerDiceClicked += inputHandler.OnAddDice;
-        RemoveBodyPowerDiceClicked += inputHandler.OnRemoveDice;
-
-        // Accuracy Dices
-        AddMindAccuracyDiceClicked += inputHandler.OnAddDice;
-        RemoveMindAccuracyDiceClicked += inputHandler.OnRemoveDice;
-        AddHeartAccuracyDiceClicked += inputHandler.OnAddDice;
-        RemoveHeartAccuracyDiceClicked += inputHandler.OnRemoveDice;
-        AddBodyAccuracyDiceClicked += inputHandler.OnAddDice;
-        RemoveBodyAccuracyDiceClicked += inputHandler.OnRemoveDice;
-
-        SkipTurnClicked += inputHandler.OnSkipTurn;
-        ConfirmClicked += inputHandler.OnConfirmAction;
-
-        InfoToggled += inputHandler.OnToggleInfoPanel;
+        AddDiceClicked      += inputHandler.OnAddDice;
+        RemoveDiceClicked   += inputHandler.OnRemoveDice;
+        SkipTurnClicked     += inputHandler.OnSkipTurn;
+        ConfirmClicked      += inputHandler.OnConfirmAction;
+        SelectInfoButtonClicked += inputHandler.OnToggleInfoPanel;
 
         inputHandler.ConfirmAvailabilityChanged += SetConfirmInteractable;
 
-        if (InfoToggle != null)
-            InfoToggle.SetIsOnWithoutNotify(false);
+        if (SelectInfoButton != null)
+            SelectInfoButton.onClick.AddListener(HandleInfoClick);
 
         SetConfirmInteractable(false);
         HideConfirmPanel();
     }
 
-    public void UpdateDiceAllocationStats(int mind, int heart, int body)
-    {
-        if (diceAllocationView == null)
-            diceAllocationView = FindObjectOfType<DiceAllocationView>();
-
-        if (diceAllocationView == null)
-            return;
-
-        diceAllocationView.UpdateStatValueTexts(mind, heart, body);
-    }
+    // -------------------------------------------------------------------------
+    // API pública — controle de interatividade
+    // -------------------------------------------------------------------------
 
     public void SetAddDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
-        switch (stat)
-        {
-            case DiceStatType.Mind:
-                if (rollType == DiceRollType.Power && AddMindPowerDiceButton != null)
-                    AddMindPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && AddMindAccuracyDiceButton != null)
-                    AddMindAccuracyDiceButton.interactable = isInteractable;
-                break;
-
-            case DiceStatType.Heart:
-                if (rollType == DiceRollType.Power && AddHeartPowerDiceButton != null)
-                    AddHeartPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && AddHeartAccuracyDiceButton != null)
-                    AddHeartAccuracyDiceButton.interactable = isInteractable;
-                break;
-
-            case DiceStatType.Body:
-                if (rollType == DiceRollType.Power && AddBodyPowerDiceButton != null)
-                    AddBodyPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && AddBodyAccuracyDiceButton != null)
-                    AddBodyAccuracyDiceButton.interactable = isInteractable;
-                break;
-        }
+        var allocator = FindAllocator(stat, rollType);
+        allocator?.SetAddInteractable(isInteractable);
     }
 
     public void SetRemoveDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
-        switch (stat)
-        {
-            case DiceStatType.Mind:
-                if (rollType == DiceRollType.Power && RemoveMindPowerDiceButton != null)
-                    RemoveMindPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && RemoveMindAccuracyDiceButton != null)
-                    RemoveMindAccuracyDiceButton.interactable = isInteractable;
-                break;
-
-            case DiceStatType.Heart:
-                if (rollType == DiceRollType.Power && RemoveHeartPowerDiceButton != null)
-                    RemoveHeartPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && RemoveHeartAccuracyDiceButton != null)
-                    RemoveHeartAccuracyDiceButton.interactable = isInteractable;
-                break;
-
-            case DiceStatType.Body:
-                if (rollType == DiceRollType.Power && RemoveBodyPowerDiceButton != null)
-                    RemoveBodyPowerDiceButton.interactable = isInteractable;
-
-                if (rollType == DiceRollType.Accuracy && RemoveBodyAccuracyDiceButton != null)
-                    RemoveBodyAccuracyDiceButton.interactable = isInteractable;
-                break;
-        }
+        var allocator = FindAllocator(stat, rollType);
+        allocator?.SetRemoveInteractable(isInteractable);
     }
 
     public void SetConfirmInteractable(bool isInteractable)
@@ -318,156 +214,35 @@ public class ActionPanelView : MonoBehaviour
 
     public void SetAllInteractable(bool isInteractable)
     {
-        if (SelectAttackButton != null)
-            SelectAttackButton.interactable = isInteractable;
+        if (SelectAttackButton != null) SelectAttackButton.interactable = isInteractable;
+        if (SelectDefendButton != null) SelectDefendButton.interactable = isInteractable;
+        if (EndTurnButton != null)      EndTurnButton.interactable      = isInteractable;
+        if (ConfirmButton != null)      ConfirmButton.interactable      = isInteractable;
+        if (SelectInfoButton != null)         SelectInfoButton.interactable         = isInteractable;
 
-        if (SelectDefendButton != null)
-            SelectDefendButton.interactable = isInteractable;
-
-        if (AddMindPowerDiceButton != null)
-            AddMindPowerDiceButton.interactable = isInteractable;
-
-        if (RemoveMindPowerDiceButton != null)
-            RemoveMindPowerDiceButton.interactable = isInteractable;
-
-        if (AddMindAccuracyDiceButton != null)
-            AddMindAccuracyDiceButton.interactable = isInteractable;
-
-        if (RemoveMindAccuracyDiceButton != null)
-            RemoveMindAccuracyDiceButton.interactable = isInteractable;
-
-        if (AddHeartPowerDiceButton != null)
-            AddHeartPowerDiceButton.interactable = isInteractable;
-
-        if (RemoveHeartPowerDiceButton != null)
-            RemoveHeartPowerDiceButton.interactable = isInteractable;
-
-        if (AddHeartAccuracyDiceButton != null)
-            AddHeartAccuracyDiceButton.interactable = isInteractable;
-
-        if (RemoveHeartAccuracyDiceButton != null)
-            RemoveHeartAccuracyDiceButton.interactable = isInteractable;
-
-        if (AddBodyPowerDiceButton != null)
-            AddBodyPowerDiceButton.interactable = isInteractable;
-
-        if (RemoveBodyPowerDiceButton != null)
-            RemoveBodyPowerDiceButton.interactable = isInteractable;
-
-        if (AddBodyAccuracyDiceButton != null)
-            AddBodyAccuracyDiceButton.interactable = isInteractable;
-
-        if (RemoveBodyAccuracyDiceButton != null)
-            RemoveBodyAccuracyDiceButton.interactable = isInteractable;
-
-        if (EndTurnButton != null)
-            EndTurnButton.interactable = isInteractable;
-
-        if (ConfirmButton != null)
-            ConfirmButton.interactable = isInteractable;
-
-        if (InfoToggle != null)
-            InfoToggle.interactable = isInteractable;
+        // Substitui os 12 blocos if/interactable anteriores por um loop
+        foreach (var allocator in diceAllocators)
+            allocator?.SetAllInteractable(isInteractable);
     }
 
-    private void HandleSelectAttackClick()
+    // -------------------------------------------------------------------------
+    // API pública — exibição e atualização
+    // -------------------------------------------------------------------------
+
+    public void UpdateDiceAllocationStats(int mind, int heart, int body)
     {
-        SelectAttackClicked?.Invoke();
+        if (diceAllocationView == null)
+            diceAllocationView = FindObjectOfType<DiceAllocationView>();
+
+        diceAllocationView?.UpdateStatValueTexts(mind, heart, body);
     }
 
-    private void HandleSelectDefendClick()
+    /// <summary>
+    /// Atualiza o contador visível em uma linha específica de alocador.
+    /// </summary>
+    public void SetAllocatorCount(DiceStatType stat, DiceRollType rollType, int count)
     {
-        SelectDefendClicked?.Invoke();
-    }
-
-    private void HandleSkipTurnClick()
-    {
-        SkipTurnClicked?.Invoke();
-    }
-
-    private void HandleConfirmClick()
-    {
-        ConfirmClicked?.Invoke();
-    }
-
-    private void HandleItemsClick()
-    {
-        if (inventoryView != null)
-            inventoryView.Open();
-    }
-
-    private void HandleTricksClick()
-    {
-        if (trickInventoryView != null)
-        {
-            trickInventoryView.Open();
-        }
-        
-    }
-
-    private void HandleAddMindPowerDiceClick()
-    {
-        AddMindPowerDiceClicked?.Invoke(DiceStatType.Mind, DiceRollType.Power);
-    }
-
-    private void HandleAddHeartPowerDiceClick()
-    {
-        AddHeartPowerDiceClicked?.Invoke(DiceStatType.Heart, DiceRollType.Power);
-    }
-
-    private void HandleAddBodyPowerDiceClick()
-    {
-        AddBodyPowerDiceClicked?.Invoke(DiceStatType.Body, DiceRollType.Power);
-    }
-
-    private void HandleAddMindAccuracyDiceClick()
-    {
-        AddMindAccuracyDiceClicked?.Invoke(DiceStatType.Mind, DiceRollType.Accuracy);
-    }
-
-    private void HandleAddHeartAccuracyDiceClick()
-    {
-        AddHeartAccuracyDiceClicked?.Invoke(DiceStatType.Heart, DiceRollType.Accuracy);
-    }
-
-    private void HandleAddBodyAccuracyDiceClick()
-    {
-        AddBodyAccuracyDiceClicked?.Invoke(DiceStatType.Body, DiceRollType.Accuracy);
-    }
-
-    private void HandleRemoveMindPowerDiceClick()
-    {
-        RemoveMindPowerDiceClicked?.Invoke(DiceStatType.Mind, DiceRollType.Power);
-    }
-
-    private void HandleRemoveHeartPowerDiceClick()
-    {
-        RemoveHeartPowerDiceClicked?.Invoke(DiceStatType.Heart, DiceRollType.Power);
-    }
-
-    private void HandleRemoveBodyPowerDiceClick()
-    {
-        RemoveBodyPowerDiceClicked?.Invoke(DiceStatType.Body, DiceRollType.Power);
-    }
-
-    private void HandleRemoveMindAccuracyDiceClick()
-    {
-        RemoveMindAccuracyDiceClicked?.Invoke(DiceStatType.Mind, DiceRollType.Accuracy);
-    }
-
-    private void HandleRemoveHeartAccuracyDiceClick()
-    {
-        RemoveHeartAccuracyDiceClicked?.Invoke(DiceStatType.Heart, DiceRollType.Accuracy);
-    }
-
-    private void HandleRemoveBodyAccuracyDiceClick()
-    {
-        RemoveBodyAccuracyDiceClicked?.Invoke(DiceStatType.Body, DiceRollType.Accuracy);
-    }
-
-    private void HandleInfoToggleChanged(bool isEnabled)
-    {
-        InfoToggled?.Invoke(isEnabled);
+        FindAllocator(stat, rollType)?.SetCount(count);
     }
 
     public void SetPlayerRoleButtons(bool isPlayerAttacker)
@@ -535,10 +310,67 @@ public class ActionPanelView : MonoBehaviour
         }
 
         bool isAttack = action.Definition != null && action.Definition.Type == ActionType.Attack;
+
         if (SelectAttackButton != null)
-            SelectAttackButton.image.color = isAttack ? new Color(0.85f, 0.35f, 0.35f, 1f) : Color.white;
+            SelectAttackButton.image.color = isAttack
+                ? new Color(0.85f, 0.35f, 0.35f, 1f)
+                : Color.white;
 
         if (SelectDefendButton != null)
-            SelectDefendButton.image.color = isAttack ? Color.white : new Color(0.35f, 0.65f, 0.95f, 1f);
+            SelectDefendButton.image.color = isAttack
+                ? Color.white
+                : new Color(0.35f, 0.65f, 0.95f, 1f);
+    }
+
+    // -------------------------------------------------------------------------
+    // Handlers privados — botões de ação
+    // -------------------------------------------------------------------------
+
+    private void HandleSelectAttackClick()      => SelectAttackClicked?.Invoke();
+    private void HandleSelectDefendClick()      => SelectDefendClicked?.Invoke();
+    private void HandleSkipTurnClick()          => SkipTurnClicked?.Invoke();
+    private void HandleConfirmClick()           => ConfirmClicked?.Invoke();
+    private void HandleInfoClick() => SelectInfoButtonClicked?.Invoke();
+
+    private void HandleItemsClick()
+    {
+        inventoryView?.Open();
+    }
+
+    private void HandleTricksClick()
+    {
+        trickInventoryView?.Open();
+    }
+
+    // -------------------------------------------------------------------------
+    // Handlers privados — alocadores de dado
+    // -------------------------------------------------------------------------
+
+    // Bubbles o evento do componente filho para o evento público desta View,
+    // preservando o padrão View → InputHandler já estabelecido no projeto.
+    private void HandleAllocatorAddPressed(DiceStatType stat, DiceRollType roll)
+        => AddDiceClicked?.Invoke(stat, roll);
+
+    private void HandleAllocatorRemovePressed(DiceStatType stat, DiceRollType roll)
+        => RemoveDiceClicked?.Invoke(stat, roll);
+
+    // -------------------------------------------------------------------------
+    // Utilitário
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Retorna o alocador correspondente ao par (stat, rollType),
+    /// ou null se não encontrado.
+    /// </summary>
+    private DiceStatAllocatorUI FindAllocator(DiceStatType stat, DiceRollType rollType)
+    {
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator != null && allocator.StatType == stat && allocator.RollType == rollType)
+                return allocator;
+        }
+
+        Debug.LogWarning($"[ActionPanelView] Alocador não encontrado para {stat} + {rollType}.");
+        return null;
     }
 }
