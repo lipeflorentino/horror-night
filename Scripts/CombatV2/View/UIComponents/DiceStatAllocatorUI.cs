@@ -7,8 +7,8 @@ using UnityEngine.UI;
 /// Componente modular que representa uma linha de alocação de dados.
 /// Encapsula: Botão de Adicionar, Botão de Remover e Texto do Contador.
 ///
-/// Configure StatType e RollType no Inspector para identificar
-/// qual dado esta linha representa (ex: Mind + Power).
+/// Pode ser configurado via Inspector (StatType/RollType) ou em runtime
+/// via Initialize(stat, roll), que sobrescreve os valores serializados.
 ///
 /// Uso no ActionPanelView:
 ///   allocator.OnAddPressed  += handler.OnAddDice;
@@ -33,6 +33,12 @@ public class DiceStatAllocatorUI : MonoBehaviour
     [SerializeField] private Button removeButton;
     [SerializeField] private TMP_Text countText;
     [SerializeField] private TMP_Text statValueText;
+    [SerializeField] private TMP_Text statNameText;
+    [SerializeField] private Sprite mindIcon;
+    [SerializeField] private Sprite heartIcon;
+    [SerializeField] private Sprite bodyIcon;
+    [SerializeField] private Image statIconImage;
+
 
     // -------------------------------------------------------------------------
     // Eventos públicos
@@ -54,6 +60,26 @@ public class DiceStatAllocatorUI : MonoBehaviour
     // -------------------------------------------------------------------------
     // Ciclo de vida
     // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Configura a identidade do alocador em runtime, sobrescrevendo os valores do Inspector.
+    /// Deve ser chamado antes do Awake processar os listeners (i.e., logo após Instantiate).
+    /// </summary>
+    public void Initialize(DiceStatType stat, DiceRollType roll)
+    {
+        statType = stat;
+        rollType = roll;
+        
+        if (statNameText != null)
+            statNameText.text = stat.ToString();
+            
+        if (mindIcon != null && stat == DiceStatType.Mind)
+            statIconImage.sprite = mindIcon;
+        else if (heartIcon != null && stat == DiceStatType.Heart)
+            statIconImage.sprite = heartIcon;
+        else if (bodyIcon != null && stat == DiceStatType.Body)
+            statIconImage.sprite = bodyIcon;
+    }
 
     private void Awake()
     {
@@ -77,7 +103,10 @@ public class DiceStatAllocatorUI : MonoBehaviour
     // Handlers internos
     // -------------------------------------------------------------------------
 
-    private void HandleAddClick()    => OnAddPressed?.Invoke(statType, rollType);
+    private void HandleAddClick()
+    {
+        OnAddPressed?.Invoke(statType, rollType);   
+    }
     private void HandleRemoveClick() => OnRemovePressed?.Invoke(statType, rollType);
 
     // -------------------------------------------------------------------------
@@ -115,6 +144,6 @@ public class DiceStatAllocatorUI : MonoBehaviour
     public void SetStatValue(int value)
     {
         if (statValueText != null)
-            statValueText.text = value.ToString();
+            statValueText.text = "d" + value.ToString();
     }
 }

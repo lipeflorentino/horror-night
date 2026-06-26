@@ -5,6 +5,7 @@ using UnityEngine;
 public class CombatInputHandler : MonoBehaviour
 {
     private CombatManager Combat;
+    private DiceAllocationView diceAllocationView;
     private readonly List<DiceStatType> PowerDiceTypes = new();
     private readonly List<DiceStatType> AccuracyDiceTypes = new();
     private ActionType? SelectedAction = null;
@@ -13,7 +14,26 @@ public class CombatInputHandler : MonoBehaviour
     private DiceStatType SelectedPowerDiceType = DiceStatType.Body;
     private DiceStatType SelectedAccuracyDiceType = DiceStatType.Mind;
 
-    public event Action<bool> ConfirmAvailabilityChanged;
+    public void BindDiceAllocationView(DiceAllocationView view)
+    {
+        if (diceAllocationView != null)
+            diceAllocationView.ConfirmClicked -= OnConfirmAction;
+
+        diceAllocationView = view;
+
+        if (diceAllocationView != null)
+        {
+            diceAllocationView.ConfirmClicked += OnConfirmAction;
+            diceAllocationView.SetConfirmInteractable(false);
+            diceAllocationView.HideAllocationPanel();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (diceAllocationView != null)
+            diceAllocationView.ConfirmClicked -= OnConfirmAction;
+    }
 
     public void Init(CombatManager cm)
     {
@@ -29,7 +49,7 @@ public class CombatInputHandler : MonoBehaviour
     {
         RefreshSelectionPreview();
         RefreshDiceButtons();
-        NotifyConfirmAvailability();
+        UpdateConfirmAvailability();
     }
 
     public void SetAllowedAction(ActionType allowedAction)
@@ -40,11 +60,12 @@ public class CombatInputHandler : MonoBehaviour
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
         SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
-        Combat.View.ActionPanel.HideConfirmPanel();
+        diceAllocationView.HideAllocationPanel();
+
         RefreshSelectionPreview();
         RefreshDiceButtons();
         UpdateCombatView();
-        NotifyConfirmAvailability();
+        UpdateConfirmAvailability();
     }
 
     public void OnSelectAttack()
@@ -57,8 +78,8 @@ public class CombatInputHandler : MonoBehaviour
         }
 
         SelectedAction = ActionType.Attack;
-        Combat.View.ActionPanel.ShowConfirmPanel("Attack");
-        NotifyConfirmAvailability();
+        diceAllocationView.ShowAllocationPanel("Attack");
+        UpdateConfirmAvailability();
     }
 
     public void OnSelectDefend()
@@ -71,8 +92,8 @@ public class CombatInputHandler : MonoBehaviour
         }
 
         SelectedAction = ActionType.Defense;
-        Combat.View.ActionPanel.ShowConfirmPanel("Defense");
-        NotifyConfirmAvailability();
+        diceAllocationView.ShowAllocationPanel("Defense");
+        UpdateConfirmAvailability();
     }
 
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
@@ -95,7 +116,7 @@ public class CombatInputHandler : MonoBehaviour
         RefreshSelectionPreview();
         UpdateCombatView();
         RefreshDiceButtons();
-        NotifyConfirmAvailability();
+        UpdateConfirmAvailability();
     }
 
     public void OnRemoveDice(DiceStatType diceStatType, DiceRollType diceRollType)
@@ -115,7 +136,7 @@ public class CombatInputHandler : MonoBehaviour
         RefreshSelectionPreview();
         UpdateCombatView();
         RefreshDiceButtons();
-        NotifyConfirmAvailability();
+        UpdateConfirmAvailability();
     }
 
     public void OnConfirmAction()
@@ -136,8 +157,8 @@ public class CombatInputHandler : MonoBehaviour
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerInput(SelectedAction.Value, new List<DiceStatType>(PowerDiceTypes), new List<DiceStatType>(AccuracyDiceTypes));
         SelectedAction = null;
-        Combat.View.ActionPanel.HideConfirmPanel();
-        NotifyConfirmAvailability();
+        diceAllocationView.HideAllocationPanel();
+        UpdateConfirmAvailability();
     }
 
     public void OnSkipTurn()
@@ -148,30 +169,30 @@ public class CombatInputHandler : MonoBehaviour
         SelectedAction = null;
         PowerDiceTypes.Clear();
         AccuracyDiceTypes.Clear();
-        Combat.View.ActionPanel.HideConfirmPanel();
+        diceAllocationView.HideAllocationPanel();
         RefreshSelectionPreview();
 
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerSkipTurn();
         RefreshDiceButtons();
-        NotifyConfirmAvailability();
+        UpdateConfirmAvailability();
     }
 
-    public void OnToggleInfoPanel()
+    public void OnSelectInfoPanel()
     {
         Combat.View.SetInfoPanelVisible();
     }
 
-    private void NotifyConfirmAvailability()
+    private void UpdateConfirmAvailability()
     {
         bool hasValidDiceAllocation = PowerDiceTypes.Count + AccuracyDiceTypes.Count > 0;
         bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null && hasValidDiceAllocation;
-        ConfirmAvailabilityChanged?.Invoke(isAvailable);
+        diceAllocationView.SetConfirmInteractable(isAvailable);
     }
 
     private void RefreshDiceButtons()
     {
-        if (Combat.View.ActionPanel == null)
+        if (Combat.View.DiceAllocationView == null)
             return;
 
         bool canAllocate = !IsWaitingTurnResolution;
@@ -181,29 +202,32 @@ public class CombatInputHandler : MonoBehaviour
 
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
-            Combat.View.ActionPanel.SetAddDiceButtonInteractable(
+            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
                 DiceRollType.Power,
                 canAllocate && remainingPower > 0 && CanUseDiceType(stat)
             );
 
-            Combat.View.ActionPanel.SetAddDiceButtonInteractable(
+            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
                 DiceRollType.Accuracy,
                 canAllocate && remainingAccuracy > 0 && CanUseDiceType(stat)
             );
             
-            Combat.View.ActionPanel.SetRemoveDiceButtonInteractable(
+            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(
                 stat,
                 DiceRollType.Power,
                 PowerDiceTypes.Contains(stat)
             );
 
-            Combat.View.ActionPanel.SetRemoveDiceButtonInteractable(
+            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(
                 stat,
                 DiceRollType.Accuracy,
                 AccuracyDiceTypes.Contains(stat)
             );
+
+            Combat.View.DiceAllocationView.SetAllocatorCount(stat, DiceRollType.Power, PowerDiceTypes.FindAll(x => x == stat).Count);
+            Combat.View.DiceAllocationView.SetAllocatorCount(stat, DiceRollType.Accuracy, AccuracyDiceTypes.FindAll(x => x == stat).Count);
         }
     }
 
@@ -230,10 +254,10 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshSelectionPreview()
     {
-        if (Combat == null || Combat.View == null || Combat.View.ActionPanel  == null)
+        if (Combat == null || Combat.View == null || Combat.View.DiceAllocationView  == null)
             return;
 
-        Combat.View.ActionPanel.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
+        Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
         List<int> powerFaces = GetDiceFacesForSelection(PowerDiceTypes, false);
         List<int> accuracyFaces = GetDiceFacesForSelection(AccuracyDiceTypes, false);
@@ -246,7 +270,7 @@ public class CombatInputHandler : MonoBehaviour
         (int lowMax, int mediumMax, int highMin) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
         (int lowMax, int mediumMax, int highMin) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
-        Combat.View.ActionPanel.UpdateSelectionPreview(
+        Combat.View.DiceAllocationView.UpdateSelectionPreview(
             Combat.GetEffectivePlayerActionPower(),
             PowerDiceTypes,
             powerFaces,

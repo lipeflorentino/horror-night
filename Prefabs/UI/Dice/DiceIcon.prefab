@@ -225,3 +225,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iconImage: {fileID: 1630943867277935583}
   facesText: {fileID: 3229741269644017917}
+  mindDiceIcon: {fileID: -1571396919, guid: 3ba77c6aff93bb3498af07afe3000272, type: 3}
+  heartDiceIcon: {fileID: 450645594, guid: 3ba77c6aff93bb3498af07afe3000272, type: 3}
+  bodyDiceIcon: {fileID: 638481977, guid: 3ba77c6aff93bb3498af07afe3000272, type: 3}

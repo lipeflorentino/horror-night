@@ -9,6 +9,7 @@ public class CombatView : MonoBehaviour
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
     public DicePanelView DicePanelView;
+    public DiceAllocationView DiceAllocationView;
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
     public CombatLogView CombatLogView;
@@ -42,6 +43,7 @@ public class CombatView : MonoBehaviour
         ActionPanel = FindObjectOfType<ActionPanelView>();
         FeedbackView = FindObjectOfType<FeedbackView>();
         DicePanelView = FindObjectOfType<DicePanelView>();
+        DiceAllocationView = FindObjectOfType<DiceAllocationView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
         CombatLogView = FindObjectOfType<CombatLogView>();
@@ -55,6 +57,7 @@ public class CombatView : MonoBehaviour
     public void BindInput(CombatInputHandler inputHandler)
     {
         ActionPanel.BindInput(inputHandler);
+        DiceAllocationView.BindInput(inputHandler);
     }
 
     public void UpdateView(Battler player, Battler enemy)

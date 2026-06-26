@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DiceAllocationView : MonoBehaviour
 {
@@ -9,19 +11,151 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private RectTransform powerDiceContainer;
     [SerializeField] private RectTransform accuracyDiceContainer;
     [SerializeField] private DiceAllocationItemUI allocationItemPrefab;
-    [SerializeField] private Sprite mindDiceIcon;
-    [SerializeField] private Sprite heartDiceIcon;
-    [SerializeField] private Sprite bodyDiceIcon;
     [SerializeField] private TMP_Text diceTiersText;
     [SerializeField] private TMP_Text resultPanelText;
     
-    [Header("Stat Values")]
-    [SerializeField] private TMP_Text mindPowerValueText; 
-    [SerializeField] private TMP_Text mindAccuracyValueText;
-    [SerializeField] private TMP_Text heartPowerValueText; 
-    [SerializeField] private TMP_Text heartAccuracyValueText;
-    [SerializeField] private TMP_Text bodyPowerValueText; 
-    [SerializeField] private TMP_Text bodyAccuracyValueText;
+    [Header("Painel de Alocação")]
+    [SerializeField] private GameObject allocationPanel;
+    [SerializeField] private TMP_Text allocationActionText;
+    [SerializeField] private Button confirmButton;
+    [SerializeField] private Button closeButton;
+
+    [Header("Alocadores de Dado — gerados em runtime (Mind/Heart/Body × Power/Accuracy)")]
+    [SerializeField] private RectTransform accuracyAllocatorsContainer; 
+    [SerializeField] private RectTransform powerAllocatorsContainer;
+    [SerializeField] private DiceStatAllocatorUI allocatorPrefab;
+
+    private DiceStatAllocatorUI[] diceAllocators;
+
+    public event Action<DiceStatType, DiceRollType> AddDiceClicked;
+    public event Action<DiceStatType, DiceRollType> RemoveDiceClicked;
+     private CombatInputHandler boundInputHandler;
+
+    public event Action ConfirmClicked;
+
+    private void Awake()
+    {
+        InstantiateAllocators();
+
+        if (confirmButton != null)
+            confirmButton.onClick.AddListener(HandleConfirmClick);
+
+        if (closeButton != null)
+            closeButton.onClick.AddListener(() => HideAllocationPanel());
+
+        HideAllocationPanel();
+    }
+
+    private void OnDestroy()
+    {
+        if (confirmButton != null)
+            confirmButton.onClick.RemoveListener(HandleConfirmClick);
+
+        if (closeButton != null)
+            closeButton.onClick.RemoveAllListeners();
+
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator == null) continue;
+            allocator.OnAddPressed    -= HandleAllocatorAddPressed;
+            allocator.OnRemovePressed -= HandleAllocatorRemovePressed;
+        }
+    }
+
+    private void InstantiateAllocators()
+    {
+        if (allocatorPrefab == null || accuracyAllocatorsContainer == null || powerAllocatorsContainer == null)
+        {
+            Debug.LogError("[DiceAllocationView] allocatorPrefab ou allocatorsContainer não atribuídos.");
+            diceAllocators = Array.Empty<DiceStatAllocatorUI>();
+            return;
+        }
+
+        var combinations = new (DiceStatType stat, DiceRollType roll)[]
+        {
+            (DiceStatType.Mind,  DiceRollType.Power),
+            (DiceStatType.Mind,  DiceRollType.Accuracy),
+            (DiceStatType.Heart, DiceRollType.Power),
+            (DiceStatType.Heart, DiceRollType.Accuracy),
+            (DiceStatType.Body,  DiceRollType.Power),
+            (DiceStatType.Body,  DiceRollType.Accuracy),
+        };
+
+        diceAllocators = new DiceStatAllocatorUI[combinations.Length];
+
+        for (int i = 0; i < combinations.Length; i++)
+        {
+            if (combinations[i].roll == DiceRollType.Power)
+            {
+                DiceStatAllocatorUI powerAllocator = Instantiate(allocatorPrefab, powerAllocatorsContainer);
+                powerAllocator.Initialize(combinations[i].stat, combinations[i].roll);
+                powerAllocator.OnAddPressed    += HandleAllocatorAddPressed;
+                powerAllocator.OnRemovePressed += HandleAllocatorRemovePressed;
+
+                diceAllocators[i] = powerAllocator;
+            }  
+            else
+            {
+                DiceStatAllocatorUI accuracyAllocator = Instantiate(allocatorPrefab, accuracyAllocatorsContainer);
+                accuracyAllocator.Initialize(combinations[i].stat, combinations[i].roll);
+                accuracyAllocator.OnAddPressed    += HandleAllocatorAddPressed;
+                accuracyAllocator.OnRemovePressed += HandleAllocatorRemovePressed;
+
+                diceAllocators[i] = accuracyAllocator;
+            }
+        }
+    }
+
+    public void BindInput(CombatInputHandler inputHandler)
+    {
+        inputHandler.BindDiceAllocationView(this);
+
+        if (boundInputHandler != null)
+        {
+            AddDiceClicked          -= boundInputHandler.OnAddDice;
+            RemoveDiceClicked       -= boundInputHandler.OnRemoveDice;
+        }
+
+        boundInputHandler = inputHandler;
+        
+        AddDiceClicked          += inputHandler.OnAddDice;
+        RemoveDiceClicked       += inputHandler.OnRemoveDice;
+    }
+
+    // -------------------------------------------------------------------------
+    // API pública — Painel de Alocação
+    // -------------------------------------------------------------------------
+
+    public void ShowAllocationPanel(string actionLabel)
+    {
+        if (allocationPanel != null)
+            allocationPanel.SetActive(true);
+
+        if (allocationActionText != null)
+            allocationActionText.text = actionLabel;
+    }
+
+    public void HideAllocationPanel()
+    {
+        if (allocationPanel != null)
+            allocationPanel.SetActive(false);
+    }
+
+    public void SetConfirmInteractable(bool isInteractable)
+    {
+        if (confirmButton != null)
+            confirmButton.interactable = isInteractable;
+    }
+
+    // -------------------------------------------------------------------------
+    // Handler privado
+    // -------------------------------------------------------------------------
+
+    private void HandleConfirmClick() => ConfirmClicked?.Invoke();
+
+    // -------------------------------------------------------------------------
+    // API pública — Preview
+    // -------------------------------------------------------------------------
 
     public void UpdateSelectionPreview(
         int actionPower,
@@ -39,25 +173,30 @@ public class DiceAllocationView : MonoBehaviour
         UpdateResultPanel(actionPower, aggregatedPowerFaces, powerTierBoundaries, accuracyTierBoundaries);
     }
 
-    public void UpdateStatValueTexts(int mind, int heart, int body)
+    
+
+    // -------------------------------------------------------------------------
+    // API pública — exibição e atualização
+    // -------------------------------------------------------------------------
+
+    public void UpdateDiceAllocationStats(int mind, int heart, int body)
     {
-        if (mindPowerValueText != null)
-            mindPowerValueText.text = $"{mind}";
-
-        if (mindAccuracyValueText != null)
-            mindAccuracyValueText.text = $"{mind}";
-
-        if (heartPowerValueText != null)
-            heartPowerValueText.text = $"{heart}";
-
-        if (heartAccuracyValueText != null)
-            heartAccuracyValueText.text = $"{heart}";
-
-        if (bodyPowerValueText != null)
-            bodyPowerValueText.text = $"{body}";
-
-        if (bodyAccuracyValueText != null)
-            bodyAccuracyValueText.text = $"{body}";
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator == null) continue;
+            if (allocator.StatType == DiceStatType.Mind)
+            {
+                allocator.SetStatValue(mind);
+            }
+            else if (allocator.StatType == DiceStatType.Heart)
+            {
+                allocator.SetStatValue(heart);
+            }
+            else if (allocator.StatType == DiceStatType.Body)
+            {
+                allocator.SetStatValue(body);
+            }
+        }
     }
 
     private void RebuildAllocationContainer(RectTransform container, IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
@@ -75,19 +214,38 @@ public class DiceAllocationView : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             DiceAllocationItemUI item = Instantiate(allocationItemPrefab, container);
-            item.Bind(GetIcon(types[i]), faces[i]);
+            item.Bind(types[i], faces[i]);
         }
     }
 
-    private Sprite GetIcon(DiceStatType type)
+    // -------------------------------------------------------------------------
+    // API pública — controle de interatividade
+    // -------------------------------------------------------------------------
+
+    public void SetAddDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
     {
-        return type switch
-        {
-            DiceStatType.Mind => mindDiceIcon,
-            DiceStatType.Heart => heartDiceIcon,
-            DiceStatType.Body => bodyDiceIcon,
-            _ => null
-        };
+        var allocator = FindAllocator(stat, rollType);
+        allocator.SetAddInteractable(isInteractable);
+    }
+
+    public void SetRemoveDiceButtonInteractable(DiceStatType stat, DiceRollType rollType, bool isInteractable)
+    {
+        var allocator = FindAllocator(stat, rollType);
+        allocator.SetRemoveInteractable(isInteractable);
+    }
+
+    public void SetAllAllocatorButtonsInteractable(bool isInteractable)
+    {
+        foreach (var allocator in diceAllocators)
+            allocator.SetAllInteractable(isInteractable);
+    }
+
+    /// <summary>
+    /// Atualiza o contador visível em uma linha específica de alocador.
+    /// </summary>
+    public void SetAllocatorCount(DiceStatType stat, DiceRollType rollType, int count)
+    {
+        FindAllocator(stat, rollType).SetCount(count);
     }
 
     private void UpdateDiceTiersLabel(
@@ -162,7 +320,10 @@ public class DiceAllocationView : MonoBehaviour
     private int SumMin(IReadOnlyList<int> faces)
     {
         if (faces == null || faces.Count == 0) return 0;
-        return 1;
+        int minValue = int.MaxValue;
+        for (int i = 0; i < faces.Count; i++)
+            minValue = Mathf.Min(minValue, Mathf.Max(1, faces[i]));
+        return minValue;
     }
 
     private int SumMax(IReadOnlyList<int> faces)
@@ -172,5 +333,37 @@ public class DiceAllocationView : MonoBehaviour
         for (int i = 0; i < faces.Count; i++)
             maxValue = Mathf.Max(maxValue, Mathf.Max(1, faces[i]));
         return maxValue;
+    }
+
+    // -------------------------------------------------------------------------
+    // Handlers privados — alocadores de dado
+    // -------------------------------------------------------------------------
+
+    // Bubbles o evento do componente filho para o evento público desta View,
+    // preservando o padrão View → InputHandler já estabelecido no projeto.
+    private void HandleAllocatorAddPressed(DiceStatType stat, DiceRollType roll)
+        => AddDiceClicked?.Invoke(stat, roll);
+
+    private void HandleAllocatorRemovePressed(DiceStatType stat, DiceRollType roll)
+        => RemoveDiceClicked?.Invoke(stat, roll);
+
+    // -------------------------------------------------------------------------
+    // Utilitário
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Retorna o alocador correspondente ao par (stat, rollType),
+    /// ou null se não encontrado.
+    /// </summary>
+    private DiceStatAllocatorUI FindAllocator(DiceStatType stat, DiceRollType rollType)
+    {
+        foreach (var allocator in diceAllocators)
+        {
+            if (allocator != null && allocator.StatType == stat && allocator.RollType == rollType)
+                return allocator;
+        }
+
+        Debug.LogWarning($"[ActionPanelView] Alocador não encontrado para {stat} + {rollType}.");
+        return null;
     }
 }
