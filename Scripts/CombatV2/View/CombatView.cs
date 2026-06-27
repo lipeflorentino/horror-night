@@ -8,7 +8,7 @@ public class CombatView : MonoBehaviour
     public BattlerPanelView EnemyPanel;
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
-    public DicePanelView DicePanelView;
+    public DiceRollView DiceRollView;
     public DiceAllocationView DiceAllocationView;
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
@@ -42,15 +42,14 @@ public class CombatView : MonoBehaviour
 
         ActionPanel = FindObjectOfType<ActionPanelView>();
         FeedbackView = FindObjectOfType<FeedbackView>();
-        DicePanelView = FindObjectOfType<DicePanelView>();
+        DiceRollView = FindObjectOfType<DiceRollView>();
         DiceAllocationView = FindObjectOfType<DiceAllocationView>();
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
         CombatLogView = FindObjectOfType<CombatLogView>();
         ActiveTricksView = FindObjectOfType<ActiveTricksView>();
             
-        DicePanelView.HidePanel();
-        InfoPanelView.Init();
+        DiceRollView.HidePanel();
         ActiveTricksView.Init(combatManager);
     }
 
@@ -83,10 +82,10 @@ public class CombatView : MonoBehaviour
         IReadOnlyList<DiceResult> enemyRolls,
         DiceRollType rollType)
     {
-        if (DicePanelView  == null)
+        if (DiceRollView  == null)
             yield break;
 
-        yield return DicePanelView.PlayDiceResolution(playerRolls, enemyRolls, rollType);
+        yield return DiceRollView.PlayDiceResolution(playerRolls, enemyRolls, rollType);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

@@ -168,7 +168,6 @@ public class CombatManager : MonoBehaviour
 
     public void RefreshCombatUI()
     {
-        Logger.Log("Refreshing Combat UI...");
         View.UpdateView(Player, Enemy);
         Input.RefreshDiceAllocationUI();
     }

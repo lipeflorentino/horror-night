@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class DicePanelView : MonoBehaviour
+public class DiceRollView : MonoBehaviour
 {
     [Header("Dynamic Dice Slots")]
     [SerializeField] private DiceRollUI diceRollSlotPrefab;

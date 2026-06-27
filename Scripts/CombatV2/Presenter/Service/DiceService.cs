@@ -294,13 +294,13 @@ public class DiceService
         return thresholds;
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int focus = 0, int strength = 0)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int focus = 0, int strength = 0)
     {
         CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
         return GetTierBoundaries(context);
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetTierBoundaries(CombatRollContext context)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(CombatRollContext context)
     {
         int safeMaxValue = Math.Max(1, context.MaxValue);
         ThresholdPair thresholds = GetThresholds(context.WithRoll(context.RollType, context.StatType, safeMaxValue));
@@ -332,6 +332,6 @@ public class DiceService
         if (mediumMax < lowMax)
             mediumMax = lowMax;
 
-        return (lowMax, mediumMax, highMin);
+        return (lowMax, mediumMax, highMin, safeMaxValue);
     }
 }

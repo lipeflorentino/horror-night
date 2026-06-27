@@ -25,6 +25,10 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private RectTransform powerAllocatorsContainer;
     [SerializeField] private DiceStatAllocatorUI allocatorPrefab;
 
+    [Header("Barra de níveis de rolagem")]
+    [SerializeField] private DiceTierBarUI accuracyTierBar;
+    [SerializeField] private DiceTierBarUI powerTierBar;
+
     private DiceStatAllocatorUI[] diceAllocators;
 
     public event Action<DiceStatType, DiceRollType> AddDiceClicked;
@@ -164,8 +168,8 @@ public class DiceAllocationView : MonoBehaviour
         IReadOnlyList<int> aggregatedPowerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
-        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
-        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
+        (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
     {
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
@@ -249,32 +253,28 @@ public class DiceAllocationView : MonoBehaviour
     }
 
     private void UpdateDiceTiersLabel(
-        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
-        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
+        (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
     {
-        if (diceTiersText == null)
-            return;
+        powerTierBar.SetBoundaries(
+            powerTierBoundaries.lowMax,
+            powerTierBoundaries.mediumMax,
+            powerTierBoundaries.highMin,
+            powerTierBoundaries.maxValue);
+            
 
-        string powerLow = powerTierBoundaries.lowMax > 0 ? $"1-{powerTierBoundaries.lowMax}" : "-";
-        string powerMedium = powerTierBoundaries.mediumMax > powerTierBoundaries.lowMax
-            ? $"{powerTierBoundaries.lowMax + 1}-{powerTierBoundaries.mediumMax}"
-            : "-";
-        string powerHigh = powerTierBoundaries.highMin > 0 ? $"{powerTierBoundaries.highMin}+" : "-";
-
-        string accuracyLow = accuracyTierBoundaries.lowMax > 0 ? $"1-{accuracyTierBoundaries.lowMax}" : "-";
-        string accuracyMedium = accuracyTierBoundaries.mediumMax > accuracyTierBoundaries.lowMax
-            ? $"{accuracyTierBoundaries.lowMax + 1}-{accuracyTierBoundaries.mediumMax}"
-            : "-";
-        string accuracyHigh = accuracyTierBoundaries.highMin > 0 ? $"{accuracyTierBoundaries.highMin}+" : "-";
-
-        diceTiersText.text = $"Power L({powerLow}) M({powerMedium}) H({powerHigh})\nAccuracy L({accuracyLow}) M({accuracyMedium}) H({accuracyHigh})";
+        accuracyTierBar.SetBoundaries(
+            accuracyTierBoundaries.lowMax,
+            accuracyTierBoundaries.mediumMax,
+            accuracyTierBoundaries.highMin,
+            accuracyTierBoundaries.maxValue);
     }
 
     private void UpdateResultPanel(
         int actionPower,
         IReadOnlyList<int> aggregatedPowerFaces,
-        (int lowMax, int mediumMax, int highMin) powerTierBoundaries,
-        (int lowMax, int mediumMax, int highMin) accuracyTierBoundaries)
+        (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
     {
         if (resultPanelText == null)
             return;
@@ -296,7 +296,7 @@ public class DiceAllocationView : MonoBehaviour
         resultPanelText.text = sb.ToString();
     }
 
-    private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin) boundaries)
+    private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)
     {
         if (value <= boundaries.lowMax)
             return DiceTier.Low;

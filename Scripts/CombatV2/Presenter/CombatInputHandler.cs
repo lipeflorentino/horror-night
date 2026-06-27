@@ -267,8 +267,8 @@ public class CombatInputHandler : MonoBehaviour
         
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
-        (int lowMax, int mediumMax, int highMin) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
-        (int lowMax, int mediumMax, int highMin) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
+        (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
         Combat.View.DiceAllocationView.UpdateSelectionPreview(
             Combat.GetEffectivePlayerActionPower(),
@@ -355,7 +355,7 @@ public class CombatInputHandler : MonoBehaviour
         return isAggregated ? Combat.GetDiceService().ConvertToAggregatedFaces(Combat.Player, diceTypes) : Combat.GetDiceService().ConvertToFaces(Combat.Player, diceTypes);
     }
 
-    public (int lowMax, int mediumMax, int highMin) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
         CombatRollContext context = Combat.BuildPlayerRollContext(maxValue, statType, rollType);
         return Combat.GetDiceService().GetTierBoundaries(context);
