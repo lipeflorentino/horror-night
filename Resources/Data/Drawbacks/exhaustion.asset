@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a425e133546695548841118226922a4e, type: 3}
+  m_Name: exhaustion
+  m_EditorClassIdentifier: 
+  Id: exhaustion
+  DisplayName: Exhaustion
+  Description: "Voc\xEA se sente exausto e sua for\xE7a mental, emocional e fisica
+    \xE9 reduzida em 4."
+  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
+  DurationTurns: -1
+  PerkIds:
+  - exhaustion_strength
+  - exhaustion_body
+  - exhaustion_heart
+  - exhaustion_mind
+  FlavorText: "O cansa\xE7o \xE9 um fardo pesado de carregar."

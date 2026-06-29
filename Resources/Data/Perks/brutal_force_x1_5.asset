@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: brutal_force_x1_5
   m_EditorClassIdentifier: 
   Id: brutal_force_x1_5
-  IsPermanentIdentity: 0
   DefaultDurationTurns: -1
   MaxStacks: 1
   StackMode: 0
-  Tags: identity;body
+  Tags: 
   Rules:
-  - Trigger: 1
-    ModifierTarget: 2
+  - Trigger: 3
+    ModifierTarget: 5
     Operation: 2
     OwnerRole: 0
     ActionType: 0

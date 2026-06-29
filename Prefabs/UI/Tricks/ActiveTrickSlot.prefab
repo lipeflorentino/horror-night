@@ -169,7 +169,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.8, y: -52.2}
+  m_AnchoredPosition: {x: 22, y: -30}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4017911164430572588
@@ -307,7 +307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   icon: {fileID: 5308060385825111399}
-  costText: {fileID: 0}
+  inputKeyText: {fileID: 0}
   rarityBorder: {fileID: 0}
   releaseButton: {fileID: 2454889617426283868}
   tooltipPrefab: {fileID: 2954958933267147499, guid: 68b0103cd3d37a242a8819fff8766372, type: 3}

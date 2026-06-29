@@ -7,6 +7,7 @@ public class CombatLogView : MonoBehaviour
     [Header("References")]
     [SerializeField] private RectTransform contentRoot;
     [SerializeField] private CombatLogItemUI logItemPrefab;
+    [SerializeField] private GameObject panelRoot;
 
     [Header("Icons")]
     [SerializeField] private Sprite attackPowerIcon;
@@ -25,10 +26,11 @@ public class CombatLogView : MonoBehaviour
     [SerializeField, Min(0.01f)] private float slideDuration = 0.2f;
     [SerializeField] private float slideDistance = 40f;
 
-    private readonly Queue<CombatLogItemUI> _activeLogs = new();
+    private readonly Queue<CombatLogItemUI> activeLogs = new();
 
     public void ShowFromResult(ActionResolutionResult result)
     {
+        panelRoot.SetActive(true);
         TryShowLog(result.AttackPowerLogText, attackPowerIcon, attackColor);
         TryShowLog(result.DefensePowerLogText, defensePowerIcon, defenseColor);
         TryShowLog(result.AttackAccuracyLogText, attackAccuracyIcon, attackColor);
@@ -48,11 +50,11 @@ public class CombatLogView : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = item.gameObject.AddComponent<CanvasGroup>();
 
-        _activeLogs.Enqueue(item);
+        activeLogs.Enqueue(item);
 
-        if (_activeLogs.Count > maxLogs)
+        if (activeLogs.Count > maxLogs)
         {
-            CombatLogItemUI oldest = _activeLogs.Dequeue();
+            CombatLogItemUI oldest = activeLogs.Dequeue();
             if (oldest != null)
                 Destroy(oldest.gameObject);
         }
@@ -110,19 +112,20 @@ public class CombatLogView : MonoBehaviour
             return;
 
         bool removed = false;
-        int count = _activeLogs.Count;
+        int count = activeLogs.Count;
         for (int i = 0; i < count; i++)
         {
-            CombatLogItemUI current = _activeLogs.Dequeue();
+            CombatLogItemUI current = activeLogs.Dequeue();
             if (!removed && current == item)
             {
                 removed = true;
                 continue;
             }
 
-            _activeLogs.Enqueue(current);
+            activeLogs.Enqueue(current);
         }
 
         Destroy(item.gameObject);
+        panelRoot.SetActive(false);
     }
 }

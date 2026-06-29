@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: six_feet_under
   m_EditorClassIdentifier: 
   Id: six_feet_under
-  IsPermanentIdentity: 0
   DefaultDurationTurns: -1
   MaxStacks: 1
   StackMode: 0
-  Tags: permanent;power;attack
+  Tags: 
   Rules:
-  - Trigger: 2
-    ModifierTarget: 3
+  - Trigger: 4
+    ModifierTarget: 6
     Operation: 1
     OwnerRole: 0
     ActionType: 0

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: live_instinct
   DisplayName: Instinto Vivo
-  Description: Ao rolar heart adiciona 1 dado extra.
+  Description: "Adiciona 1 dado extra sempre que voc\xEA realizar uma rolagem com
+    dados de Heart."
   Icon: {fileID: 0}
   Level: 1
   MindCost: 0
@@ -23,11 +24,12 @@ MonoBehaviour:
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
+  ActivationMode: 0
   PerkIds:
   - live_instinct
-  ActivationMode: 0
+  DrawbackIds: []
   Rarity: 0
   Tags:
   - identity
   - heart
-  FlavorText: "O cora\xE7\xE3o acelerado traz rea\xE7\xF5es instintivas e impulsivas."
+  FlavorText: "O cora\xE7\xE3o dita o ritmo da sobreviv\xEAncia."

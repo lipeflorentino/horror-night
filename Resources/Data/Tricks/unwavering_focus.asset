@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab22c90c89400c74c990f72e53088905, type: 3}
+  m_Name: unwavering_focus
+  m_EditorClassIdentifier: 
+  Id: unwavering_focus
+  DisplayName: "Foco Inabal\xE1vel"
+  Description: "Na sua a\xE7\xE3o de Defesa, cada ataque bloqueado adiciona +3 de
+    Focus no pr\xF3ximo turno."
+  Icon: {fileID: 0}
+  Level: 2
+  MindCost: 1
+  BodyCost: 0
+  HeartCost: 1
+  TimingTurns: 1
+  DurationTurns: 1
+  CooldownTurns: 4
+  ActivationMode: 0
+  PerkIds:
+  - unwavering_focus
+  DrawbackIds: []
+  Rarity: 1
+  Tags:
+  - defense
+  - focus
+  FlavorText: Olhos fixos no oponente antecipando cada golpe.

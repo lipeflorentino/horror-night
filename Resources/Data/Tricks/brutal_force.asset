@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: brutal_force
   DisplayName: "For\xE7a Brutal"
-  Description: High power de body vale x2 e medium power vale x1.5.
+  Description: "Modifica seus testes de Poder com dados de Body: resultados de n\xEDvel
+    Alto causam dano dobrado (x2) e resultados de n\xEDvel M\xE9dio aumentam o dano
+    em (x1.5)."
   Icon: {fileID: 21300000, guid: b3d9803ff6299304ba5b4717d4fb72df, type: 3}
   Level: 1
   MindCost: 0
@@ -23,10 +25,11 @@ MonoBehaviour:
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
+  ActivationMode: 0
   PerkIds:
   - brutal_force_x2
   - brutal_force_x1_5
-  ActivationMode: 0
+  DrawbackIds: []
   Rarity: 0
   Tags:
   - identity

@@ -9,12 +9,6 @@ public class CombatLogItemUI : MonoBehaviour
 
     public void Bind(Sprite sprite, string logText, Color textColor)
     {
-        if (icon != null)
-        {
-            icon.enabled = sprite != null;
-            icon.sprite = sprite;
-        }
-
         if (text != null)
         {
             text.text = logText;

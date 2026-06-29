@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: equal_share
   DisplayName: "Divis\xE3o Igualit\xE1ria"
-  Description: "Se a soma dos dados for igual a soma dos dados do atacante o dano
-    ser\xE1 dividido pelos combatentes envolvidos."
+  Description: "Se a soma dos seus dados for igual \xE0 soma dos dados do atacante,
+    o dano total do confronto \xE9 dividido igualmente entre todos os combatentes
+    envolvidos."
   Icon: {fileID: 21300000, guid: b186a421c840be74da21940d73bcd7e5, type: 3}
   Level: 2
   MindCost: 1
@@ -24,12 +25,13 @@ MonoBehaviour:
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
+  ActivationMode: 0
   PerkIds:
   - equal_share
-  ActivationMode: 0
+  DrawbackIds: []
   Rarity: 2
   Tags:
   - permanent
-  - equal_share
+  - damage
   - defense
-  FlavorText: Equilibrio perfeito entre defesa e ofensa.
+  FlavorText: "A dor compartilhada \xE9 a \xFAnica justi\xE7a."

@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: equal_share
   m_EditorClassIdentifier: 
   Id: equal_share
-  IsPermanentIdentity: 0
   DefaultDurationTurns: -1
   MaxStacks: 1
   StackMode: 0
-  Tags: permanent;defense
+  Tags: 
   Rules:
-  - Trigger: 2
-    ModifierTarget: 3
+  - Trigger: 4
+    ModifierTarget: 6
     Operation: 1
     OwnerRole: 0
     ActionType: 1
@@ -31,6 +30,6 @@ MonoBehaviour:
     FilterByStatType: 0
     Tier: 0
     FilterByTier: 0
-    ConditionKey: 4
+    ConditionKey: 8
     ConditionValue: 
     Value: 0.5

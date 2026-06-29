@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: analytic_precision
   m_EditorClassIdentifier: 
   Id: analytic_precision
-  IsPermanentIdentity: 0
   DefaultDurationTurns: -1
   MaxStacks: 1
   StackMode: 0
-  Tags: identity;mind
+  Tags: 
   Rules:
   - Trigger: 0
     ModifierTarget: 0

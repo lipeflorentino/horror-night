@@ -13,14 +13,13 @@ MonoBehaviour:
   m_Name: live_instinct
   m_EditorClassIdentifier: 
   Id: live_instinct
-  IsPermanentIdentity: 0
   DefaultDurationTurns: -1
   MaxStacks: 1
   StackMode: 0
-  Tags: identity;heart
+  Tags: 
   Rules:
   - Trigger: 0
-    ModifierTarget: 1
+    ModifierTarget: 4
     Operation: 0
     OwnerRole: 0
     ActionType: 0

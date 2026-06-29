@@ -626,7 +626,7 @@ public class CombatManager : MonoBehaviour
     private ITrickInventory BuildPlayerTrickInventory(Battler owner)
     {   
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
-        TrickInventorySnapshot snapshot = SessionData != null ? SessionData.PlayerSnapshot.trickInventory : null;
+        TrickInventorySnapshot snapshot = SessionData?.PlayerSnapshot.trickInventory;
         TrickInventory trickInventory = new(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, PerkService);
 
         return trickInventory;

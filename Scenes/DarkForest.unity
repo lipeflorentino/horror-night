@@ -7514,11 +7514,6 @@ MonoBehaviour:
   mindHud:
     fillImage: {fileID: 6162320184280885047}
     valueText: {fileID: 6034745862005186359}
-  playerInventory: {fileID: 0}
-  trickInventorySnapshot:
-    learnedTrickIds: []
-    identityTrickIds: []
-    castedSlots: []
   attack: 12
   defense: 4
   initiative: 5
@@ -7540,6 +7535,15 @@ MonoBehaviour:
   currentMind: 10
   maxHp: 25
   currentHp: 25
+  playerInventory: {fileID: 0}
+  trickInventorySnapshot:
+    learnedTrickIds:
+    - vengence
+    - endurance
+    identityTrickIds:
+    - analytic_precision
+    - live_instinct
+    castedSlots: []
 --- !u!224 &1420438872995974988
 RectTransform:
   m_ObjectHideFlags: 0

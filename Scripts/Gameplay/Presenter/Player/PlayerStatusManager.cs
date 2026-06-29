@@ -17,8 +17,6 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private StatHudBinding heartHud;
     [SerializeField] private StatHudBinding bodyHud;
     [SerializeField] private StatHudBinding mindHud;
-    [SerializeField] private PlayerInventory playerInventory;
-    [SerializeField] private TrickInventorySnapshot trickInventorySnapshot = new();
 
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
@@ -50,6 +48,10 @@ public class PlayerStatusManager : MonoBehaviour
     [Header("HP")]
     [SerializeField] private float maxHp = 100f;
     [SerializeField] private float currentHp = 100f;
+    
+    [Header("Inventory")]
+    [SerializeField] private PlayerInventory playerInventory;
+    [SerializeField] private TrickInventorySnapshot trickInventorySnapshot = new();
 
     private void Awake()
     {

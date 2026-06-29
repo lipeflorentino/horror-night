@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab22c90c89400c74c990f72e53088905, type: 3}
+  m_Name: adrenaline_surge
+  m_EditorClassIdentifier: 
+  Id: adrenaline_surge
+  DisplayName: Golpe de Adrenalina
+  Description: "Se o teste de Precis\xE3o com dados de Body for n\xEDvel Alto, voc\xEA
+    ganha +2 dados de Poder para o ataque."
+  Icon: {fileID: 0}
+  Level: 2
+  MindCost: 0
+  BodyCost: 3
+  HeartCost: 1
+  TimingTurns: 0
+  DurationTurns: 1
+  CooldownTurns: 2
+  ActivationMode: 0
+  PerkIds:
+  - adrenaline_surge
+  DrawbackIds: []
+  Rarity: 1
+  Tags:
+  - body
+  - extra_dices
+  FlavorText: "O sangue ferve e os limites f\xEDsicos se rompem."
