@@ -11,11 +11,13 @@ public class DiceTierBarUI : MonoBehaviour
     [SerializeField] private TMP_Text lowLabel;
     [SerializeField] private TMP_Text mediumLabel;
     [SerializeField] private TMP_Text highLabel;
+    [SerializeField] private GameObject rollIndicator;
     private readonly float barWidth = 240;
 
     private void Awake()
     {
         SetVisible(false);
+        SetIndicatorVisible(false);
     }
 
     public void SetBoundaries(int lowMax, int mediumMax, int highMin, int maxValue)
@@ -64,5 +66,25 @@ public class DiceTierBarUI : MonoBehaviour
     public void SetVisible(bool visible)
     {
         gameObject.SetActive(visible);
+    }
+
+    public void SetIndicatorVisible(bool visible)
+    {
+        if (rollIndicator != null) rollIndicator.SetActive(visible);
+    }
+
+    public void SetRollIndicatorPosition(float rollValue, int maxValue)
+    {
+        if (rollIndicator == null) return;
+        SetIndicatorVisible(true);
+
+        float safeMaxValue = Mathf.Max(1f, maxValue);
+        float rollPct = Mathf.Clamp01(rollValue / safeMaxValue);
+
+        RectTransform indicatorRect = rollIndicator.GetComponent<RectTransform>();
+
+        indicatorRect.anchorMin = new Vector2(rollPct, indicatorRect.anchorMin.y);
+        indicatorRect.anchorMax = new Vector2(rollPct, indicatorRect.anchorMax.y);
+        indicatorRect.anchoredPosition = new Vector2(0f, indicatorRect.anchoredPosition.y);
     }
 }

@@ -7539,10 +7539,7 @@ MonoBehaviour:
   trickInventorySnapshot:
     learnedTrickIds:
     - vengence
-    - endurance
-    identityTrickIds:
-    - analytic_precision
-    - live_instinct
+    identityTrickIds: []
     castedSlots: []
 --- !u!224 &1420438872995974988
 RectTransform:

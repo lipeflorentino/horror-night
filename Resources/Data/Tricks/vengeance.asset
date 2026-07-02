@@ -17,14 +17,14 @@ MonoBehaviour:
   Description: "Cada vez que voc\xEA sofre dano, voc\xEA ganha +1 de Trick Charges
     (at\xE9 3). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Attack
     por charge na sua a\xE7\xE3o de Ataque."
-  Icon: {fileID: 0}
-  Level: 2
-  MindCost: 0
-  BodyCost: 0
-  HeartCost: 0
+  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
+  Level: 1
+  MindCost: 1
+  BodyCost: 3
+  HeartCost: 3
   TimingTurns: 0
-  DurationTurns: -1
-  CooldownTurns: 0
+  DurationTurns: 6
+  CooldownTurns: 8
   ActivationMode: 2
   PerkIds:
   - vengeance_charge

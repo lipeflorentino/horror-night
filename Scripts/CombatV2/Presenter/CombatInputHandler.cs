@@ -357,7 +357,6 @@ public class CombatInputHandler : MonoBehaviour
 
     public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
-        CombatRollContext context = Combat.BuildPlayerRollContext(maxValue, statType, rollType);
-        return Combat.GetDiceService().GetTierBoundaries(context);
+        return Combat.GetPlayerTierBoundaries(maxValue, statType, rollType);
     }
 }

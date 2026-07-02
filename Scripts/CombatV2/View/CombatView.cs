@@ -80,12 +80,13 @@ public class CombatView : MonoBehaviour
     public IEnumerator PlayDiceResolution(
         IReadOnlyList<DiceResult> playerRolls,
         IReadOnlyList<DiceResult> enemyRolls,
-        DiceRollType rollType)
+        DiceRollType rollType,
+        (int lowMax, int mediumMax, int highMin, int maxValue) tierBoundaries)
     {
         if (DiceRollView  == null)
             yield break;
 
-        yield return DiceRollView.PlayDiceResolution(playerRolls, enemyRolls, rollType);
+        yield return DiceRollView.PlayDiceResolution(playerRolls, enemyRolls, rollType, tierBoundaries);
     }
 
     public void HighlightSelectedAction(ActionInstance action)

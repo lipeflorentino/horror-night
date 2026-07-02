@@ -90,7 +90,7 @@ public class ActionResolverService
 
         result.Damage = damage;
         result.Outcome = result.Accuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
-        result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : string.Empty;
+        result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : "HIT";
 
         if (ignoreAttack)
         {

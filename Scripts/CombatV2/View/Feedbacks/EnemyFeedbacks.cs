@@ -18,6 +18,8 @@ public class EnemyFeedbacks : MonoBehaviour
     [SerializeField] private GameObject popupObject;
     [SerializeField] private Canvas worldPopupCanvas;
     [SerializeField] private GameObject enemyVisual;
+    [SerializeField] private Color damageColor = new(1f, 0.1f, 0.1f, 1f);
+    [SerializeField] private Color statusColor = new(0.1f, 0.1f, 1f, 1f);
 
     void Start()
     {
@@ -36,16 +38,16 @@ public class EnemyFeedbacks : MonoBehaviour
 
     public void ShowDamagePopup(int damage)
     {
-        ShowPopupText($"-{damage}");
+        ShowPopupText($"-{damage}", damageColor);
         StartCoroutine(AnimateEnemyFlash());
     }
 
     public void ShowStatusPopup(string text)
     {
-        ShowPopupText(text);
+        ShowPopupText(text, statusColor);
     }
 
-    private void ShowPopupText(string text)
+    private void ShowPopupText(string text, Color color)
     {
         popupObject.SetActive(true);
 
@@ -59,6 +61,7 @@ public class EnemyFeedbacks : MonoBehaviour
         }
 
         popupText.text = text;
+        popupText.color = color;
 
         StartCoroutine(AnimateEnemyPopup(popupRect, popupText));
     }

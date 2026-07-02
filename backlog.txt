@@ -1,91 +1,72 @@
-HISTÓRIAS 
-    1. Estrutura de Clareiras (prefabs + conexões)
-    2. Variável global de Tensão
-    3. Variável global de Corrupção
-    4. Tabela de eventos ponderados
-    5. Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
-    6. Sistema simples de perda parcial
-    7. Sistema de combate em turnos
-    8. Sistemas do personagem (hp, inventory, progressão, controles)
-    
-    
-BACKLOG 
-    - Implementar sistemas que faltam
-        - Presence, Treasure, NPC, Class
-    - Ajustar painel de resultado de ocorrencia, nao deve mostrar meta e roll quando nao tiver rolagem
-    - Fazer painel de resultados (total damage, total kills, total xp, etc)
-    - Fazer galeria  (monstros, itens, reliquias, etc.)
+LISTA DE TAREFAS - RPG DE COMBATE EM TURNOS
+==================================================
+Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo tem maior prioridade)
+==================================================
 
-    - Jogador pode fugir de combates quando seu nível é maior do que do inimigo (sendo possível ver recompensas do combate)
-    - Cartas de estado de combate são habilitadas (com custo) e podem ser ativadas durante combate mediante a rolagem de dados ou condição especial. 
-        O estado de combate pode alterar significativamente as stats e ações do combatente
-    - Adicionar indicativo visual de rolagem máxima (highlight)
-    - Ter a possibilidade de habilidades que dão buffs/debuffs caso certos valores no dados sejam tirados
-    - Possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente 
-    - Ter builds baseadas nas stats (mind, heart, body)
-    - Ter uma forma de mostrar visualmente a eficacia da ação (power, accuracy)
-    - Delegar responsabilidades do CombatManager 
-        - TurnManager, TrickManager, EnemyActionManager
-
-TO DO 
-    - Criar NPCEncounterSystem
-        - sorteio assim como enemies/loot
-        - tem tipo (loja, melhoria, troca, etc)
-    - Ajustar logica de type, behavior e style na IA de inimigos
-    - Implementar TreasureSystem 
-        - Drop de artefatos lendarios, epicos
-        - Drop de Perks e CombatStateCards
-    - lucky_strike abre input de dado para player decidir qual será o numero da sorte
-        - adicionar parametro no trick/perk
-    - Tricks são aprendidos por meio de pergaminhos
-        - pergaminhos podem ter varios tricks 
-        - adquiridos por loot ou NPCs 
-    - Estabelecer tricks para os inimigos
-        - identity tricks 
-        - criar feedback para o uso de tricks pelo inimigo
-    - Corrigir tela de Loot (textos, alinhamento, etc)
-    - Ajustar recompensa Xp (icone?, text?)
-    - Criar CharacterSO (Nicolas)
-        - gerar icone do Character
-    - Implementar Tricks que forçam "testes" escolhidos pelo jogador
-        - Uma rolagem antes de accuracy/power 
-        - teste igual classicos de RPG 
-    - Implementar o conceito/uso de momentum 
-        - Ativa habilidades especiais (poderes/stance/glitches?)
-    - Implementar sistema de "Curses" ou maldições, elas alteram sistemas de jogo (UI, cor, sons, textos)
-
-HOTFIXES 
-    - Ajustar as views de Tricks 
-        - ajustar ui de triggered / cooldown / casted 
-    - Ajustar painel de infos (fechamento, tamanho)
+🗺️ HISTÓRIAS / ÉPICOS (Menor Prioridade)
+--------------------------------------------------
+- Estrutura de Clareiras (prefabs + conexões de mapa)
+- Variável global de Tensão
+- Variável global de Corrupção
+- Tabela de eventos ponderados
+- Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
+- Sistema simples de perda parcial
+- Sistema de combate em turnos (Core)
+- Sistemas do personagem (HP, inventory, progressão, controles)
 
 
-BUGS
-    - 
+🗄️ BACKLOG
+--------------------------------------------------
+- Implementar sistemas secundários restantes: Presence, Treasure, NPC, Class
+- Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
+- Cartas de Estado de Combate: Habilitadas com custo, ativadas por rolagem/condição especial, alterando drasticamente os status e ações do combatente.
+- Ter builds baseadas em Atributos (Mind, Heart, Body)
+- Estruturar e delegar responsabilidades do CombatManager (dividir em TurnManager, TrickManager e EnemyActionManager)
+- Implementar habilidades com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
+- Implementar manipulação de dados (possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente)
+- Criar feedback de eficácia da ação (mostrar visualmente power e accuracy)
+- Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
+- Adicionar indicativo visual de rolagem máxima (highlight no dado)
+- Fazer painel de resultados pós-jogo/combate (total damage, total kills, total xp, etc.)
+- Fazer galeria de discoveries (monstros, itens, relíquias, etc.)
 
 
-TASK 
-    - Criar UI de Drawback 
-    - Testar fluxo completo de tricks / perks no combate 
-    - Criar nova perk usando a Skill criada
+📝 TO DO
+--------------------------------------------------
+- Implementar sistema de "Curses" (Maldições) que alteram diretamente os sistemas do jogo (UI, cor, sons, textos)
+- Implementar o conceito/uso de Momentum (sistema para ativar habilidades especiais/poderes/stance/glitches)
+- Implementar Tricks que forçam "testes" escolhidos pelo jogador (uma rolagem clássica de RPG antes do cálculo de accuracy/power)
+- Criar NPCEncounterSystem (sistema de sorteio similar a inimigos/loot, contendo tipos como loja, melhoria, troca, etc.)
+- Implementar TreasureSystem (configurar drop de artefatos lendários/épicos, Perks e CombatStateCards)
+- Sistema de Pergaminhos: Fazer com que Tricks sejam aprendidos por meio de pergaminhos (que podem conter vários tricks e ser adquiridos por loot ou NPCs)
+- Estabelecer tricks para os inimigos (definir identity tricks e criar feedback visual/log para quando o inimigo usá-las)
+- Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
+- Criar CharacterSO (Nicolas) e gerar o ícone do personagem
+- Ajustar lógica de type, behavior e style na IA de inimigos
+- Criar nova perk usando a Skill criada
+- Criar UI de Drawback
+- Adicionar informações no painel do player (XP e Gold)
+- Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
 
-TESTS
 
-    1. Equipar a trick adrenaline_surge no slot do Player
-    2. Alocar dados de Mind no Accuracy
-    3. Realizar um Ataque
-    4. Verificar no Console:
-    
-        [Perk Triggered] adrenaline_surge - Trigger: AfterAccuracyRoll, Target: ExtraDice, Value: 2 (quando tier for High)
-        [Adrenaline Surge] Player ganhou 2 dado(s) extra(s) de Poder (Mind) pelo Accuracy tier High.
-        [Flow] Player rolled POWER best:X | ACCURACY best:Y using Z dice. — Z inclui os dados extras
+🧪 TESTS & TASKS DE VALIDAÇÃO
+--------------------------------------------------
+- Executar Teste Estruturado - Adrenaline Surge:
+    1. Equipar a trick adrenaline_surge no slot do Player.
+    2. Alocar dados de Mind no Accuracy.
+    3. Realizar um Ataque.
+    4. Verificar no Console as tags: [Perk Triggered], [Adrenaline Surge] e [Flow] validando o bônus de dados extras.
+- Testar fluxo completo de tricks / perks no combate
+- Testar feedbacks visuais/console (blocked, evaded, missed)
 
 
-Prompts:
-    Use a skill CreateTricksAndPErks para criar a seguinte trick no projeto:
+🐛 BUGS & FIXES
+--------------------------------------------------
+- Corrigir bug: middle alert swallow memory vague
+- Ajustar tela de Loot (textos, alinhamento, etc.)
 
-    Nome: Sede de Sangue
-    Conceito/Descrição: É uma habilidade onde o jogador entra em uma postura agressiva. 
-                        Toda vez que eu atacar e tirar um resultado de nível Alto usando dados de Body, 
-                        eu quero acumular +2 de Ataque para o próximo turno. No entanto, se o combate avançar e 
-                        eu passar 2 turnos inteiros sem realizar nenhum ataque, eu sofro dano de fadiga como punição.
+
+🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
+--------------------------------------------------
+- Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)
+- Ajustar painel de infos (fechamento, tamanho)

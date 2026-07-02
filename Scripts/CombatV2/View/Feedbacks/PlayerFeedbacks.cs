@@ -9,12 +9,12 @@ public class PlayerFeedbacks : MonoBehaviour
     public Image playerFlashImage;
     [SerializeField] private GameObject actionLogPanel;
     [SerializeField] private TextMeshProUGUI playerStatusText;
-    private const float PlayerFlashDuration = 0.15f;
-    private const float PlayerFlashAlpha = 0.45f;
-    private const float PlayerStatusDuration = 2f;
-
+    [SerializeField] private float PlayerStatusDuration = 2f;
+    
     [Header("Player Damage Flash")]
+    const float PlayerFlashAlpha = 0.45f;
     [SerializeField] private Color playerFlashColor = new(0.9f, 0.1f, 0.1f, PlayerFlashAlpha);
+    [SerializeField] private float PlayerFlashDuration = 0.15f;
 
     void Start()
     {
@@ -24,7 +24,7 @@ public class PlayerFeedbacks : MonoBehaviour
             return;
         }
 
-        actionLogPanel.gameObject.SetActive(false);
+        actionLogPanel.SetActive(false);
     }
 
     public void ShowPlayerDamageFlash()
@@ -35,15 +35,15 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowStatusText(string text)
     {
-        actionLogPanel.gameObject.SetActive(true);
+        actionLogPanel.SetActive(true);
+
         if (playerStatusText == null)
         {
             Debug.Log($"[Feedback] {text}");
             return;
         }
-
-        StopCoroutine(nameof(AnimatePlayerStatusText));
-        StartCoroutine(AnimatePlayerStatusText(text));
+        
+        StartCoroutine(AnimateActionLog(text));
     }
 
     private IEnumerator AnimatePlayerFlash()
@@ -66,6 +66,13 @@ public class PlayerFeedbacks : MonoBehaviour
 
         playerFlashImage.enabled = false;
         playerFlashImage.gameObject.SetActive(false);
+    }
+
+    private IEnumerator AnimateActionLog(string text)
+    {
+        playerStatusText.text = text;
+        yield return new WaitForSeconds(PlayerStatusDuration);
+        actionLogPanel.SetActive(false);
     }
 
     private IEnumerator AnimatePlayerStatusText(string text)

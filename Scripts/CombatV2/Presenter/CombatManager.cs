@@ -265,14 +265,24 @@ public class CombatManager : MonoBehaviour
         bool defenseAccuracyEffective = ResolveDefenseAccuracy();
         bool isPlayerDefending = action == ActionType.Defense;
 
-        yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy);
+        DiceResult bestAccuracy = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
+        var accuracyBoundaries = bestAccuracy != null 
+            ? GetPlayerTierBoundaries(bestAccuracy.MaxValue, bestAccuracy.StatType, DiceRollType.Accuracy)
+            : (1, 1, 1, 1);
+
+        yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy, accuracyBoundaries);
 
         bool shouldPlayPowerResolution = attackerAccuracyEffective && (!isPlayerDefending || defenseAccuracyEffective);
 
         if (shouldPlayPowerResolution)
         {
             List<DiceResult> playerRolls = isPlayerDefending && !defenseAccuracyEffective ? null : PendingPlayerPowerRolls;
-            yield return View.PlayDiceResolution(playerRolls, PendingEnemyPowerRolls, DiceRollType.Power);
+            DiceResult bestPower = DiceService.GetBestResult(PendingPlayerPowerRolls);
+            var powerBoundaries = bestPower != null
+                ? GetPlayerTierBoundaries(bestPower.MaxValue, bestPower.StatType, DiceRollType.Power)
+                : (1, 1, 1, 1);
+
+            yield return View.PlayDiceResolution(playerRolls, PendingEnemyPowerRolls, DiceRollType.Power, powerBoundaries);
         }
 
         Resolve();
@@ -335,8 +345,9 @@ public class CombatManager : MonoBehaviour
         DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
         DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
 
-        ActionInstance playerActionInstance = new ActionInstance(playerAction, playerPowerDice, playerAccuracyDice);
+        ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice);
         ActionInstance enemyActionInstance = PlayerIsAttacker ? CurrentTurn.DefenseAction : CurrentTurn.AttackAction;
+        
         enemyActionInstance.Definition = BuildDefinitionFromBattler(Enemy, Player, enemyActionInstance.Definition.Type);
         enemyActionInstance = new ActionInstance(enemyActionInstance.Definition, enemyPowerDice, enemyAccuracyDice);
 
@@ -671,5 +682,11 @@ public class CombatManager : MonoBehaviour
     public DiceService GetDiceService()
     {
         return DiceService;
+    }
+
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
+    {
+        CombatRollContext context = BuildPlayerRollContext(maxValue, statType, rollType);
+        return GetDiceService().GetTierBoundaries(context);
     }
 }

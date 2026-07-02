@@ -15,6 +15,7 @@ public class DiceRollView : MonoBehaviour
     [SerializeField] private float highlightResultDelay = 2f;
     [SerializeField] private GameObject diceResolutionPanel;
     [SerializeField] private TMP_Text playerRollTypeLabel, enemyRollTypeLabel;
+    [SerializeField] private DiceTierBarUI tierBar;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
     private readonly List<DiceRollUI> runtimeEnemySlots = new();
@@ -23,7 +24,8 @@ public class DiceRollView : MonoBehaviour
     public IEnumerator PlayDiceResolution(
         IReadOnlyList<DiceResult> playerRolls,
         IReadOnlyList<DiceResult> enemyRolls,
-        DiceRollType rollType)
+        DiceRollType rollType,
+        (int lowMax, int mediumMax, int highMin, int maxValue) tierBoundaries)
     {
         EnsureSlotsInitialized();
         ShowDiceResolution(true);
@@ -37,17 +39,20 @@ public class DiceRollView : MonoBehaviour
         int enemyHighlightedIndex = GetHighlightedRollIndex(enemyRolls, enemyCount);
 
         PrepareSlots(runtimePlayerSlots, playerCount, playerHighlightedIndex);
-        PrepareSlots(runtimeEnemySlots, enemyCount, enemyHighlightedIndex);
+        //PrepareSlots(runtimeEnemySlots, enemyCount, enemyHighlightedIndex);
         EnqueueRollAnimations(runtimePlayerSlots, playerRolls, playerCount, runningCoroutines);
-        EnqueueRollAnimations(runtimeEnemySlots, enemyRolls, enemyCount, runningCoroutines);
+        //EnqueueRollAnimations(runtimeEnemySlots, enemyRolls, enemyCount, runningCoroutines);
 
         for (int i = 0; i < runningCoroutines.Count; i++)
             yield return runningCoroutines[i];
 
         yield return new WaitForSeconds(postRollDelay);
         SetHighlightedIndex(runtimePlayerSlots, playerHighlightedIndex, playerCount);
-        SetHighlightedIndex(runtimeEnemySlots, enemyHighlightedIndex, enemyCount);
+        //SetHighlightedIndex(runtimeEnemySlots, enemyHighlightedIndex, enemyCount);
+        tierBar.SetBoundaries(tierBoundaries.lowMax, tierBoundaries.mediumMax, tierBoundaries.highMin, tierBoundaries.maxValue);
+        tierBar.SetRollIndicatorPosition(GetBetterRollValue(playerRolls, playerCount), tierBoundaries.maxValue);
         yield return new WaitForSeconds(highlightResultDelay);
+        tierBar.SetIndicatorVisible(false);
         ShowDiceResolution(false);
     }
 
@@ -70,10 +75,10 @@ public class DiceRollView : MonoBehaviour
         }
 
         ConfigureContainerLayout(playerSlotsContainer, TextAnchor.MiddleRight);
-        ConfigureContainerLayout(enemySlotsContainer, TextAnchor.MiddleLeft);
+        // ConfigureContainerLayout(enemySlotsContainer, TextAnchor.MiddleLeft);
 
         CreateSlots(runtimePlayerSlots, playerSlotsContainer);
-        CreateSlots(runtimeEnemySlots, enemySlotsContainer);
+        // CreateSlots(runtimeEnemySlots, enemySlotsContainer);
 
         slotsInitialized = true;
     }
@@ -155,6 +160,21 @@ public class DiceRollView : MonoBehaviour
         }
 
         return bestIndex;
+    }
+
+    public int GetBetterRollValue(IReadOnlyList<DiceResult> rolls, int usedCount)
+    {
+        if (rolls == null || usedCount <= 0)
+            return -1;
+
+        int bestIndex = 0;
+        for (int i = 1; i < usedCount; i++)
+        {
+            if (IsBetterRoll(rolls[i], rolls[bestIndex]))
+                bestIndex = i;
+        }
+
+        return rolls[bestIndex].Value;
     }
 
     private bool IsBetterRoll(DiceResult candidate, DiceResult currentBest)
