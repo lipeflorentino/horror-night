@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: nicolas
   DisplayName: Nicolas
+  CharacterIcon: {fileID: -276885369, guid: 4f4cadd6fd36adf4d968b81e65360a4d, type: 3}
   Description: A timid and gentle soul
   Xp: 0
   Heart: 5
