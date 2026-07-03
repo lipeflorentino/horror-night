@@ -18,7 +18,7 @@ public class Battler
     public int CurrentPowerDices, CurrentAccuracyDices;
     public int MaxPowerDices, MaxAccuracyDices;
     public bool IsPlayer;
-    public List<BattlerStateInstance> States = new();
+    public List<BattlerStateRuntimeInstance> ActiveStates = new();
     public List<PerkRuntimeInstance> Perks = new();
     public List<TrickRuntimeInstance> Tricks = new();
     public List<DrawbackRuntimeInstance> Drawbacks = new();
@@ -75,21 +75,6 @@ public class Battler
         return isAttacker ? atk : df;
     }
 
-    public void ApplyState(BattlerStateDefinition definition, Battler source = null, int durationTurns = -1, int stacks = 1)
-    {
-        new BattlerStateService().ApplyState(this, definition, source, durationTurns, stacks);
-    }
-
-    public void RemoveState(string stateId)
-    {
-        new BattlerStateService().RemoveState(this, stateId);
-    }
-
-    public bool HasState(string stateId)
-    {
-        return new BattlerStateService().HasState(this, stateId);
-    }
-
     /// <summary>
     /// Retorna todos os Perks efetivos (diretos + de Tricks)
     /// </summary>
@@ -101,8 +86,14 @@ public class Battler
         for (int i = 0; i < Perks.Count; i++)
         {
             PerkRuntimeInstance perk = Perks[i];
-            if (perk?.SourceTrick != null && perk.SourceTrick.IsActive() && added.Add(perk))
-                perks.Add(perk);
+            if (perk == null || !perk.IsActive())
+                continue;
+
+            if (perk.SourceTrick == null || perk.SourceTrick.IsActive())
+            {
+                if (added.Add(perk))
+                    perks.Add(perk);
+            }
         }
 
         // Perks de Tricks

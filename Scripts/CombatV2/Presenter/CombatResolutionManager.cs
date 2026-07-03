@@ -42,9 +42,9 @@ public class CombatResolutionManager
         return defense != null && defense.AccuracyDice != null && defense.AccuracyDice.Tier != DiceTier.Low;
     }
 
-    public static ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType, BattlerStateService stateService)
+    public static ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType, PerkService perkService)
     {
-        int basePower = stateService.GetEffectiveActionPower(battler, opponent, actionType);
+        int basePower = perkService != null ? perkService.GetEffectiveActionPower(battler, opponent, actionType) : battler?.GetBattlerActionPower(actionType == ActionType.Attack) ?? 0;
         string id = actionType == ActionType.Attack ? "attack" : "defense";
         return new ActionDefinition(id, actionType, basePower);
     }

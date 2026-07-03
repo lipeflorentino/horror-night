@@ -47,7 +47,6 @@ public class TurnManager
     public static void EndTurn(
         Battler player, 
         Battler enemy, 
-        BattlerStateService stateService, 
         PerkService perkService, 
         TrickService trickService, 
         ITrickInventory playerTrickInventory, 
@@ -59,8 +58,6 @@ public class TurnManager
 
         player.RecoverDices(1);
         enemy.RecoverDices(1);
-        stateService.TickTurnEnd(player);
-        stateService.TickTurnEnd(enemy);
         perkService.TickTurnEnd(player);
         perkService.TickTurnEnd(enemy);
         trickService.TickTrickEnd(player, playerTrickInventory);

@@ -22,6 +22,11 @@ public class PerkRuntimeInstance
         SetSourceTrick(sourceTrick);
     }
 
+    public bool IsActive()
+    {
+        return Definition != null && (RemainingTurns < 0 || RemainingTurns > 0);
+    }
+
     public void SetSourceTrick(TrickRuntimeInstance sourceTrick)
     {
         SourceTrick = sourceTrick;

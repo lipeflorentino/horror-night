@@ -1,3 +1,19 @@
+public enum BattlerStateRole
+{
+    OwnerAsActor,
+    OwnerAsOpponent,
+    OwnerAsAttacker,
+    OwnerAsDefender,
+    OwnerAsTarget
+}
+
+public enum BattlerStateStackMode
+{
+    RefreshDuration,
+    AddStack,
+    Replace
+}
+
 public enum PerkTrigger
 {
     BeforeRoll,
@@ -23,6 +39,8 @@ public enum PerkModifierTarget
     MaxRollValue,
     ExtraDice,
     PowerMultiplier,
+    AttackPower,
+    DefensePower,
     DamagePercent,
     MomentumPoints,
     Focus,

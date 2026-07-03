@@ -94,7 +94,7 @@ public class PerkService
 
     public void TickTurnEnd(Battler battler)
     {
-        if (battler == null || battler.Perks.Count == 0)
+        if (battler == null)
             return;
 
         for (int i = battler.Perks.Count - 1; i >= 0; i--)
@@ -120,6 +120,26 @@ public class PerkService
             }
         }
 
+        if (battler.ActiveStates.Count > 0)
+        {
+            for (int i = battler.ActiveStates.Count - 1; i >= 0; i--)
+            {
+                BattlerStateRuntimeInstance state = battler.ActiveStates[i];
+                if (state == null || state.Definition == null)
+                {
+                    battler.ActiveStates.RemoveAt(i);
+                    continue;
+                }
+
+                if (state.RemainingTurns < 0)
+                    continue;
+
+                state.DecreaseDuration();
+                if (state.RemainingTurns == 0)
+                    battler.ActiveStates.RemoveAt(i);
+            }
+        }
+
         if (battler.Drawbacks.Count > 0)
         {
             for (int i = battler.Drawbacks.Count - 1; i >= 0; i--)
@@ -139,6 +159,147 @@ public class PerkService
                 {
                     battler.Drawbacks.RemoveAt(i);
                 }
+            }
+        }
+    }
+
+
+
+    public BattlerStateRuntimeInstance ApplyBattlerState(Battler target, string stateId, Battler source = null, int durationTurns = -1)
+    {
+        BattlerStateSO definition = BattlerStateDatabase.GetOrCreateRuntimeDatabase().GetById(stateId);
+        return ApplyBattlerState(target, definition, source, durationTurns);
+    }
+
+    public BattlerStateRuntimeInstance ApplyBattlerState(Battler target, BattlerStateSO definition, Battler source = null, int durationTurns = -1)
+    {
+        if (target == null || definition == null)
+            return null;
+
+        BattlerStateRuntimeInstance existing = target.ActiveStates.Find(state => state != null &&
+            state.Definition != null &&
+            !string.IsNullOrWhiteSpace(state.Definition.Id) &&
+            state.Definition.Id.Equals(definition.Id, System.StringComparison.OrdinalIgnoreCase));
+
+        int resolvedDuration = durationTurns >= 0 ? durationTurns : definition.DefaultDurationTurns;
+        if (existing == null || definition.StackMode == BattlerStateStackMode.Replace)
+        {
+            if (existing != null)
+            {
+                RemoveBattlerStatePerks(target, existing);
+                target.ActiveStates.Remove(existing);
+            }
+
+            BattlerStateRuntimeInstance stateInstance = new(definition, target, source, resolvedDuration);
+            target.ActiveStates.Add(stateInstance);
+            ApplyBattlerStatePerks(target, source, stateInstance, resolvedDuration);
+            return stateInstance;
+        }
+
+        existing.Source = source;
+        existing.RemainingTurns = ResolveDuration(definition.DefaultDurationTurns, resolvedDuration, existing.RemainingTurns);
+        for (int i = 0; i < existing.ActivePerks.Count; i++)
+        {
+            if (existing.ActivePerks[i] != null)
+                existing.ActivePerks[i].RemainingTurns = existing.RemainingTurns;
+        }
+        return existing;
+    }
+
+    public void RemoveBattlerState(Battler target, string stateId)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(stateId))
+            return;
+
+        for (int i = target.ActiveStates.Count - 1; i >= 0; i--)
+        {
+            BattlerStateRuntimeInstance state = target.ActiveStates[i];
+            if (state?.Definition == null || !state.Definition.Id.Equals(stateId, System.StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            RemoveBattlerStatePerks(target, state);
+            target.ActiveStates.RemoveAt(i);
+        }
+    }
+
+    private void ApplyBattlerStatePerks(Battler target, Battler source, BattlerStateRuntimeInstance stateInstance, int durationTurns)
+    {
+        if (stateInstance?.Definition?.PerkIds == null)
+            return;
+
+        for (int i = 0; i < stateInstance.Definition.PerkIds.Count; i++)
+        {
+            PerkRuntimeInstance appliedPerk = ApplyPerk(target, stateInstance.Definition.PerkIds[i], source, durationTurns);
+            if (appliedPerk != null && !stateInstance.ActivePerks.Contains(appliedPerk))
+                stateInstance.ActivePerks.Add(appliedPerk);
+        }
+    }
+
+    private void RemoveBattlerStatePerks(Battler target, BattlerStateRuntimeInstance stateInstance)
+    {
+        if (stateInstance?.ActivePerks == null)
+            return;
+
+        for (int i = stateInstance.ActivePerks.Count - 1; i >= 0; i--)
+            RemovePerkInstance(target, stateInstance.ActivePerks[i]);
+
+        stateInstance.ActivePerks.Clear();
+    }
+
+    public int GetEffectiveActionPower(Battler actor, Battler opponent, ActionType actionType)
+    {
+        if (actor == null)
+            return 0;
+
+        PerkModifierTarget target = actionType == ActionType.Attack ? PerkModifierTarget.AttackPower : PerkModifierTarget.DefensePower;
+        float value = actionType == ActionType.Attack ? actor.Attack : actor.Defense;
+        CombatActionContext context = new(actor, opponent, actionType);
+        ApplyContextualModifiers(actor, context, PerkTrigger.BeforeRoll, target, ref value);
+        ApplyContextualModifiers(opponent, context, PerkTrigger.BeforeRoll, target, ref value);
+        return Mathf.Max(0, Mathf.RoundToInt(value));
+    }
+
+    public int GetEffectiveFocus(Battler actor, Battler opponent, ActionType actionType)
+    {
+        return GetEffectiveStat(actor, opponent, actionType, PerkModifierTarget.Focus, actor?.Focus ?? 0);
+    }
+
+    public int GetEffectiveStrength(Battler actor, Battler opponent, ActionType actionType)
+    {
+        return GetEffectiveStat(actor, opponent, actionType, PerkModifierTarget.Strength, actor?.Strength ?? 0);
+    }
+
+    private int GetEffectiveStat(Battler actor, Battler opponent, ActionType actionType, PerkModifierTarget target, int baseValue)
+    {
+        CombatActionContext context = new(actor, opponent, actionType);
+        float value = baseValue;
+        ApplyContextualModifiers(actor, context, PerkTrigger.OnActionResolved, target, ref value);
+        ApplyContextualModifiers(opponent, context, PerkTrigger.OnActionResolved, target, ref value);
+        ApplyContextualModifiers(actor, context, PerkTrigger.BeforeRoll, target, ref value);
+        ApplyContextualModifiers(opponent, context, PerkTrigger.BeforeRoll, target, ref value);
+        return Mathf.Max(0, Mathf.RoundToInt(value));
+    }
+
+    private void ApplyContextualModifiers(Battler owner, CombatActionContext context, PerkTrigger trigger, PerkModifierTarget target, ref float value)
+    {
+        if (owner == null)
+            return;
+
+        List<PerkRuntimeInstance> perks = GetEffectivePerks(owner);
+        for (int i = 0; i < perks.Count; i++)
+        {
+            PerkRuntimeInstance perk = perks[i];
+            IReadOnlyList<PerkRule> rules = perk.Definition?.Rules;
+            if (rules == null)
+                continue;
+
+            for (int j = 0; j < rules.Count; j++)
+            {
+                PerkRule rule = rules[j];
+                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !IsRoleMatch(owner, context, rule.OwnerRole))
+                    continue;
+
+                value = ApplyModifier(value, rule.Operation, rule.Value, Mathf.Max(1, perk.Stacks));
             }
         }
     }
@@ -195,6 +356,16 @@ public class PerkService
         float minValue = currentMinValue;
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MinRollPercent, ref minValue, context.MaxValue);
         return Mathf.Clamp(Mathf.CeilToInt(minValue), 1, Mathf.Max(1, context.MaxValue));
+    }
+
+
+    public (float low, float high) GetModifiedRollThresholds(Battler actor, Battler opponent, CombatRollContext context, float low, float high)
+    {
+        float modifiedLow = low;
+        float modifiedHigh = high;
+        ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MinRollPercent, ref modifiedLow);
+        ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MaxRollPercent, ref modifiedHigh);
+        return (modifiedLow, modifiedHigh);
     }
 
     public float GetPowerMultiplier(float baseMultiplier, ActionInstance action, Battler actor, Battler opponent, ActionType actionType)
@@ -283,7 +454,7 @@ public class PerkService
                 if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesRoll(context) || !IsRoleMatch(owner, context, rule.OwnerRole))
                     continue;
 
-                float ruleValue = target == PerkModifierTarget.MinRollPercent ? Mathf.Max(1, maxValue) * rule.Value : rule.Value;
+                float ruleValue = target == PerkModifierTarget.MinRollPercent && maxValue > 0 ? Mathf.Max(1, maxValue) * rule.Value : rule.Value;
                 value = ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks));
             }
         }
@@ -441,6 +612,15 @@ public class PerkService
     private static int ResolveDuration(PerkSO definition, int durationTurns, int currentDuration)
     {
         int newDuration = durationTurns >= 0 ? durationTurns : definition.DefaultDurationTurns;
+        if (currentDuration < 0 || newDuration < 0)
+            return -1;
+
+        return Mathf.Max(currentDuration, newDuration);
+    }
+
+    private static int ResolveDuration(int defaultDurationTurns, int durationTurns, int currentDuration)
+    {
+        int newDuration = durationTurns >= 0 ? durationTurns : defaultDurationTurns;
         if (currentDuration < 0 || newDuration < 0)
             return -1;
 

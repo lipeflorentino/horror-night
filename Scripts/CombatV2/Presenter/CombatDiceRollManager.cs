@@ -3,17 +3,16 @@ using System.Collections.Generic;
 public class CombatDiceRollManager
 {
     public static void RollActions(
-        Battler player, 
-        Battler enemy, 
-        ActionType action, 
-        IReadOnlyList<DiceStatType> powerDiceTypes, 
-        IReadOnlyList<DiceStatType> accuracyDiceTypes, 
-        DiceService diceService, 
-        PerkService perkService, 
-        BattlerStateService battlerStateService,
+        Battler player,
+        Battler enemy,
+        ActionType action,
+        IReadOnlyList<DiceStatType> powerDiceTypes,
+        IReadOnlyList<DiceStatType> accuracyDiceTypes,
+        DiceService diceService,
+        PerkService perkService,
         CombatTurnContext combatContext)
     {
-        ActionDefinition playerAction = CombatResolutionManager.BuildDefinitionFromBattler(player, enemy, action, battlerStateService);
+        ActionDefinition playerAction = CombatResolutionManager.BuildDefinitionFromBattler(player, enemy, action, perkService);
         ActionType enemyActionType = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction.Definition.Type : combatContext.CurrentTurn.AttackAction.Definition.Type;
 
         combatContext.PendingPlayerAccuracyRolls = diceService.RollMany(player, enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, player.Level, enemy.Level);
@@ -45,8 +44,8 @@ public class CombatDiceRollManager
 
         ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice);
         ActionInstance enemyActionInstance = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction : combatContext.CurrentTurn.AttackAction;
-        
-        enemyActionInstance.Definition = CombatResolutionManager.BuildDefinitionFromBattler(enemy, player, enemyActionInstance.Definition.Type, battlerStateService);
+
+        enemyActionInstance.Definition = CombatResolutionManager.BuildDefinitionFromBattler(enemy, player, enemyActionInstance.Definition.Type, perkService);
         enemyActionInstance = new ActionInstance(enemyActionInstance.Definition, enemyPowerDice, enemyAccuracyDice);
 
         if (combatContext.PlayerIsAttacker)
@@ -65,11 +64,11 @@ public class CombatDiceRollManager
     }
 
     public static List<DiceResult> RollExtraPowerDiceWithoutPool(
-        Battler actor, 
-        int count, 
-        DiceStatType statType, 
-        int actorLevel, 
-        int opponentLevel, 
+        Battler actor,
+        int count,
+        DiceStatType statType,
+        int actorLevel,
+        int opponentLevel,
         DiceService diceService)
     {
         List<DiceResult> extras = new();
@@ -87,31 +86,31 @@ public class CombatDiceRollManager
     }
 
     public static CombatRollContext BuildPlayerRollContext(
-        Battler player, 
-        Battler enemy, 
-        int maxValue, 
-        DiceStatType statType, 
-        DiceRollType rollType, 
-        BattlerStateService battlerStateService, 
+        Battler player,
+        Battler enemy,
+        int maxValue,
+        DiceStatType statType,
+        DiceRollType rollType,
+        PerkService perkService,
         CombatTurnContext combatContext)
     {
         ActionType actionType = combatContext.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        int focus = battlerStateService.GetEffectiveFocus(player, enemy, actionType);
-        int strength = battlerStateService.GetEffectiveStrength(player, enemy, actionType);
+        int focus = perkService.GetEffectiveFocus(player, enemy, actionType);
+        int strength = perkService.GetEffectiveStrength(player, enemy, actionType);
         return new CombatRollContext(player, enemy, actionType, rollType, statType, player.Level, enemy.Level, focus, strength, maxValue);
     }
 
     public static (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(
-        Battler player, 
-        Battler enemy, 
-        int maxValue, 
-        DiceStatType statType, 
-        DiceRollType rollType, 
-        DiceService diceService, 
-        BattlerStateService battlerStateService, 
+        Battler player,
+        Battler enemy,
+        int maxValue,
+        DiceStatType statType,
+        DiceRollType rollType,
+        DiceService diceService,
+        PerkService perkService,
         CombatTurnContext combatContext)
     {
-        CombatRollContext context = BuildPlayerRollContext(player, enemy, maxValue, statType, rollType, battlerStateService, combatContext);
+        CombatRollContext context = BuildPlayerRollContext(player, enemy, maxValue, statType, rollType, perkService, combatContext);
         return diceService.GetTierBoundaries(context);
     }
 }
