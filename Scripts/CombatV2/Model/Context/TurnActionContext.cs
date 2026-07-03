@@ -1,4 +1,4 @@
-public class TurnContext : ICombatContext
+public class TurnActionContext : ICombatContext
 {
     public Battler Attacker;
     public Battler Defender;
@@ -6,7 +6,7 @@ public class TurnContext : ICombatContext
     public ActionInstance AttackAction;
     public ActionInstance DefenseAction;
 
-    public TurnContext(Battler attacker, Battler defender)
+    public TurnActionContext(Battler attacker, Battler defender)
     {
         Attacker = attacker;
         Defender = defender;

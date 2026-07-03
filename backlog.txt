@@ -47,6 +47,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 - Criar UI de Drawback
 - Adicionar informações no painel do player (XP e Gold)
 - Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
+- Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO

@@ -17,18 +17,18 @@ Reduzir o escopo do `CombatManager` para Presenter fino, distribuindo responsabi
 \* `TurnManager` fornece a lógica de `ResolveTurnFlow`/`SkipTurnRoutine`, mas as coroutines (`StartCoroutine`, `yield return`) permanecem no `CombatManager` (MonoBehaviour), que delega os passos internos ao `TurnManager`.
 
 ## Estado Compartilhado
-- Criar `CombatTurnState`: consolida `CurrentTurn`, `PendingPlayerPowerRolls`, `PendingPlayerAccuracyRolls`, `PendingEnemyPowerRolls`, `PendingEnemyAccuracyRolls`, `PendingEnemyPowerDiceTypes`, `PendingEnemyAccuracyDiceTypes`.
+- Criar `CombatTurnContext`: consolida `CurrentTurn`, `PendingPlayerPowerRolls`, `PendingPlayerAccuracyRolls`, `PendingEnemyPowerRolls`, `PendingEnemyAccuracyRolls`, `PendingEnemyPowerDiceTypes`, `PendingEnemyAccuracyDiceTypes`.
 - Injetado por referência nos managers/coordinators que precisam ler/alterar o turno.
 
 ## CombatManager (resultante)
 Mantém:
-- Referências: `Player`, `Enemy`, `View`, `Input`, `SessionData`, `CombatEnded`, `CombatTurnState`
+- Referências: `Player`, `Enemy`, `View`, `Input`, `SessionData`, `CombatEnded`, `CombatTurnContext`
 - `Start()`: chama `CombatInitializer` e `CombatInventoryInitializer`, depois `RefreshCombatUI`/`UpdateTurnRoleUI`
 - Coroutines `ResolveTurnFlow`/`SkipTurnRoutine` (com `yield return`), delegando lógica interna ao `TurnManager`
 - Fachadas públicas usadas por View/Input (mesma assinatura atual, delegando ao manager/coordinator correspondente): `ReceivePlayerInput`, `ReceivePlayerSkipTurn`, `TryCastPlayerTrick`, `ExecuteManualTrickActivation`, `RefreshCombatUI`, `GetDiceService`, `GetBattlerStateService`, `GetEffectivePlayerActionPower`, `GetPlayerTierBoundaries`
 
 ## Composição
-- Todos os managers/coordinators são instanciados no `Start()` do `CombatManager`, recebendo services (`DiceService`, `PerkService`, etc.) e `CombatTurnState` via construtor.
+- Todos os managers/coordinators são instanciados no `Start()` do `CombatManager`, recebendo services (`DiceService`, `PerkService`, etc.) e `CombatTurnContext` via construtor.
 - Nenhum deles referencia MonoBehaviour ou UI diretamente (exceto o necessário para `View`/coroutine, restrito ao `CombatManager`).
 
 ---

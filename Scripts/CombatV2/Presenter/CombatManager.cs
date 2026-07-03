@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
@@ -25,12 +24,11 @@ public class CombatManager : MonoBehaviour
     public Battler Enemy { get; private set; }
     public Sprite PlayerIcon { get; private set; }
     public Sprite EnemyIcon { get; private set; }
-    public bool IsPlayerAttacker => PlayerIsAttacker;
-    private bool PlayerIsAttacker = true;
-    private TurnContext CurrentTurn;
-    private bool CombatEnded;
-    private int lastGrantedXp;
-    private Dictionary<ItemSO, int> lastGrantedItens;
+    
+    // Facades/Properties delegation to state
+    public CombatTurnContext TurnState { get; private set; } = new();
+    public bool IsPlayerAttacker => TurnState.PlayerIsAttacker;
+    public bool CombatEnded => TurnState.CombatEnded;
     private CombatSessionData SessionData;
 
     // =========================
@@ -53,16 +51,6 @@ public class CombatManager : MonoBehaviour
     private ActionDefinition DefenseDef;
 
     // =========================
-    // Pending rolls
-    // =========================
-    private List<DiceResult> PendingPlayerPowerRolls = new();
-    private List<DiceResult> PendingPlayerAccuracyRolls = new();
-    private List<DiceResult> PendingEnemyPowerRolls = new();
-    private List<DiceResult> PendingEnemyAccuracyRolls = new();
-    private List<DiceStatType> PendingEnemyPowerDiceTypes = new();
-    private List<DiceStatType> PendingEnemyAccuracyDiceTypes = new();
-
-    // =========================
     // Inventory and trick state
     // =========================
     private InventoryInputHandler InventoryInputHandler;
@@ -71,6 +59,9 @@ public class CombatManager : MonoBehaviour
     public ITrickInventory PlayerTrickInventory { get; private set; }
     private ITrickInventory EnemyTrickInventory;
 
+    // =========================
+    // Lifecycle and initialization
+    // =========================
     void Start()
     {
         BattlerStateService = new BattlerStateService();
@@ -86,8 +77,14 @@ public class CombatManager : MonoBehaviour
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
         SessionData = CombatSessionStore.Consume();
 
-        InitializeBattlers(SessionData);
-        DefineStartingTurnByInitiative();
+        var (player, enemy, playerIcon, enemyIcon, enemyVisuals) = CombatInitializer.InitializeBattlers(SessionData, DefaultPowerDiceCount, DefaultAccuracyDiceCount, CoreStatCap);
+        Player = player;
+        Enemy = enemy;
+        PlayerIcon = playerIcon;
+        EnemyIcon = enemyIcon;
+        EnemyVisuals = enemyVisuals;
+
+        TurnManager.DefineStartingTurnByInitiative(Player, Enemy, InitiativeResolverService, TurnState);
 
         InventoryInputHandler = FindObjectOfType<InventoryInputHandler>();
         TrickInventoryInputHandler = FindObjectOfType<TrickInventoryInputHandler>();
@@ -100,12 +97,12 @@ public class CombatManager : MonoBehaviour
         Input = FindObjectOfType<CombatInputHandler>();
         View = FindObjectOfType<CombatView>();
         
-        CombatPlayerInventory = BuildCombatInventory(SessionData);
-        PlayerTrickInventory = BuildPlayerTrickInventory(Player);
-        EnemyTrickInventory = BuildEnemyTrickInventory(Enemy);
+        CombatPlayerInventory = CombatInventoryInitializer.BuildCombatInventory(SessionData, Player);
+        PlayerTrickInventory = CombatInventoryInitializer.BuildPlayerTrickInventory(Player, SessionData, PerkService);
+        EnemyTrickInventory = CombatInventoryInitializer.BuildEnemyTrickInventory(Enemy, SessionData, PerkService);
         
-        ActivatePlayerIdentityTricks();
-        ActivateEnemyIdentityTricks();
+        CombatInventoryInitializer.ActivatePlayerIdentityTricks(Player, PlayerTrickInventory, TrickService);
+        CombatInventoryInitializer.ActivateEnemyIdentityTricks(Enemy, EnemyTrickInventory, TrickService);
 
         if (InventoryInputHandler != null)
             InventoryInputHandler.Init(this, CombatPlayerInventory);
@@ -120,121 +117,27 @@ public class CombatManager : MonoBehaviour
         View.BindInput(Input);
         
         RefreshCombatUI();
-        UpdateTurnRoleUI();
+        TurnManager.UpdateTurnRoleUI(TurnState, View, Input);
     }
 
-    private void InitializeBattlers(CombatSessionData sessionData)
-    {
-        if (sessionData == null)
-        {
-            Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
-            Player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, true);
-            Enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
-            PlayerIcon = null;
-            EnemyIcon = null;
-            return;
-        }
-
-        PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
-        EnemyInstance enemySnapshot = sessionData.EnemyInstance;
-        EnemyVisuals = FindObjectOfType<EnemyVisuals>();
-        EnemyVisuals.SetEnemyVisual(enemySnapshot ?? null);
-
-        PlayerIcon = playerSnapshot.characterIcon;
-        if (enemySnapshot != null && enemySnapshot.source != null)
-        {
-            EnemyIcon = enemySnapshot.source.image;
-        }
-
-        Player = new Battler(
-            string.IsNullOrWhiteSpace(playerSnapshot.characterName) ? "Player" : playerSnapshot.characterName,
-            Mathf.Max(1, playerSnapshot.level),
-            Mathf.RoundToInt(playerSnapshot.hp),
-            ClampCoreStat(playerSnapshot.heart),
-            ClampCoreStat(playerSnapshot.mind),
-            ClampCoreStat(playerSnapshot.body),
-            Mathf.RoundToInt(playerSnapshot.attack),
-            Mathf.RoundToInt(playerSnapshot.defense),
-            Mathf.RoundToInt(playerSnapshot.initiative),
-            Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : DefaultPowerDiceCount),
-            Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : DefaultAccuracyDiceCount),
-            true,
-            Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp),
-            Mathf.RoundToInt(playerSnapshot.focus),
-            Mathf.RoundToInt(playerSnapshot.strength),
-            Mathf.RoundToInt(playerSnapshot.agility)
-        );
-
-        if (enemySnapshot != null)
-        {
-            string enemyName = enemySnapshot.source != null ? enemySnapshot.source.enemyName : "Enemy";
-            Enemy = new Battler(
-                enemyName,
-                enemySnapshot.runTier,
-                enemySnapshot.hp,
-                enemySnapshot.heart,
-                enemySnapshot.mind,
-                enemySnapshot.body,
-                enemySnapshot.attack,
-                enemySnapshot.defense,
-                enemySnapshot.initiative,
-                enemySnapshot.currentPowerDices > 0 ? enemySnapshot.currentPowerDices : DefaultPowerDiceCount,
-                enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : DefaultAccuracyDiceCount,
-                false,
-                -1,
-                enemySnapshot.focus,
-                enemySnapshot.strength,
-                enemySnapshot.agility
-            );
-        }
-        else
-        {
-            Debug.LogWarning("[Combat] Enemy snapshot missing. Using default enemy.");
-            Enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
-        }
-    }
-
+    // =========================
+    // UI and view refresh
+    // =========================
     public void RefreshCombatUI()
     {
         View.UpdateView(Player, Enemy);
         Input.RefreshDiceAllocationUI();
     }
 
-    public BattlerStateService GetBattlerStateService()
-    {
-        return BattlerStateService;
-    }
-
-    public int GetEffectivePlayerActionPower()
-    {
-        ActionType actionType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        return BattlerStateService.GetEffectiveActionPower(Player, Enemy, actionType);
-    }
-
-    public CombatRollContext BuildPlayerRollContext(int maxValue, DiceStatType statType, DiceRollType rollType)
-    {
-        ActionType actionType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        int focus = BattlerStateService.GetEffectiveFocus(Player, Enemy, actionType);
-        int strength = BattlerStateService.GetEffectiveStrength(Player, Enemy, actionType);
-        return new CombatRollContext(Player, Enemy, actionType, rollType, statType, Player.Level, Enemy.Level, focus, strength, maxValue);
-    }
-
-    private void DefineStartingTurnByInitiative()
-    {
-        Battler firstBattler = InitiativeResolverService.ResolveStartingBattler(Player, Enemy);
-        PlayerIsAttacker = firstBattler == Player;
-        CurrentTurn = PlayerIsAttacker ? new TurnContext(Player, Enemy) : new TurnContext(Enemy, Player);
-    }
-
+    // =========================
+    // Input and event handling
+    // =========================
     public void ReceivePlayerInput(ActionType type, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
     {
-        if (CombatEnded)
-            return;
-
-        ActionType expectedType = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        if (type != expectedType)
+        if (!TurnManager.CanReceivePlayerInput(type, TurnState, out string rejectionReason))
         {
-            Debug.Log($"[Input] Ignored invalid action for current role. Expected {expectedType} and received {type}");
+            if (rejectionReason != null)
+                Logger.Log(rejectionReason);
             return;
         }
 
@@ -243,7 +146,7 @@ public class CombatManager : MonoBehaviour
 
     public void ReceivePlayerSkipTurn()
     {
-        if (CombatEnded)
+        if (!TurnManager.CanReceivePlayerSkipTurn(TurnState))
             return;
 
         StartCoroutine(SkipTurnRoutine());
@@ -251,7 +154,7 @@ public class CombatManager : MonoBehaviour
 
     public bool TryCastPlayerTrick(TrickSO trick)
     {
-        if (CombatEnded || trick == null)
+        if (TurnState.CombatEnded || trick == null)
             return false;
 
         bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
@@ -261,17 +164,20 @@ public class CombatManager : MonoBehaviour
 
     public void ExecuteManualTrickActivation(TrickRuntimeInstance instance)
     {
-        if (CombatEnded || instance == null || instance.Owner == null || PerkService == null)
+        if (TurnState.CombatEnded || instance == null || instance.Owner == null || PerkService == null)
             return;
 
         PerkService.ExecuteManualActivation(instance.Owner, instance);
         RefreshCombatUI();
     }
 
+    // =========================
+    // Turn flow and combat resolution
+    // =========================
     private IEnumerator SkipTurnRoutine()
     {
         yield return WaitForSeconds0_5;
-        if (!PlayerIsAttacker)
+        if (!TurnState.PlayerIsAttacker)
             yield break;
 
         View.ShowSkipTurnFeedback(true);
@@ -283,37 +189,37 @@ public class CombatManager : MonoBehaviour
     {
         yield return WaitForSeconds0_5;
 
-        GenerateEnemyAction();
+        TurnManager.GenerateEnemyAction(Enemy, SessionData, EnemyTurnPlanner, AttackDef, DefenseDef, TurnState);
 
         yield return WaitForSeconds0_5;
 
-        RollActions(action, powerDiceTypes, accuracyDiceTypes);
+        CombatDiceRollManager.RollActions(Player, Enemy, action, powerDiceTypes, accuracyDiceTypes, DiceService, PerkService, BattlerStateService, TurnState);
 
-        bool attackerAccuracyEffective = ResolveAttackAccuracy();
-        bool defenseAccuracyEffective = ResolveDefenseAccuracy();
+        bool attackerAccuracyEffective = CombatResolutionManager.ResolveAttackAccuracy(TurnState);
+        bool defenseAccuracyEffective = CombatResolutionManager.ResolveDefenseAccuracy(TurnState);
         bool isPlayerDefending = action == ActionType.Defense;
 
-        DiceResult bestAccuracy = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
+        DiceResult bestAccuracy = DiceService.GetBestResult(TurnState.PendingPlayerAccuracyRolls);
         var accuracyBoundaries = bestAccuracy != null 
-            ? GetPlayerTierBoundaries(bestAccuracy.MaxValue, bestAccuracy.StatType, DiceRollType.Accuracy)
+            ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestAccuracy.MaxValue, bestAccuracy.StatType, DiceRollType.Accuracy, DiceService, BattlerStateService, TurnState)
             : (1, 1, 1, 1);
 
-        yield return View.PlayDiceResolution(PendingPlayerAccuracyRolls, PendingEnemyAccuracyRolls, DiceRollType.Accuracy, accuracyBoundaries);
+        yield return View.PlayDiceResolution(TurnState.PendingPlayerAccuracyRolls, TurnState.PendingEnemyAccuracyRolls, DiceRollType.Accuracy, accuracyBoundaries);
 
         bool shouldPlayPowerResolution = attackerAccuracyEffective && (!isPlayerDefending || defenseAccuracyEffective);
 
         if (shouldPlayPowerResolution)
         {
-            List<DiceResult> playerRolls = isPlayerDefending && !defenseAccuracyEffective ? null : PendingPlayerPowerRolls;
-            DiceResult bestPower = DiceService.GetBestResult(PendingPlayerPowerRolls);
+            List<DiceResult> playerRolls = isPlayerDefending && !defenseAccuracyEffective ? null : TurnState.PendingPlayerPowerRolls;
+            DiceResult bestPower = DiceService.GetBestResult(TurnState.PendingPlayerPowerRolls);
             var powerBoundaries = bestPower != null
-                ? GetPlayerTierBoundaries(bestPower.MaxValue, bestPower.StatType, DiceRollType.Power)
+                ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestPower.MaxValue, bestPower.StatType, DiceRollType.Power, DiceService, BattlerStateService, TurnState)
                 : (1, 1, 1, 1);
 
-            yield return View.PlayDiceResolution(playerRolls, PendingEnemyPowerRolls, DiceRollType.Power, powerBoundaries);
+            yield return View.PlayDiceResolution(playerRolls, TurnState.PendingEnemyPowerRolls, DiceRollType.Power, powerBoundaries);
         }
 
-        Resolve();
+        CombatResolutionManager.Resolve(Resolver, TurnState, View, Player, Enemy);
 
         yield return WaitForSeconds0_5;
 
@@ -323,398 +229,60 @@ public class CombatManager : MonoBehaviour
         EndTurn();
     }
 
-    private void GenerateEnemyAction()
-    {
-        EnemyTurnPlan plan = EnemyTurnPlanner.BuildPlan(Enemy, SessionData?.EnemyInstance, AttackDef, DefenseDef);
-        if (PlayerIsAttacker)
-            CurrentTurn.DefenseAction = plan.Action;
-        else
-            CurrentTurn.AttackAction = plan.Action;
-
-        PendingEnemyPowerDiceTypes = plan.PowerDiceTypes;
-        PendingEnemyAccuracyDiceTypes = plan.AccuracyDiceTypes;
-    }
-
-    private void RollActions(ActionType action, IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes)
-    {
-        ActionDefinition playerAction = BuildDefinitionFromBattler(Player, Enemy, action);
-        ActionType enemyActionType = PlayerIsAttacker ? CurrentTurn.DefenseAction.Definition.Type : CurrentTurn.AttackAction.Definition.Type;
-
-        PendingPlayerAccuracyRolls = DiceService.RollMany(Player, Enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, Player.Level, Enemy.Level);
-        PendingEnemyAccuracyRolls = DiceService.RollMany(Enemy, Player, PendingEnemyAccuracyDiceTypes, enemyActionType, DiceRollType.Accuracy, Enemy.Level, Player.Level);
-
-        DiceResult playerAccuracyDice = DiceService.GetBestResult(PendingPlayerAccuracyRolls);
-        DiceResult enemyAccuracyDice = DiceService.GetBestResult(PendingEnemyAccuracyRolls);
-
-        // ── AfterAccuracyRoll: avaliar perks que dependem do tier do Accuracy (ex: adrenaline_surge)
-        int playerExtraPowerDice = PerkService.GetExtraPowerDiceAfterAccuracy(
-            Player, Enemy, playerAccuracyDice, action, out DiceStatType playerExtraStatType);
-        int enemyExtraPowerDice = PerkService.GetExtraPowerDiceAfterAccuracy(
-            Enemy, Player, enemyAccuracyDice, enemyActionType, out DiceStatType enemyExtraStatType);
-
-        PendingPlayerPowerRolls = DiceService.RollMany(Player, Enemy, powerDiceTypes, action, DiceRollType.Power, Player.Level, Enemy.Level);
-        PendingEnemyPowerRolls = DiceService.RollMany(Enemy, Player, PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, Enemy.Level, Player.Level);
-
-        // Adicionar dados extras de Poder (sem consumir pool)
-        if (playerExtraPowerDice > 0)
-        {
-            PendingPlayerPowerRolls.AddRange(
-                RollExtraPowerDiceWithoutPool(Player, Enemy, playerExtraPowerDice, playerExtraStatType, action, Player.Level, Enemy.Level));
-            Debug.Log($"[Adrenaline Surge] Player ganhou {playerExtraPowerDice} dado(s) extra(s) de Poder ({playerExtraStatType}) pelo Accuracy tier {playerAccuracyDice?.Tier}.");
-        }
-
-        if (enemyExtraPowerDice > 0)
-        {
-            PendingEnemyPowerRolls.AddRange(
-                RollExtraPowerDiceWithoutPool(Enemy, Player, enemyExtraPowerDice, enemyExtraStatType, enemyActionType, Enemy.Level, Player.Level));
-            Debug.Log($"[Adrenaline Surge] Enemy ganhou {enemyExtraPowerDice} dado(s) extra(s) de Poder ({enemyExtraStatType}) pelo Accuracy tier {enemyAccuracyDice?.Tier}.");
-        }
-
-        DiceResult playerPowerDice = DiceService.GetBestResult(PendingPlayerPowerRolls);
-        DiceResult enemyPowerDice = DiceService.GetBestResult(PendingEnemyPowerRolls);
-
-        ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice);
-        ActionInstance enemyActionInstance = PlayerIsAttacker ? CurrentTurn.DefenseAction : CurrentTurn.AttackAction;
-        
-        enemyActionInstance.Definition = BuildDefinitionFromBattler(Enemy, Player, enemyActionInstance.Definition.Type);
-        enemyActionInstance = new ActionInstance(enemyActionInstance.Definition, enemyPowerDice, enemyAccuracyDice);
-
-        if (PlayerIsAttacker)
-        {
-            CurrentTurn.AttackAction = playerActionInstance;
-            CurrentTurn.DefenseAction = enemyActionInstance;
-        }
-        else
-        {
-            CurrentTurn.AttackAction = enemyActionInstance;
-            CurrentTurn.DefenseAction = playerActionInstance;
-        }
-
-        Debug.Log($"[Flow] Player rolled POWER best:{playerPowerDice?.Value} | ACCURACY best:{playerAccuracyDice?.Value} using {PendingPlayerPowerRolls.Count + PendingPlayerAccuracyRolls.Count} dice.");
-        Debug.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice?.Value} | ACCURACY best:{enemyAccuracyDice?.Value} using {PendingEnemyPowerRolls.Count + PendingEnemyAccuracyRolls.Count} dice.");
-    }
-
-    /// <summary>
-    /// Rola dados extras de Poder SEM consumir a pool de dados do battler.
-    /// Usado por efeitos como adrenaline_surge que concedem dados bônus.
-    /// </summary>
-    private List<DiceResult> RollExtraPowerDiceWithoutPool(Battler actor, Battler opponent, int count, DiceStatType statType, ActionType actionType, int actorLevel, int opponentLevel)
-    {
-        List<DiceResult> extras = new();
-        int maxValue = DiceService.GetDiceMaxValueForType(actor, statType);
-        if (maxValue <= 0 || count <= 0)
-            return extras;
-
-        for (int i = 0; i < count; i++)
-        {
-            DiceResult extra = DiceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power);
-            extras.Add(extra);
-        }
-
-        return extras;
-    }
-
-    private void Resolve()
-    {
-        ActionResolutionResult result = Resolver.Resolve(
-            CurrentTurn.AttackAction,
-            CurrentTurn.DefenseAction,
-            CurrentTurn.Attacker,
-            CurrentTurn.Defender
-        );
-        Debug.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | Feedback: {result.FeedbackText}");
-        View.ShowAttackEffect(PlayerIsAttacker);
-
-        if (result.AppliesDamage)
-        {
-            Debug.Log($"[Resolve] Applying {result.Damage} damage to {result.FinalTarget.Name}");
-            result.FinalTarget.ReceiveDamage(result.Damage);
-        }
-
-        View.ShowResolveFeedback(result, PlayerIsAttacker == false);
-
-        Debug.Log($"[HP] Player: {Player.HP} | Enemy: {Enemy.HP}");
-
-        View.UpdateView(Player, Enemy);
-    }
-
-    private bool ResolveAttackAccuracy()
-    {
-        ActionInstance attack = CurrentTurn.AttackAction;
-        return attack != null && attack.AccuracyDice != null && attack.AccuracyDice.Tier != DiceTier.Low;
-    }
-
-    public bool ResolveDefenseAccuracy()
-    {
-        ActionInstance defense = CurrentTurn.DefenseAction;
-        return defense != null && defense.AccuracyDice != null && defense.AccuracyDice.Tier != DiceTier.Low;
-    }
-
     private void EndTurn()
     {
-        if (CombatEnded)
-            return;
-
-        Player.RecoverDices(1);
-        Enemy.RecoverDices(1);
-        BattlerStateService.TickTurnEnd(Player);
-        BattlerStateService.TickTurnEnd(Enemy);
-        PerkService.TickTurnEnd(Player);
-        PerkService.TickTurnEnd(Enemy);
-        TrickService.TickTrickEnd(Player, PlayerTrickInventory);
-        TrickService.TickTrickEnd(Enemy, EnemyTrickInventory);
-        View.UpdateView(Player, Enemy);
-        PlayerIsAttacker = !PlayerIsAttacker;
-        CurrentTurn = PlayerIsAttacker ? new TurnContext(Player, Enemy) : new TurnContext(Enemy, Player);
-
-        UpdateTurnRoleUI();
+        TurnManager.EndTurn(Player, Enemy, BattlerStateService, PerkService, TrickService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
+        RefreshCombatUI();
+        TurnManager.UpdateTurnRoleUI(TurnState, View, Input);
     }
 
-    private void UpdateTurnRoleUI()
-    {
-        ActionType allowedAction = PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        View.UpdateTurnOwner(PlayerIsAttacker);
-        Input.SetAllowedAction(allowedAction);
-        View.ActionPanel.SetPlayerRoleButtons(PlayerIsAttacker);
-    }
-
-    private ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType)
-    {
-        int basePower = BattlerStateService.GetEffectiveActionPower(battler, opponent, actionType);
-        string id = actionType == ActionType.Attack ? "attack" : "defense";
-        return new ActionDefinition(id, actionType, basePower);
-    }
-
+    // =========================
+    // Combat end and scene flow
+    // =========================
     private bool TryHandleCombatEnd()
     {
-        if (Player.IsAlive() && Enemy.IsAlive())
-            return false;
-
-        CombatEnded = true;
-        View.SetCombatInputEnabled(false);
-
-        bool playerWon = Player.IsAlive() && !Enemy.IsAlive();
-        if (playerWon)
-        {
-            lastGrantedXp = RewardService.GrantXpRewardIfEligible(Enemy.Level, Player.Level);
-            if (SessionData?.EnemyInstance?.source != null)
-            {
-                lastGrantedItens = RewardService.GetRandomLoot(Enemy.Level);
-            }
-            else
-            {
-                lastGrantedItens = new Dictionary<ItemSO, int>();
-            }
-            View.CombatEndView.ShowVictory(lastGrantedXp, lastGrantedItens, ProceedToGameplayScene);
-        }
-        else
-        {
-            View.CombatEndView.ShowGameOver(RestartCombat, QuitCombat);
-        }
-
-        return true;
+        return CombatEndService.TryHandleCombatEnd(
+            Player, Enemy, TurnState, View, RewardService, SessionData, 
+            ProceedToGameplayScene, RestartCombat, QuitCombat);
     }
 
     private void RestartCombat()
     {
-        CombatSessionStore.Clear();
-        CombatResultStore.Clear();
-        CombatReturnStore.Clear();
-        SceneManager.LoadScene(GameplaySceneName);
+        CombatEndService.RestartCombat(GameplaySceneName);
     }
 
     private void QuitCombat()
     {
-        #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-        #else
-                Application.Quit();
-        #endif
+        CombatEndService.QuitCombat();
     }
 
     private void ProceedToGameplayScene()
     {
-        CombatResultStore.SetResult(new CombatResultSnapshot
-        {
-            PlayerSnapshot = BuildResultPlayerSnapshot(),
-            EnemyInstance = SessionData?.EnemyInstance,
-            PlayerWon = true,
-            XpGained = lastGrantedXp,
-            ItensGained = lastGrantedItens,
-        });
-
-        CombatReturnStore.Set(new CombatReturnSnapshot
-        {
-            SceneName = SessionData != null ? SessionData.ReturnSceneName : GameplaySceneName,
-            Level = SessionData?.ReturnLevel,
-            LevelIndex = SessionData != null ? SessionData.ReturnLevelIndex : 0,
-            ExploredNodes = SessionData?.ReturnExploredNodes,
-            PlayerPosition = SessionData != null ? SessionData.ReturnPlayerPosition : Vector3.zero
-        });
-
-        string targetScene = SessionData != null && !string.IsNullOrWhiteSpace(SessionData.ReturnSceneName)
-            ? SessionData.ReturnSceneName
-            : GameplaySceneName;
-        SceneManager.LoadScene(targetScene);
+        CombatEndService.ProceedToGameplayScene(
+            Player, PlayerTrickInventory, CombatPlayerInventory, SessionData, TurnState, CoreStatCap, GameplaySceneName);
     }
 
-    private PlayerStatusSnapshot BuildResultPlayerSnapshot()
+    // =========================
+    // Service accessors and helpers
+    // =========================
+    public BattlerStateService GetBattlerStateService()
     {
-        if (SessionData == null)
-        {
-            return new PlayerStatusSnapshot
-            {
-                hp = Player.HP,
-                heart = ClampCoreStat(Player.Heart),
-                mind = ClampCoreStat(Player.Mind),
-                body = ClampCoreStat(Player.Body),
-                attack = Player.Attack,
-                defense = Player.Defense,
-                initiative = Player.Initiative,
-                focus = Player.Focus,
-                strength = Player.Strength,
-                agility = Player.Agility,
-                maxHeart = ClampCoreStat(Player.Heart),
-                maxMind = ClampCoreStat(Player.Mind),
-                maxBody = ClampCoreStat(Player.Body),
-                maxHp = Player.MaxHp,
-                powerDices = Player.CurrentPowerDices,
-                accuracyDices = Player.CurrentAccuracyDices,
-                trickInventory = PlayerTrickInventory != null
-                    ? TrickInventorySnapshot.CreatePersistentSnapshot(PlayerTrickInventory.GetSnapshot())
-                    : new TrickInventorySnapshot()
-            };
-        }
-
-        PlayerStatusSnapshot snapshot = SessionData.PlayerSnapshot;
-        snapshot.hp = Player.HP;
-        snapshot.heart = ClampCoreStat(Player.Heart);
-        snapshot.mind = ClampCoreStat(Player.Mind);
-        snapshot.body = ClampCoreStat(Player.Body);
-        snapshot.attack = Player.Attack;
-        snapshot.defense = Player.Defense;
-        snapshot.initiative = Player.Initiative;
-        snapshot.focus = Player.Focus;
-        snapshot.strength = Player.Strength;
-        snapshot.agility = Player.Agility;
-        snapshot.maxHeart = ClampCoreStat(Mathf.Max(snapshot.maxHeart, snapshot.heart));
-        snapshot.maxMind = ClampCoreStat(Mathf.Max(snapshot.maxMind, snapshot.mind));
-        snapshot.maxBody = ClampCoreStat(Mathf.Max(snapshot.maxBody, snapshot.body));
-        snapshot.maxHp = Player.MaxHp;
-        snapshot.powerDices = Player.CurrentPowerDices;
-        snapshot.accuracyDices = Player.CurrentAccuracyDices;
-        if (CombatPlayerInventory != null)
-            snapshot.inventory = CombatPlayerInventory.GetSnapshot();
-        if (PlayerTrickInventory != null)
-            snapshot.trickInventory = TrickInventorySnapshot.CreatePersistentSnapshot(PlayerTrickInventory.GetSnapshot());
-        return snapshot;
+        return BattlerStateService;
     }
-    
-    private int ClampCoreStat(float value)
+
+    public int GetEffectivePlayerActionPower()
     {
-        return Mathf.Clamp(Mathf.RoundToInt(value), 0, CoreStatCap);
+        ActionType actionType = TurnState.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
+        return BattlerStateService.GetEffectiveActionPower(Player, Enemy, actionType);
     }
 
-    private void ActivatePlayerIdentityTricks()
-    {   
-        if (Player == null || PlayerTrickInventory?.IdentitySlots == null)
-        {
-            return;
-        }
-
-        int activatedCount = 0;
-        for (int i = 0; i < PlayerTrickInventory.IdentitySlots.Count; i++)
-        {
-            TrickRuntimeInstance instance = PlayerTrickInventory.IdentitySlots[i]?.RuntimeInstance;
-            if (instance?.Definition != null)
-            {
-                TrickService.ApplyTrick(Player, instance, Player);
-                activatedCount++;
-            }
-        }
-    }
-
-    private void ActivateEnemyIdentityTricks()
-    {   
-        if (Enemy == null || EnemyTrickInventory?.IdentitySlots == null)
-        {
-            return;
-        }
-
-        // Logger.Log($"[CombatManager] ActivateEnemyIdentityTricks: Total de identity slots: {EnemyTrickInventory.IdentitySlots.Count}");
-        
-        int activatedCount = 0;
-        for (int i = 0; i < EnemyTrickInventory.IdentitySlots.Count; i++)
-        {
-            TrickRuntimeInstance instance = EnemyTrickInventory.IdentitySlots[i]?.RuntimeInstance;
-            if (instance?.Definition != null)
-            {
-                // Logger.Log($"[CombatManager] ActivateEnemyIdentityTricks[{i}]: Ativando '{instance.Definition.DisplayName}' (ID: {instance.Definition.Id})");
-                TrickService.ApplyTrick(Enemy, instance, Enemy);
-                activatedCount++;
-            }
-            else
-            {
-                // Logger.Log($"[CombatManager] ActivateEnemyIdentityTricks[{i}]: Slot vazio ou sem definição.");
-            }
-        }
-        
-        // Logger.Log($"[CombatManager] ActivateEnemyIdentityTricks: Conclusão. Identity tricks ativadas: {activatedCount}/{EnemyTrickInventory.IdentitySlots.Count}");
-    }
-
-    private ITrickInventory BuildPlayerTrickInventory(Battler owner)
-    {   
-        TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
-        TrickInventorySnapshot snapshot = SessionData?.PlayerSnapshot.trickInventory;
-        TrickInventory trickInventory = new(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, PerkService);
-
-        return trickInventory;
-    }
-
-    private ITrickInventory BuildEnemyTrickInventory(Battler owner)
-    {   
-        TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
-        TrickInventorySnapshot snapshot = null;
-
-        if (SessionData?.EnemyInstance?.source != null)
-        {
-            snapshot = SessionData.EnemyInstance.source.GetTrickInventorySnapshot();
-            // Logger.Log($"[CombatManager] BuildEnemyTrickInventory: Snapshot obtido do EnemySO. Tricks aprendidas: {snapshot.learnedTrickIds.Count}.");
-        }
-
-        TrickInventory trickInventory = new(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, PerkService);
-        
-        return trickInventory;
-    }
-
-    private ICombatInventory BuildCombatInventory(CombatSessionData sessionData)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
-        ItemDatabase itemDatabase = FindObjectOfType<ItemDatabase>();
-        PlayerInventorySnapshot snapshot = null;
-        if (sessionData?.PlayerSnapshot != null)
-            snapshot = sessionData.PlayerSnapshot.inventory;
-
-        PlayerInventory inventory = FindObjectOfType<PlayerInventory>();
-        if (snapshot == null && inventory != null)
-            snapshot = inventory.GetSnapshot();
-
-        if (itemDatabase != null)
-            return new CombatInventory(Player, itemDatabase, snapshot ?? new PlayerInventorySnapshot());
-
-        if (inventory != null && snapshot != null)
-            inventory.RestoreSnapshot(snapshot);
-
-        return inventory;
+        return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, BattlerStateService, TurnState);
     }
 
     public DiceService GetDiceService()
     {
         return DiceService;
-    }
-
-    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
-    {
-        CombatRollContext context = BuildPlayerRollContext(maxValue, statType, rollType);
-        return GetDiceService().GetTierBoundaries(context);
     }
 }

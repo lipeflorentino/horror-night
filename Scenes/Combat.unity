@@ -9611,6 +9611,7 @@ Transform:
   - {fileID: 1568449879}
   - {fileID: 2073077305}
   - {fileID: 1600810957}
+  - {fileID: 1793599951}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &680874706
@@ -16684,38 +16685,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1154723557}
   m_CullTransparentMesh: 1
---- !u!1 &1161733801
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1161733802}
-  m_Layer: 0
-  m_Name: ViewManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1161733802
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161733801}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1465.6136, y: 527.29346, z: -3.7274525}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1793599951}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167307101
 GameObject:
   m_ObjectHideFlags: 0
@@ -22291,10 +22260,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b891e405a8552474b81084219bdd0b3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameplaySceneName: DarkForest
+  DefaultPowerDiceCount: 3
+  DefaultAccuracyDiceCount: 3
+  CoreStatCap: 20
+  GameplaySceneName: Gameplay
   View: {fileID: 0}
   Input: {fileID: 0}
-  EnemyVisuals: {fileID: 0}
 --- !u!1 &1571761607
 GameObject:
   m_ObjectHideFlags: 0
@@ -24934,11 +24905,11 @@ Transform:
   m_GameObject: {fileID: 1793599950}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -733.5757, y: -218.70502, z: -3.7017744}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1161733802}
+  m_Father: {fileID: 673971347}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1793599952
 MonoBehaviour:
@@ -38984,7 +38955,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1211341127}
   - {fileID: 673971347}
-  - {fileID: 1161733802}
   - {fileID: 6101374163679403211}
   - {fileID: 399351990}
   - {fileID: 788150948}
