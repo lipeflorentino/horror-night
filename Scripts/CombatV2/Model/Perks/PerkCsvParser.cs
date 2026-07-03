@@ -70,6 +70,9 @@ public static class PerkCsvParser
         if (target == PerkModifierTarget.PowerMultiplier)
             return PerkTrigger.PowerMultiplier;
 
+        if (target == PerkModifierTarget.AttackPower || target == PerkModifierTarget.DefensePower)
+            return PerkTrigger.BeforeRoll;
+
         if (target == PerkModifierTarget.DamagePercent || target == PerkModifierTarget.MomentumPoints)
             return PerkTrigger.AfterResolve;
 

@@ -1,0 +1,4 @@
+Id,DisplayName,Description,DurationTurns,MaxStacks,StackMode,PerkIds,FlavorText
+exposed,Exposto,Reduz eficácia defensiva,1,1,RefreshDuration,state_exposed_max_accuracy;state_exposed_defense_power;state_exposed_defender_accuracy,Vulnerável a ataques
+angry,Raivoso,Aumenta ataque mas prejudica defesa,1,1,RefreshDuration,state_angry_attack_power;state_angry_power_high_threshold;state_angry_power_low_threshold;state_angry_defense_power;state_angry_defender_accuracy,Fúria às cegas
+cautious,Cauteloso,Postura defensiva extrema prejudica precisão,1,1,RefreshDuration,state_cautious_max_accuracy;state_cautious_min_accuracy,Prudência excessiva

@@ -26,3 +26,13 @@ exhaustion_mind,Any,Any,Any,Any,Any,OnApply,,Mind,Add,-4,1,RefreshDuration
 accumulated_rage_charge,OwnerAsActor,Any,Any,Any,Any,OnBlocked,,TrickCharges,Add,1,5,AddStack
 accumulated_rage_release_attack,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Attack,AddPerCharge,1,5,RefreshDuration
 accumulated_rage_release_damage,OwnerAsActor,Any,Any,Any,Any,OnManualActivation,,Damage,AddPerCharge,1,5,RefreshDuration
+state_exposed_max_accuracy,OwnerAsTarget,Attack,Accuracy,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
+state_exposed_defense_power,OwnerAsDefender,Defense,Any,Any,Any,Always,,DefensePower,Multiply,0.90,1,RefreshDuration
+state_exposed_defender_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,0.10,1,RefreshDuration
+state_angry_attack_power,OwnerAsAttacker,Attack,Any,Any,Any,Always,,AttackPower,Multiply,1.10,1,RefreshDuration
+state_angry_power_high_threshold,OwnerAsAttacker,Attack,Power,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
+state_angry_power_low_threshold,OwnerAsAttacker,Attack,Power,Any,Any,Always,,MinRollPercent,Add,-0.15,1,RefreshDuration
+state_angry_defense_power,OwnerAsDefender,Defense,Any,Any,Any,Always,,DefensePower,Multiply,0.90,1,RefreshDuration
+state_angry_defender_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,0.15,1,RefreshDuration
+state_cautious_max_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
+state_cautious_min_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MinRollPercent,Add,-0.15,1,RefreshDuration

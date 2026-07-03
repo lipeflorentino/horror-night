@@ -6,12 +6,10 @@ public class DiceService
 {
     private const float CombatStatThresholdShift = 0.05f;
     private readonly System.Random random = new();
-    private readonly BattlerStateService stateService;
     private readonly PerkService perkService;
 
-    public DiceService(BattlerStateService stateService = null, PerkService perkService = null)
+    public DiceService(PerkService perkService = null)
     {
-        this.stateService = stateService;
         this.perkService = perkService;
     }
 
@@ -28,6 +26,19 @@ public class DiceService
             MaxValue = maxValue;
             StatType = statType;
             RollType = rollType;
+        }
+    }
+
+
+    private struct ThresholdPair
+    {
+        public float Low;
+        public float High;
+
+        public ThresholdPair(float low, float high)
+        {
+            Low = low;
+            High = high;
         }
     }
 
@@ -91,8 +102,8 @@ public class DiceService
 
     public List<DiceResult> RollMany(Battler actor, Battler opponent, IReadOnlyList<DiceStatType> diceTypes, ActionType actionType, DiceRollType rollType, int actorLevel = 1, int opponentLevel = 1)
     {
-        int focus = stateService != null ? stateService.GetEffectiveFocus(actor, opponent, actionType) : actor?.Focus ?? 0;
-        int strength = stateService != null ? stateService.GetEffectiveStrength(actor, opponent, actionType) : actor?.Strength ?? 0;
+        int focus = perkService != null ? perkService.GetEffectiveFocus(actor, opponent, actionType) : actor?.Focus ?? 0;
+        int strength = perkService != null ? perkService.GetEffectiveStrength(actor, opponent, actionType) : actor?.Strength ?? 0;
         List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(actor, opponent, diceTypes, actionType, rollType, actorLevel, opponentLevel, focus, strength);
 
         if (diceSpecs.Count == 0)
@@ -268,8 +279,12 @@ public class DiceService
         float shift = levelShift + combatStatShift;
 
         ThresholdPair thresholds = new(baseLowThreshold - shift, baseHighThreshold - shift);
-        if (stateService != null)
-            thresholds = stateService.ApplyThresholdModifiers(thresholds, context);
+        if (perkService != null)
+        {
+            var modified = perkService.GetModifiedRollThresholds(context.Actor, context.Opponent, context, thresholds.Low, thresholds.High);
+            thresholds.Low = modified.low;
+            thresholds.High = modified.high;
+        }
 
         thresholds.Low = Mathf.Clamp(thresholds.Low, 0.05f, 0.45f);
         thresholds.High = Mathf.Clamp(thresholds.High, 0.55f, 0.95f);

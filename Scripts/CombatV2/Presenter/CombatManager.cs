@@ -35,7 +35,6 @@ public class CombatManager : MonoBehaviour
     // Services
     // =========================
     private DiceService DiceService;
-    private BattlerStateService BattlerStateService;
     private PerkService PerkService;
     private TrickService TrickService;
     private ActionResolverService Resolver;
@@ -64,10 +63,9 @@ public class CombatManager : MonoBehaviour
     // =========================
     void Start()
     {
-        BattlerStateService = new BattlerStateService();
         PerkService = new PerkService();
         TrickService = new TrickService(PerkService);
-        DiceService = new DiceService(BattlerStateService, PerkService);
+        DiceService = new DiceService(PerkService);
         Resolver = new ActionResolverService(PerkService);
         InitiativeResolverService = new InitiativeResolverService();
         EnemyActionSelector = new EnemyActionSelector();
@@ -193,7 +191,7 @@ public class CombatManager : MonoBehaviour
 
         yield return WaitForSeconds0_5;
 
-        CombatDiceRollManager.RollActions(Player, Enemy, action, powerDiceTypes, accuracyDiceTypes, DiceService, PerkService, BattlerStateService, TurnState);
+        CombatDiceRollManager.RollActions(Player, Enemy, action, powerDiceTypes, accuracyDiceTypes, DiceService, PerkService, TurnState);
 
         bool attackerAccuracyEffective = CombatResolutionManager.ResolveAttackAccuracy(TurnState);
         bool defenseAccuracyEffective = CombatResolutionManager.ResolveDefenseAccuracy(TurnState);
@@ -201,7 +199,7 @@ public class CombatManager : MonoBehaviour
 
         DiceResult bestAccuracy = DiceService.GetBestResult(TurnState.PendingPlayerAccuracyRolls);
         var accuracyBoundaries = bestAccuracy != null 
-            ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestAccuracy.MaxValue, bestAccuracy.StatType, DiceRollType.Accuracy, DiceService, BattlerStateService, TurnState)
+            ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestAccuracy.MaxValue, bestAccuracy.StatType, DiceRollType.Accuracy, DiceService, PerkService, TurnState)
             : (1, 1, 1, 1);
 
         yield return View.PlayDiceResolution(TurnState.PendingPlayerAccuracyRolls, TurnState.PendingEnemyAccuracyRolls, DiceRollType.Accuracy, accuracyBoundaries);
@@ -213,7 +211,7 @@ public class CombatManager : MonoBehaviour
             List<DiceResult> playerRolls = isPlayerDefending && !defenseAccuracyEffective ? null : TurnState.PendingPlayerPowerRolls;
             DiceResult bestPower = DiceService.GetBestResult(TurnState.PendingPlayerPowerRolls);
             var powerBoundaries = bestPower != null
-                ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestPower.MaxValue, bestPower.StatType, DiceRollType.Power, DiceService, BattlerStateService, TurnState)
+                ? CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, bestPower.MaxValue, bestPower.StatType, DiceRollType.Power, DiceService, PerkService, TurnState)
                 : (1, 1, 1, 1);
 
             yield return View.PlayDiceResolution(playerRolls, TurnState.PendingEnemyPowerRolls, DiceRollType.Power, powerBoundaries);
@@ -231,7 +229,7 @@ public class CombatManager : MonoBehaviour
 
     private void EndTurn()
     {
-        TurnManager.EndTurn(Player, Enemy, BattlerStateService, PerkService, TrickService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
+        TurnManager.EndTurn(Player, Enemy, PerkService, TrickService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
         RefreshCombatUI();
         TurnManager.UpdateTurnRoleUI(TurnState, View, Input);
     }
@@ -265,20 +263,15 @@ public class CombatManager : MonoBehaviour
     // =========================
     // Service accessors and helpers
     // =========================
-    public BattlerStateService GetBattlerStateService()
-    {
-        return BattlerStateService;
-    }
-
     public int GetEffectivePlayerActionPower()
     {
         ActionType actionType = TurnState.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        return BattlerStateService.GetEffectiveActionPower(Player, Enemy, actionType);
+        return PerkService.GetEffectiveActionPower(Player, Enemy, actionType);
     }
 
     public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
     {
-        return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, BattlerStateService, TurnState);
+        return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, PerkService, TurnState);
     }
 
     public DiceService GetDiceService()

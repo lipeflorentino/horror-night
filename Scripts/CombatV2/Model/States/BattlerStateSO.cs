@@ -2,14 +2,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BattlerState", menuName = "Combat/Battler State")]
-public class BattlerStateDefinition : ScriptableObject
+public class BattlerStateSO : ScriptableObject
 {
     public string Id;
     public string DisplayName;
+    [TextArea(2, 4)]
+    public string Description;
     public Sprite Icon;
     public int DefaultDurationTurns = 1;
     public int MaxStacks = 1;
     public BattlerStateStackMode StackMode = BattlerStateStackMode.RefreshDuration;
-    public List<ThresholdModifier> ThresholdModifiers = new();
-    public List<BattlerStatModifier> BattlerStatModifiers = new();
+    public List<string> PerkIds = new();
+    [TextArea(1, 2)]
+    public string FlavorText;
+
+    public bool IsValid()
+    {
+        return !string.IsNullOrEmpty(Id) && PerkIds.Count > 0;
+    }
 }
