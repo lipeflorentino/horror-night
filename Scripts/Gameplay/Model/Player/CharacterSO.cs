@@ -7,6 +7,7 @@ public class CharacterSO : ScriptableObject
     [Header("Identity")]
     public string Id;
     public string DisplayName = "Player";
+    public Sprite CharacterIcon;
     [TextArea(2, 4)] public string Description;
     [Header("Progression Defaults")]
     [Min(0)] public int Xp = 0;

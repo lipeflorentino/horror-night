@@ -16,6 +16,8 @@ public class CombatManager : MonoBehaviour
 
     public Battler Player { get; private set; }
     public Battler Enemy { get; private set; }
+    public Sprite PlayerIcon { get; private set; }
+    public Sprite EnemyIcon { get; private set; }
     public bool IsPlayerAttacker => PlayerIsAttacker;
 
     private DiceService DiceService;
@@ -110,6 +112,8 @@ public class CombatManager : MonoBehaviour
             Debug.LogWarning("[Combat] No CombatSessionData found. Using default battlers.");
             Player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, true);
             Enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, DefaultPowerDiceCount, DefaultAccuracyDiceCount, false);
+            PlayerIcon = null;
+            EnemyIcon = null;
             return;
         }
 
@@ -117,6 +121,12 @@ public class CombatManager : MonoBehaviour
         EnemyInstance enemySnapshot = sessionData.EnemyInstance;
         EnemyVisuals = FindObjectOfType<EnemyVisuals>();
         EnemyVisuals.SetEnemyVisual(enemySnapshot ?? null);
+
+        PlayerIcon = playerSnapshot.characterIcon;
+        if (enemySnapshot != null && enemySnapshot.source != null)
+        {
+            EnemyIcon = enemySnapshot.source.image;
+        }
 
         Player = new Battler(
             string.IsNullOrWhiteSpace(playerSnapshot.characterName) ? "Player" : playerSnapshot.characterName,

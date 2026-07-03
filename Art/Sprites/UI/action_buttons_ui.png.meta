@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d819c35162189474da8b65f14a840fde
+guid: bb98d3e99fd5bae46a06657fc52156f4
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -110,13 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: attack
+      name: action_button_atk
       rect:
         serializedVersion: 2
-        x: 38
-        y: 390
-        width: 132
-        height: 132
+        x: 208
+        y: 553
+        width: 357
+        height: 353
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -124,20 +124,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1bb70ea50d171c34bb905e7d6d591480
-      internalID: -888320612
+      spriteID: efa0ca492af31f04cbacddaa3b355dbd
+      internalID: -1218411877
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: defense
+      name: action_buttons_def
       rect:
         serializedVersion: 2
-        x: 203
-        y: 391
-        width: 131
-        height: 131
+        x: 634
+        y: 552
+        width: 355
+        height: 354
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -145,20 +145,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f70219547f6e93044831abd954b33963
-      internalID: -532898635
+      spriteID: 317130ca2b779aa42818c60391e72b7d
+      internalID: -985834562
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: focus
+      name: action_buttons_itens
       rect:
         serializedVersion: 2
-        x: 366
-        y: 391
-        width: 130
-        height: 130
+        x: 1056
+        y: 553
+        width: 360
+        height: 353
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8203121c080d3c4428d09202dd5c5f80
-      internalID: -764800833
+      spriteID: 82efd7e2178764b4f90f6342352b9b7d
+      internalID: -1723779423
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: strength
+      name: action_buttons_tricks
       rect:
         serializedVersion: 2
-        x: 529
-        y: 390
-        width: 131
-        height: 132
+        x: 207
+        y: 109
+        width: 358
+        height: 353
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,41 +187,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 37a37af899822bf458f5be1923cbedfd
-      internalID: 758321381
+      spriteID: 57a9845397366e24ebd4d09c1f1fc384
+      internalID: 56304943
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: agility
+      name: action_buttons_infos
       rect:
         serializedVersion: 2
-        x: 38
-        y: 215
-        width: 131
-        height: 130
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 1, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 6b57586623e2ac14a9845d56757fbe7e
-      internalID: -1772028135
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: mind
-      rect:
-        serializedVersion: 2
-        x: 202
-        y: 214
-        width: 133
-        height: 132
+        x: 633
+        y: 109
+        width: 357
+        height: 352
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -229,20 +208,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 563ea6bf8aa4ddd4db608cce083a429d
-      internalID: 1620779048
+      spriteID: 093d186a92bd0054aa0ed4f165d501e9
+      internalID: -388770283
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: heart
+      name: action_buttons_skip
       rect:
         serializedVersion: 2
-        x: 365
-        y: 214
-        width: 134
-        height: 132
+        x: 1056
+        y: 109
+        width: 360
+        height: 352
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -250,92 +229,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f92b11c9f57cfaa4792b73227538bcee
-      internalID: 636049560
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: body
-      rect:
-        serializedVersion: 2
-        x: 529
-        y: 214
-        width: 133
-        height: 132
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 669cb5894c3dc7c40ba46dc896d45192
-      internalID: 118346307
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: initiative
-      rect:
-        serializedVersion: 2
-        x: 38
-        y: 41
-        width: 133
-        height: 132
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: cf0b83beeb6c3f043b527da2f0548d0b
-      internalID: 1703131562
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: powerDice
-      rect:
-        serializedVersion: 2
-        x: 202
-        y: 40
-        width: 133
-        height: 133
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 329aae919d18ba04d925c1415e407b0a
-      internalID: 679581114
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: accuracyDice
-      rect:
-        serializedVersion: 2
-        x: 366
-        y: 40
-        width: 131
-        height: 132
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c81282d1df9fcb046ae5d4848c794cd6
-      internalID: 694863495
+      spriteID: 616f1c7dd09ae81459b14f499c79cf44
+      internalID: -1426996045
       vertices: []
       indices: 
       edges: []
@@ -351,17 +246,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      accuracyDice: 694863495
-      agility: -1772028135
-      attack: -888320612
-      body: 118346307
-      defense: -532898635
-      focus: -764800833
-      heart: 636049560
-      initiative: 1703131562
-      mind: 1620779048
-      powerDice: 679581114
-      strength: 758321381
+      action_button_atk: -1218411877
+      action_buttons_def: -985834562
+      action_buttons_infos: -388770283
+      action_buttons_itens: -1723779423
+      action_buttons_skip: -1426996045
+      action_buttons_tricks: 56304943
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

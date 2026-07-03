@@ -236,6 +236,7 @@ public class PlayerStatusManager : MonoBehaviour
         {
             characterId = character != null ? character.Id : string.Empty,
             characterName = character != null ? character.DisplayName : string.Empty,
+            characterIcon = character != null ? character.CharacterIcon : null,
             heart = ClampCoreStat(currentHeart, maxHeart),
             body = ClampCoreStat(currentBody, maxBody),
             mind = ClampCoreStat(currentMind, maxMind),

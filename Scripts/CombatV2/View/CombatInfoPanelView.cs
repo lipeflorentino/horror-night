@@ -2,24 +2,28 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CombatInfoPanelView : MonoBehaviour
 {
     private const string StatsIconResourcePath = "UI/Battler/Stats/{0}Icon";
 
     [SerializeField] private GameObject panelRoot;
+    [SerializeField] private Button closeButton;
 
     [Header("Player Profile")]
     [SerializeField] private TMP_Text playerNameText;
     [SerializeField] private TMP_Text playerLvlText;
     [SerializeField] private TMP_Text playerHpText;
     [SerializeField] private Transform playerStatsContainer;
+    [SerializeField] private Image playerIcon;
 
     [Header("Enemy Profile")]
     [SerializeField] private TMP_Text enemyNameText;
     [SerializeField] private TMP_Text enemyLvlText;
     [SerializeField] private TMP_Text enemyHpText;
     [SerializeField] private Transform enemyStatsContainer;
+    [SerializeField] private Image enemyIcon;
 
     [Header("Stat Row Prefab")]
     [SerializeField] private StatRowUI statRowPrefab;
@@ -43,7 +47,21 @@ public class CombatInfoPanelView : MonoBehaviour
         ("AccuracyDices", "Accuracy dices", b => $"{b.CurrentAccuracyDices}/{b.MaxAccuracyDices}"),
     };
 
-    public void Bind(Battler player, Battler enemy)
+    private void OnEnable()
+    {
+        if (closeButton != null)
+            closeButton.onClick.AddListener(Close);
+
+        Close();
+    }
+
+    private void OnDisable()
+    {
+        if (closeButton != null)
+            closeButton.onClick.RemoveListener(Close);
+    }
+
+    public void Bind(Battler player, Sprite playerSprite, Battler enemy, Sprite enemySprite)
     {
         if (playerNameText != null)
             playerNameText.text = player.Name;
@@ -54,6 +72,9 @@ public class CombatInfoPanelView : MonoBehaviour
         if (playerHpText != null)
             playerHpText.text = $"{player.HP}/{player.MaxHp}";
 
+        if (playerIcon != null)
+            playerIcon.sprite = playerSprite;
+
         if (enemyNameText != null)
             enemyNameText.text = enemy.Name;
 
@@ -62,6 +83,9 @@ public class CombatInfoPanelView : MonoBehaviour
 
         if (enemyHpText != null)
             enemyHpText.text = $"{enemy.HP}/{enemy.MaxHp}";
+
+        if (enemyIcon != null)
+            enemyIcon.sprite = enemySprite;
 
         BuildStatRows(player, playerStatsContainer);
         BuildStatRows(enemy, enemyStatsContainer);
@@ -105,11 +129,16 @@ public class CombatInfoPanelView : MonoBehaviour
         return sprite;
     }
 
-    public void SetVisible()
+    public void SetVisible(bool visible)
     {
         if (panelRoot != null)
-            panelRoot.SetActive(!panelRoot.activeSelf);
+            panelRoot.SetActive(visible);
         else
-            gameObject.SetActive(!gameObject.activeSelf);
+            gameObject.SetActive(visible);
+    }
+
+    private void Close()
+    {
+        SetVisible(false);
     }
 }

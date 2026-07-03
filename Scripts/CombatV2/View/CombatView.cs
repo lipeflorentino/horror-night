@@ -15,6 +15,9 @@ public class CombatView : MonoBehaviour
     public CombatLogView CombatLogView;
     public ActiveTricksView ActiveTricksView;
 
+    private Sprite playerIconSprite;
+    private Sprite enemyIconSprite;
+
     public void Init(CombatManager combatManager)
     {
         BattlerPanelView[] panels = FindObjectsOfType<BattlerPanelView>();
@@ -51,6 +54,9 @@ public class CombatView : MonoBehaviour
             
         DiceRollView.HidePanel();
         ActiveTricksView.Init(combatManager);
+
+        playerIconSprite = combatManager.PlayerIcon;
+        enemyIconSprite = combatManager.EnemyIcon;
     }
 
     public void BindInput(CombatInputHandler inputHandler)
@@ -63,7 +69,7 @@ public class CombatView : MonoBehaviour
     {
         PlayerPanel.Bind(player);
         EnemyPanel.Bind(enemy);
-        InfoPanelView.Bind(player, enemy);
+        InfoPanelView.Bind(player, playerIconSprite, enemy, enemyIconSprite);
     }
 
     public void UpdateTurnOwner(bool isPlayerAttacker)
@@ -118,6 +124,6 @@ public class CombatView : MonoBehaviour
     public void SetInfoPanelVisible()
     {
         if (InfoPanelView != null)
-            InfoPanelView.SetVisible();
+            InfoPanelView.SetVisible(true);
     }
 }

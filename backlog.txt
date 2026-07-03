@@ -68,5 +68,5 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 --------------------------------------------------
+- No painel de combat infos puxar icone do inimigo e do player
 - Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)
-- Ajustar painel de infos (fechamento, tamanho)

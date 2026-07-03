@@ -5,6 +5,7 @@ public struct PlayerStatusSnapshot
 {
     [SerializeField] public string characterId;
     [SerializeField] public string characterName;
+    [SerializeField] public Sprite characterIcon;
     [SerializeField] public float heart;
     [SerializeField] public float body;
     [SerializeField] public float mind;
