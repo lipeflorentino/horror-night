@@ -42,7 +42,7 @@ public static class BattlerStateCsvParser
             state.Icon = sprite;
             state.DefaultDurationTurns = ParseInt(Get(row, columns, "DurationTurns"), 1);
             state.MaxStacks = Math.Max(1, ParseInt(Get(row, columns, "MaxStacks"), 1));
-            state.StackMode = ParseEnum(Get(row, columns, "StackMode"), BattlerStateStackMode.RefreshDuration);
+            state.StackMode = ParseEnum(Get(row, columns, "StackMode"), PerkStackMode.RefreshDuration);
             state.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
             state.FlavorText = Get(row, columns, "FlavorText");
             

@@ -1,4 +1,4 @@
-public enum BattlerStateRole
+public enum PerkRole
 {
     OwnerAsActor,
     OwnerAsOpponent,
@@ -7,7 +7,7 @@ public enum BattlerStateRole
     OwnerAsTarget
 }
 
-public enum BattlerStateStackMode
+public enum PerkStackMode
 {
     RefreshDuration,
     AddStack,

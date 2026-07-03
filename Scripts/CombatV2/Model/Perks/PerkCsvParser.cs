@@ -27,7 +27,7 @@ public static class PerkCsvParser
             perk.Id = id;
             perk.DefaultDurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
             perk.MaxStacks = Math.Max(1, ParseInt(Get(row, columns, "MaxStacks"), 1));
-            perk.StackMode = ParseEnum(Get(row, columns, "StackMode"), BattlerStateStackMode.RefreshDuration);
+            perk.StackMode = ParseEnum(Get(row, columns, "StackMode"), PerkStackMode.RefreshDuration);
             perk.Tags = Get(row, columns, "Tags");
             perk.Rules.Add(ParseRule(row, columns));
             perks.Add(perk);
@@ -50,7 +50,7 @@ public static class PerkCsvParser
             Trigger = InferTrigger(modifierTarget, filterByTier),
             ModifierTarget = modifierTarget,
             Operation = ParseEnum(Get(row, columns, "Operation"), PerkOperation.Add),
-            OwnerRole = ParseEnum(Get(row, columns, "OwnerRole"), BattlerStateRole.OwnerAsActor),
+            OwnerRole = ParseEnum(Get(row, columns, "OwnerRole"), PerkRole.OwnerAsActor),
             ActionType = ParseEnum(actionFilter, ActionType.Attack),
             FilterByActionType = HasFilter(actionFilter),
             RollType = ParseEnum(rollFilter, DiceRollType.Power),

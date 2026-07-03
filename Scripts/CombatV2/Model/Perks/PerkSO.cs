@@ -10,7 +10,7 @@ public class PerkSO : ScriptableObject
     public string Id;
     public int DefaultDurationTurns = -1;
     public int MaxStacks = 1;
-    public BattlerStateStackMode StackMode = BattlerStateStackMode.RefreshDuration;
+    public PerkStackMode StackMode = PerkStackMode.RefreshDuration;
     public string Tags;
     public List<PerkRule> Rules = new();
 }

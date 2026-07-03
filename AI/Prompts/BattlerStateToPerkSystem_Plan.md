@@ -55,7 +55,7 @@ public class BattlerStateSO : ScriptableObject
     public Sprite Icon;
     public int DefaultDurationTurns = 1;
     public int MaxStacks = 1;
-    public BattlerStateStackMode StackMode = BattlerStateStackMode.RefreshDuration;
+    public PerkStackMode StackMode = PerkStackMode.RefreshDuration;
     public List<string> PerkIds = new();  // Perks atômicos que compõem o estado
     public string FlavorText;
     public bool IsValid() => !string.IsNullOrEmpty(Id) && PerkIds.Count > 0;
@@ -188,11 +188,11 @@ Adicionar suporte interno em `ApplyRollModifiersFromOwner` e `ApplyDiceModifiers
 | `Model/States/BattlerStatModifier.cs` | Removido (substituído por PerkRule) |
 | `Model/States/ThresholdModifier.cs` | Removido (substituído por PerkRule) |
 | `Model/States/ThresholdPair.cs` | Removido |
-| `Enums/Enums.cs` | Enums `BattlerStateRole`, `BattlerStateStackMode`, `BattlerStateStatType`, `ModifierOperation`, `ThresholdBand` — os que ainda são usados por Perks (`BattlerStateRole`, `BattlerStateStackMode`) ficam em `PerkEnums.cs`; os exclusivos de States são deletados. |
+| `Enums/Enums.cs` | Enums `PerkRole`, `PerkStackMode`, `BattlerStateStatType`, `ModifierOperation`, `ThresholdBand` — os que ainda são usados por Perks (`PerkRole`, `PerkStackMode`) ficam em `PerkEnums.cs`; os exclusivos de States são deletados. |
 
 > [!WARNING]
-> `BattlerStateStackMode` é usado em `PerkSO` e `DrawbackSO`. Este enum deve **migrar** para `PerkEnums.cs` antes de deletar `Enums.cs`.
-> `BattlerStateRole` idem — já está em `PerkEnums.cs` nesse projeto? Confirmar antes de deletar.
+> `PerkStackMode` é usado em `PerkSO` e `DrawbackSO`. Este enum deve **migrar** para `PerkEnums.cs` antes de deletar `Enums.cs`.
+> `PerkRole` idem — já está em `PerkEnums.cs` nesse projeto? Confirmar antes de deletar.
 
 ---
 

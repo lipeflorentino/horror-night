@@ -31,7 +31,7 @@ O sistema de Perks do Combat V2 tem uma **arquitetura sólida mas incompleta**. 
 | Coluna | Tipo | Descrição | Valores |
 |--------|------|-----------|---------|
 | **Trigger** | `PerkTrigger` | Momento de disparo | `BeforeRoll`, `PowerMultiplier`, `AfterResolve` |
-| **OwnerRole** | `BattlerStateRole` | Quem é o dono? | `OwnerAsActor`, `OwnerAsAttacker`, `OwnerAsDefender`, `OwnerAsTarget` |
+| **OwnerRole** | `PerkRole` | Quem é o dono? | `OwnerAsActor`, `OwnerAsAttacker`, `OwnerAsDefender`, `OwnerAsTarget` |
 
 ### Colunas de Filtros (ONDE Aplicar)
 | Coluna | Tipo | Descrição | Valores |

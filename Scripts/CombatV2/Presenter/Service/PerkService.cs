@@ -72,11 +72,11 @@ public class PerkService
 
         switch (definition.StackMode)
         {
-            case BattlerStateStackMode.AddStack:
+            case PerkStackMode.AddStack:
                 existing.Stacks = Mathf.Clamp(existing.Stacks + Mathf.Max(1, stacks), 1, maxStacks);
                 existing.RemainingTurns = ResolveDuration(definition, durationTurns, existing.RemainingTurns);
                 break;
-            case BattlerStateStackMode.Replace:
+            case PerkStackMode.Replace:
                 existing.Source = source;
                 existing.SetSourceTrick(sourceTrick);
                 existing.Stacks = Mathf.Clamp(stacks, 1, maxStacks);
@@ -182,7 +182,7 @@ public class PerkService
             state.Definition.Id.Equals(definition.Id, System.StringComparison.OrdinalIgnoreCase));
 
         int resolvedDuration = durationTurns >= 0 ? durationTurns : definition.DefaultDurationTurns;
-        if (existing == null || definition.StackMode == BattlerStateStackMode.Replace)
+        if (existing == null || definition.StackMode == PerkStackMode.Replace)
         {
             if (existing != null)
             {
@@ -306,7 +306,6 @@ public class PerkService
 
     public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context)
     {
-        // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
         triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll, GetEffectivePerks(actor));
         if (opponent != null)
             triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll, GetEffectivePerks(opponent));
@@ -315,18 +314,7 @@ public class PerkService
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.ExtraDice, ref value);
         return Mathf.Max(0, Mathf.RoundToInt(value));
     }
-
-    /// <summary>
-    /// Avalia e retorna dados extras de Poder concedidos por perks AfterAccuracyRoll
-    /// (ex: adrenaline_surge). Chamado APÓS o roll de Accuracy, ANTES do roll de Power.
-    /// Os dados extras não consomem pool.
-    /// </summary>
-    /// <param name="actor">Battler que realizou a ação.</param>
-    /// <param name="opponent">Oponente (pode ser null).</param>
-    /// <param name="accuracyResult">Melhor resultado do dado de Accuracy já rolado.</param>
-    /// <param name="actionType">Tipo de ação (Attack/Defense).</param>
-    /// <param name="extraDiceStatType">StatType dos dados extras a rolar (out).</param>
-    /// <returns>Quantidade de dados extras de Poder a adicionar.</returns>
+    
     public int GetExtraPowerDiceAfterAccuracy(
         Battler actor,
         Battler opponent,
@@ -344,11 +332,8 @@ public class PerkService
         return Mathf.Max(0, count);
     }
 
-
-
     public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue)
     {
-        // ✅ Dispara triggers ANTES de aplicar modificadores (BeforeRoll)
         triggerEvaluator.EvaluateRollTriggers(actor, context, PerkTrigger.BeforeRoll, GetEffectivePerks(actor));
         if (opponent != null)
             triggerEvaluator.EvaluateRollTriggers(opponent, context, PerkTrigger.BeforeRoll, GetEffectivePerks(opponent));
@@ -393,7 +378,6 @@ public class PerkService
         List<DiceResult> actionDice = GetActionDice(action);
         List<DiceResult> opposingActionDice = GetActionDice(opposingAction);
         
-        // ✅ Dispara triggers quando dados são analisados para dano (AfterResolve)
         if (action.PowerDice != null)
         {
             triggerEvaluator.EvaluateDiceTriggers(actor, actionContext, action.PowerDice, PerkTrigger.AfterResolve, GetEffectivePerks(actor), actionDice, opposingActionDice);
@@ -591,20 +575,20 @@ public class PerkService
         return current + value * stacks;
     }
 
-    private static bool IsRoleMatch(Battler owner, CombatRollContext context, BattlerStateRole role)
+    private static bool IsRoleMatch(Battler owner, CombatRollContext context, PerkRole role)
     {
         return IsRoleMatch(owner, context.ToActionContext(), role);
     }
 
-    private static bool IsRoleMatch(Battler owner, CombatActionContext context, BattlerStateRole role)
+    private static bool IsRoleMatch(Battler owner, CombatActionContext context, PerkRole role)
     {
         return role switch
         {
-            BattlerStateRole.OwnerAsActor => owner == context.Actor,
-            BattlerStateRole.OwnerAsOpponent => owner == context.Opponent,
-            BattlerStateRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
-            BattlerStateRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
-            BattlerStateRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
+            PerkRole.OwnerAsActor => owner == context.Actor,
+            PerkRole.OwnerAsOpponent => owner == context.Opponent,
+            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
             _ => false
         };
     }

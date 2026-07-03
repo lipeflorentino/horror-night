@@ -11,7 +11,7 @@ public class BattlerStateSO : ScriptableObject
     public Sprite Icon;
     public int DefaultDurationTurns = 1;
     public int MaxStacks = 1;
-    public BattlerStateStackMode StackMode = BattlerStateStackMode.RefreshDuration;
+    public PerkStackMode StackMode = PerkStackMode.RefreshDuration;
     public List<string> PerkIds = new();
     [TextArea(1, 2)]
     public string FlavorText;

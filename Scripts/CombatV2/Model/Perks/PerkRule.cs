@@ -6,7 +6,7 @@ public class PerkRule
     public PerkTrigger Trigger = PerkTrigger.BeforeRoll;
     public PerkModifierTarget ModifierTarget = PerkModifierTarget.ExtraDice;
     public PerkOperation Operation = PerkOperation.Add;
-    public BattlerStateRole OwnerRole = BattlerStateRole.OwnerAsActor;
+    public PerkRole OwnerRole = PerkRole.OwnerAsActor;
     public ActionType ActionType;
     public bool FilterByActionType;
     public DiceRollType RollType;
