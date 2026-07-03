@@ -1,25 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
+    [Header("Settings")]
+    [SerializeField] private int DefaultPowerDiceCount = 3;
+    [SerializeField] private int DefaultAccuracyDiceCount = 3;
+    [Tooltip("Maximum value for Heart, Mind, and Body stats")]
+    [SerializeField] private int CoreStatCap = 20;
+    [SerializeField] private string GameplaySceneName = "Gameplay";
+    private EnemyVisuals EnemyVisuals;
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
-    private const int DefaultPowerDiceCount = 3;
-    private const int DefaultAccuracyDiceCount = 3;
-    private const int CoreStatCap = 20;
-    [SerializeField] private string gameplaySceneName = "Gameplay";
+
+    [Header("References and UI")]
     public CombatView View;
     public CombatInputHandler Input;
 
+    // =========================
+    // Battlers and combat state
+    // =========================
     public Battler Player { get; private set; }
     public Battler Enemy { get; private set; }
     public Sprite PlayerIcon { get; private set; }
     public Sprite EnemyIcon { get; private set; }
     public bool IsPlayerAttacker => PlayerIsAttacker;
+    private bool PlayerIsAttacker = true;
+    private TurnContext CurrentTurn;
+    private bool CombatEnded;
+    private int lastGrantedXp;
+    private Dictionary<ItemSO, int> lastGrantedItens;
+    private CombatSessionData SessionData;
 
+    // =========================
+    // Services
+    // =========================
     private DiceService DiceService;
     private BattlerStateService BattlerStateService;
     private PerkService PerkService;
@@ -28,30 +44,32 @@ public class CombatManager : MonoBehaviour
     private InitiativeResolverService InitiativeResolverService;
     private EnemyActionSelector EnemyActionSelector;
     private EnemyTurnPlanner EnemyTurnPlanner;
+    private RewardService RewardService;
 
+    // =========================
+    // Action definitions
+    // =========================
     private ActionDefinition AttackDef;
     private ActionDefinition DefenseDef;
 
-    private bool PlayerIsAttacker = true;
-    private TurnContext CurrentTurn;
-
+    // =========================
+    // Pending rolls
+    // =========================
     private List<DiceResult> PendingPlayerPowerRolls = new();
     private List<DiceResult> PendingPlayerAccuracyRolls = new();
     private List<DiceResult> PendingEnemyPowerRolls = new();
     private List<DiceResult> PendingEnemyAccuracyRolls = new();
     private List<DiceStatType> PendingEnemyPowerDiceTypes = new();
     private List<DiceStatType> PendingEnemyAccuracyDiceTypes = new();
-    private bool CombatEnded;
-    private int lastGrantedXp;
-    private Dictionary<ItemSO, int> lastGrantedItens;
-    private CombatSessionData SessionData;
-    private RewardService RewardService;
+
+    // =========================
+    // Inventory and trick state
+    // =========================
     private InventoryInputHandler InventoryInputHandler;
     private TrickInventoryInputHandler TrickInventoryInputHandler;
     private ICombatInventory CombatPlayerInventory;
     public ITrickInventory PlayerTrickInventory { get; private set; }
     private ITrickInventory EnemyTrickInventory;
-    [SerializeField] private EnemyVisuals EnemyVisuals;
 
     void Start()
     {
@@ -502,7 +520,7 @@ public class CombatManager : MonoBehaviour
         CombatSessionStore.Clear();
         CombatResultStore.Clear();
         CombatReturnStore.Clear();
-        SceneManager.LoadScene(gameplaySceneName);
+        SceneManager.LoadScene(GameplaySceneName);
     }
 
     private void QuitCombat()
@@ -527,7 +545,7 @@ public class CombatManager : MonoBehaviour
 
         CombatReturnStore.Set(new CombatReturnSnapshot
         {
-            SceneName = SessionData != null ? SessionData.ReturnSceneName : gameplaySceneName,
+            SceneName = SessionData != null ? SessionData.ReturnSceneName : GameplaySceneName,
             Level = SessionData?.ReturnLevel,
             LevelIndex = SessionData != null ? SessionData.ReturnLevelIndex : 0,
             ExploredNodes = SessionData?.ReturnExploredNodes,
@@ -536,7 +554,7 @@ public class CombatManager : MonoBehaviour
 
         string targetScene = SessionData != null && !string.IsNullOrWhiteSpace(SessionData.ReturnSceneName)
             ? SessionData.ReturnSceneName
-            : gameplaySceneName;
+            : GameplaySceneName;
         SceneManager.LoadScene(targetScene);
     }
 
@@ -592,7 +610,7 @@ public class CombatManager : MonoBehaviour
         return snapshot;
     }
     
-    private static int ClampCoreStat(float value)
+    private int ClampCoreStat(float value)
     {
         return Mathf.Clamp(Mathf.RoundToInt(value), 0, CoreStatCap);
     }

@@ -208,8 +208,6 @@ public class DiceService
             int baseFace = Mathf.Max(1, totalValue / diceCount);
             int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
 
-            if (battler != null && !battler.IsPlayer) Logger.Log($"[DiceService] Building dice for {pair.Key}: totalValue={totalValue}, diceCount={diceCount}, baseFace={baseFace}, remainder={remainder}");
-
             for (int i = 0; i < diceCount; i++)
             {
                 int bonus = i < remainder ? 1 : 0;
@@ -218,7 +216,6 @@ public class DiceService
                 CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, maxFace);
                 minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace) ?? minFace;
                 diceSpecs.Add(new DiceRollSpec(minFace, maxFace, pair.Key, rollType));
-                LogDiceStatBonus(pair.Key);
             }
         }
 
@@ -236,17 +233,6 @@ public class DiceService
             DiceStatType.Heart => Mathf.Max(0, battler.Heart),
             DiceStatType.Body => Mathf.Max(0, battler.Body),
             _ => 0
-        };
-    }
-
-    public void LogDiceStatBonus(DiceStatType diceType)
-    {
-        string bonusText = diceType switch
-        {
-            DiceStatType.Mind => "Mind DiceStatBonus placeholder",
-            DiceStatType.Heart => "Heart DiceStatBonus placeholder",
-            DiceStatType.Body => "Body DiceStatBonus placeholder",
-            _ => "Unknown DiceStatBonus placeholder"
         };
     }
 
