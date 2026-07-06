@@ -326,6 +326,7 @@ public class PerkTriggerEvaluator
             Owner = owner,
             SourceTrickId = perk.SourceTrickId,
             SourceTrickInstanceId = perk.SourceTrickInstanceId,
+            SourceTrick = perk.SourceTrick,
             Trigger = rule.Trigger,
             ModifierTarget = rule.ModifierTarget,
             AppliedValue = appliedValue,

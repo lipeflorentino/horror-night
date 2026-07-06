@@ -1,13 +1,14 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
 /// Exibe um ícone de Trick (card/ability) na UI com suporte a tooltip.
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class TrickIconUI : MonoBehaviour
+public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI inputKeyText;
@@ -86,7 +87,9 @@ public class TrickIconUI : MonoBehaviour
     }
 
     private void OnDestroy()
-    {       
+    {
+        HideTooltip();
+
         if (releaseButton != null)
             releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
     }
@@ -101,17 +104,37 @@ public class TrickIconUI : MonoBehaviour
         // TODO: Implementar animação de saída
     }
 
-    void OnMouseEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        if (tooltipPrefab != null && trickDefinition != null)
-        {
-            tooltip = Instantiate(tooltipPrefab, transform).GetComponent<TrickTooltip>();
-            if (tooltip != null)
-                tooltip.Show(trickDefinition);
-        }
+        ShowTooltip();
     }
 
-    void OnMouseExit()
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        HideTooltip();
+    }
+
+    private void OnMouseEnter()
+    {
+        ShowTooltip();
+    }
+
+    private void OnMouseExit()
+    {
+        HideTooltip();
+    }
+
+    private void ShowTooltip()
+    {
+        if (tooltip != null || tooltipPrefab == null || trickDefinition == null)
+            return;
+
+        tooltip = Instantiate(tooltipPrefab, transform).GetComponent<TrickTooltip>();
+        if (tooltip != null)
+            tooltip.Show(trickDefinition);
+    }
+
+    private void HideTooltip()
     {
         if (tooltip != null)
             Destroy(tooltip.gameObject);

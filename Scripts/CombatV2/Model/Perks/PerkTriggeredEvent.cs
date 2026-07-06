@@ -26,6 +26,11 @@ public struct PerkTriggeredEvent
     public string SourceTrickInstanceId { get; set; }
 
     /// <summary>
+    /// Instância runtime do Trick que originou o perk, quando existir.
+    /// </summary>
+    public TrickRuntimeInstance SourceTrick { get; set; }
+
+    /// <summary>
     /// Trigger que causou o disparo do perk.
     /// </summary>
     public PerkTrigger Trigger { get; set; }

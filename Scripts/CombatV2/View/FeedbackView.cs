@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class FeedbackView : MonoBehaviour
@@ -9,7 +10,8 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private CombatLogView combatLogView;
-    [SerializeField] private PerkActivationFeedback perkActivationFeedback;
+    [FormerlySerializedAs("perkActivationFeedback")]
+    [SerializeField] private TrickActivationFeedback trickActivationFeedback;
 
     [Header("Attack Effect")]
     [SerializeField] private GameObject playerAttackEffectPrefab;
@@ -25,20 +27,24 @@ public class FeedbackView : MonoBehaviour
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
         enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
         combatLogView = FindObjectOfType<CombatLogView>();
-        perkActivationFeedback = FindObjectOfType<PerkActivationFeedback>();
+        trickActivationFeedback = FindObjectOfType<TrickActivationFeedback>();
 
         if (playerFeedbacks == null)
             Debug.LogError("FeedbackView: PlayerFeedbacks component is missing.");
 
         if (enemyFeedbacks == null)
             Debug.LogError("FeedbackView: EnemyFeedbacks component is missing.");
-
-        if (perkActivationFeedback != null)
-        {
-            PerkService perkService = new();
-            perkActivationFeedback.Initialize(perkService);
-        }
     }
+
+    public void Init(PerkService perkService)
+    {
+        if (trickActivationFeedback == null)
+            trickActivationFeedback = FindObjectOfType<TrickActivationFeedback>();
+
+        if (trickActivationFeedback != null)
+            trickActivationFeedback.Initialize(perkService);
+    }
+
     public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
     {
         if (!string.IsNullOrWhiteSpace(result.FeedbackText))
