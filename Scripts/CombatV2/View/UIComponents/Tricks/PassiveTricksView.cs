@@ -2,18 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
-public class TrickActivationFeedback : MonoBehaviour
+public class PassiveTricksView : MonoBehaviour
 {
-    [FormerlySerializedAs("perkActivationPrefab")]
     [SerializeField] private GameObject trickActivationPrefab;
     [SerializeField] private Transform playerAnchor;
     [SerializeField] private Transform enemyAnchor;
-    [SerializeField] private string fallbackInputKeyText = string.Empty;
     [SerializeField] private float feedbackDuration = 2f;
-    [SerializeField] private bool onlyShowPassiveTricks = true;
 
     private PerkService perkService;
     private readonly Dictionary<string, int> lastFeedbackFrameByTrick = new();
@@ -40,7 +35,7 @@ public class TrickActivationFeedback : MonoBehaviour
         if (evt.Owner == null || trickDefinition == null)
             return;
 
-        if (onlyShowPassiveTricks && !trickDefinition.IsPassive)
+        if (!trickDefinition.IsPassive)
             return;
 
         string feedbackKey = string.IsNullOrWhiteSpace(sourceTrick.InstanceId) ? trickDefinition.Id : sourceTrick.InstanceId;
@@ -54,10 +49,9 @@ public class TrickActivationFeedback : MonoBehaviour
             return;
 
         GameObject popupObject = Instantiate(trickActivationPrefab, anchor);
-        TrickIconUI popup = popupObject.GetComponent<TrickIconUI>();
-        if (popup != null)
+        if (popupObject.TryGetComponent<TrickIconUI>(out var popup))
         {
-            popup.Setup(trickDefinition, fallbackInputKeyText, sourceTrick);
+            popup.Setup(trickDefinition, string.Empty, sourceTrick);
             popup.PlayEnterAnimation();
         }
 
