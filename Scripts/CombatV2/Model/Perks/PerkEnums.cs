@@ -34,6 +34,7 @@ public enum PerkTrigger
 public enum PerkModifierTarget
 {
     MinRollPercent,
+    LowRollThresholdPercent,
     MaxRollPercent,
     MinRollValue,
     MaxRollValue,

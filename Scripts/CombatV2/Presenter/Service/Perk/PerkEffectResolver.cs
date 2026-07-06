@@ -79,7 +79,7 @@ public class PerkEffectResolver
     {
         float modifiedLow = low;
         float modifiedHigh = high;
-        ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MinRollPercent, ref modifiedLow);
+        ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.LowRollThresholdPercent, ref modifiedLow);
         ApplyRollModifiers(actor, opponent, context, PerkTrigger.BeforeRoll, PerkModifierTarget.MaxRollPercent, ref modifiedHigh);
         return (modifiedLow, modifiedHigh);
     }
@@ -133,8 +133,6 @@ public class PerkEffectResolver
     {
         CombatActionContext context = new(actor, opponent, actionType);
         float value = baseValue;
-        ApplyContextualModifiers(actor, context, PerkTrigger.OnActionResolved, target, ref value);
-        ApplyContextualModifiers(opponent, context, PerkTrigger.OnActionResolved, target, ref value);
         ApplyContextualModifiers(actor, context, PerkTrigger.BeforeRoll, target, ref value);
         ApplyContextualModifiers(opponent, context, PerkTrigger.BeforeRoll, target, ref value);
         return Mathf.Max(0, Mathf.RoundToInt(value));

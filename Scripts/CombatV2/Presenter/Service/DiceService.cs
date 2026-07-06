@@ -281,9 +281,9 @@ public class DiceService
         ThresholdPair thresholds = new(baseLowThreshold - shift, baseHighThreshold - shift);
         if (perkService != null)
         {
-            var modified = perkService.GetModifiedRollThresholds(context.Actor, context.Opponent, context, thresholds.Low, thresholds.High);
-            thresholds.Low = modified.low;
-            thresholds.High = modified.high;
+            var (low, high) = perkService.GetModifiedRollThresholds(context.Actor, context.Opponent, context, thresholds.Low, thresholds.High);
+            thresholds.Low = low;
+            thresholds.High = high;
         }
 
         thresholds.Low = Mathf.Clamp(thresholds.Low, 0.05f, 0.45f);

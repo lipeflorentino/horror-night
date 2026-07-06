@@ -31,8 +31,8 @@ state_exposed_defense_power,OwnerAsDefender,Defense,Any,Any,Any,Always,,DefenseP
 state_exposed_defender_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,0.10,1,RefreshDuration
 state_angry_attack_power,OwnerAsAttacker,Attack,Any,Any,Any,Always,,AttackPower,Multiply,1.10,1,RefreshDuration
 state_angry_power_high_threshold,OwnerAsAttacker,Attack,Power,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
-state_angry_power_low_threshold,OwnerAsAttacker,Attack,Power,Any,Any,Always,,MinRollPercent,Add,-0.15,1,RefreshDuration
+state_angry_power_low_threshold,OwnerAsAttacker,Attack,Power,Any,Any,Always,,LowRollThresholdPercent,Add,-0.15,1,RefreshDuration
 state_angry_defense_power,OwnerAsDefender,Defense,Any,Any,Any,Always,,DefensePower,Multiply,0.90,1,RefreshDuration
 state_angry_defender_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,0.15,1,RefreshDuration
 state_cautious_max_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
-state_cautious_min_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MinRollPercent,Add,-0.15,1,RefreshDuration
+state_cautious_min_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,LowRollThresholdPercent,Add,-0.15,1,RefreshDuration
