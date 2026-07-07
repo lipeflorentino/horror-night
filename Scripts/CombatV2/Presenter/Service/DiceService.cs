@@ -247,22 +247,35 @@ public class DiceService
         };
     }
 
+    private int GetTierReferenceMaxValue(CombatRollContext context)
+    {
+        if (context.Actor != null)
+        {
+            int baseValue = context.Actor.GetBaseStatValue(context.StatType);
+            if (baseValue > 0)
+                return Mathf.Max(1, baseValue);
+        }
+
+        return Mathf.Max(1, context.MaxValue);
+    }
+
     private DiceTier GetTier(int value, CombatRollContext context)
     {
-        if (context.MaxValue <= 1)
+        int tierReferenceMaxValue = GetTierReferenceMaxValue(context);
+        if (tierReferenceMaxValue <= 1)
             return DiceTier.Low;
 
-        float normalized = (float)value / context.MaxValue;
-        ThresholdPair thresholds = GetThresholds(context);
+        float normalized = (float)value / tierReferenceMaxValue;
+        ThresholdPair thresholds = GetThresholds(context, tierReferenceMaxValue);
 
         if (normalized <= thresholds.Low) return DiceTier.Low;
         if (normalized <= thresholds.High) return DiceTier.Medium;
         return DiceTier.High;
     }
 
-    private ThresholdPair GetThresholds(CombatRollContext context)
+    private ThresholdPair GetThresholds(CombatRollContext context, int tierReferenceMaxValue)
     {
-        int safeMaxValue = Mathf.Max(1, context.MaxValue);
+        int safeMaxValue = Mathf.Max(1, tierReferenceMaxValue);
         int delta = context.ActorLevel - context.OpponentLevel;
 
         const float baseLowThreshold = 0.25f;
@@ -303,8 +316,9 @@ public class DiceService
 
     public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(CombatRollContext context)
     {
-        int safeMaxValue = Math.Max(1, context.MaxValue);
-        ThresholdPair thresholds = GetThresholds(context.WithRoll(context.RollType, context.StatType, safeMaxValue));
+        int tierReferenceMaxValue = GetTierReferenceMaxValue(context);
+        int safeMaxValue = Math.Max(1, tierReferenceMaxValue);
+        ThresholdPair thresholds = GetThresholds(context.WithRoll(context.RollType, context.StatType, safeMaxValue), safeMaxValue);
 
         int lowMax = 0;
         int mediumMax = 0;

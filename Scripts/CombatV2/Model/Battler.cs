@@ -8,6 +8,9 @@ public class Battler
     public int Heart;
     public int Mind;
     public int Body;
+    public int BaseHeart;
+    public int BaseMind;
+    public int BaseBody;
     public int Attack;
     public int Defense;
     public int Initiative;
@@ -23,7 +26,7 @@ public class Battler
     public List<TrickRuntimeInstance> Tricks = new();
     public List<DrawbackRuntimeInstance> Drawbacks = new();
 
-    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0, int baseHeart = -1, int baseBody = -1, int baseMind = -1)
     {
         Name = name;
         Level = level;
@@ -31,6 +34,9 @@ public class Battler
         Heart = heart;
         Mind = mind;
         Body = body;
+        BaseHeart = baseHeart >= 0 ? baseHeart : heart;
+        BaseBody = baseBody >= 0 ? baseBody : body;
+        BaseMind = baseMind >= 0 ? baseMind : mind;
         Attack = attack;
         Defense = defense;
         Initiative = initiative;
@@ -43,6 +49,28 @@ public class Battler
         MaxAccuracyDices = accuracyDices;
         MaxHp = maxHp > 0 ? maxHp : HP;
         IsPlayer = isPlayer;
+    }
+
+    public int GetCurrentStatValue(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => Mind,
+            DiceStatType.Heart => Heart,
+            DiceStatType.Body => Body,
+            _ => 0
+        };
+    }
+
+    public int GetBaseStatValue(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => BaseMind,
+            DiceStatType.Heart => BaseHeart,
+            DiceStatType.Body => BaseBody,
+            _ => 0
+        };
     }
 
     public void ReceiveDamage(int damage)

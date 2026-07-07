@@ -55,7 +55,10 @@ public class CombatInitializer
             Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp),
             Mathf.RoundToInt(playerSnapshot.focus),
             Mathf.RoundToInt(playerSnapshot.strength),
-            Mathf.RoundToInt(playerSnapshot.agility)
+            Mathf.RoundToInt(playerSnapshot.agility),
+            ClampCoreStat(playerSnapshot.heart, coreStatCap),
+            ClampCoreStat(playerSnapshot.body, coreStatCap),
+            ClampCoreStat(playerSnapshot.mind, coreStatCap)
         );
 
         if (enemySnapshot != null)
@@ -77,7 +80,10 @@ public class CombatInitializer
                 -1,
                 enemySnapshot.focus,
                 enemySnapshot.strength,
-                enemySnapshot.agility
+                enemySnapshot.agility,
+                enemySnapshot.heart,
+                enemySnapshot.body,
+                enemySnapshot.mind
             );
         }
         else
