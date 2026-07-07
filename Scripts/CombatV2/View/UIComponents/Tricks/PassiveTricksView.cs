@@ -11,20 +11,35 @@ public class PassiveTricksView : MonoBehaviour
     [SerializeField] private float feedbackDuration = 2f;
 
     private PerkService perkService;
+    private TrickService trickService;
     private readonly Dictionary<string, int> lastFeedbackFrameByTrick = new();
+    private readonly Dictionary<string, GameObject> popupByTrick = new();
 
-    public void Initialize(PerkService service)
+    public void Initialize(PerkService service, TrickService trickServiceInstance)
     {
-        if (perkService == service)
+        if (perkService == service && trickService == trickServiceInstance)
             return;
 
         if (perkService != null)
             perkService.OnPerkTriggered -= HandlePerkTriggered;
 
+        if (trickService != null)
+        {
+            trickService.OnTrickExpired -= HandleTrickExpired;
+            trickService.OnTrickRemoved -= HandleTrickRemoved;
+        }
+
         perkService = service;
+        trickService = trickServiceInstance;
 
         if (perkService != null)
             perkService.OnPerkTriggered += HandlePerkTriggered;
+
+        if (trickService != null)
+        {
+            trickService.OnTrickExpired += HandleTrickExpired;
+            trickService.OnTrickRemoved += HandleTrickRemoved;
+        }
     }
 
     private void HandlePerkTriggered(PerkTriggeredEvent evt)
@@ -44,6 +59,9 @@ public class PassiveTricksView : MonoBehaviour
 
         lastFeedbackFrameByTrick[feedbackKey] = Time.frameCount;
 
+        if (popupByTrick.ContainsKey(feedbackKey))
+            return;
+
         Transform anchor = evt.Owner.IsPlayer ? playerAnchor : enemyAnchor;
         if (anchor == null || trickActivationPrefab == null)
             return;
@@ -59,10 +77,51 @@ public class PassiveTricksView : MonoBehaviour
         if (text != null && string.IsNullOrWhiteSpace(text.text))
             text.text = $"{trickDefinition.DisplayName} acionado!";
 
+        popupByTrick[feedbackKey] = popupObject;
         StartCoroutine(AnimatePopup(popupObject));
 
         Debug.Log($"[TrickFeedback] {trickDefinition.Id} acionado por perk {evt.PerkId} " +
                   $"- Trigger: {evt.Trigger}, Target: {evt.ModifierTarget}, Value: {evt.AppliedValue}, Stacks: {evt.StacksApplied}");
+    }
+
+    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
+    {
+        RemovePopupForTrick(trick);
+    }
+
+    private void HandleTrickRemoved(Battler battler, string trickId)
+    {
+        if (string.IsNullOrWhiteSpace(trickId))
+            return;
+
+        foreach (var pair in new List<KeyValuePair<string, GameObject>>(popupByTrick))
+        {
+            if (pair.Key.Equals(trickId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                RemovePopup(pair.Key);
+                break;
+            }
+        }
+    }
+
+    private void RemovePopupForTrick(TrickRuntimeInstance trick)
+    {
+        if (trick == null)
+            return;
+
+        string feedbackKey = string.IsNullOrWhiteSpace(trick.InstanceId) ? trick.Definition?.Id : trick.InstanceId;
+        if (!string.IsNullOrWhiteSpace(feedbackKey))
+            RemovePopup(feedbackKey);
+    }
+
+    private void RemovePopup(string feedbackKey)
+    {
+        if (string.IsNullOrWhiteSpace(feedbackKey) || !popupByTrick.TryGetValue(feedbackKey, out GameObject popupObject))
+            return;
+
+        popupByTrick.Remove(feedbackKey);
+        if (popupObject != null)
+            StartCoroutine(AnimatePopupExit(popupObject));
     }
 
     private IEnumerator AnimatePopup(GameObject popup)
@@ -90,7 +149,34 @@ public class PassiveTricksView : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSeconds(Mathf.Max(0f, feedbackDuration - enterDuration));
+        while (popup != null)
+            yield return null;
+    }
+
+    private IEnumerator AnimatePopupExit(GameObject popup)
+    {
+        if (popup == null)
+            yield break;
+
+        CanvasGroup canvasGroup = popup.GetComponent<CanvasGroup>();
+        RectTransform rectTransform = popup.GetComponent<RectTransform>();
+        Vector3 startScale = rectTransform != null ? rectTransform.localScale : Vector3.one;
+
+        float elapsed = 0f;
+        float exitDuration = Mathf.Min(0.2f, feedbackDuration);
+        while (elapsed < exitDuration && popup != null)
+        {
+            elapsed += Time.deltaTime;
+            float t = exitDuration <= 0f ? 1f : Mathf.Clamp01(1f - elapsed / exitDuration);
+
+            if (canvasGroup != null)
+                canvasGroup.alpha = t;
+
+            if (rectTransform != null)
+                rectTransform.localScale = Vector3.Lerp(startScale, startScale * 0.9f, 1f - t);
+
+            yield return null;
+        }
 
         if (popup != null)
             Destroy(popup);
@@ -100,5 +186,11 @@ public class PassiveTricksView : MonoBehaviour
     {
         if (perkService != null)
             perkService.OnPerkTriggered -= HandlePerkTriggered;
+
+        if (trickService != null)
+        {
+            trickService.OnTrickExpired -= HandleTrickExpired;
+            trickService.OnTrickRemoved -= HandleTrickRemoved;
+        }
     }
 }

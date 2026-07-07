@@ -13632,7 +13632,7 @@ MonoBehaviour:
   trickActivationPrefab: {fileID: 1294631821955276076, guid: 25d7177e8c098b34ab7253530dedc529, type: 3}
   playerAnchor: {fileID: 812965577}
   enemyAnchor: {fileID: 0}
-  feedbackDuration: 10
+  feedbackDuration: 2
 --- !u!1 &937761975
 GameObject:
   m_ObjectHideFlags: 0

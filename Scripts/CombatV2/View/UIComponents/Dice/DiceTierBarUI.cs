@@ -22,7 +22,7 @@ public class DiceTierBarUI : MonoBehaviour
 
     public void SetBoundaries(int lowMax, int mediumMax, int highMin, int maxValue)
     {
-        SetVisible(lowMax > 0 && mediumMax > 0 && highMin > 0 && maxValue > 0);
+        SetVisible(lowMax > 0 || mediumMax > 0 || highMin > 0 || maxValue > 0);
 
         float safeMaxValue = Mathf.Max(1f, maxValue);
 

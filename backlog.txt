@@ -65,6 +65,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 --------------------------------------------------
 - Corrigir bug: middle alert swallow memory vague
 - Ajustar tela de Loot (textos, alinhamento, etc.)
+- Ajustar valor de rolagem (dice faces)
 
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)

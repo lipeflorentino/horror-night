@@ -36,13 +36,13 @@ public class FeedbackView : MonoBehaviour
             Debug.LogError("FeedbackView: EnemyFeedbacks component is missing.");
     }
 
-    public void Init(PerkService perkService)
+    public void Init(PerkService perkService, TrickService trickService)
     {
         if (passiveTricksView == null)
             passiveTricksView = FindObjectOfType<PassiveTricksView>();
 
         if (passiveTricksView != null)
-            passiveTricksView.Initialize(perkService);
+            passiveTricksView.Initialize(perkService, trickService);
     }
 
     public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)

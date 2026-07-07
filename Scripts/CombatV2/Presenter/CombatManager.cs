@@ -37,6 +37,7 @@ public class CombatManager : MonoBehaviour
     private DiceService DiceService;
     private PerkService PerkService;
     public PerkService GetPerkService() => PerkService;
+    public TrickService GetTrickService() => TrickService;
     private TrickService TrickService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
