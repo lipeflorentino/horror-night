@@ -278,9 +278,9 @@ public class PerkService
         return effectResolver.GetEffectiveStrength(actor, opponent, actionType);
     }
 
-    public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context)
+    public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context, bool evaluateTriggers = true)
     {
-        return effectResolver.GetExtraDiceCount(actor, opponent, context);
+        return effectResolver.GetExtraDiceCount(actor, opponent, context, evaluateTriggers);
     }
     
     public int GetExtraPowerDiceAfterAccuracy(
@@ -293,9 +293,9 @@ public class PerkService
         return effectResolver.GetExtraPowerDiceAfterAccuracy(actor, opponent, accuracyResult, actionType, out extraDiceStatType);
     }
 
-    public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue)
+    public int GetMinimumRollValue(Battler actor, Battler opponent, CombatRollContext context, int currentMinValue, bool evaluateTriggers = true)
     {
-        return effectResolver.GetMinimumRollValue(actor, opponent, context, currentMinValue);
+        return effectResolver.GetMinimumRollValue(actor, opponent, context, currentMinValue, evaluateTriggers);
     }
 
     public (float low, float high) GetModifiedRollThresholds(Battler actor, Battler opponent, CombatRollContext context, float low, float high)

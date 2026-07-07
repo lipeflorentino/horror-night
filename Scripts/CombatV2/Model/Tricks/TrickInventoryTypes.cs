@@ -27,5 +27,5 @@ public struct TrickInventoryItemLocation
         SlotIndex = slotIndex;
     }
 
-    public bool IsSlot => Location == TrickInventoryLocation.IdentitySlot || Location == TrickInventoryLocation.CastedSlot;
+    public readonly bool IsSlot => Location == TrickInventoryLocation.IdentitySlot || Location == TrickInventoryLocation.CastedSlot;
 }

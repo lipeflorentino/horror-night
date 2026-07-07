@@ -70,4 +70,9 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 --------------------------------------------------
 - Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)
-    1. Criar um sistema de feedback visual para “triggered”
+    
+    Criar uma UI especifica para tricks de identidade e tricks temporarias
+    Implementar overlay de cooldown nos slots do inventário
+    Implementar área de active tricks com ícones
+    Implementar feedback de “triggered” temporário
+    Refinar animações e transições
