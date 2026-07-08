@@ -10,7 +10,6 @@ public class TrickTooltip : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private TextMeshProUGUI costText;
-    [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI rarityText;
     [SerializeField] private TextMeshProUGUI flavorText;
     [SerializeField] private Image iconImage;
@@ -30,11 +29,8 @@ public class TrickTooltip : MonoBehaviour
             descriptionText.text = trickDefinition.Description;
         
         if (costText != null)
-            costText.text = $"Custo: Mind {trickDefinition.MindCost} | Body {trickDefinition.BodyCost} | Heart {trickDefinition.HeartCost}";
-        
-        if (levelText != null)
-            levelText.text = $"Level: {trickDefinition.Level}";
-        
+            costText.text = $"Requisitos: {trickDefinition.Requirements?.ToDisplayString() ?? "Nenhum"} | Momentum: {trickDefinition.MomentumCost}";
+            
         if (rarityText != null)
             rarityText.text = $"Raridade: {trickDefinition.Rarity}";
         

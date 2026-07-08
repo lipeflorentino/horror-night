@@ -8,6 +8,8 @@ public class Battler
     public int Heart;
     public int Mind;
     public int Body;
+    public int Momentum;
+    public int MaxMomentum = 6;
     public int BaseHeart;
     public int BaseMind;
     public int BaseBody;
@@ -34,6 +36,7 @@ public class Battler
         Heart = heart;
         Mind = mind;
         Body = body;
+        Momentum = 0;
         BaseHeart = baseHeart >= 0 ? baseHeart : heart;
         BaseBody = baseBody >= 0 ? baseBody : body;
         BaseMind = baseMind >= 0 ? baseMind : mind;
@@ -89,6 +92,30 @@ public class Battler
 
         if (CurrentAccuracyDices > MaxAccuracyDices)
             CurrentAccuracyDices = MaxAccuracyDices;
+    }
+
+    public void AddMomentum(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        Momentum += amount;
+        if (Momentum > MaxMomentum)
+            Momentum = MaxMomentum;
+    }
+
+    public bool SpendMomentum(int amount)
+    {
+        if (amount <= 0 || Momentum < amount)
+            return false;
+
+        Momentum -= amount;
+        return true;
+    }
+
+    public void ResetMomentum()
+    {
+        Momentum = 0;
     }
 
     public bool IsAlive()

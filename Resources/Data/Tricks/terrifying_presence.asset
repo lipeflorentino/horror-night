@@ -17,13 +17,23 @@ MonoBehaviour:
   Description: "Todos os inimigos ao seu redor sofrem -4 de Strength enquanto voc\xEA
     estiver presente."
   Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
   Level: 3
-  MindCost: 0
-  BodyCost: 0
-  HeartCost: 0
+  Requirements:
+    MinLevel: 3
+    MinMind: 2
+    MinHeart: 4
+    MinBody: 0
+    MinAttack: 0
+    MinDefense: 0
+    MinInitiative: 1
+    MinFocus: 0
+    MinStrength: 4
+    MinAgility: 0
+  MomentumCost: 5
   TimingTurns: 0
-  DurationTurns: -1
-  CooldownTurns: 0
+  DurationTurns: 2
+  CooldownTurns: 5
   ActivationMode: 1
   PerkIds:
   - terrifying_presence

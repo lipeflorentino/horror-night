@@ -54,10 +54,22 @@ public static class TrickCsvImporter
         target.DisplayName = source.DisplayName;
         target.Description = source.Description;
         target.Icon = source.Icon;
+        target.Thumbnail = source.Thumbnail;
         target.Level = source.Level;
-        target.MindCost = source.MindCost;
-        target.BodyCost = source.BodyCost;
-        target.HeartCost = source.HeartCost;
+        target.MomentumCost = source.MomentumCost;
+        target.Requirements = source.Requirements != null ? new TrickRequirements
+        {
+            MinLevel = source.Requirements.MinLevel,
+            MinMind = source.Requirements.MinMind,
+            MinHeart = source.Requirements.MinHeart,
+            MinBody = source.Requirements.MinBody,
+            MinAttack = source.Requirements.MinAttack,
+            MinDefense = source.Requirements.MinDefense,
+            MinInitiative = source.Requirements.MinInitiative,
+            MinFocus = source.Requirements.MinFocus,
+            MinStrength = source.Requirements.MinStrength,
+            MinAgility = source.Requirements.MinAgility
+        } : new TrickRequirements();
         target.TimingTurns = source.TimingTurns;
         target.DurationTurns = source.DurationTurns;
         target.CooldownTurns = source.CooldownTurns;

@@ -18,9 +18,18 @@ MonoBehaviour:
     ponto de Momentum."
   Icon: {fileID: 21300000, guid: e894a34faf7dac9479e6382214ef968e, type: 3}
   Level: 3
-  MindCost: 1
-  BodyCost: 0
-  HeartCost: 2
+  Requirements:
+    MinLevel: 3
+    MinMind: 2
+    MinHeart: 3
+    MinBody: 0
+    MinAttack: 3
+    MinDefense: 0
+    MinInitiative: 2
+    MinFocus: 0
+    MinStrength: 0
+    MinAgility: 1
+  MomentumCost: 0
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0

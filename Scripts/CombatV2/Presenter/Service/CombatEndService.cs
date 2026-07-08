@@ -18,6 +18,9 @@ public class CombatEndService
         if (player.IsAlive() && enemy.IsAlive())
             return false;
 
+        player.ResetMomentum();
+        enemy.ResetMomentum();
+
         state.CombatEnded = true;
         view.SetCombatInputEnabled(false);
 

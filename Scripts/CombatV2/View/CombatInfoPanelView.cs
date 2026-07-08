@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CombatInfoPanelView : MonoBehaviour
 {
-    private const string StatsIconResourcePath = "UI/Battler/Stats/{0}Icon";
+    private const string StatsIconResourcePath = "Assets/Art/Sprites/Stats/{0}Icon.png";
 
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private Button closeButton;
@@ -120,10 +121,10 @@ public class CombatInfoPanelView : MonoBehaviour
             return cachedSprite;
 
         string path = string.Format(StatsIconResourcePath, statKey);
-        Sprite sprite = Resources.Load<Sprite>(path);
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
 
         if (sprite == null)
-            Debug.LogWarning($"[CombatInfoPanelView] Icon not found at Resources/{path}.png");
+            Debug.LogWarning($"[CombatInfoPanelView] Icon not found at {path}.png");
 
         _iconCache[statKey] = sprite;
         return sprite;

@@ -10,16 +10,19 @@ public class TrickInfoPanelUI : MonoBehaviour
 
     [Header("Trick Info")]
     [SerializeField] private GameObject trickInfoPanel;
+    [SerializeField] private Image trickThumbnailImage;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text cooldownText;
     [SerializeField] private TMP_Text durationText;
-    [SerializeField] private TMP_Text rarityText;
-    [SerializeField] private TMP_Text mindCostText;
-    [SerializeField] private TMP_Text bodyCostText;
-    [SerializeField] private TMP_Text heartCostText;
+    [SerializeField] private TrickRarityUI rarityIcon;
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private TMP_Text tagsText;
+    [SerializeField] private TMP_Text momentumCostText;
+
+    [Header("Requirements")]
+    [SerializeField] private Transform requirementsContainer;
+    [SerializeField] private TrickRequirementUI requirementPrefab;
 
     [Header("Interaction Buttons")]
     [SerializeField] private Button castButton;
@@ -61,16 +64,17 @@ public class TrickInfoPanelUI : MonoBehaviour
         if (trick == null)
             return;
 
+        if (trickThumbnailImage != null) trickThumbnailImage.sprite = trick.Thumbnail;
         if (nameText != null) nameText.text = trick.DisplayName;
         if (levelText != null) levelText.text = $"{trick.Level}";
-        if (cooldownText != null) cooldownText.text = runtimeInstance != null ? $"{runtimeInstance.CooldownTurnsRemaining}/{trick.CooldownTurns}" : $"{trick.CooldownTurns}";
-        if (durationText != null) durationText.text = FormatDuration(trick, runtimeInstance);
-        if (rarityText != null) rarityText.text = $"{trick.Rarity}";
+        if (cooldownText != null) cooldownText.text = trick.CooldownTurns > 0 ? $"{trick.CooldownTurns} " + "Turnos" : "-";
+        if (durationText != null) durationText.text = FormatDuration(trick);
+        if (rarityIcon != null) rarityIcon.Setup($"{trick.Rarity}");
         if (descriptionText != null) descriptionText.text = trick.Description;
         if (tagsText != null) tagsText.text = trick.Tags != null && trick.Tags.Count > 0 ? $"{string.Join(", ", trick.Tags.ToArray())}" : "-";
-        if (mindCostText != null) mindCostText.text = trick.MindCost > 0 ? $"{trick.MindCost}" : "-";
-        if (bodyCostText != null) bodyCostText.text = trick.BodyCost > 0 ? $"{trick.BodyCost}" : "-";
-        if (heartCostText != null) heartCostText.text = trick.HeartCost > 0 ? $"{trick.HeartCost}" : "-";
+        if (momentumCostText != null) momentumCostText.text = trick.MomentumCost > 0 ? $"{trick.MomentumCost}" : "-";
+
+        PopulateRequirements(trick.Requirements);
 
         ConfigureActions(trick, runtimeInstance, location);
     }
@@ -111,7 +115,25 @@ public class TrickInfoPanelUI : MonoBehaviour
         if (closeButton != null) closeButton.gameObject.SetActive(hasTrick);
     }
 
-    private static string FormatDuration(TrickSO trick, TrickRuntimeInstance runtimeInstance)
+    private void PopulateRequirements(TrickRequirements requirements)
+    {
+        if (requirementsContainer == null || requirementPrefab == null)
+            return;
+
+        for (int i = requirementsContainer.childCount - 1; i >= 0; i--)
+            Destroy(requirementsContainer.GetChild(i).gameObject);
+
+        if (requirements == null)
+            return;
+
+        foreach (var (statKey, value) in requirements.GetActiveRequirements())
+        {
+            TrickRequirementUI requirementUI = Instantiate(requirementPrefab, requirementsContainer);
+            requirementUI.Setup(statKey, value);
+        }
+    }
+
+    private static string FormatDuration(TrickSO trick)
     {
         if (trick == null)
             return "-";
@@ -119,6 +141,6 @@ public class TrickInfoPanelUI : MonoBehaviour
         if (trick.DurationTurns < 0)
             return "Permanent";
 
-        return runtimeInstance != null ? $"{runtimeInstance.RemainingTurns}/{trick.DurationTurns}" : $"{trick.DurationTurns}";
+        return $"{trick.DurationTurns} " + "Turnos";
     }
 }

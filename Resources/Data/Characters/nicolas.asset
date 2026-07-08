@@ -15,21 +15,21 @@ MonoBehaviour:
   Id: nicolas
   DisplayName: Nicolas
   CharacterIcon: {fileID: -276885369, guid: 4f4cadd6fd36adf4d968b81e65360a4d, type: 3}
-  Description: A timid and gentle soul
+  Description: A timid and gentle soul.
   Xp: 0
-  Heart: 5
-  Body: 2
-  Mind: 3
+  Heart: 6
+  Body: 6
+  Mind: 6
   Hp: 25
-  Attack: 3
-  Defense: 2
+  Attack: 5
+  Defense: 3
   Initiative: 1
-  Focus: 2
+  Focus: 1
   Strength: 1
   Agility: 1
   PowerDices: 1
-  AccuracyDices: 2
+  AccuracyDices: 1
   IdentityTricks:
   - {fileID: 11400000, guid: bfc3bc31bcfb74b43815f71856ededbc, type: 2}
   - {fileID: 11400000, guid: aa33636fb73d76144a1dcc3235af0ba5, type: 2}
-  - {fileID: 11400000, guid: b48c1b21a6ad443469d54441fd65619f, type: 2}
+  - {fileID: 11400000, guid: 051d7323b56fe8e4d924aa5f01eb9281, type: 2}

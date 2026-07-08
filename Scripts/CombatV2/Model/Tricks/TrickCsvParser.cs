@@ -28,16 +28,29 @@ public static class TrickCsvParser
             TrickSO trick = ScriptableObject.CreateInstance<TrickSO>();
             
             string iconName = Get(row, columns, "IconName");
-            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Tricks/" + iconName + ".png");
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Tricks/Icons/" + iconName + ".png");
+            Sprite thumbnail = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Tricks/Thumbnails/" + iconName + ".png");
             
             trick.Id = id;
             trick.DisplayName = Get(row, columns, "DisplayName");
             trick.Description = Get(row, columns, "Description");
             trick.Icon = sprite;
+            trick.Thumbnail = thumbnail;
             trick.Level = ParseInt(Get(row, columns, "Level"), 1);
-            trick.MindCost = ParseInt(Get(row, columns, "MindCost"), 0);
-            trick.BodyCost = ParseInt(Get(row, columns, "BodyCost"), 0);
-            trick.HeartCost = ParseInt(Get(row, columns, "HeartCost"), 0);
+            trick.MomentumCost = ParseInt(Get(row, columns, "MomentumCost"), 0);
+            trick.Requirements = new TrickRequirements
+            {
+                MinLevel = ParseInt(Get(row, columns, "MinLevel"), trick.Level),
+                MinMind = ParseInt(Get(row, columns, "MinMind"), 0),
+                MinHeart = ParseInt(Get(row, columns, "MinHeart"), 0),
+                MinBody = ParseInt(Get(row, columns, "MinBody"), 0),
+                MinAttack = ParseInt(Get(row, columns, "MinAttack"), 0),
+                MinDefense = ParseInt(Get(row, columns, "MinDefense"), 0),
+                MinInitiative = ParseInt(Get(row, columns, "MinInitiative"), 0),
+                MinFocus = ParseInt(Get(row, columns, "MinFocus"), 0),
+                MinStrength = ParseInt(Get(row, columns, "MinStrength"), 0),
+                MinAgility = ParseInt(Get(row, columns, "MinAgility"), 0)
+            };
             trick.TimingTurns = ParseInt(GetFirst(row, columns, "TimingTurns", "Timing"), 0);
             trick.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
             trick.CooldownTurns = ParseInt(Get(row, columns, "CooldownTurns"), 0);

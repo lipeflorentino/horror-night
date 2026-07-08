@@ -17,12 +17,22 @@ MonoBehaviour:
   Description: "Na sua a\xE7\xE3o de Defesa, cada ataque bloqueado adiciona +3 de
     Focus no pr\xF3ximo turno."
   Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
   Level: 2
-  MindCost: 1
-  BodyCost: 0
-  HeartCost: 1
+  Requirements:
+    MinLevel: 2
+    MinMind: 2
+    MinHeart: 2
+    MinBody: 0
+    MinAttack: 0
+    MinDefense: 3
+    MinInitiative: 0
+    MinFocus: 3
+    MinStrength: 0
+    MinAgility: 0
+  MomentumCost: 6
   TimingTurns: 1
-  DurationTurns: 1
+  DurationTurns: 2
   CooldownTurns: 4
   ActivationMode: 0
   PerkIds:

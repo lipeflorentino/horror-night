@@ -17,22 +17,32 @@ MonoBehaviour:
   Description: "Cada vez que voc\xEA sofre dano, voc\xEA ganha +1 de Trick Charges
     (at\xE9 3). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Attack
     por charge na sua a\xE7\xE3o de Ataque."
-  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
-  Level: 1
-  MindCost: 1
-  BodyCost: 3
-  HeartCost: 3
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
+  Level: 2
+  Requirements:
+    MinLevel: 2
+    MinMind: 3
+    MinHeart: 4
+    MinBody: 3
+    MinAttack: 4
+    MinDefense: 0
+    MinInitiative: 0
+    MinFocus: 0
+    MinStrength: 3
+    MinAgility: 0
+  MomentumCost: 3
   TimingTurns: 0
   DurationTurns: 6
   CooldownTurns: 8
   ActivationMode: 2
   PerkIds:
   - vengeance_charge
-  - vengeance_release
+  - vengance_release
   DrawbackIds: []
   Rarity: 2
   Tags:
   - permanent
   - attack
   - trick_charges
-  FlavorText: "A vingan\xE7a \xE9 um prato que se serve frio."
+  FlavorText: "A antiga vingan\xE7a \xE9 um prato que se serve frio."

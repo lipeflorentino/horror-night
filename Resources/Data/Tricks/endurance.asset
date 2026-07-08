@@ -14,14 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: endurance
   DisplayName: "Resist\xEAncia"
-  Description: "Cada ataque bloqueado adiciona +1 de Trick Charges (at\xE9 5). Voc\xEA
-    pode gastar at\xE9 3 charges para adicionar +1 de Defense por charge na sua a\xE7\xE3o
-    de Defesa."
-  Icon: {fileID: 1358806517, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
-  Level: 1
-  MindCost: 3
-  BodyCost: 2
-  HeartCost: 1
+  Description: "Cada ataque bloqueado adiciona +1 de Trick Charges (adequado at\xE9
+    5). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Defense por charge
+    na sua a\xE7\xE3o de Defesa."
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
+  Level: 2
+  Requirements:
+    MinLevel: 2
+    MinMind: 4
+    MinHeart: 1
+    MinBody: 3
+    MinAttack: 0
+    MinDefense: 4
+    MinInitiative: 0
+    MinFocus: 0
+    MinStrength: 2
+    MinAgility: 0
+  MomentumCost: 3
   TimingTurns: 0
   DurationTurns: 5
   CooldownTurns: 5

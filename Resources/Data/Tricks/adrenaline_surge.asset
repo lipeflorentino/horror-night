@@ -18,9 +18,18 @@ MonoBehaviour:
     ganha +2 dados de Poder para o ataque."
   Icon: {fileID: 0}
   Level: 2
-  MindCost: 0
-  BodyCost: 3
-  HeartCost: 1
+  Requirements:
+    MinLevel: 2
+    MinMind: 0
+    MinHeart: 2
+    MinBody: 4
+    MinAttack: 2
+    MinDefense: 0
+    MinInitiative: 1
+    MinFocus: 0
+    MinStrength: 3
+    MinAgility: 2
+  MomentumCost: 0
   TimingTurns: 0
   DurationTurns: 1
   CooldownTurns: 2

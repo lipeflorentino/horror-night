@@ -61,41 +61,29 @@ public class TrickInventory : ITrickInventory
     public bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance)
     {
         instance = null;
-        
-        Logger.Log($"[TrickInventory] CastTrick: Tentando castar '{trick?.DisplayName}' (ID: {trick?.Id}) para {owner?.Name}");
-        
         if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || IsTrickCoolingDown(trick.Id) || !trick.CanCast(owner))
         {
-            Logger.Log($"[TrickInventory] CastTrick falhou: owner={owner != null}, trick={trick != null}, hasLearned={HasLearnedTrick(trick?.Id)}, notCasted={!IsTrickCasted(trick?.Id)}, notCooling={!IsTrickCoolingDown(trick?.Id)}, canCast={trick?.CanCast(owner) ?? false}");
             return false;
         }
 
         TrickSlot freeSlot = castedSlots.Find(slot => slot != null && slot.IsEmpty && !slot.IsLocked);
+
         if (freeSlot == null)
         {
-            Logger.Log($"[TrickInventory] CastTrick: Nenhum slot vazio disponível para castar '{trick.DisplayName}'.");
             return false;
         }
-        
-        Logger.Log($"[TrickInventory] CastTrick: Slot encontrado no índice {freeSlot.SlotIndex} para '{trick.DisplayName}'.");
 
-        owner.Mind -= trick.MindCost;
-        owner.Body -= trick.BodyCost;
-        owner.Heart -= trick.HeartCost;
-
-        Logger.Log($"[TrickInventory] CastTrick: Custos consumidos. Mind-={trick.MindCost}, Body-={trick.BodyCost}, Heart-={trick.HeartCost}.");
+        owner.SpendMomentum(trick.MomentumCost);
         
         instance = new TrickRuntimeInstance(trick, owner, trick.DurationTurns, trick.CooldownTurns, TrickSlotType.Casted, freeSlot.SlotIndex, owner);
         freeSlot.BindRuntimeInstance(instance);
+
         if (owner.Tricks != null && !owner.Tricks.Contains(instance))
             owner.Tricks.Add(instance);
 
-        // Aplicar os perks da trick aqui para garantir efeito gameplay
         ApplyPerksToInstance(instance);
-
-        Logger.Log($"[TrickInventory] CastTrick: '{trick.DisplayName}' castado com sucesso no slot {freeSlot.SlotIndex}. Perks aplicados.");
-        
         NotifyChanged();
+
         return true;
     }
 
@@ -121,6 +109,7 @@ public class TrickInventory : ITrickInventory
 
         slot.Clear();
         NotifyChanged();
+        
         return true;
     }
 

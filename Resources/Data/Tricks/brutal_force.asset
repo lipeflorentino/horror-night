@@ -18,10 +18,20 @@ MonoBehaviour:
     Alto causam dano dobrado (x2) e resultados de n\xEDvel M\xE9dio aumentam o dano
     em (x1.5)."
   Icon: {fileID: 21300000, guid: b3d9803ff6299304ba5b4717d4fb72df, type: 3}
+  Thumbnail: {fileID: 21300000, guid: 6b2cfe6fb90212349bbffab673d5bf9f, type: 3}
   Level: 1
-  MindCost: 0
-  BodyCost: 0
-  HeartCost: 0
+  Requirements:
+    MinLevel: 1
+    MinMind: 0
+    MinHeart: 0
+    MinBody: 3
+    MinAttack: 1
+    MinDefense: 0
+    MinInitiative: 0
+    MinFocus: 0
+    MinStrength: 3
+    MinAgility: 0
+  MomentumCost: 0
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0

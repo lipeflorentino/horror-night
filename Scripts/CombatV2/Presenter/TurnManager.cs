@@ -58,6 +58,8 @@ public class TurnManager
 
         player.RecoverDices(1);
         enemy.RecoverDices(1);
+        player.AddMomentum(1);
+        enemy.AddMomentum(1);
         perkService.TickTurnEnd(player);
         perkService.TickTurnEnd(enemy);
         trickService.TickTrickEnd(player, playerTrickInventory);

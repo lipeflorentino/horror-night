@@ -17,10 +17,20 @@ MonoBehaviour:
   Description: "Seus testes de Precis\xE3o usando dados de Mind nunca resultam em
     menos de 30%."
   Icon: {fileID: 21300000, guid: 9b52a0d4dd0c1b346851ee7585205e99, type: 3}
+  Thumbnail: {fileID: 21300000, guid: b33f35a3829ae2d458f5b8a942d05303, type: 3}
   Level: 1
-  MindCost: 0
-  BodyCost: 0
-  HeartCost: 0
+  Requirements:
+    MinLevel: 1
+    MinMind: 3
+    MinHeart: 0
+    MinBody: 0
+    MinAttack: 0
+    MinDefense: 0
+    MinInitiative: 0
+    MinFocus: 0
+    MinStrength: 0
+    MinAgility: 0
+  MomentumCost: 0
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0

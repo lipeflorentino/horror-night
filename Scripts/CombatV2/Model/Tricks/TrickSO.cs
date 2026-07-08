@@ -21,14 +21,14 @@ public class TrickSO : ScriptableObject
     [TextArea(2, 4)]
     public string Description;
     public Sprite Icon;
+    public Sprite Thumbnail;
 
     [Header("Requisitos")]
     public int Level = 1;
+    public TrickRequirements Requirements = new();
 
-    [Header("Custo de Casting (Consumido imediatamente)")]
-    public int MindCost = 0;
-    public int BodyCost = 0;
-    public int HeartCost = 0;
+    [Header("Custo de Casting")]
+    public int MomentumCost = 0;
 
     [Header("Timing e Duração")]
     [Min(0)]
@@ -69,11 +69,11 @@ public class TrickSO : ScriptableObject
     }
     
     /// <summary>
-    /// Retorna o custo total em todas as stats
+    /// Retorna o custo total em momentum
     /// </summary>
     public int GetTotalCost()
     {
-        return MindCost + BodyCost + HeartCost;
+        return MomentumCost;
     }
     
     /// <summary>
@@ -86,10 +86,13 @@ public class TrickSO : ScriptableObject
         
         if (battler.Level < Level)
             return false;
-        
-        if (battler.Mind < MindCost || battler.Body < BodyCost || battler.Heart < HeartCost)
+
+        if (Requirements != null && !Requirements.IsSatisfiedBy(battler))
             return false;
-        
+
+        if (battler.Momentum < MomentumCost)
+            return false;
+
         return true;
     }
     
@@ -98,6 +101,6 @@ public class TrickSO : ScriptableObject
     /// </summary>
     public string GetFormattedDescription()
     {
-        return $"{Description}\n\nLevel: {Level} | Custo: Mind {MindCost}, Body {BodyCost}, Heart {HeartCost} | Cooldown: {CooldownTurns}";
+        return $"{Description}\n\nLevel: {Level} | Requisitos: {Requirements?.ToDisplayString() ?? "Nenhum"} | Momentum: {MomentumCost} | Cooldown: {CooldownTurns}";
     }
 }
