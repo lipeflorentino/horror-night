@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Instinto Vivo
   Description: "Adiciona 1 dado extra sempre que voc\xEA realizar uma rolagem com
     dados de Heart."
-  Icon: {fileID: 21300000, guid: bfa14f5c58c5b68439eab72cbba54d17, type: 3}
+  Icon: {fileID: 21300000, guid: ab6d3d01f47840e46847705ac46658a7, type: 3}
   Thumbnail: {fileID: 21300000, guid: bfa14f5c58c5b68439eab72cbba54d17, type: 3}
   Level: 1
   Requirements:

@@ -87,7 +87,7 @@ public class TrickSlotUI : MonoBehaviour
         }
         else if (!visible && isPanelOpen)
         {
-            trickInfoPanelUI.HideTooltip();
+            trickInfoPanelUI.HidePanel();
             trickInfoPanelUI.OnRaiseInteraction -= OnRaiseInteraction;
             isPanelOpen = false;
         }

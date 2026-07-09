@@ -1,0 +1,43 @@
+
+PROMPT PARA ORGANIZAR TAREFAS 
+
+    A proxima tarefa está relacionada a organizar e agrupar UI relacionada a Tricks. Atualmente está espalhado e confuso para manter e atualizar.
+
+    De UI hoje tenho:
+
+    TrickInventoryView - que é a UI responsavel por apresentar o inventario de tricks, com a lista de tricks de identidade 
+    (tricks que "nascem" com o personagem e são castadas de graça e permanecem sempre ativas no combatente). 
+    Tenho a lista de tricks castadas que podem ser tricks passivas e tricks ativas
+
+
+PROMPT PARA GERAR TRICK THUMGNAILS
+
+    Nome: Six Feet Under
+    Descrição da Imagem: A cinematic view of an old wooden coffin half-buried in cracked dark earth under stormy skies, with a final rusted iron nail being driven forcefully into the wood by a ghostly hammer.
+
+    Nome: Número da Sorte
+    Descrição da Imagem: Two glowing translucent polyhedral gaming dice floating in mid-air, showing a total sum of exactly 7, surrounded by swirling sparks of green luck and momentum energy.
+
+    Nome: Six Feet Under
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless grave robber driving a rusted iron nail into an old wooden coffin. Rainy dark background, sketchy charcoal and ink style.
+
+    Nome: Número da Sorte
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless human hand tossing two old carved bone dice onto a wooden table, showing a total of seven. Eerie ambient lighting, stark contrasts, heavy ink lines.
+
+    Nome: Divisão Igualitária
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of two featureless human figures bound together by a single thorny black vine. Dark ink crosshatching, muted tragic color palette.
+
+    Nome: Foco Inabalável
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless warrior holding a cracked wooden shield steady, a faint pale aura shielding them from approaching dark shadowy arrows.
+
+    Nome: Golpe de Adrenalina
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless human figure, their posture tensed, with dark veins bulging across their arms and neck under a faint eerie red glow. Heavy ink shadows.
+
+    Nome: Presença Aterrorizante
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless human standing tall while a massive, menacing shadow monster looms behind them, causing an enemy figure to recoil in fear.
+
+    Nome: Resistência
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a featureless human figure kneeling calmly behind a giant iron tower shield that is covered in dents and scratches from blocked impacts. Dark ink style.
+
+    Nome: Vingança
+    Descrição da Imagem: A sketchy hand-drawn gothic horror illustration of a bleeding, injured featureless human figure rising back up, gripping a jagged sword tightly, surrounded by a dark swirling aura. Heavy charcoal shadows.

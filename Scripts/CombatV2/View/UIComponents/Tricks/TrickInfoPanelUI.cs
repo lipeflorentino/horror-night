@@ -27,7 +27,6 @@ public class TrickInfoPanelUI : MonoBehaviour
     [Header("Interaction Buttons")]
     [SerializeField] private Button castButton;
     [SerializeField] private Button dischardButton;
-    [SerializeField] private Button closeButton;
 
     private RectTransform rectTransform;
 
@@ -44,9 +43,8 @@ public class TrickInfoPanelUI : MonoBehaviour
 
         if (castButton != null) castButton.onClick.AddListener(() => RaiseInteraction(TrickInventoryAction.Cast));
         if (dischardButton != null) dischardButton.onClick.AddListener(() => RaiseInteraction(TrickInventoryAction.Dischard));
-        if (closeButton != null) closeButton.onClick.AddListener(() => RaiseInteraction(TrickInventoryAction.Close));
 
-        HideTooltip();
+        HidePanel();
     }
 
     private void OnDestroy()
@@ -56,7 +54,6 @@ public class TrickInfoPanelUI : MonoBehaviour
 
         if (castButton != null) castButton.onClick.RemoveAllListeners();
         if (dischardButton != null) dischardButton.onClick.RemoveAllListeners();
-        if (closeButton != null) closeButton.onClick.RemoveAllListeners();
     }
 
     public void SetTrickInfo(TrickSO trick, TrickRuntimeInstance runtimeInstance, TrickInventoryItemLocation location)
@@ -85,15 +82,7 @@ public class TrickInfoPanelUI : MonoBehaviour
             trickInfoPanel.SetActive(true);
     }
 
-    public void ShowTooltip(Vector3 position)
-    {
-        ShowPanel();
-
-        if (rectTransform != null)
-            rectTransform.position = position;
-    }
-
-    public void HideTooltip()
+    public void HidePanel()
     {
         if (trickInfoPanel != null)
             trickInfoPanel.SetActive(false);
@@ -112,7 +101,6 @@ public class TrickInfoPanelUI : MonoBehaviour
 
         if (castButton != null) castButton.gameObject.SetActive(canCast);
         if (dischardButton != null) dischardButton.gameObject.SetActive(canDischard);
-        if (closeButton != null) closeButton.gameObject.SetActive(hasTrick);
     }
 
     private void PopulateRequirements(TrickRequirements requirements)

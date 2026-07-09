@@ -12,6 +12,7 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 {
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI inputKeyText;
+    [SerializeField] private TMP_Text turnCountText;    
     [SerializeField] private Image rarityBorder;
     [SerializeField] private Button releaseButton;
 
@@ -35,6 +36,9 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         if (icon != null && definition.Icon != null)
             icon.sprite = definition.Icon;
+
+        if (turnCountText != null)
+            turnCountText.text = instance != null ? instance.RemainingTurns.ToString() : string.Empty;
 
         if (inputKeyText != null)
         {

@@ -74,7 +74,7 @@ public class TrickInventoryView : MonoBehaviour
         if (IsInventoryOpen())
             SelectDefaultTrick();
         else if (trickInfoPanel != null)
-            trickInfoPanel.HideTooltip();
+            trickInfoPanel.HidePanel();
     }
 
     public void SetStatus(string message)
@@ -214,7 +214,7 @@ public class TrickInventoryView : MonoBehaviour
             HandleTrickSelected(defaultSlot);
         else if (trickInfoPanel != null)
         {
-            trickInfoPanel.HideTooltip();
+            trickInfoPanel.HidePanel();
             ClearSlotSelections();
         }
     }

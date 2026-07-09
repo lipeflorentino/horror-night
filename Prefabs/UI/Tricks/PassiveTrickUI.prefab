@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 5648980457521501771}
   - component: {fileID: 1486633405008991216}
   m_Layer: 5
-  m_Name: stackCount
+  m_Name: turnCount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,8 +109,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 108, y: -32}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 20.1, y: -15.03}
+  m_SizeDelta: {x: 11.5404, y: 9.3889}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5648980457521501771
 CanvasRenderer:
@@ -167,8 +167,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 12
-  m_fontSizeBase: 12
+  m_fontSize: 10
+  m_fontSizeBase: 10
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -203,7 +203,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 178.92532, w: 28.553299}
+  m_margin: {x: 0, y: 0, z: 0.07684326, w: 0.15878296}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -263,6 +263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 6606622326316243629}
   inputKeyText: {fileID: 0}
+  turnCountText: {fileID: 1486633405008991216}
   rarityBorder: {fileID: 0}
   releaseButton: {fileID: 0}
   tooltipPrefab: {fileID: 2954958933267147499, guid: 68b0103cd3d37a242a8819fff8766372, type: 3}
@@ -279,7 +280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
