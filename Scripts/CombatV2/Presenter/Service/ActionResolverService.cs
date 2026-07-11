@@ -13,13 +13,10 @@ public class ActionResolverService
         ActionAccuracy attackAccuracy = CalculateAccuracy(attack);
         ActionAccuracy defenseAccuracy = CalculateAccuracy(defense);
 
-        bool attackPowerMaxTriggered = attack.PowerDice != null && attack.PowerDice.IsMaxRoll;
-        bool defensePowerMaxTriggered = defense.PowerDice != null && defense.PowerDice.IsMaxRoll;
-        bool attackAccuracyMaxTriggered = attack.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
-        bool defenseAccuracyMaxTriggered = defense.AccuracyDice != null && defense.AccuracyDice.IsMaxRoll;
-        
-        bool hasEvaded = false;
-        bool hasParried = false;
+        bool attackPowerMaxTriggered = attack?.PowerDice != null && attack.PowerDice.IsMaxRoll;
+        bool defensePowerMaxTriggered = defense?.PowerDice != null && defense.PowerDice.IsMaxRoll;
+        bool attackAccuracyMaxTriggered = attack?.AccuracyDice != null && attack.AccuracyDice.IsMaxRoll;
+        bool defenseAccuracyMaxTriggered = defense?.AccuracyDice != null && defense.AccuracyDice.IsMaxRoll;
 
         bool ignoreAttack = (defenseAccuracyMaxTriggered && defense.AccuracyDice.Value > attack.AccuracyDice.Value && !attackAccuracyMaxTriggered) || attackAccuracy == ActionAccuracy.Missed;
         bool ignoreDefense = (attackAccuracyMaxTriggered && attack.AccuracyDice.Value > defense.AccuracyDice.Value && !defenseAccuracyMaxTriggered) || defenseAccuracy == ActionAccuracy.Missed;
@@ -30,16 +27,7 @@ public class ActionResolverService
             FinalTarget = target
         };
 
-        int attackPower = ignoreAttack ? 0 : CalculatePower(attack, attacker, target, ActionType.Attack);
-        int defensePower = ignoreDefense ? 0 : CalculatePower(defense, target, attacker, ActionType.Defense);
-        int damage = attackPower - defensePower;
-        
-        damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
-        damage = perkService?.ApplyDamageModifiers(damage, defense, target, attacker, ActionType.Defense, attack) ?? damage;
-
-        Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
-
-        if (result.Accuracy == ActionAccuracy.Missed)
+        if (attackAccuracy == ActionAccuracy.Missed)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Missed;
@@ -50,31 +38,23 @@ public class ActionResolverService
 
         if (ignoreAttack)
         {
-            if (defensePowerMaxTriggered)
-            {
-                hasParried = true;
-            } 
-            else
-            {
-                hasEvaded = true;
-            }
-        }
-
-        if (hasEvaded)
-        {
-            result.Outcome = ActionOutcome.Evaded;
-            result.FeedbackText = "EVADED";
+            result.Outcome = defensePowerMaxTriggered ? ActionOutcome.Parried : ActionOutcome.Evaded;
+            result.Damage = 0;
+            result.FeedbackText = result.Outcome == ActionOutcome.Parried ? "PARRIED" : "EVADED";
             EvaluateTriggers(attacker, target, attack, defense, result.Outcome);
             return result;
         }
 
-        if (hasParried)
-        {
-            result.Outcome = ActionOutcome.Parried;
-            result.FeedbackText = "PARRIED";
-        }
+        int attackPower = CalculatePower(attack, attacker, target, ActionType.Attack);
+        int defensePower = CalculatePower(defense, target, attacker, ActionType.Defense);
+        int damage = attackPower - defensePower;
 
-        if (damage <= 0 && !hasParried && !hasEvaded)
+        damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
+        damage = perkService?.ApplyDamageModifiers(damage, defense, target, attacker, ActionType.Defense, attack) ?? damage;
+
+        Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
+
+        if (damage <= 0)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;
@@ -84,15 +64,8 @@ public class ActionResolverService
         }
 
         result.Damage = damage;
-        result.Outcome = result.Accuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
-        result.FeedbackText = result.Accuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : "HIT";
-
-        if (ignoreAttack)
-        {
-             result.FeedbackText = string.IsNullOrEmpty(result.FeedbackText)
-                ? "ATTACK IGNORED!"
-                : $"{result.FeedbackText} | ATTACK IGNORED!";
-        }
+        result.Outcome = attackAccuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
+        result.FeedbackText = attackAccuracy == ActionAccuracy.Critical ? "CRITICAL HIT!" : "HIT";
 
         if (ignoreDefense)
         {
