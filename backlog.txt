@@ -5,86 +5,87 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
 🗺️ HISTÓRIAS / ÉPICOS (Menor Prioridade)
 
-- Estrutura de Clareiras (prefabs + conexões de mapa)
-- Variável global de Tensão
-- Variável global de Corrupção
-- Tabela de eventos ponderados
-- Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
-- Sistema simples de perda parcial
-- Sistema de combate em turnos (Core)
-- Sistemas do personagem (HP, inventory, progressão, controles)
+    - Estrutura de Clareiras (prefabs + conexões de mapa)
+    - Variável global de Tensão
+    - Variável global de Corrupção
+    - Tabela de eventos ponderados
+    - Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
+    - Sistema simples de perda parcial
+    - Sistema de combate em turnos (Core)
+    - Sistemas do personagem (HP, inventory, progressão, controles)
 
 
 🗄️ BACKLOG
 
-- Implementar sistemas secundários restantes: Presence, Treasure, NPC, Class
-- Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
-- Cartas de Estado de Combate: Habilitadas com custo, ativadas por rolagem/condição especial, alterando drasticamente os status e ações do combatente.
-- Ter builds baseadas em Atributos (Mind, Heart, Body)
-- Estruturar e delegar responsabilidades do CombatManager (dividir em TurnManager, TrickManager e EnemyActionManager)
-- Implementar habilidades com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
-- Implementar manipulação de dados (possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente)
-- Criar feedback de eficácia da ação (mostrar visualmente power e accuracy)
-- Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
-- Adicionar indicativo visual de rolagem máxima (highlight no dado)
-- Fazer painel de resultados pós-jogo/combate (total damage, total kills, total xp, etc.)
-- Fazer galeria de discoveries (monstros, itens, relíquias, etc.)
+    - Implementar sistemas secundários restantes: Presence, Treasure, NPC, Class
+    - Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
+    - Cartas de Estado de Combate: Habilitadas com custo, ativadas por rolagem/condição especial, alterando drasticamente os status e ações do combatente.
+    - Ter builds baseadas em Atributos (Mind, Heart, Body)
+    - Estruturar e delegar responsabilidades do CombatManager (dividir em TurnManager, TrickManager e EnemyActionManager)
+    - Implementar habilidades com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
+    - Implementar manipulação de dados (possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente)
+    - Criar feedback de eficácia da ação (mostrar visualmente power e accuracy)
+    - Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
+    - Adicionar indicativo visual de rolagem máxima (highlight no dado)
+    - Fazer painel de resultados pós-jogo/combate (total damage, total kills, total xp, etc.)
+    - Fazer galeria de discoveries (monstros, itens, relíquias, etc.)
 
 
 📝 TO DO
 
-- Implementar sistema de "Curses" (Maldições) que alteram diretamente os sistemas do jogo (UI, cor, sons, textos)
-- Implementar o conceito/uso de Momentum (sistema para ativar habilidades especiais/poderes/stance/glitches)
-- Implementar Tricks que forçam "testes" escolhidos pelo jogador (uma rolagem clássica de RPG antes do cálculo de accuracy/power)
-- Criar NPCEncounterSystem (sistema de sorteio similar a inimigos/loot, contendo tipos como loja, melhoria, troca, etc.)
-- Implementar TreasureSystem (configurar drop de artefatos lendários/épicos, Perks e CombatStateCards)
-- Sistema de Pergaminhos: Fazer com que Tricks sejam aprendidos por meio de pergaminhos (que podem conter vários tricks e ser adquiridos por loot ou NPCs)
-- Estabelecer tricks para os inimigos (definir identity tricks e criar feedback visual/log para quando o inimigo usá-las)
-- Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
-- Criar CharacterSO (Nicolas) e gerar o ícone do personagem
-- Ajustar lógica de type, behavior e style na IA de inimigos
-- Criar nova perk usando a Skill criada
-- Criar UI de Drawback
-- Adicionar informações no painel do player (XP e Gold)
-- Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
-- Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
-- verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador
+    - Implementar sistema de "Curses" (Maldições) que alteram diretamente os sistemas do jogo (UI, cor, sons, textos)
+    - Implementar o conceito/uso de Momentum (sistema para ativar habilidades especiais/poderes/stance/glitches)
+    - Implementar Tricks que forçam "testes" escolhidos pelo jogador (uma rolagem clássica de RPG antes do cálculo de accuracy/power)
+    - Criar NPCEncounterSystem (sistema de sorteio similar a inimigos/loot, contendo tipos como loja, melhoria, troca, etc.)
+    - Implementar TreasureSystem (configurar drop de artefatos lendários/épicos, Perks e CombatStateCards)
+    - Sistema de Pergaminhos: Fazer com que Tricks sejam aprendidos por meio de pergaminhos (que podem conter vários tricks e ser adquiridos por loot ou NPCs)
+    - Estabelecer tricks para os inimigos (definir identity tricks e criar feedback visual/log para quando o inimigo usá-las)
+    - Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
+    - Criar CharacterSO (Nicolas) e gerar o ícone do personagem
+    - Ajustar lógica de type, behavior e style na IA de inimigos
+    - Criar nova perk usando a Skill criada
+    - Criar UI de Drawback
+    - Adicionar informações no painel do player (XP e Gold)
+    - Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
+    - Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
+    - verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador
+    - Novo tipo de evento "Trick or Treat" entra na categoria de "Event" do node
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO
 
-- Executar Teste Estruturado 
-    - Adrenaline Surge:
-        1. Equipar a trick adrenaline_surge no slot do Player.
-        2. Alocar dados de Mind no Accuracy.
-        3. Realizar um Ataque.
-        4. Verificar no Console as tags: [Perk Triggered], [Adrenaline Surge] e [Flow] validando o bônus de dados extras.
-- Testar fluxo completo de tricks / perks no combate
-- Testar feedbacks visuais/console (blocked, evaded, missed)
+    - Executar Teste Estruturado 
+        - Adrenaline Surge:
+            1. Equipar a trick adrenaline_surge no slot do Player.
+            2. Alocar dados de Mind no Accuracy.
+            3. Realizar um Ataque.
+            4. Verificar no Console as tags: [Perk Triggered], [Adrenaline Surge] e [Flow] validando o bônus de dados extras.
+    - Testar fluxo completo de tricks / perks no combate
+    - Testar feedbacks visuais/console (blocked, evaded, missed)
 
 
 🐛 BUGS & FIXES
 
-- Corrigir bug: middle alert swallow memory vague
-- Ajustar tela de Loot (textos, alinhamento, etc.)
-- Ajustar valor de rolagem (dice faces)
+    - Corrigir bug: middle alert swallow memory vague
+    - Ajustar tela de Loot (textos, alinhamento, etc.)
+    - Ajustar valor de rolagem (dice faces)
 
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
-- Ajustar cast de tricks 
-    - requisitos (outras stats alem de mind, heart, body)
-    - custo (momentum)
+    - Ajustar cast de tricks 
+        - requisitos (outras stats alem de mind, heart, body)
+        - custo (momentum)
 
-- Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)    
-    - Criar uma UI especifica para tricks de identidade e tricks temporarias
-    - Implementar overlay de cooldown nos slots do inventário
-    - Implementar área de active tricks com ícones
-    - Implementar feedback de “triggered” temporário
-    - Refinar animações e transições
-    - Mudar botão de confirmar na tela de DiceView (icone de dado)
+    - Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)    
+        - Criar uma UI especifica para tricks de identidade e tricks temporarias
+        - Implementar overlay de cooldown nos slots do inventário
+        - Implementar área de active tricks com ícones
+        - Implementar feedback de “triggered” temporário
+        - Refinar animações e transições
+        - Mudar botão de confirmar na tela de DiceView (icone de dado)
 
-
-
+    - Ajustar o combatLogView
+        - dar feedbacks das ações/triggers/efeitos/resoluções
 
 

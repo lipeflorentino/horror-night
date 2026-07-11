@@ -9,41 +9,39 @@ public class CombatLogView : MonoBehaviour
     [SerializeField] private CombatLogItemUI logItemPrefab;
     [SerializeField] private GameObject panelRoot;
 
-    [Header("Icons")]
-    [SerializeField] private Sprite attackPowerIcon;
-    [SerializeField] private Sprite defensePowerIcon;
-    [SerializeField] private Sprite attackAccuracyIcon;
-    [SerializeField] private Sprite defenseAccuracyIcon;
-
     [Header("Colors")]
-    [SerializeField] private Color attackColor = new(0.3f, 0.95f, 1f, 1f); // ciano
-    [SerializeField] private Color defenseColor = new(0.82f, 0.62f, 1f, 1f); // lilas
+    public Color defaultColor = new(0.3f, 0.95f, 1f, 1f);
 
     [Header("Behavior")]
-    [SerializeField, Min(1)] private int maxLogs = 6;
-    [SerializeField, Min(0.1f)] private float lifetimeSeconds = 6f;
-    [SerializeField, Min(0.01f)] private float fadeDuration = 0.2f;
-    [SerializeField, Min(0.01f)] private float slideDuration = 0.2f;
-    [SerializeField] private float slideDistance = 40f;
+    [SerializeField, Min(1)] private int maxLogs = 7;
+    [SerializeField, Min(0.1f)] private float lifetimeSeconds = 8f;
 
     private readonly Queue<CombatLogItemUI> activeLogs = new();
 
-    public void ShowFromResult(ActionResolutionResult result)
+    public void ShowTriggerFeedback(PerkTriggeredEvent evt)
     {
-        panelRoot.SetActive(true);
-        TryShowLog(result.AttackPowerLogText, attackPowerIcon, attackColor);
-        TryShowLog(result.DefensePowerLogText, defensePowerIcon, defenseColor);
-        TryShowLog(result.AttackAccuracyLogText, attackAccuracyIcon, attackColor);
-        TryShowLog(result.DefenseAccuracyLogText, defenseAccuracyIcon, defenseColor);
+        Logger.Log($"[Perk Triggered] {evt.PerkId}");
+        if (evt.SourceTrick?.Definition != null)
+        {
+            string displayName = string.IsNullOrWhiteSpace(evt.SourceTrick.Definition.DisplayName)
+                ? evt.SourceTrick.Definition.Id
+                : evt.SourceTrick.Definition.DisplayName;
+
+            ShowTextLog($"{displayName} acionado", evt.SourceTrick.Definition.Icon, defaultColor);
+            return;
+        }
     }
 
-    private void TryShowLog(string logText, Sprite icon, Color textColor)
+    public void ShowTextLog(string logText, Sprite icon = null, Color? textColor = null)
     {
         if (string.IsNullOrWhiteSpace(logText) || contentRoot == null || logItemPrefab == null)
             return;
 
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
         CombatLogItemUI item = Instantiate(logItemPrefab, contentRoot);
-        item.Bind(icon, logText, textColor);
+        item.Bind(icon, logText, textColor ?? defaultColor);
 
         RectTransform rect = item.GetComponent<RectTransform>();
         CanvasGroup canvasGroup = item.GetComponent<CanvasGroup>();
@@ -69,41 +67,6 @@ public class CombatLogView : MonoBehaviour
 
         yield return new WaitForSeconds(lifetimeSeconds);
         RemoveAndDestroy(item);
-
-        /* Vector2 basePosition = rect != null ? rect.anchoredPosition : Vector2.zero;
-        Vector2 startPosition = basePosition + Vector2.left * slideDistance;
-
-        float t = 0f;
-        canvasGroup.alpha = 0f;
-        if (rect != null)
-            rect.anchoredPosition = startPosition;
-
-        while (t < slideDuration)
-        {
-            t += Time.deltaTime;
-            float p = Mathf.Clamp01(t / slideDuration);
-            canvasGroup.alpha = Mathf.Lerp(0f, 1f, p);
-            if (rect != null)
-                rect.anchoredPosition = Vector2.Lerp(startPosition, basePosition, p);
-            yield return null;
-        }
-
-        canvasGroup.alpha = 1f;
-        if (rect != null)
-            rect.anchoredPosition = basePosition;
-
-        yield return new WaitForSeconds(lifetimeSeconds);
-
-        t = 0f;
-        while (t < fadeDuration)
-        {
-            t += Time.deltaTime;
-            float p = Mathf.Clamp01(t / fadeDuration);
-            canvasGroup.alpha = Mathf.Lerp(1f, 0f, p);
-            yield return null;
-        }
-
-        RemoveAndDestroy(item); */
     }
 
     private void RemoveAndDestroy(CombatLogItemUI item)
@@ -126,6 +89,8 @@ public class CombatLogView : MonoBehaviour
         }
 
         Destroy(item.gameObject);
-        panelRoot.SetActive(false);
+
+        if (panelRoot != null && activeLogs.Count == 0)
+            panelRoot.SetActive(false);
     }
 }

@@ -337,9 +337,6 @@ public class PerkTriggerEvaluator
 
         perk.SourceTrick?.MarkTriggered();
         OnPerkTriggered?.Invoke(triggerEvent);
-
-        Debug.Log($"[Perk Triggered] {perk.Definition.Id} " +
-                  $"- Trigger: {rule.Trigger}, Target: {rule.ModifierTarget}, Value: {appliedValue}");
     }
 
     /// <summary>

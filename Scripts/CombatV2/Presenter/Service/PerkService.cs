@@ -13,6 +13,10 @@ public class PerkService
     public event System.Action<Battler, PerkRuntimeInstance> OnPerkApplied;
     public event System.Action<Battler, string> OnPerkRemoved;
     public event System.Action<PerkTriggeredEvent> OnPerkTriggered;
+    public event System.Action<Battler, BattlerStateRuntimeInstance> OnBattlerStateApplied;
+    public event System.Action<Battler, BattlerStateRuntimeInstance> OnBattlerStateRemoved;
+    public event System.Action<Battler, DrawbackRuntimeInstance> OnDrawbackApplied;
+    public event System.Action<Battler, DrawbackRuntimeInstance> OnDrawbackRemoved;
 
     public PerkService()
     {
@@ -22,10 +26,6 @@ public class PerkService
         triggerEvaluator = new PerkTriggerEvaluator(database);
         triggerEvaluator.OnPerkTriggered += (evt) => OnPerkTriggered?.Invoke(evt);
         effectResolver = new PerkEffectResolver(triggerEvaluator, GetEffectivePerks);
-        
-        OnPerkApplied += (b, p) => Debug.Log($"Perk {p.Definition.Id} aplicado!");
-        OnPerkRemoved += (b, id) => Debug.Log($"Perk {id} removido!");
-        OnPerkTriggered += (evt) => Debug.Log($"Perk {evt.PerkId} acionado com trigger {evt.Trigger}!");
     }
 
     // =========================
@@ -147,7 +147,10 @@ public class PerkService
 
                 state.DecreaseDuration();
                 if (state.RemainingTurns == 0)
+                {
+                    OnBattlerStateRemoved?.Invoke(battler, state);
                     battler.ActiveStates.RemoveAt(i);
+                }
             }
         }
 
@@ -168,6 +171,7 @@ public class PerkService
                 drawback.DecreaseDuration();
                 if (drawback.RemainingTurns == 0) // Remove at exactly 0. 
                 {
+                    OnDrawbackRemoved?.Invoke(battler, drawback);
                     battler.Drawbacks.RemoveAt(i);
                 }
             }
@@ -207,6 +211,7 @@ public class PerkService
             BattlerStateRuntimeInstance stateInstance = new(definition, target, source, resolvedDuration);
             target.ActiveStates.Add(stateInstance);
             ApplyBattlerStatePerks(target, source, stateInstance, resolvedDuration);
+            OnBattlerStateApplied?.Invoke(target, stateInstance);
             return stateInstance;
         }
 
@@ -232,6 +237,7 @@ public class PerkService
                 continue;
 
             RemoveBattlerStatePerks(target, state);
+            OnBattlerStateRemoved?.Invoke(target, state);
             target.ActiveStates.RemoveAt(i);
         }
     }
@@ -441,6 +447,7 @@ public class PerkService
                 {
                     DrawbackRuntimeInstance drawbackInstance = new(drawback, battler, drawback.DurationTurns, battler);
                     battler.Drawbacks.Add(drawbackInstance);
+                    OnDrawbackApplied?.Invoke(battler, drawbackInstance);
 
                     for (int j = 0; j < drawback.PerkIds.Count; j++)
                     {

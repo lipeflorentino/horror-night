@@ -54,7 +54,7 @@ public class CombatView : MonoBehaviour
             
         DiceRollView.HidePanel();
         ActiveTricksView.Init(combatManager);
-        FeedbackView.Init(combatManager.GetPerkService(), combatManager.GetTrickService());
+        FeedbackView.Init(combatManager.GetPerkService(), combatManager.GetTrickService(), combatManager.Player, combatManager.Enemy);
 
         playerIconSprite = combatManager.PlayerIcon;
         enemyIconSprite = combatManager.EnemyIcon;

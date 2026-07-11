@@ -38,11 +38,6 @@ public class ActionResolverService
         damage = perkService?.ApplyDamageModifiers(damage, defense, target, attacker, ActionType.Defense, attack) ?? damage;
 
         Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
-        
-        result.AttackPowerLogText = $"Attack Power: {attackPower}";
-        result.DefensePowerLogText = $"Defense Power: {defensePower}";
-        result.AttackAccuracyLogText = $"Attack Accuracy: {attackAccuracy}";
-        result.DefenseAccuracyLogText = $"Defense Accuracy: {defenseAccuracy}";
 
         if (result.Accuracy == ActionAccuracy.Missed)
         {

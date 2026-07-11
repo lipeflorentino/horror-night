@@ -1,18 +1,18 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class FeedbackView : MonoBehaviour
 {
     public TMP_Text TurnOwnerText;
+    [SerializeField] private StatusEffectFeedbacks playerStatusEffectFeedbacks;
+    [SerializeField] private StatusEffectFeedbacks enemyStatusEffectFeedbacks;
+
+    private PerkService perkService;
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private CombatLogView combatLogView;
-    [FormerlySerializedAs("perkActivationFeedback")]
-    [SerializeField] private PassiveTricksView passiveTricksView;
-
     [Header("Attack Effect")]
     [SerializeField] private GameObject playerAttackEffectPrefab;
     [SerializeField] private GameObject enemyAttackEffectPrefab;
@@ -27,22 +27,60 @@ public class FeedbackView : MonoBehaviour
         playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
         enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
         combatLogView = FindObjectOfType<CombatLogView>();
-        passiveTricksView = FindObjectOfType<PassiveTricksView>();
-
-        if (playerFeedbacks == null)
-            Debug.LogError("FeedbackView: PlayerFeedbacks component is missing.");
-
-        if (enemyFeedbacks == null)
-            Debug.LogError("FeedbackView: EnemyFeedbacks component is missing.");
+        ResolveFeedbackViews();
     }
 
-    public void Init(PerkService perkService, TrickService trickService)
+    public void Init(PerkService perkService, TrickService trickService, Battler playerBattler, Battler enemyBattler)
     {
-        if (passiveTricksView == null)
-            passiveTricksView = FindObjectOfType<PassiveTricksView>();
+        if (this.perkService != null)
+            this.perkService.OnPerkTriggered -= HandlePerkTriggered;
 
-        if (passiveTricksView != null)
-            passiveTricksView.Initialize(perkService, trickService);
+        ResolveFeedbackViews();
+        this.perkService = perkService;
+
+        if (playerStatusEffectFeedbacks != null)
+            playerStatusEffectFeedbacks.Initialize(perkService, trickService, playerBattler);
+
+        if (enemyStatusEffectFeedbacks != null)
+            enemyStatusEffectFeedbacks.Initialize(perkService, trickService, enemyBattler);
+
+        if (this.perkService != null)
+            this.perkService.OnPerkTriggered += HandlePerkTriggered;
+    }
+
+    private void ResolveFeedbackViews()
+    {
+        if (playerStatusEffectFeedbacks != null && enemyStatusEffectFeedbacks != null)
+            return;
+
+        StatusEffectFeedbacks[] feedbackViews = FindObjectsOfType<StatusEffectFeedbacks>();
+        if (feedbackViews == null || feedbackViews.Length == 0)
+            return;
+
+        for (int i = 0; i < feedbackViews.Length; i++)
+        {
+            StatusEffectFeedbacks view = feedbackViews[i];
+            if (view == null)
+                continue;
+
+            if (playerStatusEffectFeedbacks == null && view.OwnerBattler != null && view.OwnerBattler.IsPlayer)
+                playerStatusEffectFeedbacks = view;
+
+            if (enemyStatusEffectFeedbacks == null && view.OwnerBattler != null && !view.OwnerBattler.IsPlayer)
+                enemyStatusEffectFeedbacks = view;
+        }
+
+        if (playerStatusEffectFeedbacks == null && feedbackViews.Length > 0)
+            playerStatusEffectFeedbacks = feedbackViews[0];
+
+        if (enemyStatusEffectFeedbacks == null && feedbackViews.Length > 1)
+            enemyStatusEffectFeedbacks = feedbackViews[1];
+    }
+
+    private void HandlePerkTriggered(PerkTriggeredEvent evt)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowTriggerFeedback(evt);
     }
 
     public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
@@ -51,8 +89,6 @@ public class FeedbackView : MonoBehaviour
         {
             ShowStatusText(result.FeedbackText, targetIsPlayer);
         }
-
-        combatLogView.ShowFromResult(result);
 
         if (!result.AppliesDamage)
             return;
@@ -70,15 +106,9 @@ public class FeedbackView : MonoBehaviour
     {
         Transform anchor = attackerIsPlayer ? playerAttackEffectAnchor : enemyAttackEffectAnchor;
         GameObject attackEffectPrefab = attackerIsPlayer ? playerAttackEffectPrefab : enemyAttackEffectPrefab;
-
-        if (attackEffectPrefab == null || anchor == null)
-        {
-            Debug.Log("[Feedback] Attack effect prefab or anchor is missing.");
-            return;
-        }
-
         GameObject effect = Instantiate(attackEffectPrefab, anchor.position, Quaternion.identity, anchor);
         Image slashImage = effect.GetComponentInChildren<Image>();
+        
         if (slashImage != null)
         {
             slashImage.color = attackerIsPlayer
@@ -106,18 +136,6 @@ public class FeedbackView : MonoBehaviour
         }
 
         enemyFeedbacks.ShowStatusPopup(text);
-    }
-
-    public void ShowHealFeedback(int healAmount)
-    {
-        // Implement visual feedback for healing
-        Debug.Log($"Healed: {healAmount}");
-    }
-
-    public void ShowDodgeFeedback()
-    {
-        // Implement visual feedback for dodging an attack
-        Debug.Log("Attack Dodged!");
     }
 
     public void ShowTurnStartFeedback(bool isPlayerTurn)
@@ -167,6 +185,12 @@ public class FeedbackView : MonoBehaviour
         }
 
         Destroy(rect.gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (perkService != null)
+            perkService.OnPerkTriggered -= HandlePerkTriggered;
     }
 
     private static void SetImageAlpha(Image image, float alpha)

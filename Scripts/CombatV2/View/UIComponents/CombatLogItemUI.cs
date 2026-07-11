@@ -14,5 +14,11 @@ public class CombatLogItemUI : MonoBehaviour
             text.text = logText;
             text.color = textColor;
         }
+
+        if (icon != null)
+        {
+            icon.sprite = sprite;
+            icon.gameObject.SetActive(sprite != null);
+        }
     }
 }

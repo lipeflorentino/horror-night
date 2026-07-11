@@ -23,7 +23,6 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public TrickSO TrickDefinition => trickDefinition;
     public TrickRuntimeInstance RuntimeInstance => runtimeInstance;
-    public event Action<TrickSO> TrickClicked;
     public event Action<TrickRuntimeInstance> OnReleaseClicked;
 
     /// <summary>

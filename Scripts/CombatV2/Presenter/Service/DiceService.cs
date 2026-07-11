@@ -214,7 +214,8 @@ public class DiceService
                 continue;
 
             CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, totalValue);
-            diceCount += perkService?.GetExtraDiceCount(battler, opponent, perkContext, evaluateRollTriggers) ?? 0;
+            int extraDice = perkService?.GetExtraDiceCount(battler, opponent, perkContext, evaluateRollTriggers) ?? 0;
+            diceCount += extraDice;
 
             int baseFace = Mathf.Max(1, totalValue / diceCount);
             int remainder = Mathf.Max(0, totalValue - (baseFace * diceCount));
@@ -225,7 +226,7 @@ public class DiceService
                 int maxFace = baseFace + bonus;
                 int minFace = Mathf.Clamp(1 + agility, 1, maxFace);
                 CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, maxFace);
-                minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, evaluateRollTriggers) ?? minFace;
+                minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, false) ?? minFace;
                 diceSpecs.Add(new DiceRollSpec(minFace, maxFace, pair.Key, rollType));
             }
         }
