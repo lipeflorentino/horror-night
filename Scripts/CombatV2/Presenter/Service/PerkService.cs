@@ -108,6 +108,14 @@ public class PerkService
         if (battler == null)
             return;
 
+        // Dano contínuo de Sangramento (Bleeding)
+        bool isBleeding = battler.Drawbacks.Exists(d => d != null && d.IsActive() && d.Definition.Id.Equals("bleeding", System.StringComparison.OrdinalIgnoreCase));
+        if (isBleeding)
+        {
+            battler.ReceiveDamage(2);
+            Debug.Log($"[Drawback] {battler.Name} perdeu 2 HP por Bleeding. HP Restante: {battler.HP}");
+        }
+
         for (int i = battler.Perks.Count - 1; i >= 0; i--)
         {
             PerkRuntimeInstance perk = battler.Perks[i];
@@ -272,6 +280,21 @@ public class PerkService
     public int GetEffectiveActionPower(Battler actor, Battler opponent, ActionType actionType)
     {
         return effectResolver.GetEffectiveActionPower(actor, opponent, actionType);
+    }
+
+    public int GetEffectiveMind(Battler battler)
+    {
+        return effectResolver.GetEffectiveMind(battler);
+    }
+
+    public int GetEffectiveHeart(Battler battler)
+    {
+        return effectResolver.GetEffectiveHeart(battler);
+    }
+
+    public int GetEffectiveBody(Battler battler)
+    {
+        return effectResolver.GetEffectiveBody(battler);
     }
 
     public int GetEffectiveFocus(Battler actor, Battler opponent, ActionType actionType)
@@ -446,13 +469,14 @@ public class PerkService
                 DrawbackSO drawback = drawbackDb.GetById(trickInstance.Definition.DrawbackIds[i]);
                 if (drawback != null && drawback.PerkIds != null)
                 {
-                    DrawbackRuntimeInstance drawbackInstance = new(drawback, battler, drawback.DurationTurns, battler);
+                    int rolledDuration = drawback.RollDuration();
+                    DrawbackRuntimeInstance drawbackInstance = new(drawback, battler, rolledDuration, battler);
                     battler.Drawbacks.Add(drawbackInstance);
                     OnDrawbackApplied?.Invoke(battler, drawbackInstance);
 
                     for (int j = 0; j < drawback.PerkIds.Count; j++)
                     {
-                        PerkRuntimeInstance appliedPerk = ApplyPerk(battler, drawback.PerkIds[j], battler, drawback.DurationTurns, 1);
+                        PerkRuntimeInstance appliedPerk = ApplyPerk(battler, drawback.PerkIds[j], battler, rolledDuration, 1);
                         if (appliedPerk != null)
                         {
                             drawbackInstance.ActivePerks.Add(appliedPerk);

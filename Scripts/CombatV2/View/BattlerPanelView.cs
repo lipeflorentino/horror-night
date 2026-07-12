@@ -21,14 +21,14 @@ public class BattlerPanelView : MonoBehaviour
     public TMP_Text StrengthText;
     public TMP_Text AgilityText;
 
-    public void Bind(Battler battler)
+    public void Bind(Battler battler, PerkService perkService = null)
     {
         // Bind Stats
         currentHp = battler.HP;
         maxHp = battler.MaxHp;
-        currentMind = battler.Mind;
-        currentHeart = battler.Heart;
-        currentBody = battler.Body;
+        currentMind = perkService != null ? perkService.GetEffectiveMind(battler) : battler.Mind;
+        currentHeart = perkService != null ? perkService.GetEffectiveHeart(battler) : battler.Heart;
+        currentBody = perkService != null ? perkService.GetEffectiveBody(battler) : battler.Body;
 
         // Bind Texts
         if (NameText != null)
@@ -38,13 +38,13 @@ public class BattlerPanelView : MonoBehaviour
             LevelText.text = "Lv. " + battler.Level.ToString();
 
         if (MindText != null)
-            MindText.text = battler.Mind.ToString();
+            MindText.text = currentMind.ToString();
 
         if (HeartText != null)
-            HeartText.text = battler.Heart.ToString();
+            HeartText.text = currentHeart.ToString();
 
         if (BodyText != null)
-            BodyText.text = battler.Body.ToString();
+            BodyText.text = currentBody.ToString();
 
         if (HpText != null)
             HpText.text = battler.HP.ToString();
@@ -56,11 +56,14 @@ public class BattlerPanelView : MonoBehaviour
         // if (DiceText != null)
         //     DiceText.text = battler.CurrentDices.ToString();
 
+        int effectiveAttack = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Attack) : battler.Attack;
+        int effectiveDefense = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Defense) : battler.Defense;
+
         if (AttackText != null)
-            AttackText.text = battler.Attack.ToString();
+            AttackText.text = effectiveAttack.ToString();
         
         if (DefenseText != null)
-            DefenseText.text = battler.Defense.ToString();
+            DefenseText.text = effectiveDefense.ToString();
 
         if (InitiativeText != null)
             InitiativeText.text = battler.Initiative.ToString();

@@ -36,3 +36,10 @@ state_angry_defense_power,OwnerAsDefender,Defense,Any,Any,Any,Always,,DefensePow
 state_angry_defender_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,0.15,1,RefreshDuration
 state_cautious_max_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,MaxRollPercent,Add,-0.15,1,RefreshDuration
 state_cautious_min_accuracy,OwnerAsDefender,Defense,Accuracy,Any,Any,Always,,LowRollThresholdPercent,Add,-0.15,1,RefreshDuration
+bleeding_mind,Any,Any,Any,Any,Any,OnApply,,Mind,Add,-2,1,RefreshDuration
+bleeding_heart,Any,Any,Any,Any,Any,OnApply,,Heart,Add,-2,1,RefreshDuration
+bleeding_body,Any,Any,Any,Any,Any,OnApply,,Body,Add,-2,1,RefreshDuration
+broken_bones_body,Any,Any,Any,Any,Any,OnApply,,Body,Multiply,0.7,1,RefreshDuration
+broken_bones_attack,Any,Any,Any,Any,Any,Always,,AttackPower,Multiply,0.5,1,RefreshDuration
+broken_bones_defense,Any,Any,Any,Any,Any,Always,,DefensePower,Multiply,0.5,1,RefreshDuration
+

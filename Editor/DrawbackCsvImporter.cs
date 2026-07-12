@@ -55,6 +55,8 @@ public static class DrawbackCsvImporter
         target.Description = source.Description;
         target.Icon = source.Icon;
         target.DurationTurns = source.DurationTurns;
+        target.DurationMin = source.DurationMin;
+        target.DurationMax = source.DurationMax;
         target.PerkIds = new List<string>(source.PerkIds);
         target.FlavorText = source.FlavorText;
     }

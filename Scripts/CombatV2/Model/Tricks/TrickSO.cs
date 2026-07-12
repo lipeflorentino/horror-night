@@ -79,7 +79,7 @@ public class TrickSO : ScriptableObject
     /// <summary>
     /// Verifica se o battler pode fazer cast deste trick
     /// </summary>
-    public bool CanCast(Battler battler)
+    public bool CanCast(Battler battler, PerkService perkService = null)
     {
         if (battler == null)
             return false;
@@ -87,7 +87,7 @@ public class TrickSO : ScriptableObject
         if (battler.Level < Level)
             return false;
 
-        if (Requirements != null && !Requirements.IsSatisfiedBy(battler))
+        if (Requirements != null && !Requirements.IsSatisfiedBy(battler, perkService))
             return false;
 
         if (battler.Momentum < MomentumCost)

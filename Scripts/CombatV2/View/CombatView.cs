@@ -17,9 +17,11 @@ public class CombatView : MonoBehaviour
 
     private Sprite playerIconSprite;
     private Sprite enemyIconSprite;
+    private CombatManager combatManager;
 
     public void Init(CombatManager combatManager)
     {
+        this.combatManager = combatManager;
         BattlerPanelView[] panels = FindObjectsOfType<BattlerPanelView>();
         
         foreach (BattlerPanelView panel in panels)
@@ -68,8 +70,9 @@ public class CombatView : MonoBehaviour
 
     public void UpdateView(Battler player, Battler enemy)
     {
-        PlayerPanel.Bind(player);
-        EnemyPanel.Bind(enemy);
+        PerkService perkService = combatManager != null ? combatManager.GetPerkService() : null;
+        PlayerPanel.Bind(player, perkService);
+        EnemyPanel.Bind(enemy, perkService);
         InfoPanelView.Bind(player, playerIconSprite, enemy, enemyIconSprite);
     }
 

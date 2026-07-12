@@ -40,7 +40,34 @@ public static class DrawbackCsvParser
             drawback.DisplayName = Get(row, columns, "DisplayName");
             drawback.Description = Get(row, columns, "Description");
             drawback.Icon = sprite;
-            drawback.DurationTurns = ParseInt(Get(row, columns, "DurationTurns"), -1);
+            
+            string durationVal = Get(row, columns, "DurationTurns");
+            int minVal = -1;
+            int maxVal = -1;
+            int defaultDuration = -1;
+            if (!string.IsNullOrWhiteSpace(durationVal))
+            {
+                if (durationVal.Contains("-"))
+                {
+                    string[] parts = durationVal.Split('-');
+                    if (parts.Length == 2)
+                    {
+                        minVal = ParseInt(parts[0], -1);
+                        maxVal = ParseInt(parts[1], -1);
+                        defaultDuration = minVal;
+                    }
+                }
+                else
+                {
+                    defaultDuration = ParseInt(durationVal, -1);
+                    minVal = defaultDuration;
+                    maxVal = defaultDuration;
+                }
+            }
+            drawback.DurationTurns = defaultDuration;
+            drawback.DurationMin = minVal;
+            drawback.DurationMax = maxVal;
+
             drawback.PerkIds = ParseStringList(Get(row, columns, "PerkIds"), ";");
             drawback.FlavorText = Get(row, columns, "FlavorText");
             

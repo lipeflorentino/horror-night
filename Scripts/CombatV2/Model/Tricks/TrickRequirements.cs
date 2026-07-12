@@ -26,7 +26,7 @@ public class TrickRequirements
         MinStrength > 0 ||
         MinAgility > 0;
 
-    public bool IsSatisfiedBy(Battler battler)
+    public bool IsSatisfiedBy(Battler battler, PerkService perkService = null)
     {
         if (battler == null)
             return false;
@@ -34,13 +34,23 @@ public class TrickRequirements
         if (battler.Level < MinLevel)
             return false;
 
-        if (battler.Mind < MinMind || battler.Heart < MinHeart || battler.Body < MinBody)
+        int mind = perkService != null ? perkService.GetEffectiveMind(battler) : battler.Mind;
+        int heart = perkService != null ? perkService.GetEffectiveHeart(battler) : battler.Heart;
+        int body = perkService != null ? perkService.GetEffectiveBody(battler) : battler.Body;
+
+        if (mind < MinMind || heart < MinHeart || body < MinBody)
             return false;
 
-        if (battler.Attack < MinAttack || battler.Defense < MinDefense || battler.Initiative < MinInitiative)
+        int attack = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Attack) : battler.Attack;
+        int defense = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Defense) : battler.Defense;
+
+        if (attack < MinAttack || defense < MinDefense || battler.Initiative < MinInitiative)
             return false;
 
-        if (battler.Focus < MinFocus || battler.Strength < MinStrength || battler.Agility < MinAgility)
+        int focus = perkService != null ? perkService.GetEffectiveFocus(battler, null, ActionType.Attack) : battler.Focus;
+        int strength = perkService != null ? perkService.GetEffectiveStrength(battler, null, ActionType.Attack) : battler.Strength;
+
+        if (focus < MinFocus || strength < MinStrength || battler.Agility < MinAgility)
             return false;
 
         return true;

@@ -26,8 +26,8 @@ public class ActionResolverService
         if (defensePowerMaxTriggered)
             powerMaxSource |= PowerMaxSource.Defense;
 
-        bool ignoreAttack = (defenseAccuracyMaxTriggered && defense?.AccuracyDice != null && attack?.AccuracyDice != null && defense.AccuracyDice.Value > attack.AccuracyDice.Value && !attackAccuracyMaxTriggered) || attackAccuracy == ActionAccuracy.Missed;
-        bool ignoreDefense = (attackAccuracyMaxTriggered && attack?.AccuracyDice != null && defense?.AccuracyDice != null && attack.AccuracyDice.Value > defense.AccuracyDice.Value && !defenseAccuracyMaxTriggered) || defenseAccuracy == ActionAccuracy.Missed;
+        bool ignoreAttack = (defenseAccuracyMaxTriggered && defense?.AccuracyDice != null && attack?.AccuracyDice != null && defense.AccuracyDice.Value > attack.AccuracyDice.Value) || attackAccuracy == ActionAccuracy.Missed;
+        bool ignoreDefense = (attackAccuracyMaxTriggered && attack?.AccuracyDice != null && defense?.AccuracyDice != null && attack.AccuracyDice.Value > defense.AccuracyDice.Value) || defenseAccuracy == ActionAccuracy.Missed;
 
         ActionResolutionResult result = new()
         {
@@ -124,13 +124,13 @@ public class ActionResolverService
                 return ActionResolutionVariation.LegendaryClash;
 
             if (result.IgnoreDefense && attackPowerMax)
-                return ActionResolutionVariation.Annihilation;
+                return ActionResolutionVariation.Deathstroke;
 
             if (result.IgnoreDefense)
                 return ActionResolutionVariation.DevastatingStrike;
 
             if (attackPowerMax)
-                return ActionResolutionVariation.Overkill;
+                return ActionResolutionVariation.Overpower;
 
             if (defensePowerMax)
                 return ActionResolutionVariation.IronWall;
@@ -150,10 +150,10 @@ public class ActionResolverService
                 return ActionResolutionVariation.PiercingHit;
 
             if (attackPowerMax)
-                return ActionResolutionVariation.PowerSurge;
+                return ActionResolutionVariation.PowerHit;
 
             if (defensePowerMax)
-                return ActionResolutionVariation.IronWall;
+                return ActionResolutionVariation.Stronghold;
 
             return ActionResolutionVariation.Hit;
         }
@@ -183,17 +183,17 @@ public class ActionResolverService
         return result.ResolutionVariation switch
         {
             ActionResolutionVariation.LegendaryClash => "LEGENDARY CLASH",
-            ActionResolutionVariation.Annihilation => "ANNIHILATION",
-            ActionResolutionVariation.Overkill => "OVERKILL",
+            ActionResolutionVariation.Deathstroke => "DEATHSTROKE",
+            ActionResolutionVariation.Overpower => "OVERPOWER",
             ActionResolutionVariation.DevastatingStrike => "DEVASTATING STRIKE",
             ActionResolutionVariation.ArmorShatter => "ARMOR SHATTER",
-            ActionResolutionVariation.PowerSurge => "POWER SURGE",
+            ActionResolutionVariation.PowerHit => "POWER HIT",
             ActionResolutionVariation.PiercingHit => "PIERCING HIT",
             ActionResolutionVariation.CriticalHit => "CRITICAL HIT!",
             ActionResolutionVariation.Hit => "HIT",
             ActionResolutionVariation.Missed => "MISSED",
-            // Defesa em Power Max não muda o resultado do ataque em si: mantém o texto base do Outcome.
-            ActionResolutionVariation.IronWall => result.Outcome == ActionOutcome.CriticalHit ? "CRITICAL HIT!" : "HIT",
+            ActionResolutionVariation.IronWall => "CRITICAL HIT!",
+            ActionResolutionVariation.Stronghold => "HIT",
             _ => string.Empty
         };
     }
@@ -208,6 +208,9 @@ public class ActionResolverService
 
         if (result.ResolutionVariation == ActionResolutionVariation.IronWall)
             return "IRON WALL";
+
+        if (result.ResolutionVariation == ActionResolutionVariation.Stronghold)
+            return "STRONGHOLD";
 
         if (result.IgnoreDefense)
             return "GUARD BROKEN";

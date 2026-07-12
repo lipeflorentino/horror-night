@@ -88,4 +88,5 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Ajustar o combatLogView
         - dar feedbacks das ações/triggers/efeitos/resoluções
 
-
+    - Ajustar aplicação de "bleeding" no TickEndTurn
+        - escalável por conta de outros efeitos (poisoning, pain, etc)

@@ -18,6 +18,23 @@ public class DrawbackSO : ScriptableObject
     [Header("Configuração")]
     [Tooltip("-1 = Permanente, 0+ = Número de turnos")]
     public int DurationTurns = -1;
+    public int DurationMin = -1;
+    public int DurationMax = -1;
+
+    /// <summary>
+    /// Calcula uma duração aleatória entre DurationMin e DurationMax (inclusive).
+    /// Se não configurado, retorna a duração padrão DurationTurns.
+    /// </summary>
+    public int RollDuration()
+    {
+        if (DurationMin < 0 || DurationMax < 0)
+            return DurationTurns;
+
+        if (DurationMin == DurationMax)
+            return DurationMin;
+
+        return Random.Range(DurationMin, DurationMax + 1);
+    }
 
     [Header("Efeitos")]
     [Tooltip("IDs dos Perks que este Drawback ativa. Devem ser encontrados em PerkDatabase.")]

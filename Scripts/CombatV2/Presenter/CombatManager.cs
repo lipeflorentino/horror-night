@@ -233,6 +233,8 @@ public class CombatManager : MonoBehaviour
     {
         TurnManager.EndTurn(Player, Enemy, PerkService, TrickService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
         RefreshCombatUI();
+        if (TryHandleCombatEnd())
+            return;
         TurnManager.UpdateTurnRoleUI(TurnState, View, Input);
     }
 

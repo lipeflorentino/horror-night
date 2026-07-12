@@ -61,7 +61,7 @@ public class TrickInventory : ITrickInventory
     public bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance)
     {
         instance = null;
-        if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || IsTrickCoolingDown(trick.Id) || !trick.CanCast(owner))
+        if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || IsTrickCoolingDown(trick.Id) || !trick.CanCast(owner, perkService))
         {
             return false;
         }

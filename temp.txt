@@ -1,14 +1,4 @@
 
-PROMPT PARA ORGANIZAR TAREFAS 
-
-    A proxima tarefa está relacionada a organizar e agrupar UI relacionada a Tricks. Atualmente está espalhado e confuso para manter e atualizar.
-
-    De UI hoje tenho:
-
-    TrickInventoryView - que é a UI responsavel por apresentar o inventario de tricks, com a lista de tricks de identidade 
-    (tricks que "nascem" com o personagem e são castadas de graça e permanecem sempre ativas no combatente). 
-    Tenho a lista de tricks castadas que podem ser tricks passivas e tricks ativas
-
 
 PROMPT PARA GERAR TRICK THUMGNAILS
 

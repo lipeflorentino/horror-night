@@ -36,6 +36,39 @@ public class PerkEffectResolver
         return GetEffectiveStat(actor, opponent, actionType, PerkModifierTarget.Strength, actor?.Strength ?? 0);
     }
 
+    public int GetEffectiveMind(Battler battler)
+    {
+        if (battler == null)
+            return 0;
+
+        float value = battler.Mind;
+        CombatActionContext context = new(battler, null, ActionType.Attack);
+        ApplyContextualModifiers(battler, context, PerkTrigger.BeforeRoll, PerkModifierTarget.Mind, ref value);
+        return Mathf.Max(0, Mathf.RoundToInt(value));
+    }
+
+    public int GetEffectiveHeart(Battler battler)
+    {
+        if (battler == null)
+            return 0;
+
+        float value = battler.Heart;
+        CombatActionContext context = new(battler, null, ActionType.Attack);
+        ApplyContextualModifiers(battler, context, PerkTrigger.BeforeRoll, PerkModifierTarget.Heart, ref value);
+        return Mathf.Max(0, Mathf.RoundToInt(value));
+    }
+
+    public int GetEffectiveBody(Battler battler)
+    {
+        if (battler == null)
+            return 0;
+
+        float value = battler.Body;
+        CombatActionContext context = new(battler, null, ActionType.Attack);
+        ApplyContextualModifiers(battler, context, PerkTrigger.BeforeRoll, PerkModifierTarget.Body, ref value);
+        return Mathf.Max(0, Mathf.RoundToInt(value));
+    }
+
     public int GetExtraDiceCount(Battler actor, Battler opponent, CombatRollContext context, bool evaluateTriggers = true)
     {
         if (evaluateTriggers)

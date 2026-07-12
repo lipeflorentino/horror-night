@@ -29,19 +29,19 @@ public enum ActionResolutionVariation
     Hit,
     CriticalHit,
     PiercingHit,
-    ParryBreak,
-    PowerSurge,
+    PowerHit,
     ArmorShatter,
     DevastatingStrike,
     FierceDefense,
-    Overkill,
-    Annihilation,
+    Overpower,
+    Deathstroke,
     Missed,
     Blocked,
     Evaded,
     Parried,
     LegendaryClash,
-    IronWall
+    IronWall,
+    Stronghold
 }
 
 public enum PowerMaxSource 
