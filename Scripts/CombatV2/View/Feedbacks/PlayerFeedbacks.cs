@@ -20,7 +20,13 @@ public class PlayerFeedbacks : MonoBehaviour
     {
         if (screenFlashCanvas == null || playerFlashImage == null)
         {
-            Debug.LogError("PlayerFeedbacks: Screen flash canvas or image reference is missing.");
+            Debug.LogError("[PlayerFeedbacks] Screen flash canvas or image reference is missing.");
+            return;
+        }
+
+        if (actionLogPanel == null)
+        {
+            Debug.LogError("[PlayerFeedbacks] Action log panel reference is missing.");
             return;
         }
 
@@ -35,6 +41,12 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowStatusText(string text)
     {
+        if (actionLogPanel == null)
+        {
+            Debug.LogError("[PlayerFeedbacks] Action log panel reference is missing.");
+            return;
+        }
+
         actionLogPanel.SetActive(true);
 
         if (playerStatusText == null)
@@ -42,7 +54,7 @@ public class PlayerFeedbacks : MonoBehaviour
             Debug.Log($"[Feedback] {text}");
             return;
         }
-        
+
         StartCoroutine(AnimateActionLog(text));
     }
 
@@ -50,19 +62,8 @@ public class PlayerFeedbacks : MonoBehaviour
     {
         playerFlashImage.gameObject.SetActive(true);
         playerFlashImage.enabled = true;
-        Color color = playerFlashColor;
-        color.a = PlayerFlashAlpha;
-        playerFlashImage.color = color;
 
-        float elapsed = 0f;
-        while (elapsed < PlayerFlashDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / PlayerFlashDuration);
-            color.a = Mathf.Lerp(PlayerFlashAlpha, 0f, t);
-            playerFlashImage.color = color;
-            yield return null;
-        }
+        yield return FadeUtility.FadeImageAlpha(playerFlashImage, PlayerFlashAlpha, 0f, PlayerFlashDuration);
 
         playerFlashImage.enabled = false;
         playerFlashImage.gameObject.SetActive(false);
@@ -72,27 +73,6 @@ public class PlayerFeedbacks : MonoBehaviour
     {
         playerStatusText.text = text;
         yield return new WaitForSeconds(PlayerStatusDuration);
-        actionLogPanel.SetActive(false);
-    }
-
-    private IEnumerator AnimatePlayerStatusText(string text)
-    {
-        playerStatusText.text = text;
-        actionLogPanel.SetActive(true);
-        Color color = playerStatusText.color;
-        color.a = 1f;
-        playerStatusText.color = color;
-
-        float elapsed = 0f;
-        while (elapsed < PlayerStatusDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / PlayerStatusDuration);
-            color.a = Mathf.Lerp(1f, 0f, t);
-            playerStatusText.color = color;
-            yield return null;
-        }
-
         actionLogPanel.SetActive(false);
     }
 }

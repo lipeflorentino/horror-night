@@ -7,4 +7,5 @@ public class ActionResolutionContext : ICombatContext, IPerkConditionContext
     public Battler Opponent;
     public ActionType ActionType;
     public ActionOutcome Outcome;
+    public ActionResolutionVariation ResolutionVariation;
 }

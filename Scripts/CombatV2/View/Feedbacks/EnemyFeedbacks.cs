@@ -10,6 +10,7 @@ public class EnemyFeedbacks : MonoBehaviour
     private const float EnemyPopupBounceScale = 1.2f;
     private const float EnemyFlashDuration = 0.15f;
     private const float EnemyFlashAlpha = 0.9f;
+    private const float EnemyStatusDuration = 2f;
     private Color flashColor = new(0.9f, 0.1f, 0.1f, EnemyFlashAlpha);
     
     [Header("Enemy Damage Popup")]
@@ -19,19 +20,40 @@ public class EnemyFeedbacks : MonoBehaviour
     [SerializeField] private Color damageColor = new(1f, 0.1f, 0.1f, 1f);
     [SerializeField] private Color statusColor = new(0.1f, 0.1f, 1f, 1f);
 
+    private RectTransform popupRect;
+    private TextMeshProUGUI popupText;
+    private SpriteRenderer enemySpriteRenderer;
+    [SerializeField] private GameObject actionLogPanel;
+    [SerializeField] private TMP_Text enemyStatusText;
+
     void Start()
     {
-        popupObject.SetActive(false);
         if (worldPopupCanvas == null)
         {
-            Debug.LogError("EnemyFeedbacks: World popup canvas reference is missing.");
+            Debug.LogError("[EnemyFeedbacks] World popup canvas reference is missing.");
             return;
         }
+
         if (popupObject == null)
         {
-            Debug.LogError("EnemyFeedbacks: Popup object reference is missing.");
+            Debug.LogError("[EnemyFeedbacks] Popup object reference is missing.");
             return;
         }
+
+        popupRect = popupObject.GetComponent<RectTransform>();
+        popupText = popupObject.GetComponent<TextMeshProUGUI>();
+
+        if (popupRect == null || popupText == null)
+            Debug.LogError("[EnemyFeedbacks] Popup object is missing RectTransform or TextMeshProUGUI component.");
+
+        if (enemyVisual != null)
+            enemySpriteRenderer = enemyVisual.GetComponent<SpriteRenderer>();
+
+        if (enemySpriteRenderer == null)
+            Debug.LogError("[EnemyFeedbacks] Enemy visual reference or SpriteRenderer is missing.");
+
+        popupObject.SetActive(false);
+        actionLogPanel.SetActive(false);
     }
 
     public void ShowDamagePopup(int damage)
@@ -42,29 +64,26 @@ public class EnemyFeedbacks : MonoBehaviour
 
     public void ShowStatusPopup(string text)
     {
-        ShowPopupText(text, statusColor);
+        actionLogPanel.SetActive(true);
+        StartCoroutine(AnimateActionLog(text));
     }
 
     private void ShowPopupText(string text, Color color)
     {
-        popupObject.SetActive(true);
-
-        RectTransform popupRect = popupObject.GetComponent<RectTransform>();
-        TextMeshProUGUI popupText = popupObject.GetComponent<TextMeshProUGUI>();
-
-        if (popupRect == null || popupText == null)
+        if (popupObject == null || popupRect == null || popupText == null)
         {
-            Debug.LogError("EnemyFeedbacks: Popup object is missing RectTransform or TextMeshProUGUI component.");
+            Debug.LogError("[EnemyFeedbacks] Cannot show popup, references are missing.");
             return;
         }
 
+        popupObject.SetActive(true);
         popupText.text = text;
         popupText.color = color;
 
-        StartCoroutine(AnimateEnemyPopup(popupRect, popupText));
+        StartCoroutine(AnimateEnemyPopup());
     }
 
-    private IEnumerator AnimateEnemyPopup(RectTransform popupRect, TextMeshProUGUI popupText)
+    private IEnumerator AnimateEnemyPopup()
     {
         Vector3 startPosition = popupRect.position;
         Vector3 endPosition = startPosition + Vector3.up * EnemyPopupRiseDistance;
@@ -95,21 +114,26 @@ public class EnemyFeedbacks : MonoBehaviour
 
     private IEnumerator AnimateEnemyFlash()
     {
-        SpriteRenderer spriteRenderer = enemyVisual.GetComponent<SpriteRenderer>();
-        
-        Color InitialColor = spriteRenderer.color;
-        Color color = flashColor;
-        spriteRenderer.color = color;
-
-        float elapsed = 0f;
-        while (elapsed < EnemyFlashDuration)
+        if (enemySpriteRenderer == null)
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / EnemyFlashDuration);
-            color.a = Mathf.Lerp(EnemyFlashAlpha, 1f, t);
-            spriteRenderer.color = color;
-            yield return null;
+            Debug.LogError("[EnemyFeedbacks] Cannot animate flash, SpriteRenderer reference is missing.");
+            yield break;
         }
-        spriteRenderer.color = InitialColor;
+
+        Color initialColor = enemySpriteRenderer.color;
+        enemySpriteRenderer.color = flashColor;
+
+        yield return FadeUtility.FadeSpriteAlpha(enemySpriteRenderer, EnemyFlashAlpha, 1f, EnemyFlashDuration);
+
+        enemySpriteRenderer.color = initialColor;
+    }
+
+    
+
+    private IEnumerator AnimateActionLog(string text)
+    {
+        enemyStatusText.text = text;
+        yield return new WaitForSeconds(EnemyStatusDuration);
+        actionLogPanel.SetActive(false);
     }
 }

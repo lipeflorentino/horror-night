@@ -322,14 +322,15 @@ public class PerkService
     // =========================
     // Trigger evaluation
     // =========================
-    public void EvaluateActionResolutionTriggers(Battler actor, Battler opponent, ActionType actionType, ActionOutcome outcome)
+    public void EvaluateActionResolutionTriggers(Battler actor, Battler opponent, ActionType actionType, ActionOutcome outcome, ActionResolutionVariation variation = ActionResolutionVariation.None)
     {
         ActionResolutionContext actionResolutionContext = new()
         {
             Actor = actor,
             Opponent = opponent,
             ActionType = actionType,
-            Outcome = outcome
+            Outcome = outcome,
+            ResolutionVariation = variation
         };
 
         triggerEvaluator.EvaluateActionResolutionTriggers(actor, actionResolutionContext, GetEffectivePerks(actor));

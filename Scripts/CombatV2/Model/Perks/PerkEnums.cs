@@ -75,6 +75,7 @@ public enum PerkConditionKey
     BlockedAttack,
     EvadedAttack,
     PerriedAttack,
+    ResolutionVariationEquals,
     CriticalHit,
     MissedAttack,
     HitAttack,

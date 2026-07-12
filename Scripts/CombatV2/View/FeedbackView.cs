@@ -1,7 +1,5 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class FeedbackView : MonoBehaviour
 {
@@ -13,21 +11,11 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private CombatLogView combatLogView;
-    [Header("Attack Effect")]
-    [SerializeField] private GameObject playerAttackEffectPrefab;
-    [SerializeField] private GameObject enemyAttackEffectPrefab;
-
-    [Header("Attack Configs")]
-    [SerializeField] private Transform playerAttackEffectAnchor;
-    [SerializeField] private Transform enemyAttackEffectAnchor;
-    [SerializeField] private float attackEffectDuration = 0.75f;
+    [SerializeField] private AttackEffectFeedbacks attackEffectFeedbacks;
 
     void Start()
     {
-        playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
-        enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
-        combatLogView = FindObjectOfType<CombatLogView>();
-        ResolveFeedbackViews();
+        ResolveFeedbackDependencies();
     }
 
     public void Init(PerkService perkService, TrickService trickService, Battler playerBattler, Battler enemyBattler)
@@ -35,7 +23,7 @@ public class FeedbackView : MonoBehaviour
         if (this.perkService != null)
             this.perkService.OnPerkTriggered -= HandlePerkTriggered;
 
-        ResolveFeedbackViews();
+        ResolveFeedbackDependencies();
         this.perkService = perkService;
 
         if (playerStatusEffectFeedbacks != null)
@@ -47,8 +35,34 @@ public class FeedbackView : MonoBehaviour
         if (this.perkService != null)
             this.perkService.OnPerkTriggered += HandlePerkTriggered;
     }
+    
+    private void ResolveFeedbackDependencies()
+    {
+        if (playerFeedbacks == null)
+            playerFeedbacks = FindObjectOfType<PlayerFeedbacks>();
 
-    private void ResolveFeedbackViews()
+        if (enemyFeedbacks == null)
+            enemyFeedbacks = FindObjectOfType<EnemyFeedbacks>();
+
+        if (combatLogView == null)
+            combatLogView = FindObjectOfType<CombatLogView>();
+
+        if (attackEffectFeedbacks == null)
+            attackEffectFeedbacks = FindObjectOfType<AttackEffectFeedbacks>();
+
+        if (playerFeedbacks == null)
+            Debug.LogError("[FeedbackView] PlayerFeedbacks reference not found in scene.");
+
+        if (enemyFeedbacks == null)
+            Debug.LogError("[FeedbackView] EnemyFeedbacks reference not found in scene.");
+
+        if (attackEffectFeedbacks == null)
+            Debug.LogError("[FeedbackView] AttackEffectFeedbacks reference not found in scene.");
+
+        ResolveStatusEffectFeedbacks();
+    }
+
+    private void ResolveStatusEffectFeedbacks()
     {
         if (playerStatusEffectFeedbacks != null && enemyStatusEffectFeedbacks != null)
             return;
@@ -83,11 +97,18 @@ public class FeedbackView : MonoBehaviour
             combatLogView.ShowTriggerFeedback(evt);
     }
 
-    public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
+    public void ShowResolveFeedback(ActionResolutionResult result, bool attackerIsPlayer)
     {
-        if (!string.IsNullOrWhiteSpace(result.FeedbackText))
+        bool targetIsPlayer = !attackerIsPlayer;
+
+        if (!string.IsNullOrWhiteSpace(result.AttackFeedbackText))
         {
-            ShowStatusText(result.FeedbackText, targetIsPlayer);
+            ShowStatusText(result.AttackFeedbackText, attackerIsPlayer);
+        }
+
+        if (!string.IsNullOrWhiteSpace(result.DefenseFeedbackText))
+        {
+            ShowStatusText(result.DefenseFeedbackText, targetIsPlayer);
         }
 
         if (!result.AppliesDamage)
@@ -95,7 +116,19 @@ public class FeedbackView : MonoBehaviour
 
         if (targetIsPlayer)
         {
+            if (playerFeedbacks == null)
+            {
+                Debug.LogError("[FeedbackView] PlayerFeedbacks reference is missing, cannot show damage flash.");
+                return;
+            }
+
             playerFeedbacks.ShowPlayerDamageFlash();
+            return;
+        }
+
+        if (enemyFeedbacks == null)
+        {
+            Debug.LogError("[FeedbackView] EnemyFeedbacks reference is missing, cannot show damage popup.");
             return;
         }
 
@@ -104,34 +137,32 @@ public class FeedbackView : MonoBehaviour
 
     public void ShowAttackEffect(bool attackerIsPlayer)
     {
-        Transform anchor = attackerIsPlayer ? playerAttackEffectAnchor : enemyAttackEffectAnchor;
-        GameObject attackEffectPrefab = attackerIsPlayer ? playerAttackEffectPrefab : enemyAttackEffectPrefab;
-        GameObject effect = Instantiate(attackEffectPrefab, anchor.position, Quaternion.identity, anchor);
-        Image slashImage = effect.GetComponentInChildren<Image>();
-        
-        if (slashImage != null)
+        if (attackEffectFeedbacks == null)
         {
-            slashImage.color = attackerIsPlayer
-                ? new Color(1f, 1f, 1f, 1f)
-                : new Color(1f, 0.3f, 0.3f, 1f);
-        }
-
-        RectTransform rect = effect.GetComponent<RectTransform>();
-        if (rect == null)
-        {
-            Destroy(effect, attackEffectDuration);
+            Debug.LogError("[FeedbackView] AttackEffectFeedbacks reference is missing, cannot show attack effect.");
             return;
         }
 
-        rect.rotation = Quaternion.Euler(0, 0, Random.Range(-30f, 30f));
-        StartCoroutine(AnimateSlash(rect, slashImage, attackEffectDuration));
+        attackEffectFeedbacks.ShowAttackEffect(attackerIsPlayer);
     }
 
     private void ShowStatusText(string text, bool targetIsPlayer)
     {
         if (targetIsPlayer)
         {
+            if (playerFeedbacks == null)
+            {
+                Debug.LogError("[FeedbackView] PlayerFeedbacks reference is missing, cannot show status text.");
+                return;
+            }
+
             playerFeedbacks.ShowStatusText(text);
+            return;
+        }
+
+        if (enemyFeedbacks == null)
+        {
+            Debug.LogError("[FeedbackView] EnemyFeedbacks reference is missing, cannot show status popup.");
             return;
         }
 
@@ -140,7 +171,7 @@ public class FeedbackView : MonoBehaviour
 
     public void ShowTurnStartFeedback(bool isPlayerTurn)
     {
-        string turnOwner = isPlayerTurn ? "Player's Turn" : "Enemy's Turn";
+        string turnOwner = isPlayerTurn ? "Turno do Jogador" : "Turno do Inimigo";
 
         if (TurnOwnerText != null)
             TurnOwnerText.text = turnOwner;
@@ -148,58 +179,12 @@ public class FeedbackView : MonoBehaviour
 
     public void ShowSkipTurnFeedback(bool isPlayerTurn)
     {
-        ShowStatusText("Turn skipped", isPlayerTurn);
-    }
-
-    private IEnumerator AnimateSlash(RectTransform rect, Image slashImage, float duration)
-    {
-        duration = Mathf.Max(0.01f, duration);
-        float time = 0f;
-
-        Vector3 startScale = Vector3.one * 1f;
-        Vector3 midScale = Vector3.one * 1.8f;
-        Vector3 endScale = Vector3.one * 2.3f;
-
-        rect.localScale = startScale;
-        SetImageAlpha(slashImage, 0f);
-
-        while (time < duration)
-        {
-            time += Time.deltaTime;
-            float t = time / duration;
-
-            if (t < 0.3f)
-            {
-                float p = t / 0.3f;
-                rect.localScale = Vector3.Lerp(startScale, midScale, p);
-                SetImageAlpha(slashImage, Mathf.Lerp(0, 1, p));
-            }
-            else
-            {
-                float p = (t - 0.3f) / 0.7f;
-                rect.localScale = Vector3.Lerp(midScale, endScale, p);
-                SetImageAlpha(slashImage, Mathf.Lerp(1, 0, p));
-            }
-
-            yield return null;
-        }
-
-        Destroy(rect.gameObject);
+        ShowStatusText("Turno pulado", isPlayerTurn);
     }
 
     private void OnDestroy()
     {
         if (perkService != null)
             perkService.OnPerkTriggered -= HandlePerkTriggered;
-    }
-
-    private static void SetImageAlpha(Image image, float alpha)
-    {
-        if (image == null)
-            return;
-
-        Color color = image.color;
-        color.a = alpha;
-        image.color = color;
     }
 }

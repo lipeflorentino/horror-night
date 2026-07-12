@@ -101,9 +101,9 @@ public class CombatView : MonoBehaviour
         ActionPanel.HighlightSelectedAction(action);
     }
 
-    public void ShowResolveFeedback(ActionResolutionResult result, bool targetIsPlayer)
+    public void ShowResolveFeedback(ActionResolutionResult result, bool attackerIsPlayer)
     {
-        FeedbackView.ShowResolveFeedback(result, targetIsPlayer);
+        FeedbackView.ShowResolveFeedback(result, attackerIsPlayer);
     }
 
     public void ShowAttackEffect(bool attackerIsPlayer)

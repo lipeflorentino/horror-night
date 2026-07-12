@@ -14,8 +14,12 @@ public class CombatResolutionManager
             state.CurrentTurn.Defender
         );
         
-        Logger.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | Feedback: {result.FeedbackText}");
-        view.ShowAttackEffect(state.PlayerIsAttacker);
+        Logger.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | AttackFeedback: {result.AttackFeedbackText} | DefenseFeedback: {result.DefenseFeedbackText}");
+        
+        if (result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Hit) 
+        {
+            view.ShowAttackEffect(state.PlayerIsAttacker);
+        }
 
         if (result.AppliesDamage)
         {
@@ -23,7 +27,7 @@ public class CombatResolutionManager
             result.FinalTarget.ReceiveDamage(result.Damage);
         }
 
-        view.ShowResolveFeedback(result, state.PlayerIsAttacker == false);
+        view.ShowResolveFeedback(result, state.PlayerIsAttacker);
 
         Logger.Log($"[HP] Player: {player.HP} | Enemy: {enemy.HP}");
 
