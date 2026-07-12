@@ -4,6 +4,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Character", menuName = "Game/Character")]
 public class CharacterSO : ScriptableObject
 {
+    public const float DefaultHeart = 20f;
+    public const float DefaultBody = 20f;
+    public const float DefaultMind = 20f;
+    public const float DefaultHp = 100f;
+    public const int DefaultAttack = 10;
+    public const int DefaultDefense = 5;
+    public const int DefaultInitiative = 10;
+    public const int DefaultPowerDices = 3;
+    public const int DefaultAccuracyDices = 3;
+    public const int DefaultXpThreshold = 10;
+
     [Header("Identity")]
     public string Id;
     public string DisplayName = "Player";
@@ -31,6 +42,36 @@ public class CharacterSO : ScriptableObject
     [Header("Tricks")]
     [Tooltip("Tricks permanentes da identidade/classe do personagem. Entram no combate ativas como Identity Tricks.")]
     public List<TrickSO> IdentityTricks = new();
+
+    public void ApplyDefaults()
+    {
+        if (IdentityTricks == null)
+            IdentityTricks = new List<TrickSO>();
+
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            Id = string.IsNullOrWhiteSpace(DisplayName)
+                ? "character"
+                : DisplayName.Replace(" ", "_").ToLowerInvariant();
+        }
+
+        if (string.IsNullOrWhiteSpace(DisplayName))
+            DisplayName = "Player";
+
+        Xp = Mathf.Max(0, Xp <= 0 ? DefaultXpThreshold : Xp);
+        Heart = Mathf.Max(1f, Heart <= 0f ? DefaultHeart : Heart);
+        Body = Mathf.Max(1f, Body <= 0f ? DefaultBody : Body);
+        Mind = Mathf.Max(1f, Mind <= 0f ? DefaultMind : Mind);
+        Hp = Mathf.Max(1f, Hp <= 0f ? DefaultHp : Hp);
+        Attack = Mathf.Max(0, Attack <= 0 ? DefaultAttack : Attack);
+        Defense = Mathf.Max(0, Defense <= 0 ? DefaultDefense : Defense);
+        Initiative = Mathf.Max(0, Initiative <= 0 ? DefaultInitiative : Initiative);
+        Focus = Mathf.Max(0, Focus);
+        Strength = Mathf.Max(0, Strength);
+        Agility = Mathf.Max(0, Agility);
+        PowerDices = Mathf.Max(1, PowerDices <= 0 ? DefaultPowerDices : PowerDices);
+        AccuracyDices = Mathf.Max(1, AccuracyDices <= 0 ? DefaultAccuracyDices : AccuracyDices);
+    }
     public TrickInventorySnapshot CreateInitialTrickSnapshot()
     {
         TrickInventorySnapshot snapshot = new();

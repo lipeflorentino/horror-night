@@ -148,11 +148,13 @@ public class DiceService
             if (!aggregatedByStat.TryGetValue(roll.StatType, out DiceResult aggregate))
             {
                 DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType, roll.MinValue);
+                firstResult.SubRolls.Add(roll);
                 aggregatedByStat[roll.StatType] = firstResult;
                 orderedResults.Add(firstResult);
                 continue;
             }
 
+            aggregate.SubRolls.Add(roll);
             aggregate.Value += roll.Value;
             aggregate.MinValue += roll.MinValue;
             aggregate.MaxValue += roll.MaxValue;

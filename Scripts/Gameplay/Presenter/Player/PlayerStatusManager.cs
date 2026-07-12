@@ -57,7 +57,10 @@ public class PlayerStatusManager : MonoBehaviour
     {
         if (playerInventory == null)
             playerInventory = GetComponent<PlayerInventory>();
-            
+
+        if (character != null)
+            character.ApplyDefaults();
+
         ApplyCharacterDefaults();
         currentArchetype = initialArchetype;
         maxHeart = ClampCoreStatMax(maxHeart);
@@ -250,14 +253,14 @@ public class PlayerStatusManager : MonoBehaviour
             currentXp = Mathf.Max(0, currentXp),
             maxXp = Mathf.Max(1, maxXp),
             hp = currentHp,
+            powerDices = Mathf.Max(0, currentPowerDices),
+            accuracyDices = Mathf.Max(0, currentAccuracyDices),
             maxHeart = ClampCoreStatMax(maxHeart),
             maxBody = ClampCoreStatMax(maxBody),
             maxMind = ClampCoreStatMax(maxMind),
-            maxHp = maxHp,
-            powerDices = currentPowerDices,
-            accuracyDices = currentAccuracyDices,
-            maxPowerDices = maxPowerDices,
-            maxAccuracyDices = maxAccuracyDices,
+            maxHp = Mathf.Max(1f, maxHp),
+            maxPowerDices = Mathf.Max(1, maxPowerDices),
+            maxAccuracyDices = Mathf.Max(1, maxAccuracyDices),
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints,
             inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot(),
@@ -272,9 +275,9 @@ public class PlayerStatusManager : MonoBehaviour
         maxMind = ClampCoreStatMax(snapshot.maxMind > 0f ? snapshot.maxMind : maxMind);
         maxHp = Mathf.Max(1f, snapshot.maxHp > 0f ? snapshot.maxHp : maxHp);
 
-        currentHeart = ClampCoreStat(snapshot.heart, maxHeart);
-        currentBody = ClampCoreStat(snapshot.body, maxBody);
-        currentMind = ClampCoreStat(snapshot.mind, maxMind);
+        currentHeart = ClampCoreStat(snapshot.heart > 0f ? snapshot.heart : maxHeart, maxHeart);
+        currentBody = ClampCoreStat(snapshot.body > 0f ? snapshot.body : maxBody, maxBody);
+        currentMind = ClampCoreStat(snapshot.mind > 0f ? snapshot.mind : maxMind, maxMind);
         if (snapshot.attack > 0f)
             attack = Mathf.Max(0, Mathf.RoundToInt(snapshot.attack));
         if (snapshot.defense > 0f)
@@ -310,18 +313,20 @@ public class PlayerStatusManager : MonoBehaviour
         if (character == null)
             return;
 
+        character.ApplyDefaults();
+
         initialArchetype = PlayerArchetype.Standard;
         archetypePoints = new ArchetypePoints();
         level = 1;
-        currentXp = Mathf.Max(0, character.Xp);
-        maxXp = Mathf.Max(0, character.Xp);
+        currentXp = 0;
+        maxXp = Mathf.Max(1, character.Xp > 0 ? character.Xp : CharacterSO.DefaultXpThreshold);
         maxHeart = Mathf.Max(1f, character.Heart);
         currentHeart = maxHeart;
         maxBody = Mathf.Max(1f, character.Body);
         currentBody = maxBody;
         maxMind = Mathf.Max(1f, character.Mind);
         currentMind = maxMind;
-        maxHp = Mathf.Max(1f, CalculateMaxXpForLevel(level));
+        maxHp = Mathf.Max(1f, character.Hp > 0f ? character.Hp : CharacterSO.DefaultHp);
         currentHp = maxHp;
         attack = Mathf.Max(0, character.Attack);
         defense = Mathf.Max(0, character.Defense);

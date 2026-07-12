@@ -78,21 +78,9 @@ public class PlayerFeedbacks : MonoBehaviour
         Logger.Log($"[Feedback] {text}");
 
         Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
-        string damageColor = "#FFD700";
+
         playerStatusText.color = textColor;
-        
-        if (Regex.IsMatch(text, @"[+-]\d+"))
-        {
-            int bonusIndex = text.IndexOfAny(new char[] { '+', '-' });
-            
-            string baseText = text[..bonusIndex];
-            string bonusText = text[bonusIndex..];
-            playerStatusText.text = $"{baseText}<color={damageColor}>{bonusText}</color>";
-        }
-        else
-        {
-            playerStatusText.text = text;
-        }
+        playerStatusText.text = text;
         
         yield return new WaitForSeconds(PlayerStatusDuration);
         actionLogPanel.SetActive(false);

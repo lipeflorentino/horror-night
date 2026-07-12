@@ -180,7 +180,12 @@ public class ActionResolverService
     {
         bool showAttackFeedback = result.Outcome == ActionOutcome.Hit || result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Missed;
         
-        result.DamageBonusFeedbackText = result.DamageBonus > 0 ? $" +{result.DamageBonus} DMG" : (result.DamageBonus < 0 ? $" {result.DamageBonus} DMG" : string.Empty);
+        result.DamageBonusFeedbackText = result.DamageBonus > 0 
+            ? $"  <color=#FFFFFF>{"with"} </color> <color=#FFD700>{result.Damage} (+{result.DamageBonus}) DMG</color>" 
+            : (result.DamageBonus < 0 
+                ? $"  <color=#FFFFFF>{"with"}</color> <color=#FFD700>{result.Damage} ({result.DamageBonus}) DMG</color>" 
+                : string.Empty);
+                
         result.AttackFeedbackText = showAttackFeedback ? BuildAttackFeedback(result) : string.Empty;
         result.DefenseFeedbackText = BuildDefenseFeedback(result);
 

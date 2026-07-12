@@ -20,15 +20,15 @@ MonoBehaviour:
   Heart: 6
   Body: 6
   Mind: 6
-  Hp: 25
-  Attack: 5
-  Defense: 3
-  Initiative: 1
+  Hp: 30
+  Attack: 8
+  Defense: 6
+  Initiative: 2
   Focus: 1
   Strength: 1
   Agility: 1
-  PowerDices: 1
-  AccuracyDices: 1
+  PowerDices: 3
+  AccuracyDices: 3
   IdentityTricks:
   - {fileID: 11400000, guid: bfc3bc31bcfb74b43815f71856ededbc, type: 2}
   - {fileID: 11400000, guid: aa33636fb73d76144a1dcc3235af0ba5, type: 2}

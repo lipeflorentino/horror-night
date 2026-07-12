@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(RectTransform))]
 public class DiceRollUI : MonoBehaviour
 {
     [SerializeField] private Image diceImage;
@@ -18,6 +19,14 @@ public class DiceRollUI : MonoBehaviour
     [SerializeField] private Sprite mindDiceIcon;
     [SerializeField] private Sprite heartDiceIcon;
     [SerializeField] private Sprite bodyDiceIcon;
+
+    private RectTransform rectTransform;
+    public RectTransform RectTransform => rectTransform;
+
+    private void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+    }
 
     public void SetHighlighted(bool highlighted)
     {
@@ -72,6 +81,84 @@ public class DiceRollUI : MonoBehaviour
 
         if (diceValueText != null)
             diceValueText.text = finalValue.ToString();
+    }
+
+    public IEnumerator PlayFadeOut(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            SetAlpha(Mathf.Lerp(1f, 0f, elapsed / duration));
+            yield return null;
+        }
+        SetAlpha(0f);
+        gameObject.SetActive(false);
+    }
+
+    public IEnumerator PlayFadeIn(float duration)
+    {
+        gameObject.SetActive(true);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            SetAlpha(Mathf.Lerp(0f, 1f, elapsed / duration));
+            yield return null;
+        }
+        SetAlpha(1f);
+    }
+
+    public IEnumerator PlayMoveTo(Vector2 targetAnchoredPosition, float duration)
+    {
+        if (rectTransform == null)
+            yield break;
+
+        Vector2 startPosition = rectTransform.anchoredPosition;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            rectTransform.anchoredPosition = Vector2.Lerp(startPosition, targetAnchoredPosition, elapsed / duration);
+            yield return null;
+        }
+
+        rectTransform.anchoredPosition = targetAnchoredPosition;
+    }
+
+    public IEnumerator PlayPulse(float duration, float scaleMultiplier = 1.2f)
+    {
+        if (rectTransform == null)
+            yield break;
+
+        Vector3 originalScale = rectTransform.localScale;
+        Vector3 peakScale = originalScale * scaleMultiplier;
+        float halfDuration = duration * 0.5f;
+
+        float elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            rectTransform.localScale = Vector3.Lerp(originalScale, peakScale, elapsed / halfDuration);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            rectTransform.localScale = Vector3.Lerp(peakScale, originalScale, elapsed / halfDuration);
+            yield return null;
+        }
+
+        rectTransform.localScale = originalScale;
+    }
+
+    public void SetValueText(int value)
+    {
+        if (diceValueText != null)
+            diceValueText.text = value.ToString();
     }
 
     public void SetDiceIcon(DiceStatType statType)

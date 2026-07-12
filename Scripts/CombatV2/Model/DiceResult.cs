@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public enum DiceTier
 {
     Low,
@@ -28,6 +30,7 @@ public class DiceResult
     public DiceStatType StatType;
     public DiceRollType RollType;
     public bool IsMaxRoll => Value >= MaxValue && MaxValue > 1;
+    public List<DiceResult> SubRolls = new();
 
     public DiceResult(int value, DiceTier tier, int maxValue, DiceStatType statType, DiceRollType rollType, int minValue = 1)
     {

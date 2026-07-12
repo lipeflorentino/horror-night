@@ -13,12 +13,15 @@ public class DiceRollView : MonoBehaviour
     [SerializeField, Min(1)] private int maxSlotsPerSide = 3;
     [SerializeField] private float postRollDelay = 0.4f;
     [SerializeField] private float highlightResultDelay = 2f;
+    [SerializeField] private float mergeMoveDuration = 0.3f;
+    [SerializeField] private float mergePulseDuration = 0.2f;
+    [SerializeField] private float mergeFadeOutDuration = 0.25f;
     [SerializeField] private GameObject diceResolutionPanel;
     [SerializeField] private TMP_Text playerRollTypeLabel, enemyRollTypeLabel;
     [SerializeField] private DiceTierBarUI tierBar;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
-    private readonly List<DiceRollUI> runtimeEnemySlots = new();
+    // private readonly List<DiceRollUI> runtimeEnemySlots = new();
     private bool slotsInitialized;
 
     public IEnumerator PlayDiceResolution(
@@ -28,32 +31,136 @@ public class DiceRollView : MonoBehaviour
         (int lowMax, int mediumMax, int highMin, int maxValue) tierBoundaries)
     {
         EnsureSlotsInitialized();
+        SetupResolutionPanel(rollType, tierBoundaries);
+
+        List<DiceResult> individualRolls = FlattenRolls(playerRolls);
+        yield return PlayIndividualRollAnimations(individualRolls);
+
+        yield return new WaitForSeconds(postRollDelay);
+
+        List<DiceRollUI> activeFinalSlots = null;
+        yield return PlayMergeStep(playerRolls, runtimePlayerSlots, result => activeFinalSlots = result);
+
+        HighlightBestResult(activeFinalSlots, playerRolls, tierBoundaries.maxValue);
+
+        yield return new WaitForSeconds(highlightResultDelay);
+
+        tierBar.SetIndicatorVisible(false);
+        ShowDiceResolution(false);
+    }
+
+    private void SetupResolutionPanel(DiceRollType rollType, (int lowMax, int mediumMax, int highMin, int maxValue) tierBoundaries)
+    {
         ShowDiceResolution(true);
         UpdateRollTypeLabel(rollType);
+        tierBar.SetBoundaries(tierBoundaries.lowMax, tierBoundaries.mediumMax, tierBoundaries.highMin, tierBoundaries.maxValue);
+    }
+
+    private List<DiceResult> FlattenRolls(IReadOnlyList<DiceResult> rolls)
+    {
+        List<DiceResult> individualRolls = new();
+        if (rolls == null)
+            return individualRolls;
+
+        for (int i = 0; i < rolls.Count; i++)
+        {
+            var roll = rolls[i];
+            if (roll.SubRolls != null && roll.SubRolls.Count > 0)
+                individualRolls.AddRange(roll.SubRolls);
+            else
+                individualRolls.Add(roll);
+        }
+
+        return individualRolls;
+    }
+
+    private IEnumerator PlayIndividualRollAnimations(List<DiceResult> individualRolls)
+    {
+        PrepareSlots(runtimePlayerSlots, individualRolls.Count, playerSlotsContainer);
 
         List<Coroutine> runningCoroutines = new();
-
-        int playerCount = Mathf.Min(playerRolls != null ? playerRolls.Count : 0, maxSlotsPerSide);
-        int enemyCount = Mathf.Min(enemyRolls != null ? enemyRolls.Count : 0, maxSlotsPerSide);
-        int playerHighlightedIndex = GetHighlightedRollIndex(playerRolls, playerCount);
-        int enemyHighlightedIndex = GetHighlightedRollIndex(enemyRolls, enemyCount);
-
-        PrepareSlots(runtimePlayerSlots, playerCount, playerHighlightedIndex);
-        //PrepareSlots(runtimeEnemySlots, enemyCount, enemyHighlightedIndex);
-        EnqueueRollAnimations(runtimePlayerSlots, playerRolls, playerCount, runningCoroutines);
-        //EnqueueRollAnimations(runtimeEnemySlots, enemyRolls, enemyCount, runningCoroutines);
+        for (int i = 0; i < individualRolls.Count; i++)
+        {
+            runtimePlayerSlots[i].SetDiceIcon(individualRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[i].PlayRollAnimation(individualRolls[i].Value, individualRolls[i].MaxValue)));
+        }
 
         for (int i = 0; i < runningCoroutines.Count; i++)
             yield return runningCoroutines[i];
+    }
 
-        yield return new WaitForSeconds(postRollDelay);
-        SetHighlightedIndex(runtimePlayerSlots, playerHighlightedIndex, playerCount);
-        //SetHighlightedIndex(runtimeEnemySlots, enemyHighlightedIndex, enemyCount);
-        tierBar.SetBoundaries(tierBoundaries.lowMax, tierBoundaries.mediumMax, tierBoundaries.highMin, tierBoundaries.maxValue);
-        tierBar.SetRollIndicatorPosition(GetBetterRollValue(playerRolls, playerCount), tierBoundaries.maxValue);
-        yield return new WaitForSeconds(highlightResultDelay);
-        tierBar.SetIndicatorVisible(false);
-        ShowDiceResolution(false);
+    private IEnumerator PlayMergeStep(IReadOnlyList<DiceResult> playerRolls, List<DiceRollUI> individualSlots, System.Action<List<DiceRollUI>> onComplete)
+    {
+        List<DiceRollUI> activeFinalSlots = new();
+
+        if (playerRolls == null)
+        {
+            onComplete?.Invoke(activeFinalSlots);
+            yield break;
+        }
+
+        playerSlotsContainer.TryGetComponent<HorizontalLayoutGroup>(out var layoutGroup);
+        if (layoutGroup != null)
+            layoutGroup.enabled = false;
+
+        List<Coroutine> mergeCoroutines = new();
+        int individualIndex = 0;
+
+        for (int i = 0; i < playerRolls.Count; i++)
+        {
+            DiceResult aggregatedRoll = playerRolls[i];
+            int subCount = aggregatedRoll.SubRolls != null && aggregatedRoll.SubRolls.Count > 1
+                ? aggregatedRoll.SubRolls.Count
+                : 1;
+
+            DiceRollUI baseSlot = individualSlots[individualIndex];
+
+            if (subCount > 1)
+            {
+                Vector2 targetPosition = baseSlot.RectTransform.anchoredPosition;
+
+                for (int j = 1; j < subCount; j++)
+                {
+                    DiceRollUI slotToMerge = individualSlots[individualIndex + j];
+                    mergeCoroutines.Add(StartCoroutine(MergeSlotIntoBase(slotToMerge, targetPosition)));
+                }
+
+                mergeCoroutines.Add(StartCoroutine(FinalizeMergedSlot(baseSlot, aggregatedRoll)));
+            }
+
+            individualIndex += subCount;
+            activeFinalSlots.Add(baseSlot);
+        }
+
+        for (int i = 0; i < mergeCoroutines.Count; i++)
+            yield return mergeCoroutines[i];
+
+        if (layoutGroup != null)
+            layoutGroup.enabled = true;
+
+        onComplete?.Invoke(activeFinalSlots);
+    }
+
+    private IEnumerator MergeSlotIntoBase(DiceRollUI slot, Vector2 targetPosition)
+    {
+        yield return StartCoroutine(slot.PlayMoveTo(targetPosition, mergeMoveDuration));
+        yield return StartCoroutine(slot.PlayFadeOut(mergeFadeOutDuration));
+    }
+
+    private IEnumerator FinalizeMergedSlot(DiceRollUI baseSlot, DiceResult aggregatedRoll)
+    {
+        yield return new WaitForSeconds(mergeMoveDuration);
+        baseSlot.SetValueText(aggregatedRoll.Value);
+        yield return StartCoroutine(baseSlot.PlayPulse(mergePulseDuration));
+    }
+
+    private void HighlightBestResult(List<DiceRollUI> activeFinalSlots, IReadOnlyList<DiceResult> playerRolls, int maxValue)
+    {
+        int usedCount = playerRolls != null ? playerRolls.Count : 0;
+        int highlightedIndex = GetHighlightedRollIndex(playerRolls, usedCount);
+        SetHighlightedIndex(activeFinalSlots, highlightedIndex);
+
+        tierBar.SetRollIndicatorPosition(GetBetterRollValue(playerRolls, usedCount), maxValue);
     }
 
     public void ShowDiceResolution(bool status)
@@ -75,18 +182,14 @@ public class DiceRollView : MonoBehaviour
         }
 
         ConfigureContainerLayout(playerSlotsContainer, TextAnchor.MiddleRight);
-        // ConfigureContainerLayout(enemySlotsContainer, TextAnchor.MiddleLeft);
-
         CreateSlots(runtimePlayerSlots, playerSlotsContainer);
-        // CreateSlots(runtimeEnemySlots, enemySlotsContainer);
 
         slotsInitialized = true;
     }
 
     private void ConfigureContainerLayout(RectTransform container, TextAnchor alignment)
     {
-        HorizontalLayoutGroup layoutGroup = container.GetComponent<HorizontalLayoutGroup>();
-        if (layoutGroup == null)
+        if (!container.TryGetComponent<HorizontalLayoutGroup>(out var layoutGroup))
             layoutGroup = container.gameObject.AddComponent<HorizontalLayoutGroup>();
 
         layoutGroup.childControlWidth = false;
@@ -111,40 +214,46 @@ public class DiceRollView : MonoBehaviour
         }
     }
 
-    private void PrepareSlots(List<DiceRollUI> slots, int usedCount, int highlightedIndex)
+    private void PreparePool(List<DiceRollUI> slots, int neededCount, RectTransform container)
+    {
+        while (slots.Count < neededCount)
+        {
+            DiceRollUI slot = Instantiate(diceRollSlotPrefab, container);
+            slot.gameObject.SetActive(false);
+            slots.Add(slot);
+        }
+    }
+
+    private void PrepareSlots(List<DiceRollUI> slots, int neededCount, RectTransform container)
     {
         for (int i = 0; i < slots.Count; i++)
         {
-            bool isActive = i < usedCount;
-            slots[i].gameObject.SetActive(isActive);
-            slots[i].SetHighlighted(false);
+            slots[i].gameObject.SetActive(false);
+            slots[i].ClearValue();
         }
-    }
 
-    private void EnqueueRollAnimations(List<DiceRollUI> slots, IReadOnlyList<DiceResult> rolls, int usedCount, List<Coroutine> runningCoroutines)
-    {
-        if (rolls == null)
-            return;
+        PreparePool(slots, neededCount, container);
 
-        for (int i = 0; i < usedCount; i++)
+        for (int i = 0; i < neededCount; i++)
         {
-            slots[i].SetDiceIcon(rolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(slots[i].PlayRollAnimation(rolls[i].Value, rolls[i].MaxValue)));
+            slots[i].gameObject.SetActive(true);
         }
     }
 
-    private void SetHighlightedIndex(List<DiceRollUI> slots, int highlightedIndex, int usedCount)
+    private void SetHighlightedIndex(List<DiceRollUI> slots, int highlightedIndex)
     {
-        for (int i = 0; i < usedCount; i++)
+        for (int i = 0; i < slots.Count; i++)
             slots[i].SetHighlighted(i == highlightedIndex);
     }
 
     private void UpdateRollTypeLabel(DiceRollType rollType)
     {
         if (playerRollTypeLabel != null)
-            playerRollTypeLabel.text = rollType == DiceRollType.Accuracy ? "Accuracy Roll" : "Power Roll";
-        if (enemyRollTypeLabel != null)
-            enemyRollTypeLabel.text = rollType == DiceRollType.Accuracy ? "Accuracy Roll" : "Power Roll";
+        {
+            playerRollTypeLabel.text = rollType == DiceRollType.Accuracy 
+                ? "<color=#FFFB00>Accuracy Roll</color>" 
+                : "<color=#EAA00E>Power Roll</color>";
+        }
     }
 
     private int GetHighlightedRollIndex(IReadOnlyList<DiceResult> rolls, int usedCount)
