@@ -51,18 +51,30 @@ public enum PowerMaxSource
     Defense
 }
 
+public enum ActionResolutionSecondaryEffect
+{
+    None,
+    BrokenBones,
+    Bleeding,
+    Dying,
+    Stagger
+}
+
 public class ActionResolutionResult
 {
     public int Damage;
+    public int DamageBonus;
     public ActionAccuracy Accuracy;
     public ActionOutcome Outcome;
     public DefenseOutcome DefenseOutcome;
     public ActionResolutionVariation ResolutionVariation;
+    public ActionResolutionSecondaryEffect SecondaryEffect;
     public bool IgnoreAttack;
     public bool IgnoreDefense;
     public PowerMaxSource PowerMaxSource;
     public Battler FinalTarget;
     public string AttackFeedbackText;
     public string DefenseFeedbackText;
+    public string DamageBonusFeedbackText;
     public bool AppliesDamage => Damage > 0;
 }

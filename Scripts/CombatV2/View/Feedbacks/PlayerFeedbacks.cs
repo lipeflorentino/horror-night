@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,17 +17,20 @@ public class PlayerFeedbacks : MonoBehaviour
     [SerializeField] private Color playerFlashColor = new(0.9f, 0.1f, 0.1f, PlayerFlashAlpha);
     [SerializeField] private float PlayerFlashDuration = 0.15f;
 
+    [Header("Feedback Text Colors")]
+    [SerializeField] private Color attackFeedbackColor = new(1f, 0.1f, 0.1f, 1f);
+    [SerializeField] private Color defenseFeedbackColor = new(0.1f, 0.1f, 1f, 1f);
     void Start()
     {
         if (screenFlashCanvas == null || playerFlashImage == null)
         {
-            Debug.LogError("[PlayerFeedbacks] Screen flash canvas or image reference is missing.");
+            Logger.Log("[PlayerFeedbacks] Screen flash canvas or image reference is missing.");
             return;
         }
 
         if (actionLogPanel == null)
         {
-            Debug.LogError("[PlayerFeedbacks] Action log panel reference is missing.");
+            Logger.Log("[PlayerFeedbacks] Action log panel reference is missing.");
             return;
         }
 
@@ -35,15 +39,15 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowPlayerDamageFlash()
     {
-        Debug.Log("[Feedback] Player damage flash triggered.");
+        Logger.Log("[Feedback] Player damage flash triggered.");
         StartCoroutine(AnimatePlayerFlash());
     }
 
-    public void ShowStatusText(string text)
+    public void ShowStatusText(string text, bool isAttackFeedback)
     {
         if (actionLogPanel == null)
         {
-            Debug.LogError("[PlayerFeedbacks] Action log panel reference is missing.");
+            Logger.Log("[PlayerFeedbacks] Action log panel reference is missing.");
             return;
         }
 
@@ -51,11 +55,11 @@ public class PlayerFeedbacks : MonoBehaviour
 
         if (playerStatusText == null)
         {
-            Debug.Log($"[Feedback] {text}");
+            Logger.Log($"[Feedback] {text}");
             return;
         }
 
-        StartCoroutine(AnimateActionLog(text));
+        StartCoroutine(AnimateActionLog(text, isAttackFeedback));
     }
 
     private IEnumerator AnimatePlayerFlash()
@@ -69,9 +73,27 @@ public class PlayerFeedbacks : MonoBehaviour
         playerFlashImage.gameObject.SetActive(false);
     }
 
-    private IEnumerator AnimateActionLog(string text)
+    private IEnumerator AnimateActionLog(string text, bool isAttackFeedback)
     {
-        playerStatusText.text = text;
+        Logger.Log($"[Feedback] {text}");
+
+        Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
+        string damageColor = "#FFD700";
+        playerStatusText.color = textColor;
+        
+        if (Regex.IsMatch(text, @"[+-]\d+"))
+        {
+            int bonusIndex = text.IndexOfAny(new char[] { '+', '-' });
+            
+            string baseText = text[..bonusIndex];
+            string bonusText = text[bonusIndex..];
+            playerStatusText.text = $"{baseText}<color={damageColor}>{bonusText}</color>";
+        }
+        else
+        {
+            playerStatusText.text = text;
+        }
+        
         yield return new WaitForSeconds(PlayerStatusDuration);
         actionLogPanel.SetActive(false);
     }

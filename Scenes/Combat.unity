@@ -5867,9 +5867,11 @@ MonoBehaviour:
   playerFlashImage: {fileID: 1621853460}
   actionLogPanel: {fileID: 811372878}
   playerStatusText: {fileID: 1526861991}
-  PlayerStatusDuration: 3.5
+  PlayerStatusDuration: 5
   playerFlashColor: {r: 0.9245283, g: 0.16048414, b: 0.16048414, a: 0.45}
   PlayerFlashDuration: 0.15
+  attackFeedbackColor: {r: 0.9150943, g: 0.34100214, b: 0.34100214, a: 1}
+  defenseFeedbackColor: {r: 0.39315593, g: 0.39315593, b: 0.8773585, a: 1}
 --- !u!1 &428167810
 GameObject:
   m_ObjectHideFlags: 0
@@ -6876,7 +6878,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 79, y: 21}
+  m_AnchoredPosition: {x: 50, y: 20}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &512245883
@@ -12876,6 +12878,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f78c7f8318b45c41abc239b3b189878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnemyStatusDuration: 5
   popupObject: {fileID: 932496529}
   worldPopupCanvas: {fileID: 1558428054}
   enemyVisual: {fileID: 8766488522727681693}
@@ -12883,6 +12886,8 @@ MonoBehaviour:
   statusColor: {r: 0.789053, g: 0.789053, b: 0.9150943, a: 1}
   actionLogPanel: {fileID: 1396629204}
   enemyStatusText: {fileID: 748966044}
+  attackFeedbackColor: {r: 1, g: 0.1, b: 0.1, a: 1}
+  defenseFeedbackColor: {r: 0.1, g: 0.1, b: 1, a: 1}
 --- !u!1 &927449329
 GameObject:
   m_ObjectHideFlags: 0
@@ -20572,7 +20577,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -19.8}
+  m_AnchoredPosition: {x: 2.8, y: 7.5}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1396771696
@@ -22332,8 +22337,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278255601
-  m_fontColor: {r: 0.9435899, g: 1, b: 0, a: 1}
+    rgba: 4294934016
+  m_fontColor: {r: 0, g: 0.4946847, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -25115,7 +25120,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1736665950
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36484,7 +36489,7 @@ MonoBehaviour:
   HeartText: {fileID: 1090789125}
   BodyText: {fileID: 13349622}
   HpFill: {fileID: 523073096}
-  HpText: {fileID: 0}
+  HpText: {fileID: 2039809563}
   DiceText: {fileID: 0}
   AttackText: {fileID: 0}
   DefenseText: {fileID: 0}

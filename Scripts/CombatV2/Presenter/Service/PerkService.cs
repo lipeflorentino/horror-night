@@ -191,6 +191,42 @@ public class PerkService
     // =========================
     // Battler states and drawbacks
     // =========================
+    public DrawbackRuntimeInstance ApplyDrawback(Battler target, string drawbackId, Battler source = null, int durationTurns = -1)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(drawbackId))
+            return null;
+
+        DrawbackDatabase drawbackDb = DrawbackDatabase.GetOrCreateRuntimeDatabase();
+        DrawbackSO definition = drawbackDb.GetById(drawbackId);
+        if (definition == null)
+        {
+            Logger.Log($"[PerkService] Drawback '{drawbackId}' not found.");
+            return null;
+        }
+
+        DrawbackRuntimeInstance existing = target.Drawbacks.Find(drawback => drawback != null && drawback.Definition != null &&
+            drawback.Definition.Id.Equals(drawbackId, System.StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+            return existing;
+
+        int resolvedDuration = durationTurns >= 0 ? durationTurns : definition.DurationTurns;
+        DrawbackRuntimeInstance drawbackInstance = new(definition, target, resolvedDuration, source);
+        target.Drawbacks.Add(drawbackInstance);
+        OnDrawbackApplied?.Invoke(target, drawbackInstance);
+
+        if (definition.PerkIds != null)
+        {
+            for (int i = 0; i < definition.PerkIds.Count; i++)
+            {
+                PerkRuntimeInstance appliedPerk = ApplyPerk(target, definition.PerkIds[i], source, resolvedDuration);
+                if (appliedPerk != null)
+                    drawbackInstance.ActivePerks.Add(appliedPerk);
+            }
+        }
+
+        return drawbackInstance;
+    }
+
     public BattlerStateRuntimeInstance ApplyBattlerState(Battler target, string stateId, Battler source = null, int durationTurns = -1)
     {
         BattlerStateSO definition = BattlerStateDatabase.GetOrCreateRuntimeDatabase().GetById(stateId);

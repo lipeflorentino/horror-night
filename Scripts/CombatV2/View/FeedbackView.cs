@@ -103,12 +103,12 @@ public class FeedbackView : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(result.AttackFeedbackText))
         {
-            ShowStatusText(result.AttackFeedbackText, attackerIsPlayer);
+            ShowStatusText(result.AttackFeedbackText, attackerIsPlayer, true);
         }
 
         if (!string.IsNullOrWhiteSpace(result.DefenseFeedbackText))
         {
-            ShowStatusText(result.DefenseFeedbackText, targetIsPlayer);
+            ShowStatusText(result.DefenseFeedbackText, targetIsPlayer, false);
         }
 
         if (!result.AppliesDamage)
@@ -146,7 +146,7 @@ public class FeedbackView : MonoBehaviour
         attackEffectFeedbacks.ShowAttackEffect(attackerIsPlayer);
     }
 
-    private void ShowStatusText(string text, bool targetIsPlayer)
+    private void ShowStatusText(string text, bool targetIsPlayer, bool isAttackFeedback)
     {
         if (targetIsPlayer)
         {
@@ -156,7 +156,7 @@ public class FeedbackView : MonoBehaviour
                 return;
             }
 
-            playerFeedbacks.ShowStatusText(text);
+            playerFeedbacks.ShowStatusText(text, isAttackFeedback);
             return;
         }
 
@@ -166,7 +166,7 @@ public class FeedbackView : MonoBehaviour
             return;
         }
 
-        enemyFeedbacks.ShowStatusPopup(text);
+        enemyFeedbacks.ShowStatusPopup(text, isAttackFeedback);
     }
 
     public void ShowTurnStartFeedback(bool isPlayerTurn)
@@ -179,7 +179,7 @@ public class FeedbackView : MonoBehaviour
 
     public void ShowSkipTurnFeedback(bool isPlayerTurn)
     {
-        ShowStatusText("Turno pulado", isPlayerTurn);
+        ShowStatusText("Turno pulado", isPlayerTurn, false);
     }
 
     private void OnDestroy()

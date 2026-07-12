@@ -32,7 +32,9 @@ public class ActionResolverService
         ActionResolutionResult result = new()
         {
             Accuracy = attackAccuracy,
-            FinalTarget = target
+            FinalTarget = target,
+            DamageBonus = 0,
+            SecondaryEffect = ActionResolutionSecondaryEffect.None
         };
 
         if (attackAccuracy == ActionAccuracy.Missed)
@@ -76,7 +78,20 @@ public class ActionResolverService
 
         Logger.Log($"Damage Calculation: Attack Power ({attackPower}) - Defense Power ({defensePower}) = {damage}");
 
-        if (damage <= 0)
+        result.Outcome = attackAccuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
+        result.DefenseOutcome = DefenseOutcome.None;
+        result.IgnoreAttack = false;
+        result.IgnoreDefense = ignoreDefense;
+        result.PowerMaxSource = powerMaxSource;
+        result.ResolutionVariation = ResolveVariation(result);
+        result.SecondaryEffect = GetSecondaryEffect(result.ResolutionVariation);
+        result.DamageBonus = GetDamageBonus(result.ResolutionVariation);
+        damage = UnityEngine.Mathf.Max(0, damage + result.DamageBonus);
+
+        bool isDefensiveReductionVariation = result.ResolutionVariation == ActionResolutionVariation.IronWall ||
+            result.ResolutionVariation == ActionResolutionVariation.Stronghold;
+
+        if (damage <= 0 && !isDefensiveReductionVariation)
         {
             result.Damage = 0;
             result.Outcome = ActionOutcome.Blocked;
@@ -85,6 +100,8 @@ public class ActionResolverService
             result.IgnoreDefense = false;
             result.PowerMaxSource = powerMaxSource;
             result.ResolutionVariation = ActionResolutionVariation.Blocked;
+            result.SecondaryEffect = ActionResolutionSecondaryEffect.None;
+            result.DamageBonus = 0;
             ApplyFeedback(result);
 
             EvaluateTriggers(attacker, target, attack, defense, result);
@@ -92,19 +109,8 @@ public class ActionResolverService
         }
 
         result.Damage = damage;
-        result.Outcome = attackAccuracy == ActionAccuracy.Critical ? ActionOutcome.CriticalHit : ActionOutcome.Hit;
-        result.DefenseOutcome = DefenseOutcome.None;
-        result.IgnoreAttack = false;
-        result.IgnoreDefense = ignoreDefense;
-        result.PowerMaxSource = powerMaxSource;
-        result.ResolutionVariation = ResolveVariation(result);
 
-        if (powerMaxSource.HasFlag(PowerMaxSource.Attack))
-            TriggerPowerMaxPlaceholder(attacker, isAttackerSource: true);
-
-        if (powerMaxSource.HasFlag(PowerMaxSource.Defense))
-            TriggerPowerMaxPlaceholder(target, isAttackerSource: false);
-
+        ApplySecondaryEffect(result, attacker, target);
         ApplyFeedback(result);
 
         EvaluateTriggers(attacker, target, attack, defense, result);
@@ -173,9 +179,19 @@ public class ActionResolverService
     private void ApplyFeedback(ActionResolutionResult result)
     {
         bool showAttackFeedback = result.Outcome == ActionOutcome.Hit || result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Missed;
-
+        
+        result.DamageBonusFeedbackText = result.DamageBonus > 0 ? $" +{result.DamageBonus} DMG" : (result.DamageBonus < 0 ? $" {result.DamageBonus} DMG" : string.Empty);
         result.AttackFeedbackText = showAttackFeedback ? BuildAttackFeedback(result) : string.Empty;
         result.DefenseFeedbackText = BuildDefenseFeedback(result);
+
+        if (result.DamageBonus > 0 && showAttackFeedback)
+        {
+            result.AttackFeedbackText += result.DamageBonusFeedbackText;
+        }
+        else if (result.DamageBonus < 0)
+        {
+            result.DefenseFeedbackText += result.DamageBonusFeedbackText;
+        }
     }
 
     private string BuildAttackFeedback(ActionResolutionResult result)
@@ -262,10 +278,73 @@ public class ActionResolverService
         return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * multiplier);
     }
 
-    private void TriggerPowerMaxPlaceholder(Battler battler, bool isAttackerSource)
+    private int GetDamageBonus(ActionResolutionVariation variation)
     {
-        string role = isAttackerSource ? "attack" : "defense";
-        Logger.Log($"[Resolve] {battler.Name} triggered POWER MAX effect ({role}).");
+        return variation switch
+        {
+            ActionResolutionVariation.IronWall => -3,
+            ActionResolutionVariation.Stronghold => -3,
+            ActionResolutionVariation.PiercingHit => 2,
+            ActionResolutionVariation.PowerHit => 3,
+            ActionResolutionVariation.CriticalHit => 4,
+            ActionResolutionVariation.ArmorShatter => 5,
+            ActionResolutionVariation.Overpower => 6,
+            ActionResolutionVariation.DevastatingStrike => 7,
+            ActionResolutionVariation.Deathstroke => 10,
+            ActionResolutionVariation.LegendaryClash => 8,
+            _ => 0
+        };
+    }
+
+    private ActionResolutionSecondaryEffect GetSecondaryEffect(ActionResolutionVariation variation)
+    {
+        return variation switch
+        {
+            ActionResolutionVariation.Overpower => ActionResolutionSecondaryEffect.BrokenBones,
+            ActionResolutionVariation.DevastatingStrike => ActionResolutionSecondaryEffect.Bleeding,
+            ActionResolutionVariation.Deathstroke => ActionResolutionSecondaryEffect.Dying,
+            ActionResolutionVariation.LegendaryClash => ActionResolutionSecondaryEffect.Stagger,
+            _ => ActionResolutionSecondaryEffect.None
+        };
+    }
+
+    private void ApplySecondaryEffect(ActionResolutionResult result, Battler attacker, Battler target)
+    {
+        if (result == null || perkService == null || result.SecondaryEffect == ActionResolutionSecondaryEffect.None)
+            return;
+
+        switch (result.SecondaryEffect)
+        {
+            case ActionResolutionSecondaryEffect.BrokenBones:
+                ApplySecondaryEffectToTarget(target, "broken-bones", attacker);
+                break;
+            case ActionResolutionSecondaryEffect.Bleeding:
+                ApplySecondaryEffectToTarget(target, "bleeding", attacker);
+                break;
+            case ActionResolutionSecondaryEffect.Dying:
+                ApplySecondaryEffectToTarget(target, "dying", attacker);
+                break;
+            case ActionResolutionSecondaryEffect.Stagger:
+                ApplySecondaryEffectToTarget(attacker, "stagger", target);
+                ApplySecondaryEffectToTarget(target, "stagger", attacker);
+                break;
+        }
+    }
+
+    private void ApplySecondaryEffectToTarget(Battler target, string stateOrDrawbackId, Battler source)
+    {
+        if (target == null || string.IsNullOrWhiteSpace(stateOrDrawbackId) || perkService == null)
+            return;
+
+        if (stateOrDrawbackId.Equals("bleeding", System.StringComparison.OrdinalIgnoreCase))
+        {
+            perkService.ApplyDrawback(target, stateOrDrawbackId, source);
+            return;
+        }
+
+        BattlerStateRuntimeInstance state = perkService.ApplyBattlerState(target, stateOrDrawbackId, source);
+        if (state == null)
+            Logger.Log($"[Resolve] Secondary effect '{stateOrDrawbackId}' was not applied because no state definition exists yet.");
     }
 
     private float GetMultiplier(DiceTier tier)

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -10,8 +11,8 @@ public class EnemyFeedbacks : MonoBehaviour
     private const float EnemyPopupBounceScale = 1.2f;
     private const float EnemyFlashDuration = 0.15f;
     private const float EnemyFlashAlpha = 0.9f;
-    private const float EnemyStatusDuration = 2f;
     private Color flashColor = new(0.9f, 0.1f, 0.1f, EnemyFlashAlpha);
+    [SerializeField] private float EnemyStatusDuration = 2f;
     
     [Header("Enemy Damage Popup")]
     [SerializeField] private GameObject popupObject;
@@ -25,6 +26,10 @@ public class EnemyFeedbacks : MonoBehaviour
     private SpriteRenderer enemySpriteRenderer;
     [SerializeField] private GameObject actionLogPanel;
     [SerializeField] private TMP_Text enemyStatusText;
+
+    [Header("Feedback Text Colors")]
+    [SerializeField] private Color attackFeedbackColor = new(1f, 0.1f, 0.1f, 1f);
+    [SerializeField] private Color defenseFeedbackColor = new(0.1f, 0.1f, 1f, 1f);
 
     void Start()
     {
@@ -62,10 +67,10 @@ public class EnemyFeedbacks : MonoBehaviour
         StartCoroutine(AnimateEnemyFlash());
     }
 
-    public void ShowStatusPopup(string text)
+    public void ShowStatusPopup(string text, bool isAttackFeedback)
     {
         actionLogPanel.SetActive(true);
-        StartCoroutine(AnimateActionLog(text));
+        StartCoroutine(AnimateActionLog(text, isAttackFeedback));
     }
 
     private void ShowPopupText(string text, Color color)
@@ -130,9 +135,27 @@ public class EnemyFeedbacks : MonoBehaviour
 
     
 
-    private IEnumerator AnimateActionLog(string text)
+    private IEnumerator AnimateActionLog(string text, bool isAttackFeedback)
     {
-        enemyStatusText.text = text;
+        Logger.Log($"[Feedback] {text}");
+
+        Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
+        string damageColor = "#FFD700";
+        enemyStatusText.color = textColor;
+        
+        if (Regex.IsMatch(text, @"[+-]\d+"))
+        {
+            int bonusIndex = text.IndexOfAny(new char[] { '+', '-' });
+            
+            string baseText = text[..bonusIndex];
+            string bonusText = text[bonusIndex..];
+            enemyStatusText.text = $"{baseText}<color={damageColor}>{bonusText}</color>";
+        }
+        else
+        {
+            enemyStatusText.text = text;
+        }
+        
         yield return new WaitForSeconds(EnemyStatusDuration);
         actionLogPanel.SetActive(false);
     }

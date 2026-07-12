@@ -14,7 +14,7 @@ public class CombatResolutionManager
             state.CurrentTurn.Defender
         );
         
-        Logger.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} | AttackFeedback: {result.AttackFeedbackText} | DefenseFeedback: {result.DefenseFeedbackText}");
+        Logger.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} ({(result.DamageBonus >= 0 ? "+" : string.Empty)}{result.DamageBonus} bonus) | Variation: {result.ResolutionVariation} | SecondaryEffect: {result.SecondaryEffect} | AttackFeedback: {result.AttackFeedbackText} | DefenseFeedback: {result.DefenseFeedbackText}");
         
         if (result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Hit) 
         {
