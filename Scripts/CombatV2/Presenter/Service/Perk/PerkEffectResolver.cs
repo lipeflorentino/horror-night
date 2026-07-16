@@ -211,6 +211,7 @@ public class PerkEffectResolver
     {
         if (owner == null)
             return;
+            
 
         List<PerkRuntimeInstance> perks = GetEffectivePerks(owner);
         for (int i = 0; i < perks.Count; i++)

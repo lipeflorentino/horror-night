@@ -7498,6 +7498,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   character: {fileID: 11400000, guid: ce2daa055c801614c9ee8d78e46a7f37, type: 2}
+  mindStatText: {fileID: 6034745862005186359}
+  heartStatText: {fileID: 4280897292351454989}
+  bodyStatText: {fileID: 4535212925726929276}
   initialArchetype: 0
   currentArchetype: 0
   archetypePoints:
@@ -7505,15 +7508,6 @@ MonoBehaviour:
     nf: 0
     sj: 0
     sp: 0
-  heartHud:
-    fillImage: {fileID: 7087450105071779297}
-    valueText: {fileID: 4280897292351454989}
-  bodyHud:
-    fillImage: {fileID: 70593475843145349}
-    valueText: {fileID: 4535212925726929276}
-  mindHud:
-    fillImage: {fileID: 6162320184280885047}
-    valueText: {fileID: 6034745862005186359}
   attack: 12
   defense: 4
   initiative: 5

@@ -50,6 +50,14 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
     - verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador
     - Novo tipo de evento "Trick or Treat" entra na categoria de "Event" do node
+    - Definir outra UI para rolagem de dados do inimigo 
+        - Ex. Mostrar apenas os dados com o resultado
+    - Melhorar logica de secondary effect no ActionResolverService  
+        - Está hardcoded
+        - Pode puxar do Battler (customizavel)
+    - Melhorar UI do inventorio
+    - Na Reward View colocar tooltip com descrição dos itens
+    - Analisar fluxo de itens (garantir duração, gasto, etc)
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO
@@ -68,7 +76,6 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
     - Corrigir bug: middle alert swallow memory vague
     - Ajustar tela de Loot (textos, alinhamento, etc.)
-    - Ajustar valor de rolagem (dice faces)
     - Ouro não deve aparecer no slot do inventario de combate 
     - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
 
@@ -78,6 +85,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Ajustar cast de tricks 
         - requisitos (outras stats alem de mind, heart, body)
         - custo (momentum)
+        - Dar feedback quando falta recurso (highlight vermelho)
 
     - Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)    
         - Criar uma UI especifica para tricks de identidade e tricks temporarias
@@ -89,14 +97,15 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
     - Ajustar o combatLogView
         - dar feedbacks das ações/triggers/efeitos/resoluções
+        - action log mostra o resultado (Guard Broken) e combat log mostra os numeros "with 7 (+3) DMG"
 
     - Ajustar aplicação de "bleeding" no TickEndTurn
         - escalável por conta de outros efeitos (poisoning, pain, etc)
         - feedback visual de bleeding
 
-
-    - Mensagem de "BestRoll" so aparecer com mais de um dado 
-    - Mostrar cada rolagem quando tiver varios dados do mesmo tipo e não somente um 
-    - Definir outra UI para rolagem de dados do inimigo 
-        - Ex. Mostrar apenas os dados com o resultado
-    - Feedback de bonus deve ser Damage(bonus dmg)
+    - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
+    - Adicionar um delay quando o combate encerrar por morte
+    - No painel de infos, destacar baseStat da modificação (atack -> 3 (+4))
+    - Mostrar a rolagem de dados extras (perk - instinto vivo)
+        - dar feedback do que foi "ganho" com  a ativação do perk (+2 dados)
+        - testar UI e funcionamento

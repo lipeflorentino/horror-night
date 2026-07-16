@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInventory))]
@@ -8,15 +9,15 @@ public class PlayerStatusManager : MonoBehaviour
     [Header("Character")]
     [SerializeField] private CharacterSO character;
 
+    [Header("Status HUD (Text)")]
+    [SerializeField] private TMP_Text mindStatText;
+    [SerializeField] private TMP_Text heartStatText;
+    [SerializeField] private TMP_Text bodyStatText;
+
     [Header("Archetype")]
     [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.Standard;
     [SerializeField] private PlayerArchetype currentArchetype = PlayerArchetype.Standard;
     [SerializeField] private ArchetypePoints archetypePoints;
-
-    [Header("Status HUD (Horizontal Bar + Text)")]
-    [SerializeField] private StatHudBinding heartHud;
-    [SerializeField] private StatHudBinding bodyHud;
-    [SerializeField] private StatHudBinding mindHud;
 
     [Header("Combat - Advanced Stats")]
     [SerializeField] private int attack = 10;
@@ -120,37 +121,37 @@ public class PlayerStatusManager : MonoBehaviour
     public void IncreaseHeart(float amount)
     {
         currentHeart = ClampCoreStat(currentHeart + amount, maxHeart);
-        heartHud?.SetValue(currentHeart, maxHeart);
+        heartStatText.text = currentHeart.ToString("F0");
     }
 
     public void DecreaseHeart(float amount)
     {
         currentHeart = ClampCoreStat(currentHeart - amount, maxHeart);
-        heartHud?.SetValue(currentHeart, maxHeart);
+        heartStatText.text = currentHeart.ToString("F0");
     }
 
     public void IncreaseBody(float amount)
     {
         currentBody = ClampCoreStat(currentBody + amount, maxBody);
-        bodyHud?.SetValue(currentBody, maxBody);
+        bodyStatText.text = currentBody.ToString("F0");
     }
 
     public void DecreaseBody(float amount)
     {
         currentBody = ClampCoreStat(currentBody - amount, maxBody);
-        bodyHud?.SetValue(currentBody, maxBody);
+        bodyStatText.text = currentBody.ToString("F0");
     }
 
     public void IncreaseMind(float amount)
     {
         currentMind = ClampCoreStat(currentMind + amount, maxMind);
-        mindHud?.SetValue(currentMind, maxMind);
+        mindStatText.text = currentMind.ToString("F0");
     }
 
     public void DecreaseMind(float amount)
     {
         currentMind = ClampCoreStat(currentMind - amount, maxMind);
-        mindHud?.SetValue(currentMind, maxMind);
+        mindStatText.text = currentMind.ToString("F0");
     }
 
     public float GetCurrentHeart() => currentHeart;
@@ -343,9 +344,9 @@ public class PlayerStatusManager : MonoBehaviour
 
     private void RefreshAllBars()
     {
-        heartHud?.SetValue(currentHeart, maxHeart);
-        bodyHud?.SetValue(currentBody, maxBody);
-        mindHud?.SetValue(currentMind, maxMind);
+        heartStatText.text = currentHeart.ToString("F0");
+        mindStatText.text = currentMind.ToString("F0");
+        bodyStatText.text = currentBody.ToString("F0");
     }
 
     private static float ClampCoreStat(float value, float maxValue)
