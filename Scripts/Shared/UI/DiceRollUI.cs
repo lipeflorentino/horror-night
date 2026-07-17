@@ -10,6 +10,8 @@ public class DiceRollUI : MonoBehaviour
     [SerializeField] private TMP_Text diceValueText;
     // [SerializeField] private Image highlightFrame;
     [SerializeField] private TMP_Text bestText;
+    [SerializeField] private TMP_Text extraText;
+    [SerializeField] private TMP_Text maxRollText;
     [SerializeField, Range(0f, 1f)] private float dimmedAlpha = 0.3f;
     [SerializeField] private float rollDuration = 0.65f;
     [SerializeField] private float spinSpeed = 900f;
@@ -38,6 +40,20 @@ public class DiceRollUI : MonoBehaviour
             bestText.gameObject.SetActive(highlighted);
 
         SetAlpha(highlighted ? 1f : dimmedAlpha);
+    }
+
+    public void SetExtra()
+    {
+        if (extraText != null)
+            extraText.gameObject.SetActive(true);
+    }
+
+    public void SetMaxRoll()
+    {
+        if (maxRollText != null)
+        {
+            maxRollText.gameObject.SetActive(true);
+        }
     }
 
     public void ClearValue()
