@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public enum DiceTier
@@ -29,7 +30,21 @@ public class DiceResult
     public int MinValue;
     public DiceStatType StatType;
     public DiceRollType RollType;
-    public bool IsMaxRoll => Value >= MaxValue && MaxValue > 1;
+    public bool IsExtra;
+    public bool IsMaxRoll => MaxValue > 1 && Value >= GetMaxValueForStat(StatType, MaxValue);
+
+    private static int GetMaxValueForStat(DiceStatType statType, int maxValue)
+    {
+        int statReferenceValue = Math.Max(1, maxValue);
+
+        return statType switch
+        {
+            DiceStatType.Mind => statReferenceValue,
+            DiceStatType.Heart => statReferenceValue,
+            DiceStatType.Body => statReferenceValue,
+            _ => statReferenceValue
+        };
+    }
     public List<DiceResult> SubRolls = new();
 
     public DiceResult(int value, DiceTier tier, int maxValue, DiceStatType statType, DiceRollType rollType, int minValue = 1)

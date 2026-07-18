@@ -1,55 +1,47 @@
 LISTA DE TAREFAS - RPG DE COMBATE EM TURNOS
+
+🗺️ HISTÓRIAS / ÉPICOS 
+
+    - AJustes na Estrutura de Clareiras (prefabs + conexões de mapa) 
+    - Variável global de Tensão
+    - Variável global de Corrupção
+    - Sistema simples de perda parcial (Roguelite)
+    - Narrativa
+    - Fazer painel de resultados pós-jogo/combate (total damage, total kills, total xp, etc.)
+    - Fazer galeria de discoveries (monstros, itens, relíquias, etc.)
+    - Implementar efeitos reais em EnableFogEffect e DarkenEnvironment integrado ao sistema de Pressão/Tensão
+    - Implementar sistemas secundários restantes: Presence, Treasure, NPC, Class
+    - Cartas(itens) de Estado de Combate: Habilitadas com custo, ativadas por rolagem/condição especial, alterando drasticamente os status e ações do combatente.
+    - Ter builds baseadas em Atributos (Mind, Heart, Body)
+    - Polimento de feedback visual/UX/audio/music.
+
+
 ==================================================
 Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo tem maior prioridade)
 ==================================================
 
-🗺️ HISTÓRIAS / ÉPICOS (Menor Prioridade)
 
-    - Estrutura de Clareiras (prefabs + conexões de mapa)
-    - Variável global de Tensão
-    - Variável global de Corrupção
-    - Tabela de eventos ponderados
-    - Sistema de escolha do caminho (horizontal) baseado em possibilidade de recompensas
-    - Sistema simples de perda parcial
-    - Sistema de combate em turnos (Core)
-    - Sistemas do personagem (HP, inventory, progressão, controles)
-
-
-🗄️ BACKLOG
-
-    - Implementar sistemas secundários restantes: Presence, Treasure, NPC, Class
-    - Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
-    - Cartas de Estado de Combate: Habilitadas com custo, ativadas por rolagem/condição especial, alterando drasticamente os status e ações do combatente.
-    - Ter builds baseadas em Atributos (Mind, Heart, Body)
-    - Estruturar e delegar responsabilidades do CombatManager (dividir em TurnManager, TrickManager e EnemyActionManager)
-    - Implementar habilidades com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
+🗄️ BACKLOG (Menor Prioridade)
+    
+    - Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
+    - Implementar perks/tricks com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
     - Implementar manipulação de dados (possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente)
-    - Criar feedback de eficácia da ação (mostrar visualmente power e accuracy)
-    - Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
-    - Adicionar indicativo visual de rolagem máxima (highlight no dado)
-    - Fazer painel de resultados pós-jogo/combate (total damage, total kills, total xp, etc.)
-    - Fazer galeria de discoveries (monstros, itens, relíquias, etc.)
-
-
-📝 TO DO
-
     - Implementar sistema de "Curses" (Maldições) que alteram diretamente os sistemas do jogo (UI, cor, sons, textos)
-    - Implementar o conceito/uso de Momentum (sistema para ativar habilidades especiais/poderes/stance/glitches)
     - Implementar Tricks que forçam "testes" escolhidos pelo jogador (uma rolagem clássica de RPG antes do cálculo de accuracy/power)
     - Criar NPCEncounterSystem (sistema de sorteio similar a inimigos/loot, contendo tipos como loja, melhoria, troca, etc.)
     - Implementar TreasureSystem (configurar drop de artefatos lendários/épicos, Perks e CombatStateCards)
     - Sistema de Pergaminhos: Fazer com que Tricks sejam aprendidos por meio de pergaminhos (que podem conter vários tricks e ser adquiridos por loot ou NPCs)
     - Estabelecer tricks para os inimigos (definir identity tricks e criar feedback visual/log para quando o inimigo usá-las)
-    - Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
     - Criar CharacterSO (Nicolas) e gerar o ícone do personagem
     - Ajustar lógica de type, behavior e style na IA de inimigos
-    - Criar nova perk usando a Skill criada
+    - Criar nova perk usando a Skill (AntigravityAI) criada
+    - Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
     - Criar UI de Drawback
     - Adicionar informações no painel do player (XP e Gold)
     - Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
     - Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
-    - verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador
     - Novo tipo de evento "Trick or Treat" entra na categoria de "Event" do node
+    - Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
     - Definir outra UI para rolagem de dados do inimigo 
         - Ex. Mostrar apenas os dados com o resultado
     - Melhorar logica de secondary effect no ActionResolverService  
@@ -58,6 +50,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Melhorar UI do inventorio
     - Na Reward View colocar tooltip com descrição dos itens
     - Analisar fluxo de itens (garantir duração, gasto, etc)
+    - Adicionar indicativo visual de rolagem máxima (highlight no dado)
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO
@@ -74,7 +67,6 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
 🐛 BUGS & FIXES
 
-    - Corrigir bug: middle alert swallow memory vague
     - Ajustar tela de Loot (textos, alinhamento, etc.)
     - Ouro não deve aparecer no slot do inventario de combate 
     - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
@@ -91,9 +83,8 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - Criar uma UI especifica para tricks de identidade e tricks temporarias
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
-        - Implementar feedback de “triggered” temporário
         - Refinar animações e transições
-        - Mudar botão de confirmar na tela de DiceView (icone de dado)
+        - Mudar botão de confirmar na tela de DiceRollView (icone de dado)
 
     - Ajustar o combatLogView
         - dar feedbacks das ações/triggers/efeitos/resoluções
@@ -101,7 +92,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
     - Ajustar aplicação de "bleeding" no TickEndTurn
         - escalável por conta de outros efeitos (poisoning, pain, etc)
-        - feedback visual de bleeding
+        - feedback visual de bleeding e outros efeitos (drawbacks, state)
 
     - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
     - Adicionar um delay quando o combate encerrar por morte

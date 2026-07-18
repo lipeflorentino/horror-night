@@ -85,3 +85,7 @@ Criar script que irá escutar evento dispardo quando player chega ao node.
     - Counter Stance, ao realizar um evade bem sucedido, o jogador pode fazer uma rolagem de dado para contratacar (causa exaustion)
     - Sheap Cheat, ao receber um ataque critico, transforme o ataque em um ataque normal (causa low morale - causa -15% de precisão)
     - Time Stop, não alterna o turno, você ataca duas vezes (causa exaustion)
+
+
+8) Sistema de criaturas
+    - verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador

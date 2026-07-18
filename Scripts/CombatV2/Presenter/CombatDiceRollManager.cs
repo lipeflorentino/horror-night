@@ -15,28 +15,33 @@ public class CombatDiceRollManager
         ActionDefinition playerAction = CombatResolutionManager.BuildDefinitionFromBattler(player, enemy, action, perkService);
         ActionType enemyActionType = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction.Definition.Type : combatContext.CurrentTurn.AttackAction.Definition.Type;
 
-        combatContext.PendingPlayerAccuracyRolls = diceService.RollMany(player, enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, player.Level, enemy.Level);
-        combatContext.PendingEnemyAccuracyRolls = diceService.RollMany(enemy, player, combatContext.PendingEnemyAccuracyDiceTypes, enemyActionType, DiceRollType.Accuracy, enemy.Level, player.Level);
+        List<DiceResult> playerAccuracyRolls = diceService.RollMany(player, enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, player.Level, enemy.Level);
+        List<DiceResult> enemyAccuracyRolls = diceService.RollMany(enemy, player, combatContext.PendingEnemyAccuracyDiceTypes, enemyActionType, DiceRollType.Accuracy, enemy.Level, player.Level);
 
-        DiceResult playerAccuracyDice = diceService.GetBestResult(combatContext.PendingPlayerAccuracyRolls);
-        DiceResult enemyAccuracyDice = diceService.GetBestResult(combatContext.PendingEnemyAccuracyRolls);
+        combatContext.PendingPlayerAccuracyRolls = playerAccuracyRolls;
+        combatContext.PendingEnemyAccuracyRolls = enemyAccuracyRolls;
+        DiceResult playerAccuracyDice = diceService.GetBestResult(playerAccuracyRolls);
+        DiceResult enemyAccuracyDice = diceService.GetBestResult(enemyAccuracyRolls);
 
         int playerExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(player, enemy, playerAccuracyDice, action, out DiceStatType playerExtraStatType);
         int enemyExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(enemy, player, enemyAccuracyDice, enemyActionType, out DiceStatType enemyExtraStatType);
 
-        combatContext.PendingPlayerPowerRolls = diceService.RollMany(player, enemy, powerDiceTypes, action, DiceRollType.Power, player.Level, enemy.Level);
-        combatContext.PendingEnemyPowerRolls = diceService.RollMany(enemy, player, combatContext.PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, enemy.Level, player.Level);
+        List<DiceResult> playerPowerRolls = diceService.RollMany(player, enemy, powerDiceTypes, action, DiceRollType.Power, player.Level, enemy.Level);
+        List<DiceResult> enemyPowerRolls = diceService.RollMany(enemy, player, combatContext.PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, enemy.Level, player.Level);
+
+        combatContext.PendingPlayerPowerRolls = playerPowerRolls;
+        combatContext.PendingEnemyPowerRolls = enemyPowerRolls;
 
         if (playerExtraPowerDice > 0)
         {
-            combatContext.PendingPlayerPowerRolls.AddRange(RollExtraPowerDiceWithoutPool(player, playerExtraPowerDice, playerExtraStatType, player.Level, enemy.Level, diceService));
-            Logger.Log($"[Adrenaline Surge] Player ganhou {playerExtraPowerDice} dado(s) extra(s) de Poder ({playerExtraStatType}) pelo Accuracy tier {playerAccuracyDice?.Tier}.");
+            List<DiceResult> playerExtraPowerRolls = RollExtraPowerDiceWithoutPool(player, playerExtraPowerDice, playerExtraStatType, player.Level, enemy.Level, diceService);
+            combatContext.PendingPlayerPowerRolls.AddRange(playerExtraPowerRolls);
         }
 
         if (enemyExtraPowerDice > 0)
         {
-            combatContext.PendingEnemyPowerRolls.AddRange(RollExtraPowerDiceWithoutPool(enemy, enemyExtraPowerDice, enemyExtraStatType, enemy.Level, player.Level, diceService));
-            Logger.Log($"[Adrenaline Surge] Enemy ganhou {enemyExtraPowerDice} dado(s) extra(s) de Poder ({enemyExtraStatType}) pelo Accuracy tier {enemyAccuracyDice?.Tier}.");
+            List<DiceResult> enemyExtraPowerRolls = RollExtraPowerDiceWithoutPool(enemy, enemyExtraPowerDice, enemyExtraStatType, enemy.Level, player.Level, diceService);
+            combatContext.PendingEnemyPowerRolls.AddRange(enemyExtraPowerRolls);
         }
 
         DiceResult playerPowerDice = diceService.GetBestResult(combatContext.PendingPlayerPowerRolls);
@@ -59,8 +64,8 @@ public class CombatDiceRollManager
             combatContext.CurrentTurn.DefenseAction = playerActionInstance;
         }
 
-        Logger.Log($"[Flow] Player rolled POWER best:{playerPowerDice?.Value} | ACCURACY best:{playerAccuracyDice?.Value} using {combatContext.PendingPlayerPowerRolls.Count + combatContext.PendingPlayerAccuracyRolls.Count} dice.");
-        Logger.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice?.Value} | ACCURACY best:{enemyAccuracyDice?.Value} using {combatContext.PendingEnemyPowerRolls.Count + combatContext.PendingEnemyAccuracyRolls.Count} dice.");
+        Logger.Log($"[Flow] Player rolled POWER best:{playerPowerDice?.Value} | ACCURACY best:{playerAccuracyDice?.Value} using {combatContext.PendingPlayerPowerRolls.Count} Power dices and {combatContext.PendingPlayerAccuracyRolls.Count} Accuracy dices.");
+        Logger.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice?.Value} | ACCURACY best:{enemyAccuracyDice?.Value} using {combatContext.PendingEnemyPowerRolls.Count} Power dices and {combatContext.PendingEnemyAccuracyRolls.Count} Accuracy dices.");
     }
 
     public static List<DiceResult> RollExtraPowerDiceWithoutPool(

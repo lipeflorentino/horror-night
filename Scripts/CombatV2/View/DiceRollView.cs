@@ -21,7 +21,7 @@ public class DiceRollView : MonoBehaviour
     [SerializeField] private DiceTierBarUI tierBar;
 
     private readonly List<DiceRollUI> runtimePlayerSlots = new();
-    // private readonly List<DiceRollUI> runtimeEnemySlots = new();
+    private readonly List<DiceRollUI> runtimeEnemySlots = new();
     private bool slotsInitialized;
 
     public IEnumerator PlayDiceResolution(
@@ -33,8 +33,11 @@ public class DiceRollView : MonoBehaviour
         EnsureSlotsInitialized();
         SetupResolutionPanel(rollType, tierBoundaries);
 
-        List<DiceResult> individualRolls = FlattenRolls(playerRolls);
-        yield return PlayIndividualRollAnimations(individualRolls);
+        List<DiceResult> playerIndividualRolls = FlattenRolls(playerRolls);
+        yield return PlayIndividualRollAnimations(playerIndividualRolls, runtimePlayerSlots, playerSlotsContainer);
+
+        List<DiceResult> enemyIndividualRolls = FlattenRolls(enemyRolls);
+        yield return PlayIndividualRollAnimations(enemyIndividualRolls, runtimeEnemySlots, enemySlotsContainer);
 
         yield return new WaitForSeconds(postRollDelay);
 
@@ -74,15 +77,16 @@ public class DiceRollView : MonoBehaviour
         return individualRolls;
     }
 
-    private IEnumerator PlayIndividualRollAnimations(List<DiceResult> individualRolls)
+    private IEnumerator PlayIndividualRollAnimations(List<DiceResult> individualRolls, List<DiceRollUI> slots, RectTransform container)
     {
-        PrepareSlots(runtimePlayerSlots, individualRolls.Count, playerSlotsContainer);
+        PrepareSlots(slots, individualRolls.Count, container);
+        HighlightExtraDices(slots, individualRolls);
 
         List<Coroutine> runningCoroutines = new();
         for (int i = 0; i < individualRolls.Count; i++)
         {
-            runtimePlayerSlots[i].SetDiceIcon(individualRolls[i].StatType);
-            runningCoroutines.Add(StartCoroutine(runtimePlayerSlots[i].PlayRollAnimation(individualRolls[i].Value, individualRolls[i].MaxValue)));
+            slots[i].SetDiceIcon(individualRolls[i].StatType);
+            runningCoroutines.Add(StartCoroutine(slots[i].PlayRollAnimation(individualRolls[i].Value, individualRolls[i].MaxValue)));
         }
 
         for (int i = 0; i < runningCoroutines.Count; i++)
@@ -151,7 +155,52 @@ public class DiceRollView : MonoBehaviour
     {
         yield return new WaitForSeconds(mergeMoveDuration);
         baseSlot.SetValueText(aggregatedRoll.Value);
+        baseSlot.SetExtra(false);
         yield return StartCoroutine(baseSlot.PlayPulse(mergePulseDuration));
+    }
+
+    private void HighlightResolvedRollStates(List<DiceRollUI> slots, IReadOnlyList<DiceResult> rolls)
+    {
+        if (slots == null || rolls == null)
+            return;
+
+        int usedCount = Mathf.Min(slots.Count, rolls.Count);
+        for (int i = 0; i < usedCount; i++)
+        {
+            DiceResult roll = rolls[i];
+            slots[i].SetMaxRoll(roll.IsMaxRoll);
+        }
+
+        for (int i = usedCount; i < slots.Count; i++)
+        {
+            slots[i].SetMaxRoll(false);
+        }
+    }
+
+    private void HighlightExtraDices(List<DiceRollUI> slots, IReadOnlyList<DiceResult> rolls)
+    {
+        if (slots == null || rolls == null)
+            return;
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            bool isExtra = i < rolls.Count && rolls[i].IsExtra;
+            slots[i].SetExtra(isExtra);
+        }
+    }
+
+    private bool HasExtraSubRoll(DiceResult roll)
+    {
+        if (roll?.SubRolls == null)
+            return false;
+
+        for (int i = 0; i < roll.SubRolls.Count; i++)
+        {
+            if (roll.SubRolls[i].IsExtra)
+                return true;
+        }
+
+        return false;
     }
 
     private void HighlightBestResult(List<DiceRollUI> activeFinalSlots, IReadOnlyList<DiceResult> playerRolls, int maxValue)
@@ -159,6 +208,7 @@ public class DiceRollView : MonoBehaviour
         int usedCount = playerRolls != null ? playerRolls.Count : 0;
         int highlightedIndex = GetHighlightedRollIndex(playerRolls, usedCount);
         SetHighlightedIndex(activeFinalSlots, highlightedIndex);
+        HighlightResolvedRollStates(activeFinalSlots, playerRolls);
 
         tierBar.SetRollIndicatorPosition(GetBetterRollValue(playerRolls, usedCount), maxValue);
     }
@@ -181,8 +231,10 @@ public class DiceRollView : MonoBehaviour
             return;
         }
 
-        ConfigureContainerLayout(playerSlotsContainer, TextAnchor.MiddleRight);
+        //ConfigureContainerLayout(playerSlotsContainer, TextAnchor.MiddleRight);
+        //ConfigureContainerLayout(enemySlotsContainer, TextAnchor.MiddleLeft);
         CreateSlots(runtimePlayerSlots, playerSlotsContainer);
+        CreateSlots(runtimeEnemySlots, enemySlotsContainer);
 
         slotsInitialized = true;
     }

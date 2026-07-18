@@ -8,7 +8,6 @@ public class DiceRollUI : MonoBehaviour
 {
     [SerializeField] private Image diceImage;
     [SerializeField] private TMP_Text diceValueText;
-    // [SerializeField] private Image highlightFrame;
     [SerializeField] private TMP_Text bestText;
     [SerializeField] private TMP_Text extraText;
     [SerializeField] private TMP_Text maxRollText;
@@ -42,17 +41,17 @@ public class DiceRollUI : MonoBehaviour
         SetAlpha(highlighted ? 1f : dimmedAlpha);
     }
 
-    public void SetExtra()
+    public void SetExtra(bool enabled)
     {
         if (extraText != null)
-            extraText.gameObject.SetActive(true);
+            extraText.gameObject.SetActive(enabled);
     }
 
-    public void SetMaxRoll()
+    public void SetMaxRoll(bool enabled = true)
     {
         if (maxRollText != null)
         {
-            maxRollText.gameObject.SetActive(true);
+            maxRollText.gameObject.SetActive(enabled);
         }
     }
 
@@ -62,6 +61,8 @@ public class DiceRollUI : MonoBehaviour
             diceValueText.text = "0";
 
         SetHighlighted(false);
+        SetExtra(false);
+        SetMaxRoll(false);
         SetAlpha(1f);
     }
 
