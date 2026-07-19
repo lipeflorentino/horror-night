@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +30,9 @@ public class TrickInfoPanelUI : MonoBehaviour
     [SerializeField] private Button dischardButton;
 
     private RectTransform rectTransform;
+
+    // Pool of requirement rows reused across SetTrickInfo() calls to avoid Instantiate/Destroy churn.
+    private readonly List<TrickRequirementUI> _requirementPool = new();
 
     public event Action<TrickInventoryAction> OnRaiseInteraction;
 
@@ -108,17 +112,38 @@ public class TrickInfoPanelUI : MonoBehaviour
         if (requirementsContainer == null || requirementPrefab == null)
             return;
 
-        for (int i = requirementsContainer.childCount - 1; i >= 0; i--)
-            Destroy(requirementsContainer.GetChild(i).gameObject);
-
         if (requirements == null)
+        {
+            DeactivateRequirementsFrom(0);
             return;
+        }
 
+        int index = 0;
         foreach (var (statKey, value) in requirements.GetActiveRequirements())
         {
-            TrickRequirementUI requirementUI = Instantiate(requirementPrefab, requirementsContainer);
+            TrickRequirementUI requirementUI = GetOrCreatePooledRequirement(index);
             requirementUI.Setup(statKey, value);
+            requirementUI.gameObject.SetActive(true);
+            index++;
         }
+
+        DeactivateRequirementsFrom(index);
+    }
+
+    private TrickRequirementUI GetOrCreatePooledRequirement(int index)
+    {
+        if (index < _requirementPool.Count)
+            return _requirementPool[index];
+
+        TrickRequirementUI requirementUI = Instantiate(requirementPrefab, requirementsContainer);
+        _requirementPool.Add(requirementUI);
+        return requirementUI;
+    }
+
+    private void DeactivateRequirementsFrom(int index)
+    {
+        for (int i = index; i < _requirementPool.Count; i++)
+            _requirementPool[i].gameObject.SetActive(false);
     }
 
     private static string FormatDuration(TrickSO trick)

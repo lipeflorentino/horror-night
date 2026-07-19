@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TrickRequirementUI : MonoBehaviour
 {
-    private const string RequimentsIconResourcePath = "Assets/Art/Sprites/Requirements/{0}.png";
+    private const string RequimentsIconResourcePath = "UI/Requirements/{0}.png";
 
     [Header("Requirement Info")]
     [SerializeField] private Image iconImage;
@@ -28,7 +27,7 @@ public class TrickRequirementUI : MonoBehaviour
             return cachedSprite;
 
         string path = string.Format(RequimentsIconResourcePath, statKey);
-        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        Sprite sprite = Resources.Load<Sprite>(path);
 
         if (sprite == null)
             Debug.LogWarning($"[RequirementUI] Icon not found at {path}");

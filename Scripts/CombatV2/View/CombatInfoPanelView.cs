@@ -7,7 +7,8 @@ using UnityEngine.UI;
 
 public class CombatInfoPanelView : MonoBehaviour
 {
-    private const string StatsIconResourcePath = "Assets/Art/Sprites/Stats/{0}Icon.png";
+    // Resources.Load path is relative to a "Resources" folder and must not include the extension.
+    private const string StatsIconResourcePath = "UI/Stats/{0}Icon";
 
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private Button closeButton;
@@ -32,21 +33,9 @@ public class CombatInfoPanelView : MonoBehaviour
     // Cache to avoid repeated Resources.Load calls for the same icon.
     private static readonly Dictionary<string, Sprite> _iconCache = new();
 
-    // Ordered stat definitions: resource key (used for icon lookup), display label (Pt-BR), value getter.
-    private static readonly (string Key, string Label, Func<Battler, string> GetValue)[] _statDefinitions =
-    {
-        ("Atk", "Attack", b => b.Attack.ToString()),
-        ("Def", "Defense", b => b.Defense.ToString()),
-        ("Mind", "Mind", b => b.Mind.ToString()),
-        ("Heart", "Heart", b => b.Heart.ToString()),
-        ("Body", "Body", b => b.Body.ToString()),
-        ("Init", "Initiative", b => b.Initiative.ToString()),
-        ("Focus", "Focus", b => b.Focus.ToString()),
-        ("Str", "Strength", b => b.Strength.ToString()),
-        ("Agi", "Agility", b => b.Agility.ToString()),
-        ("PowerDices", "Power dices", b => $"{b.CurrentPowerDices}/{b.MaxPowerDices}"),
-        ("AccuracyDices", "Accuracy dices", b => $"{b.CurrentAccuracyDices}/{b.MaxAccuracyDices}"),
-    };
+    // Row pools per container, reused across Bind() calls to avoid Instantiate/Destroy churn.
+    private readonly List<StatRowUI> _playerRowPool = new();
+    private readonly List<StatRowUI> _enemyRowPool = new();
 
     private void OnEnable()
     {
@@ -62,8 +51,18 @@ public class CombatInfoPanelView : MonoBehaviour
             closeButton.onClick.RemoveListener(Close);
     }
 
-    public void Bind(Battler player, Sprite playerSprite, Battler enemy, Sprite enemySprite)
+    // Stat rows arrive pre-computed (Presenter-side, via CombatInfoStatCalculator) so this View
+    // only renders — it no longer touches PerkService or decides how values are calculated.
+    public void Bind(
+        Battler player, Sprite playerSprite, IReadOnlyList<CombatInfoStatCalculator.StatRowEntry> playerStatRows,
+        Battler enemy, Sprite enemySprite, IReadOnlyList<CombatInfoStatCalculator.StatRowEntry> enemyStatRows)
     {
+        if (player == null || enemy == null)
+        {
+            Debug.LogWarning("[CombatInfoPanelView] Bind called with null player or enemy Battler.");
+            return;
+        }
+
         if (playerNameText != null)
             playerNameText.text = player.Name;
 
@@ -88,31 +87,39 @@ public class CombatInfoPanelView : MonoBehaviour
         if (enemyIcon != null)
             enemyIcon.sprite = enemySprite;
 
-        BuildStatRows(player, playerStatsContainer);
-        BuildStatRows(enemy, enemyStatsContainer);
+        BuildStatRows(playerStatRows, playerStatsContainer, _playerRowPool);
+        BuildStatRows(enemyStatRows, enemyStatsContainer, _enemyRowPool);
     }
 
-    private void BuildStatRows(Battler battler, Transform container)
+    // Reuses pooled StatRowUI instances instead of Instantiate/Destroy on every Bind().
+    private void BuildStatRows(IReadOnlyList<CombatInfoStatCalculator.StatRowEntry> rows, Transform container, List<StatRowUI> pool)
     {
-        if (container == null || statRowPrefab == null || battler == null)
+        if (container == null || statRowPrefab == null || rows == null)
         {
-            Debug.LogWarning("[CombatInfoPanelView] Missing container, prefab, or battler reference for stat rows.");
+            Debug.LogWarning("[CombatInfoPanelView] Missing container, prefab, or stat rows data.");
             return;
         }
 
-        ClearContainer(container);
-
-        foreach (var (Key, Label, GetValue) in _statDefinitions)
+        for (int i = 0; i < rows.Count; i++)
         {
-            StatRowUI row = Instantiate(statRowPrefab, container);
-            row.Bind(GetStatIcon(Key), Label, GetValue(battler));
+            StatRowUI row = GetOrCreatePooledRow(pool, container, i);
+            CombatInfoStatCalculator.StatRowEntry entry = rows[i];
+            row.Bind(GetStatIcon(entry.Key), entry.Label, entry.Value, entry.DeltaText, entry.ShowDelta, entry.PositiveDelta);
+            row.gameObject.SetActive(true);
         }
+
+        for (int i = rows.Count; i < pool.Count; i++)
+            pool[i].gameObject.SetActive(false);
     }
 
-    private static void ClearContainer(Transform container)
+    private StatRowUI GetOrCreatePooledRow(List<StatRowUI> pool, Transform container, int index)
     {
-        for (int i = container.childCount - 1; i >= 0; i--)
-            Destroy(container.GetChild(i).gameObject);
+        if (index < pool.Count)
+            return pool[index];
+
+        StatRowUI row = Instantiate(statRowPrefab, container);
+        pool.Add(row);
+        return row;
     }
 
     private static Sprite GetStatIcon(string statKey)
@@ -121,10 +128,10 @@ public class CombatInfoPanelView : MonoBehaviour
             return cachedSprite;
 
         string path = string.Format(StatsIconResourcePath, statKey);
-        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        Sprite sprite = Resources.Load<Sprite>(path);
 
         if (sprite == null)
-            Debug.LogWarning($"[CombatInfoPanelView] Icon not found at {path}.png");
+            Debug.LogWarning($"[CombatInfoPanelView] Icon not found at Resources/{path}.");
 
         _iconCache[statKey] = sprite;
         return sprite;

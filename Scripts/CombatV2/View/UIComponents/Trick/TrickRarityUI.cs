@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TrickRarityUI : MonoBehaviour
 {
-    private const string RarityIconResourcePath = "Assets/Art/Sprites/Tricks/Icons/{0}.png";
+    private const string RarityIconResourcePath = "UI/RarityIcons/{0}.png";
 
     [Header("Rarity Info")]
     [SerializeField] private Image iconImage;
@@ -25,7 +24,7 @@ public class TrickRarityUI : MonoBehaviour
             return cachedSprite;
 
         string path = string.Format(RarityIconResourcePath, rarity);
-        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        Sprite sprite = Resources.Load<Sprite>(path);
 
         if (sprite == null)
             Debug.LogWarning($"[TrickRarityUI] Icon not found at {path}");

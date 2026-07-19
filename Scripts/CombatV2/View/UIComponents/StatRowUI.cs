@@ -8,7 +8,7 @@ public class StatRowUI : MonoBehaviour
     [SerializeField] private TMP_Text labelText;
     [SerializeField] private TMP_Text valueText;
  
-    public void Bind(Sprite icon, string label, string value)
+    public void Bind(Sprite icon, string label, string value, string deltaText = "", bool showDelta = false, bool positiveDelta = true)
     {
         if (iconImage != null)
         {
@@ -20,6 +20,16 @@ public class StatRowUI : MonoBehaviour
             labelText.text = label;
  
         if (valueText != null)
-            valueText.text = value;
+        {
+            if (showDelta && !string.IsNullOrEmpty(deltaText))
+            {
+                string color = positiveDelta ? "#2ECC71" : "#E74C3C";
+                valueText.text = $"{value} <color={color}>({deltaText})</color>";
+            }
+            else
+            {
+                valueText.text = value;
+            }
+        }
     }
 }

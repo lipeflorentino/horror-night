@@ -73,7 +73,10 @@ public class CombatView : MonoBehaviour
         PerkService perkService = combatManager != null ? combatManager.GetPerkService() : null;
         PlayerPanel.Bind(player, perkService);
         EnemyPanel.Bind(enemy, perkService);
-        InfoPanelView.Bind(player, playerIconSprite, enemy, enemyIconSprite);
+
+        List<CombatInfoStatCalculator.StatRowEntry> playerStatRows = CombatInfoStatCalculator.BuildStatRows(player, enemy, perkService);
+        List<CombatInfoStatCalculator.StatRowEntry> enemyStatRows = CombatInfoStatCalculator.BuildStatRows(enemy, player, perkService);
+        InfoPanelView.Bind(player, playerIconSprite, playerStatRows, enemy, enemyIconSprite, enemyStatRows);
     }
 
     public void UpdateTurnOwner(bool isPlayerAttacker)

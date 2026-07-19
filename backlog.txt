@@ -50,7 +50,6 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Melhorar UI do inventorio
     - Na Reward View colocar tooltip com descrição dos itens
     - Analisar fluxo de itens (garantir duração, gasto, etc)
-    - Adicionar indicativo visual de rolagem máxima (highlight no dado)
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO
@@ -84,7 +83,9 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
         - Refinar animações e transições
-        - Mudar botão de confirmar na tela de DiceRollView (icone de dado)
+        - Mostrar indicativo visual dos resultados de Tiers 
+            - Power Alto 2x dmg 
+            - Accuracy Alto CriticalHit
 
     - Ajustar o combatLogView
         - dar feedbacks das ações/triggers/efeitos/resoluções
@@ -97,6 +98,3 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
     - Adicionar um delay quando o combate encerrar por morte
     - No painel de infos, destacar baseStat da modificação (atack -> 3 (+4))
-    - Mostrar a rolagem de dados extras (perk - instinto vivo)
-        - dar feedback do que foi "ganho" com  a ativação do perk (+2 dados)
-        - testar UI e funcionamento
