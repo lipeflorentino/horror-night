@@ -96,5 +96,3 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - feedback visual de bleeding e outros efeitos (drawbacks, state)
 
     - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
-    - Adicionar um delay quando o combate encerrar por morte
-    - No painel de infos, destacar baseStat da modificação (atack -> 3 (+4))

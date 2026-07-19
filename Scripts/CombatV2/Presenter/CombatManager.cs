@@ -12,6 +12,7 @@ public class CombatManager : MonoBehaviour
     [SerializeField] private string GameplaySceneName = "Gameplay";
     private EnemyVisuals EnemyVisuals;
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
+    private static readonly WaitForSeconds WaitForSeconds2 = new(2f);
 
     [Header("References and UI")]
     public CombatView View;
@@ -221,7 +222,7 @@ public class CombatManager : MonoBehaviour
 
         CombatResolutionManager.Resolve(Resolver, TurnState, View, Player, Enemy);
 
-        yield return WaitForSeconds0_5;
+        yield return WaitForSeconds2;
 
         if (TryHandleCombatEnd())
             yield break;
