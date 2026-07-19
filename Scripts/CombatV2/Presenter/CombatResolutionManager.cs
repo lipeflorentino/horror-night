@@ -14,7 +14,7 @@ public class CombatResolutionManager
             state.CurrentTurn.Defender
         );
         
-        Logger.Log($"[Resolve] Outcome: {result.Outcome} | Damage: {result.Damage} ({(result.DamageBonus >= 0 ? "+" : string.Empty)}{result.DamageBonus} bonus) | Variation: {result.ResolutionVariation} | SecondaryEffect: {result.SecondaryEffect} | AttackFeedback: {result.AttackFeedbackText} | DefenseFeedback: {result.DefenseFeedbackText}");
+        view.ShowCombatLog($"Outcome: <color=yellow>{result.Outcome}</color> <br>Damage: <color=red>{result.Damage}</color> <color=yellow>({(result.DamageBonus >= 0 ? "+" : string.Empty)}{result.DamageBonus} bonus)</color> <br>SecondaryEffect: <color=orange>{result.SecondaryEffect}</color>");
         
         if (result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Hit) 
         {
@@ -23,13 +23,13 @@ public class CombatResolutionManager
 
         if (result.AppliesDamage)
         {
-            Logger.Log($"[Resolve] Applying {result.Damage} damage to {result.FinalTarget.Name}");
+            view.ShowCombatLog($"Applying <color=red>{result.Damage}</color> damage to <color=green>{result.FinalTarget.Name}</color>");
             result.FinalTarget.ReceiveDamage(result.Damage);
         }
 
         view.ShowResolveFeedback(result, state.PlayerIsAttacker);
 
-        Logger.Log($"[HP] Player: {player.HP} | Enemy: {enemy.HP}");
+        view.ShowCombatLog($"Player: <color=green>{player.HP}</color> | Enemy: <color=orange>{enemy.HP}</color>");
 
         view.UpdateView(player, enemy);
     }

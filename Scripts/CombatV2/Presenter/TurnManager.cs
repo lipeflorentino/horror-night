@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-
 public class TurnManager
 {
     public static bool CanReceivePlayerInput(ActionType type, CombatTurnContext state, out string rejectionReason)

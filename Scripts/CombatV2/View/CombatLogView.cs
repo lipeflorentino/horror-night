@@ -21,13 +21,13 @@ public class CombatLogView : MonoBehaviour
     public void ShowTriggerFeedback(PerkTriggeredEvent evt)
     {
         Logger.Log($"[Perk Triggered] {evt.PerkId}");
+        string rarityColor = GetRarityColor(evt.SourceTrick.Definition.Rarity);
         if (evt.SourceTrick?.Definition != null)
         {
             string displayName = string.IsNullOrWhiteSpace(evt.SourceTrick.Definition.DisplayName)
                 ? evt.SourceTrick.Definition.Id
                 : evt.SourceTrick.Definition.DisplayName;
-
-            ShowTextLog($"{displayName} acionado", evt.SourceTrick.Definition.Icon, defaultColor);
+            ShowTextLog($"<color={rarityColor}>{displayName}</color> acionado", evt.SourceTrick.Definition.Icon, defaultColor);
             return;
         }
     }
@@ -92,5 +92,18 @@ public class CombatLogView : MonoBehaviour
 
         if (panelRoot != null && activeLogs.Count == 0)
             panelRoot.SetActive(false);
+    }
+
+    private string GetRarityColor(TrickRarity rarity)
+    {
+        return rarity switch
+        {
+            TrickRarity.Common => "#FFFFFF",
+            TrickRarity.Uncommon => "#00FF00",
+            TrickRarity.Rare => "#0000FF",
+            TrickRarity.Epic => "#800080",
+            TrickRarity.Legendary => "#FFA500",
+            _ => "#FFFFFF"
+        };
     }
 }

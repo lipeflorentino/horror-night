@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CombatInitializer
 {
-    public static (Battler player, Battler enemy, Sprite playerIcon, Sprite enemyIcon, EnemyVisuals enemyVisuals) InitializeBattlers(
+    public static (Battler player, Battler enemy, Sprite playerIcon, Sprite enemyIcon) InitializeBattlers(
         CombatSessionData sessionData, 
         int defaultPowerDiceCount, 
         int defaultAccuracyDiceCount, 
@@ -23,7 +23,7 @@ public class CombatInitializer
             {
                 enemyVisuals.SetEnemyVisual(null);
             }
-            return (player, enemy, playerIcon, enemyIcon, enemyVisuals);
+            return (player, enemy, playerIcon, enemyIcon);
         }
 
         PlayerStatusSnapshot playerSnapshot = sessionData.PlayerSnapshot;
@@ -92,7 +92,7 @@ public class CombatInitializer
             enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, defaultPowerDiceCount, defaultAccuracyDiceCount, false);
         }
 
-        return (player, enemy, playerIcon, enemyIcon, enemyVisuals);
+        return (player, enemy, playerIcon, enemyIcon);
     }
 
     public static int ClampCoreStat(float value, int coreStatCap)

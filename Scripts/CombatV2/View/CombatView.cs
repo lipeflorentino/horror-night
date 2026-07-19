@@ -133,4 +133,10 @@ public class CombatView : MonoBehaviour
         if (InfoPanelView != null)
             InfoPanelView.SetVisible(true);
     }
+
+    public void ShowCombatLog(string logText, Sprite icon = null, Color? textColor = null)
+    {
+        if (CombatLogView != null)
+            CombatLogView.ShowTextLog(logText, icon, textColor);
+    }
 }

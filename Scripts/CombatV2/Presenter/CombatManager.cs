@@ -10,7 +10,6 @@ public class CombatManager : MonoBehaviour
     [Tooltip("Maximum value for Heart, Mind, and Body stats")]
     [SerializeField] private int CoreStatCap = 20;
     [SerializeField] private string GameplaySceneName = "Gameplay";
-    private EnemyVisuals EnemyVisuals;
     private static readonly WaitForSeconds WaitForSeconds0_5 = new(0.5f);
     private static readonly WaitForSeconds WaitForSeconds2 = new(2f);
 
@@ -78,12 +77,11 @@ public class CombatManager : MonoBehaviour
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
         SessionData = CombatSessionStore.Consume();
 
-        var (player, enemy, playerIcon, enemyIcon, enemyVisuals) = CombatInitializer.InitializeBattlers(SessionData, DefaultPowerDiceCount, DefaultAccuracyDiceCount, CoreStatCap);
+        var (player, enemy, playerIcon, enemyIcon) = CombatInitializer.InitializeBattlers(SessionData, DefaultPowerDiceCount, DefaultAccuracyDiceCount, CoreStatCap);
         Player = player;
         Enemy = enemy;
         PlayerIcon = playerIcon;
         EnemyIcon = enemyIcon;
-        EnemyVisuals = enemyVisuals;
 
         TurnManager.DefineStartingTurnByInitiative(Player, Enemy, InitiativeResolverService, TurnState);
 
@@ -159,6 +157,7 @@ public class CombatManager : MonoBehaviour
             return false;
 
         bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
+        View.ShowCombatLog($"[Trick] <color=yellow>{trick.name}</color> cast by <color=blue>{Player.Name}</color>");
         RefreshCombatUI();
         return casted;
     }
@@ -169,6 +168,7 @@ public class CombatManager : MonoBehaviour
             return;
 
         PerkService.ExecuteManualActivation(instance.Owner, instance);
+        View.ShowCombatLog($"[Trick] <color=yellow>{instance.Definition.name}</color> manually activated by <color=blue>{instance.Owner.Name}</color>");
         RefreshCombatUI();
     }
 
@@ -192,7 +192,7 @@ public class CombatManager : MonoBehaviour
 
         TurnManager.GenerateEnemyAction(Enemy, SessionData, EnemyTurnPlanner, AttackDef, DefenseDef, TurnState);
 
-        yield return WaitForSeconds0_5;
+        yield return WaitForSeconds2;
 
         CombatDiceRollManager.RollActions(Player, Enemy, action, powerDiceTypes, accuracyDiceTypes, DiceService, PerkService, TurnState);
 

@@ -12512,7 +12512,7 @@ MonoBehaviour:
   contentRoot: {fileID: 1850523398}
   logItemPrefab: {fileID: 6341345125184490009, guid: d5a3df2bba6b3e24c9535fcd554de159, type: 3}
   panelRoot: {fileID: 2132529016}
-  defaultColor: {r: 0.3, g: 0.95, b: 1, a: 1}
+  defaultColor: {r: 0.7924528, g: 0.74311143, b: 0.74311143, a: 1}
   maxLogs: 5
   lifetimeSeconds: 6
 --- !u!1 &927274940

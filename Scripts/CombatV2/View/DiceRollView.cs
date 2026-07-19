@@ -189,20 +189,6 @@ public class DiceRollView : MonoBehaviour
         }
     }
 
-    private bool HasExtraSubRoll(DiceResult roll)
-    {
-        if (roll?.SubRolls == null)
-            return false;
-
-        for (int i = 0; i < roll.SubRolls.Count; i++)
-        {
-            if (roll.SubRolls[i].IsExtra)
-                return true;
-        }
-
-        return false;
-    }
-
     private void HighlightBestResult(List<DiceRollUI> activeFinalSlots, IReadOnlyList<DiceResult> playerRolls, int maxValue)
     {
         int usedCount = playerRolls != null ? playerRolls.Count : 0;
@@ -230,25 +216,11 @@ public class DiceRollView : MonoBehaviour
             slotsInitialized = true;
             return;
         }
-
-        //ConfigureContainerLayout(playerSlotsContainer, TextAnchor.MiddleRight);
-        //ConfigureContainerLayout(enemySlotsContainer, TextAnchor.MiddleLeft);
+        
         CreateSlots(runtimePlayerSlots, playerSlotsContainer);
         CreateSlots(runtimeEnemySlots, enemySlotsContainer);
 
         slotsInitialized = true;
-    }
-
-    private void ConfigureContainerLayout(RectTransform container, TextAnchor alignment)
-    {
-        if (!container.TryGetComponent<HorizontalLayoutGroup>(out var layoutGroup))
-            layoutGroup = container.gameObject.AddComponent<HorizontalLayoutGroup>();
-
-        layoutGroup.childControlWidth = false;
-        layoutGroup.childControlHeight = false;
-        layoutGroup.childForceExpandWidth = false;
-        layoutGroup.childForceExpandHeight = false;
-        layoutGroup.childAlignment = alignment;
     }
 
     private void CreateSlots(List<DiceRollUI> slotBuffer, RectTransform container)

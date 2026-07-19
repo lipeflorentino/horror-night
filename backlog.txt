@@ -73,6 +73,10 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
+    - Ajustar aplicação de "bleeding" no TickEndTurn
+        - escalável por conta de outros efeitos (poisoning, pain, etc)
+        - feedback visual de bleeding e outros efeitos (drawbacks, state)
+
     - Ajustar cast de tricks 
         - requisitos (outras stats alem de mind, heart, body)
         - custo (momentum)
@@ -87,12 +91,8 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
             - Power Alto 2x dmg 
             - Accuracy Alto CriticalHit
 
+    - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
+
     - Ajustar o combatLogView
         - dar feedbacks das ações/triggers/efeitos/resoluções
         - action log mostra o resultado (Guard Broken) e combat log mostra os numeros "with 7 (+3) DMG"
-
-    - Ajustar aplicação de "bleeding" no TickEndTurn
-        - escalável por conta de outros efeitos (poisoning, pain, etc)
-        - feedback visual de bleeding e outros efeitos (drawbacks, state)
-
-    - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects 
