@@ -174,7 +174,7 @@ public class DiceAllocationView : MonoBehaviour
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
         UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
-        UpdateResultPanel(actionPower, aggregatedPowerFaces, powerTierBoundaries, accuracyTierBoundaries);
+        UpdateResultPanel(actionPower, powerDiceTypes, powerFaces, aggregatedPowerFaces, accuracyDiceTypes, accuracyFaces, powerTierBoundaries, accuracyTierBoundaries);
     }
 
     
@@ -214,11 +214,32 @@ public class DiceAllocationView : MonoBehaviour
         if (types == null || faces == null)
             return;
 
-        int count = Mathf.Min(types.Count, faces.Count);
-        for (int i = 0; i < count; i++)
+        int itemCount = Mathf.Min(types.Count, faces.Count);
+
+        // Agrupa dados idênticos (mesmo tipo + mesma face) num único slot com multiplicador
+        // (ex.: dado extra de perk), preservando espaço limitado do painel.
+        List<(DiceStatType type, int face, int count)> groupedDice = new();
+        for (int i = 0; i < itemCount; i++)
+        {
+            DiceStatType type = types[i];
+            int face = Mathf.Max(1, faces[i]);
+
+            int existingIndex = groupedDice.FindIndex(g => g.type == type && g.face == face);
+            if (existingIndex >= 0)
+            {
+                var existing = groupedDice[existingIndex];
+                groupedDice[existingIndex] = (existing.type, existing.face, existing.count + 1);
+            }
+            else
+            {
+                groupedDice.Add((type, face, 1));
+            }
+        }
+
+        for (int i = 0; i < groupedDice.Count; i++)
         {
             DiceAllocationItemUI item = Instantiate(allocationItemPrefab, container);
-            item.Bind(types[i], faces[i]);
+            item.Bind(groupedDice[i].type, groupedDice[i].face, groupedDice[i].count);
         }
     }
 
@@ -272,7 +293,11 @@ public class DiceAllocationView : MonoBehaviour
 
     private void UpdateResultPanel(
         int actionPower,
+        IReadOnlyList<DiceStatType> powerDiceTypes,
+        IReadOnlyList<int> powerFaces,
         IReadOnlyList<int> aggregatedPowerFaces,
+        IReadOnlyList<DiceStatType> accuracyDiceTypes,
+        IReadOnlyList<int> accuracyFaces,
         (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
         (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
     {
@@ -288,12 +313,82 @@ public class DiceAllocationView : MonoBehaviour
         int hitThreshold = accuracyTierBoundaries.lowMax + 1;
         int criticalThreshold = accuracyTierBoundaries.highMin;
 
+        var (consistencyLabel, consistencyColorHex) = GetAllocationConsistency(powerDiceTypes, powerFaces);
+        float powerMaxRollChance = CalculateMaxRollChance(powerDiceTypes, powerFaces);
+        float accuracyMaxRollChance = CalculateMaxRollChance(accuracyDiceTypes, accuracyFaces);
+
         StringBuilder sb = new();
-        sb.AppendLine($"Damage: {minDamage:F0}-{maxDamage:F0}");
+        sb.AppendLine($"Damage: {minDamage:F0}-{maxDamage:F0}  <color={consistencyColorHex}>[{consistencyLabel}]</color>");
+        sb.AppendLine($"Chance de Rolagem Máxima/Mínima (Power): {powerMaxRollChance:P0}");
+        sb.AppendLine($"Chance de Rolagem Máxima/Mínima (Accuracy): {accuracyMaxRollChance:P0}");
         sb.AppendLine($"Hit Threshold: {hitThreshold}+");
         sb.AppendLine($"Critical Threshold: {(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--")}");
-        sb.Append("Effects: Critical Hit, Power Max (placeholder), Accuracy Max (evade/parry)");
+        // TODO: append line for effects
         resultPanelText.text = sb.ToString();
+    }
+
+    /// <summary>
+    /// Classifica o padrão de alocação de dados de Poder em Consistente/Equilibrado/Arriscado,
+    /// conforme a mecânica de Concentrar vs. Dispersar (Manual de Combate, seção 3).
+    /// Concentrar (mesmo tipo, vários dados) = Consistente. Dispersar (tipos diferentes, 1 dado cada) = Arriscado.
+    /// </summary>
+    private (string label, string colorHex) GetAllocationConsistency(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
+    {
+        if (types == null || types.Count <= 1)
+            return ("Consistente", "#4CAF50");
+
+        var groupSizes = new Dictionary<DiceStatType, int>();
+        foreach (var type in types)
+            groupSizes[type] = groupSizes.TryGetValue(type, out int current) ? current + 1 : 1;
+
+        int totalDice = types.Count;
+        int largestGroup = 0;
+        foreach (var group in groupSizes.Values)
+            largestGroup = Mathf.Max(largestGroup, group);
+
+        // 1 = todos os dados concentrados no mesmo tipo; 0 = todos dispersos em tipos distintos.
+        float concentrationIndex = (largestGroup - 1f) / (totalDice - 1f);
+
+        if (concentrationIndex >= 0.66f)
+            return ("Consistente", "#4CAF50");
+        if (concentrationIndex <= 0.33f)
+            return ("Arriscado", "#E05C5C");
+        return ("Equilibrado", "#D6B84A");
+    }
+
+    /// <summary>
+    /// Calcula a chance aproximada de disparar Rolagem Máxima com a alocação atual de dados de Poder
+    /// (Manual de Combate, seção 3.3). 
+    /// </summary>
+    private float CalculateMaxRollChance(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
+    {
+        if (types == null || faces == null || types.Count == 0 || types.Count != faces.Count)
+            return 0f;
+
+        var groupFaces = new Dictionary<DiceStatType, List<int>>();
+        for (int i = 0; i < types.Count; i++)
+        {
+            if (!groupFaces.TryGetValue(types[i], out var list))
+            {
+                list = new List<int>();
+                groupFaces[types[i]] = list;
+            }
+            list.Add(Mathf.Max(1, faces[i]));
+        }
+
+        // Cada tipo (grupo) é independente. Dados do mesmo tipo se somam (aggregate),
+        // então maximizar o grupo exige que TODOS os dados dele caiam na face máxima ao mesmo tempo.
+        float missChance = 1f;
+        foreach (var group in groupFaces.Values)
+        {
+            float hitMaxChance = 1f;
+            foreach (int faceCount in group)
+                hitMaxChance *= 1f / faceCount;
+
+            missChance *= 1f - hitMaxChance;
+        }
+
+        return 1f - missChance;
     }
 
     private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)

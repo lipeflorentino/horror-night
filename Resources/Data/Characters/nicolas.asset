@@ -16,10 +16,10 @@ MonoBehaviour:
   DisplayName: Nicolas
   CharacterIcon: {fileID: -276885369, guid: 4f4cadd6fd36adf4d968b81e65360a4d, type: 3}
   Description: A timid and gentle soul.
-  Xp: 0
-  Heart: 6
-  Body: 6
-  Mind: 6
+  Xp: 10
+  Heart: 20
+  Body: 20
+  Mind: 20
   Hp: 30
   Attack: 8
   Defense: 6

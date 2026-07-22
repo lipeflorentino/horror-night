@@ -198,6 +198,25 @@ public class DiceService
         return diceFaces;
     }
 
+    /// <summary>
+    /// Igual a ConvertToFaces, mas retorna também a lista de tipos alinhada 1:1 com as faces
+    /// (incluindo dados extras concedidos por perk, que não têm correspondência na seleção bruta do jogador).
+    /// Use esta versão sempre que "types" e "faces" forem consumidos juntos (ex.: preview de UI, cálculo de chance).
+    /// </summary>
+    public (List<DiceStatType> types, List<int> faces) ConvertToFacesWithTypes(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
+    {
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, battler?.Focus ?? 0, battler?.Strength ?? 0, evaluateRollTriggers: false);
+        List<DiceStatType> types = new(diceSpecs.Count);
+        List<int> faces = new(diceSpecs.Count);
+        for (int i = 0; i < diceSpecs.Count; i++)
+        {
+            types.Add(diceSpecs[i].StatType);
+            faces.Add(diceSpecs[i].MaxValue);
+        }
+
+        return (types, faces);
+    }
+
     private List<DiceRollSpec> BuildDiceRollSpecs(Battler battler, Battler opponent, IReadOnlyList<DiceStatType> diceTypes, ActionType actionType, DiceRollType rollType, int actorLevel, int opponentLevel, int focus, int strength, bool evaluateRollTriggers = true)
     {
         List<DiceRollSpec> diceSpecs = new();
@@ -221,24 +240,33 @@ public class DiceService
 
             CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, totalValue);
             int extraDice = perkService?.GetExtraDiceCount(battler, opponent, perkContext, evaluateRollTriggers) ?? 0;
-            int totalDiceCount = baseDiceCount + extraDice;
 
-            int baseFace = Mathf.Max(1, totalValue / totalDiceCount);
-            int remainder = Mathf.Max(0, totalValue - (baseFace * totalDiceCount));
+            // Dados base dividem o valor total da stat entre si (aloc. do jogador).
+            int baseFace = Mathf.Max(1, totalValue / baseDiceCount);
+            int remainder = Mathf.Max(0, totalValue - (baseFace * baseDiceCount));
 
-            for (int i = 0; i < totalDiceCount; i++)
+            for (int i = 0; i < baseDiceCount; i++)
             {
-                bool isExtra = i >= baseDiceCount;
                 int bonus = i < remainder ? 1 : 0;
                 int maxFace = baseFace + bonus;
-                int minFace = Mathf.Clamp(1 + agility, 1, maxFace);
-                CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, maxFace);
-                minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, false) ?? minFace;
-                diceSpecs.Add(new DiceRollSpec(minFace, maxFace, pair.Key, rollType, isExtra));
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, maxFace, isExtra: false);
             }
+
+            // Dados extras concedidos por perk usam o valor total da stat com face própria,
+            // sem diluir os dados base já alocados pelo jogador.
+            for (int i = 0; i < extraDice; i++)
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, Mathf.Max(1, totalValue), isExtra: true);
         }
 
         return diceSpecs;
+    }
+
+    private void AddDiceSpec(List<DiceRollSpec> diceSpecs, Battler battler, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int focus, int strength, int agility, int maxFace, bool isExtra)
+    {
+        int minFace = Mathf.Clamp(1 + agility, 1, maxFace);
+        CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, statType, actorLevel, opponentLevel, focus, strength, maxFace);
+        minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, false) ?? minFace;
+        diceSpecs.Add(new DiceRollSpec(minFace, maxFace, statType, rollType, isExtra));
     }
 
     public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)

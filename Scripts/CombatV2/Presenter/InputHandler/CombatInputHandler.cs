@@ -259,23 +259,23 @@ public class CombatInputHandler : MonoBehaviour
 
         Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
-        List<int> powerFaces = GetDiceFacesForSelection(PowerDiceTypes, false);
-        List<int> accuracyFaces = GetDiceFacesForSelection(AccuracyDiceTypes, false);
+        (List<DiceStatType> powerTypes, List<int> powerFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
+        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
 
         List<DiceStatType> aggregatedPowerTypes = GetAggregatedDiceTypes(PowerDiceTypes);
         List<int> aggregatedPowerFaces = GetDiceFacesForSelection(aggregatedPowerTypes, true);
         
-        (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(PowerDiceTypes, powerFaces);
-        (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(AccuracyDiceTypes, accuracyFaces);
+        (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(powerTypes, powerFaces);
+        (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(accuracyTypes, accuracyFaces);
         (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
         (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
 
         Combat.View.DiceAllocationView.UpdateSelectionPreview(
             Combat.GetEffectivePlayerActionPower(),
-            PowerDiceTypes,
+            powerTypes,
             powerFaces,
             aggregatedPowerFaces,
-            AccuracyDiceTypes,
+            accuracyTypes,
             accuracyFaces,
             powerBoundaries,
             accuracyBoundaries);
