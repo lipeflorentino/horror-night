@@ -7,6 +7,10 @@ using UnityEngine.UI;
 
 public class DiceAllocationView : MonoBehaviour
 {
+    private const string BadColorHex = "#E05C5C";
+    private const string MediumColorHex = "#F59E0B";
+    private const string GoodColorHex = "#4CAF50";
+
     [Header("Selection Preview")]
     [SerializeField] private RectTransform powerDiceContainer;
     [SerializeField] private RectTransform accuracyDiceContainer;
@@ -304,66 +308,108 @@ public class DiceAllocationView : MonoBehaviour
         if (resultPanelText == null)
             return;
 
-        int minPower = SumMin(aggregatedPowerFaces);
-        int maxPower = SumMax(aggregatedPowerFaces);
-
-        float minDamage = actionPower * GetMultiplier(GetTier(minPower, powerTierBoundaries));
-        float maxDamage = actionPower * GetMultiplier(GetTier(maxPower, powerTierBoundaries));
+        if (powerDiceTypes == null || powerDiceTypes.Count == 0 ||
+            accuracyDiceTypes == null || accuracyDiceTypes.Count == 0)
+        {
+            resultPanelText.text = string.Empty;
+            return;
+        }
 
         int hitThreshold = accuracyTierBoundaries.lowMax + 1;
         int criticalThreshold = accuracyTierBoundaries.highMin;
+        int missThreshold = accuracyTierBoundaries.lowMax;
 
-        var (consistencyLabel, consistencyColorHex) = GetAllocationConsistency(powerDiceTypes, powerFaces);
-        float powerMaxRollChance = CalculateMaxRollChance(powerDiceTypes, powerFaces);
-        float accuracyMaxRollChance = CalculateMaxRollChance(accuracyDiceTypes, accuracyFaces);
+        Dictionary<int, float> powerDistribution = CalculateBestRollDistribution(powerDiceTypes, powerFaces);
+        Dictionary<int, float> accuracyDistribution = CalculateBestRollDistribution(accuracyDiceTypes, accuracyFaces);
+        TierChances powerChances = CalculateTierChances(powerDistribution, powerTierBoundaries);
+        TierChances accuracyChances = CalculateTierChances(accuracyDistribution, accuracyTierBoundaries);
+        RollExtremes powerExtremes = CalculateRollExtremes(powerDistribution);
+        RollExtremes accuracyExtremes = CalculateRollExtremes(accuracyDistribution);
+        (int minPower, int maxPower) = GetDistributionBounds(powerDistribution);
+        float minDamage = actionPower * GetMultiplier(GetTier(minPower, powerTierBoundaries));
+        float maxDamage = actionPower * GetMultiplier(GetTier(maxPower, powerTierBoundaries));
+
+        var (consistencyLabel, consistencyColorHex) = GetAllocationConsistency(powerChances, accuracyChances);
+        float hitChance = accuracyChances.Medium + accuracyChances.High;
+        string missThresholdText = missThreshold > 0 ? $"{missThreshold}-" : "--";
 
         StringBuilder sb = new();
-        sb.AppendLine($"Damage: {minDamage:F0}-{maxDamage:F0}  <color={consistencyColorHex}>[{consistencyLabel}]</color>");
-        sb.AppendLine($"Chance de Rolagem Máxima/Mínima (Power): {powerMaxRollChance:P0}");
-        sb.AppendLine($"Chance de Rolagem Máxima/Mínima (Accuracy): {accuracyMaxRollChance:P0}");
-        sb.AppendLine($"Hit Threshold: {hitThreshold}+");
-        sb.AppendLine($"Critical Threshold: {(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--")}");
+        sb.AppendLine($"Result Instance: <color={consistencyColorHex}>[{consistencyLabel}]</color>");
+        sb.AppendLine($"Damage: {ColorValue(minDamage.ToString("F0"), GetTierColor(GetTier(minPower, powerTierBoundaries)))}-{ColorValue(maxDamage.ToString("F0"), GetTierColor(GetTier(maxPower, powerTierBoundaries)))}");
+        sb.AppendLine($"Rolagem Máxima/Mínima (Power): {ColorValue(powerExtremes.Maximum.ToString("P0"), GetGoodChanceColor(powerExtremes.Maximum))} / {ColorValue(powerExtremes.Minimum.ToString("P0"), GetBadChanceColor(powerExtremes.Minimum))}");
+        sb.AppendLine($"Rolagem Máxima/Mínima (Accuracy): {ColorValue(accuracyExtremes.Maximum.ToString("P0"), GetGoodChanceColor(accuracyExtremes.Maximum))} / {ColorValue(accuracyExtremes.Minimum.ToString("P0"), GetBadChanceColor(accuracyExtremes.Minimum))}");
+        sb.AppendLine($"Hit Threshold: {ColorValue($"{hitThreshold}+", GetLowerThresholdColor(hitThreshold, accuracyTierBoundaries.maxValue))}");
+        sb.AppendLine($"Hit Chance: {ColorValue(hitChance.ToString("P0"), GetGoodChanceColor(hitChance))}");
+        sb.AppendLine($"Miss Threshold: {ColorValue(missThresholdText, GetLowerThresholdColor(missThreshold, accuracyTierBoundaries.maxValue))}");
+        sb.AppendLine($"Miss Chance: {ColorValue(accuracyChances.Low.ToString("P0"), GetBadChanceColor(accuracyChances.Low))}");
+        sb.AppendLine($"Critical Threshold: {ColorValue(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--", GetLowerThresholdColor(criticalThreshold, accuracyTierBoundaries.maxValue))}");
+        sb.AppendLine($"Critical Chance: {ColorValue(accuracyChances.High.ToString("P0"), GetGoodChanceColor(accuracyChances.High))}");
         // TODO: append line for effects
         resultPanelText.text = sb.ToString();
     }
 
-    /// <summary>
-    /// Classifica o padrão de alocação de dados de Poder em Consistente/Equilibrado/Arriscado,
-    /// conforme a mecânica de Concentrar vs. Dispersar (Manual de Combate, seção 3).
-    /// Concentrar (mesmo tipo, vários dados) = Consistente. Dispersar (tipos diferentes, 1 dado cada) = Arriscado.
-    /// </summary>
-    private (string label, string colorHex) GetAllocationConsistency(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
+    private string ColorValue(string value, string colorHex)
     {
-        if (types == null || types.Count <= 1)
-            return ("Consistente", "#4CAF50");
+        return $"<color={colorHex}>{value}</color>";
+    }
 
-        var groupSizes = new Dictionary<DiceStatType, int>();
-        foreach (var type in types)
-            groupSizes[type] = groupSizes.TryGetValue(type, out int current) ? current + 1 : 1;
+    private string GetGoodChanceColor(float chance)
+    {
+        return chance >= 0.60f ? GoodColorHex : chance >= 0.35f ? MediumColorHex : BadColorHex;
+    }
 
-        int totalDice = types.Count;
-        int largestGroup = 0;
-        foreach (var group in groupSizes.Values)
-            largestGroup = Mathf.Max(largestGroup, group);
+    private string GetBadChanceColor(float chance)
+    {
+        return chance <= 0.20f ? GoodColorHex : chance <= 0.45f ? MediumColorHex : BadColorHex;
+    }
 
-        // 1 = todos os dados concentrados no mesmo tipo; 0 = todos dispersos em tipos distintos.
-        float concentrationIndex = (largestGroup - 1f) / (totalDice - 1f);
+    private string GetLowerThresholdColor(int threshold, int maximum)
+    {
+        if (threshold <= 0 || maximum <= 0)
+            return GoodColorHex;
 
-        if (concentrationIndex >= 0.66f)
-            return ("Consistente", "#4CAF50");
-        if (concentrationIndex <= 0.33f)
-            return ("Arriscado", "#E05C5C");
-        return ("Equilibrado", "#D6B84A");
+        float relativeThreshold = threshold / (float)maximum;
+        return relativeThreshold <= 0.33f ? GoodColorHex : relativeThreshold <= 0.66f ? MediumColorHex : BadColorHex;
+    }
+
+    private string GetTierColor(DiceTier tier)
+    {
+        return tier switch
+        {
+            DiceTier.Low => BadColorHex,
+            DiceTier.Medium => MediumColorHex,
+            DiceTier.High => GoodColorHex,
+            _ => MediumColorHex,
+        };
     }
 
     /// <summary>
-    /// Calcula a chance aproximada de disparar Rolagem Máxima com a alocação atual de dados de Poder
-    /// (Manual de Combate, seção 3.3). 
+    /// Classifica a alocação pelo resultado completo. Favorável = crítico ou hit forte;
+    /// desfavorável = miss ou hit fraco; médio = hit de poder médio.
     /// </summary>
-    private float CalculateMaxRollChance(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
+    private (string label, string colorHex) GetAllocationConsistency(TierChances power, TierChances accuracy)
+    {
+        float favorable = accuracy.High + accuracy.Medium * power.High;
+        float unfavorable = accuracy.Low + accuracy.Medium * power.Low;
+        float medium = accuracy.Medium * power.Medium;
+
+        if (medium >= favorable && medium >= unfavorable)
+            return ("Equilibrado", MediumColorHex);
+
+        if (favorable > unfavorable)
+            return ("Consistente", GoodColorHex);
+
+        return ("Arriscado", BadColorHex);
+    }
+
+    /// <summary>
+    /// Calcula a distribuição exata do melhor resultado: soma dados do mesmo atributo e,
+    /// em seguida, aplica a mesma regra de DiceService.GetBestResult (maior valor vence).
+    /// </summary>
+    private Dictionary<int, float> CalculateBestRollDistribution(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)
     {
         if (types == null || faces == null || types.Count == 0 || types.Count != faces.Count)
-            return 0f;
+            return new Dictionary<int, float> { { 1, 1f } };
 
         var groupFaces = new Dictionary<DiceStatType, List<int>>();
         for (int i = 0; i < types.Count; i++)
@@ -376,19 +422,90 @@ public class DiceAllocationView : MonoBehaviour
             list.Add(Mathf.Max(1, faces[i]));
         }
 
-        // Cada tipo (grupo) é independente. Dados do mesmo tipo se somam (aggregate),
-        // então maximizar o grupo exige que TODOS os dados dele caiam na face máxima ao mesmo tempo.
-        float missChance = 1f;
+        Dictionary<int, float> bestDistribution = new() { { 0, 1f } };
         foreach (var group in groupFaces.Values)
         {
-            float hitMaxChance = 1f;
+            Dictionary<int, float> groupDistribution = new() { { 0, 1f } };
             foreach (int faceCount in group)
-                hitMaxChance *= 1f / faceCount;
+            {
+                Dictionary<int, float> nextDistribution = new();
+                foreach (var current in groupDistribution)
+                    for (int face = 1; face <= faceCount; face++)
+                    {
+                        int value = current.Key + face;
+                        float chance = current.Value / faceCount;
+                        nextDistribution[value] = nextDistribution.TryGetValue(value, out float accumulated)
+                            ? accumulated + chance
+                            : chance;
+                    }
+                groupDistribution = nextDistribution;
+            }
 
-            missChance *= 1f - hitMaxChance;
+            Dictionary<int, float> nextBestDistribution = new();
+            foreach (var best in bestDistribution)
+                foreach (var groupValue in groupDistribution)
+                {
+                    int value = Mathf.Max(best.Key, groupValue.Key);
+                    float chance = best.Value * groupValue.Value;
+                    nextBestDistribution[value] = nextBestDistribution.TryGetValue(value, out float accumulated)
+                        ? accumulated + chance
+                        : chance;
+                }
+            bestDistribution = nextBestDistribution;
         }
 
-        return 1f - missChance;
+        return bestDistribution;
+    }
+
+    private TierChances CalculateTierChances(Dictionary<int, float> distribution, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)
+    {
+        TierChances chances = new();
+        foreach (var result in distribution)
+        {
+            if (result.Key <= boundaries.lowMax)
+                chances.Low += result.Value;
+            else if (result.Key <= boundaries.mediumMax)
+                chances.Medium += result.Value;
+            else
+                chances.High += result.Value;
+        }
+        return chances;
+    }
+
+    private RollExtremes CalculateRollExtremes(Dictionary<int, float> distribution)
+    {
+        (int minimum, int maximum) = GetDistributionBounds(distribution);
+
+        return new RollExtremes
+        {
+            Minimum = distribution.TryGetValue(minimum, out float minimumChance) ? minimumChance : 0f,
+            Maximum = distribution.TryGetValue(maximum, out float maximumChance) ? maximumChance : 0f
+        };
+    }
+
+    private (int minimum, int maximum) GetDistributionBounds(Dictionary<int, float> distribution)
+    {
+        int minimum = int.MaxValue;
+        int maximum = int.MinValue;
+        foreach (int value in distribution.Keys)
+        {
+            minimum = Mathf.Min(minimum, value);
+            maximum = Mathf.Max(maximum, value);
+        }
+        return (minimum, maximum);
+    }
+
+    private struct TierChances
+    {
+        public float Low;
+        public float Medium;
+        public float High;
+    }
+
+    private struct RollExtremes
+    {
+        public float Minimum;
+        public float Maximum;
     }
 
     private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)
@@ -410,24 +527,6 @@ public class DiceAllocationView : MonoBehaviour
             DiceTier.High => 1.5f,
             _ => 1f,
         };
-    }
-
-    private int SumMin(IReadOnlyList<int> faces)
-    {
-        if (faces == null || faces.Count == 0) return 0;
-        int minValue = int.MaxValue;
-        for (int i = 0; i < faces.Count; i++)
-            minValue = Mathf.Min(minValue, Mathf.Max(1, faces[i]));
-        return minValue;
-    }
-
-    private int SumMax(IReadOnlyList<int> faces)
-    {
-        if (faces == null || faces.Count == 0) return 0;
-        int maxValue = 0;
-        for (int i = 0; i < faces.Count; i++)
-            maxValue = Mathf.Max(maxValue, Mathf.Max(1, faces[i]));
-        return maxValue;
     }
 
     // -------------------------------------------------------------------------
