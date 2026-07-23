@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(PlayerInventory))]
 public class PlayerStatusManager : MonoBehaviour
@@ -29,10 +30,10 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private int level = 1;
     [SerializeField] private int currentXp = 0;
     [SerializeField] private int maxXp = 10;
-    [SerializeField] private int currentPowerDices = 3;
-    [SerializeField] private int currentAccuracyDices = 3;
-    [SerializeField] private int maxPowerDices = 3;
-    [SerializeField] private int maxAccuracyDices = 3;
+    [FormerlySerializedAs("currentPowerDices")]
+    [SerializeField] private int currentDices = 3;
+    [FormerlySerializedAs("maxPowerDices")]
+    [SerializeField] private int maxDices = 3;
 
     [Header("Heart")]
     [SerializeField] private float maxHeart = 100f;
@@ -254,14 +255,12 @@ public class PlayerStatusManager : MonoBehaviour
             currentXp = Mathf.Max(0, currentXp),
             maxXp = Mathf.Max(1, maxXp),
             hp = currentHp,
-            powerDices = Mathf.Max(0, currentPowerDices),
-            accuracyDices = Mathf.Max(0, currentAccuracyDices),
+            currentDices = Mathf.Max(0, currentDices),
             maxHeart = ClampCoreStatMax(maxHeart),
             maxBody = ClampCoreStatMax(maxBody),
             maxMind = ClampCoreStatMax(maxMind),
             maxHp = Mathf.Max(1f, maxHp),
-            maxPowerDices = Mathf.Max(1, maxPowerDices),
-            maxAccuracyDices = Mathf.Max(1, maxAccuracyDices),
+            maxDices = Mathf.Max(1, maxDices),
             currentArchetype = currentArchetype,
             archetypePoints = archetypePoints,
             inventory = playerInventory != null ? playerInventory.GetSnapshot() : new PlayerInventorySnapshot(),
@@ -293,10 +292,8 @@ public class PlayerStatusManager : MonoBehaviour
         currentXp = Mathf.Max(0, snapshot.currentXp);
         maxXp = Mathf.Max(1, snapshot.maxXp > 0 ? snapshot.maxXp : CalculateMaxXpForLevel(level));
         currentHp = Mathf.Clamp(snapshot.hp, 0f, maxHp);
-        currentPowerDices = Mathf.Max(0, snapshot.powerDices);
-        currentAccuracyDices = Mathf.Max(0, snapshot.accuracyDices);
-        maxPowerDices = Mathf.Max(1, snapshot.maxPowerDices > 0 ? snapshot.maxPowerDices : maxPowerDices);
-        maxAccuracyDices = Mathf.Max(1, snapshot.maxAccuracyDices > 0 ? snapshot.maxAccuracyDices : maxAccuracyDices);
+        currentDices = Mathf.Max(0, snapshot.currentDices);
+        maxDices = Mathf.Max(1, snapshot.maxDices > 0 ? snapshot.maxDices : maxDices);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
         
@@ -335,10 +332,8 @@ public class PlayerStatusManager : MonoBehaviour
         focus = Mathf.Max(0, character.Focus);
         strength = Mathf.Max(0, character.Strength);
         agility = Mathf.Max(0, character.Agility);
-        maxPowerDices = Mathf.Max(1, character.PowerDices);
-        maxAccuracyDices = Mathf.Max(1, character.AccuracyDices);
-        currentPowerDices = maxPowerDices;
-        currentAccuracyDices = maxAccuracyDices;
+        maxDices = Mathf.Max(1, character.MaxDices);
+        currentDices = maxDices;
         trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(character.CreateInitialTrickSnapshot());
     }
 

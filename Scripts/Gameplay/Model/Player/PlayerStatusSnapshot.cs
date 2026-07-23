@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public struct PlayerStatusSnapshot
@@ -19,14 +20,14 @@ public struct PlayerStatusSnapshot
     [SerializeField] public int currentXp;
     [SerializeField] public int maxXp;
     [SerializeField] public float hp;
-    [SerializeField] public int powerDices;
-    [SerializeField] public int accuracyDices;
+    [FormerlySerializedAs("powerDices")]
+    [SerializeField] public int currentDices;
     [SerializeField] public float maxHeart;
     [SerializeField] public float maxBody;
     [SerializeField] public float maxMind;
     [SerializeField] public float maxHp;
-    [SerializeField] public int maxPowerDices;
-    [SerializeField] public int maxAccuracyDices;
+    [FormerlySerializedAs("maxPowerDices")]
+    [SerializeField] public int maxDices;
     [SerializeField] public PlayerArchetype currentArchetype;
     [SerializeField] public ArchetypePoints archetypePoints;
     [SerializeField] public PlayerInventorySnapshot inventory;

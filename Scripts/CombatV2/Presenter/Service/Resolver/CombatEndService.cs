@@ -122,8 +122,8 @@ public class CombatEndService
                 maxMind = CombatInitializer.ClampCoreStat(player.Mind, coreStatCap),
                 maxBody = CombatInitializer.ClampCoreStat(player.Body, coreStatCap),
                 maxHp = player.MaxHp,
-                powerDices = player.CurrentPowerDices,
-                accuracyDices = player.CurrentAccuracyDices,
+                currentDices = player.CurrentDices,
+                maxDices = player.MaxDices,
                 trickInventory = playerTrickInventory != null
                     ? TrickInventorySnapshot.CreatePersistentSnapshot(playerTrickInventory.GetSnapshot())
                     : new TrickInventorySnapshot()
@@ -145,8 +145,8 @@ public class CombatEndService
         snapshot.maxMind = CombatInitializer.ClampCoreStat(Mathf.Max(snapshot.maxMind, snapshot.mind), coreStatCap);
         snapshot.maxBody = CombatInitializer.ClampCoreStat(Mathf.Max(snapshot.maxBody, snapshot.body), coreStatCap);
         snapshot.maxHp = player.MaxHp;
-        snapshot.powerDices = player.CurrentPowerDices;
-        snapshot.accuracyDices = player.CurrentAccuracyDices;
+        snapshot.currentDices = player.CurrentDices;
+        snapshot.maxDices = player.MaxDices;
         if (combatPlayerInventory != null)
             snapshot.inventory = combatPlayerInventory.GetSnapshot();
         if (playerTrickInventory != null)

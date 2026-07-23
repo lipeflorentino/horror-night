@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [CreateAssetMenu(fileName = "Character", menuName = "Game/Character")]
 public class CharacterSO : ScriptableObject
@@ -11,8 +12,7 @@ public class CharacterSO : ScriptableObject
     public const int DefaultAttack = 10;
     public const int DefaultDefense = 5;
     public const int DefaultInitiative = 10;
-    public const int DefaultPowerDices = 3;
-    public const int DefaultAccuracyDices = 3;
+    public const int DefaultMaxDices = 3;
     public const int DefaultXpThreshold = 10;
 
     [Header("Identity")]
@@ -36,8 +36,8 @@ public class CharacterSO : ScriptableObject
     [Min(0)] public int Focus = 0;
     [Min(0)] public int Strength = 0;
     [Min(0)] public int Agility = 0;
-    [Min(1)] public int PowerDices = 3;
-    [Min(1)] public int AccuracyDices = 3;
+    [FormerlySerializedAs("PowerDices")]
+    [Min(1)] public int MaxDices = 3;
 
     [Header("Tricks")]
     [Tooltip("Tricks permanentes da identidade/classe do personagem. Entram no combate ativas como Identity Tricks.")]
@@ -69,8 +69,7 @@ public class CharacterSO : ScriptableObject
         Focus = Mathf.Max(0, Focus);
         Strength = Mathf.Max(0, Strength);
         Agility = Mathf.Max(0, Agility);
-        PowerDices = Mathf.Max(1, PowerDices <= 0 ? DefaultPowerDices : PowerDices);
-        AccuracyDices = Mathf.Max(1, AccuracyDices <= 0 ? DefaultAccuracyDices : AccuracyDices);
+        MaxDices = Mathf.Max(1, MaxDices <= 0 ? DefaultMaxDices : MaxDices);
     }
     public TrickInventorySnapshot CreateInitialTrickSnapshot()
     {

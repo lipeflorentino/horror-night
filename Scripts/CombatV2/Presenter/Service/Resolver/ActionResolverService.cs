@@ -26,8 +26,10 @@ public class ActionResolverService
         if (defensePowerMaxTriggered)
             powerMaxSource |= PowerMaxSource.Defense;
 
-        bool ignoreAttack = (defenseAccuracyMaxTriggered && defense?.AccuracyDice != null && attack?.AccuracyDice != null && defense.AccuracyDice.Value > attack.AccuracyDice.Value) || attackAccuracy == ActionAccuracy.Missed;
-        bool ignoreDefense = (attackAccuracyMaxTriggered && attack?.AccuracyDice != null && defense?.AccuracyDice != null && attack.AccuracyDice.Value > defense.AccuracyDice.Value) || defenseAccuracy == ActionAccuracy.Missed;
+        int attackAccuracyContest = GetAccuracyContestValue(attack?.AccuracyDice);
+        int defenseAccuracyContest = GetAccuracyContestValue(defense?.AccuracyDice);
+        bool ignoreAttack = (defenseAccuracyMaxTriggered && defense?.AccuracyDice != null && attack?.AccuracyDice != null && defenseAccuracyContest > attackAccuracyContest) || attackAccuracy == ActionAccuracy.Missed;
+        bool ignoreDefense = (attackAccuracyMaxTriggered && attack?.AccuracyDice != null && defense?.AccuracyDice != null && attackAccuracyContest > defenseAccuracyContest) || defenseAccuracy == ActionAccuracy.Missed;
 
         ActionResolutionResult result = new()
         {
@@ -71,6 +73,8 @@ public class ActionResolverService
 
         int attackPower = CalculatePower(attack, attacker, target, ActionType.Attack);
         int defensePower = !ignoreDefense ? CalculatePower(defense, target, attacker, ActionType.Defense) : 0;
+        if (attack?.PowerDice?.StatType == DiceStatType.Body && attack.PowerDice.Tier == DiceTier.High)
+            defensePower = UnityEngine.Mathf.RoundToInt(defensePower * 0.85f);
         int damage = attackPower - defensePower;
 
         damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
@@ -115,6 +119,15 @@ public class ActionResolverService
 
         EvaluateTriggers(attacker, target, attack, defense, result);
         return result;
+    }
+
+    private int GetAccuracyContestValue(DiceResult accuracyDice)
+    {
+        if (accuracyDice == null)
+            return 0;
+
+        // Body é menos eficiente para acertar, mas uma Abertura perfeita pressiona a guarda.
+        return accuracyDice.Value + (accuracyDice.StatType == DiceStatType.Body && accuracyDice.IsMaxRoll ? 1 : 0);
     }
 
     // Diferencia Power Max de ataque, defesa ou ambos ao decidir a variação de resolução.
@@ -278,7 +291,10 @@ public class ActionResolverService
         if (action == null || action.PowerDice == null)
             return 0;
 
-        float multiplier = GetMultiplier(action.PowerDice.Tier);
+        float multiplier = GetMultiplier(action.PowerDice);
+        int committedPowerDice = UnityEngine.Mathf.Max(1, action.AllocatedPowerDiceCount);
+        float commitmentMultiplier = 1f + 0.10f * (committedPowerDice - 1);
+        multiplier *= commitmentMultiplier;
         multiplier = perkService?.GetPowerMultiplier(multiplier, action, actor, opponent, actionType) ?? multiplier;
         return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * multiplier);
     }
@@ -352,13 +368,34 @@ public class ActionResolverService
             Logger.Log($"[Resolve] Secondary effect '{stateOrDrawbackId}' was not applied because no state definition exists yet.");
     }
 
-    private float GetMultiplier(DiceTier tier)
+    private float GetMultiplier(DiceResult powerDice)
     {
-        return tier switch
+        if (powerDice == null)
+            return 1f;
+
+        return powerDice.StatType switch
         {
-            DiceTier.Low => 0.5f,
-            DiceTier.Medium => 1f,
-            DiceTier.High => 1.5f,
+            DiceStatType.Mind => powerDice.Tier switch
+            {
+                DiceTier.Low => 0.6f,
+                DiceTier.Medium => 1f,
+                DiceTier.High => 1.4f,
+                _ => 1f,
+            },
+            DiceStatType.Heart => powerDice.Tier switch
+            {
+                DiceTier.Low => 0.4f,
+                DiceTier.Medium => 1f,
+                DiceTier.High => 1.6f,
+                _ => 1f,
+            },
+            DiceStatType.Body => powerDice.Tier switch
+            {
+                DiceTier.Low => 0.4f,
+                DiceTier.Medium => 1f,
+                DiceTier.High => 1.5f,
+                _ => 1f,
+            },
             _ => 1f,
         };
     }

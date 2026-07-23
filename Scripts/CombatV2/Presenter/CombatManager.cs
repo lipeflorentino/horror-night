@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CombatManager : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int DefaultPowerDiceCount = 3;
-    [SerializeField] private int DefaultAccuracyDiceCount = 3;
+    [FormerlySerializedAs("DefaultPowerDiceCount")]
+    [SerializeField] private int DefaultDiceCount = 3;
     [Tooltip("Maximum value for Heart, Mind, and Body stats")]
     [SerializeField] private int CoreStatCap = 20;
     [SerializeField] private string GameplaySceneName = "Gameplay";
@@ -77,7 +78,7 @@ public class CombatManager : MonoBehaviour
         DefenseDef = new ActionDefinition("defense", ActionType.Defense, 0);
         SessionData = CombatSessionStore.Consume();
 
-        var (player, enemy, playerIcon, enemyIcon) = CombatInitializer.InitializeBattlers(SessionData, DefaultPowerDiceCount, DefaultAccuracyDiceCount, CoreStatCap);
+        var (player, enemy, playerIcon, enemyIcon) = CombatInitializer.InitializeBattlers(SessionData, DefaultDiceCount, CoreStatCap);
         Player = player;
         Enemy = enemy;
         PlayerIcon = playerIcon;
@@ -274,9 +275,9 @@ public class CombatManager : MonoBehaviour
         return PerkService.GetEffectiveActionPower(Player, Enemy, actionType);
     }
 
-    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType, int allocatedDiceCount = 1)
     {
-        return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, PerkService, TurnState);
+        return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, PerkService, TurnState, allocatedDiceCount);
     }
 
     public DiceService GetDiceService()

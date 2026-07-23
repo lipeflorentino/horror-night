@@ -17,13 +17,13 @@ MonoBehaviour:
   CharacterIcon: {fileID: -276885369, guid: 4f4cadd6fd36adf4d968b81e65360a4d, type: 3}
   Description: A timid and gentle soul.
   Xp: 10
-  Heart: 20
-  Body: 20
-  Mind: 20
+  Heart: 12
+  Body: 12
+  Mind: 12
   Hp: 30
-  Attack: 8
-  Defense: 6
-  Initiative: 2
+  Attack: 6
+  Defense: 4
+  Initiative: 3
   Focus: 1
   Strength: 1
   Agility: 1

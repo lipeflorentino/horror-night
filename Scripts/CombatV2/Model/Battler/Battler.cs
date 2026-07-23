@@ -20,15 +20,15 @@ public class Battler
     public int Strength;
     public int Agility;
 
-    public int CurrentPowerDices, CurrentAccuracyDices;
-    public int MaxPowerDices, MaxAccuracyDices;
+    public int CurrentDices;
+    public int MaxDices;
     public bool IsPlayer;
     public List<BattlerStateRuntimeInstance> ActiveStates = new();
     public List<PerkRuntimeInstance> Perks = new();
     public List<TrickRuntimeInstance> Tricks = new();
     public List<DrawbackRuntimeInstance> Drawbacks = new();
 
-    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int powerDices, int accuracyDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0, int baseHeart = -1, int baseBody = -1, int baseMind = -1)
+    public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int maxDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0, int baseHeart = -1, int baseBody = -1, int baseMind = -1)
     {
         Name = name;
         Level = level;
@@ -46,10 +46,8 @@ public class Battler
         Focus = focus;
         Strength = strength;
         Agility = agility;
-        CurrentPowerDices = powerDices;
-        MaxPowerDices = powerDices;
-        CurrentAccuracyDices = accuracyDices;
-        MaxAccuracyDices = accuracyDices;
+        MaxDices = maxDices;
+        CurrentDices = maxDices;
         MaxHp = maxHp > 0 ? maxHp : HP;
         IsPlayer = isPlayer;
     }
@@ -84,14 +82,16 @@ public class Battler
 
     public void RecoverDices(int amount)
     {
-        CurrentPowerDices += amount;
-        CurrentAccuracyDices += amount;
+        CurrentDices += amount;
+        if (CurrentDices > MaxDices)
+            CurrentDices = MaxDices;
+    }
 
-        if (CurrentPowerDices > MaxPowerDices)
-            CurrentPowerDices = MaxPowerDices;
+    public int CurrentActionDices => System.Math.Max(0, CurrentDices);
 
-        if (CurrentAccuracyDices > MaxAccuracyDices)
-            CurrentAccuracyDices = MaxAccuracyDices;
+    public void SpendActionDices(int amount)
+    {
+        CurrentDices = System.Math.Max(0, CurrentDices - amount);
     }
 
     public void AddMomentum(int amount)

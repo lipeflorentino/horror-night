@@ -99,7 +99,7 @@ public class CombatInputHandler : MonoBehaviour
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (GetRemainingDiceCount(diceRollType) <= 0) return;
+        if (!CanAddDiceToRoll(diceRollType)) return;
         if (!CanUseDiceType(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
@@ -148,9 +148,9 @@ public class CombatInputHandler : MonoBehaviour
             return;
         }
 
-        if (PowerDiceTypes.Count + AccuracyDiceTypes.Count <= 0)
+        if (PowerDiceTypes.Count <= 0 || AccuracyDiceTypes.Count <= 0)
         {
-            Debug.Log("[Input] No dice allocated");
+            Debug.Log("[Input] Both Power and Accuracy need at least one dice");
             return;
         }
 
@@ -185,7 +185,7 @@ public class CombatInputHandler : MonoBehaviour
 
     private void UpdateConfirmAvailability()
     {
-        bool hasValidDiceAllocation = PowerDiceTypes.Count + AccuracyDiceTypes.Count > 0;
+        bool hasValidDiceAllocation = PowerDiceTypes.Count > 0 && AccuracyDiceTypes.Count > 0;
         bool isAvailable = !IsWaitingTurnResolution && SelectedAction != null && hasValidDiceAllocation;
         diceAllocationView.SetConfirmInteractable(isAvailable);
     }
@@ -197,21 +197,21 @@ public class CombatInputHandler : MonoBehaviour
 
         bool canAllocate = !IsWaitingTurnResolution;
 
-        int remainingPower = GetRemainingDiceCount(DiceRollType.Power);
-        int remainingAccuracy = GetRemainingDiceCount(DiceRollType.Accuracy);
-
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
+            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll(DiceRollType.Power);
+            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll(DiceRollType.Accuracy);
+
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
                 DiceRollType.Power,
-                canAllocate && remainingPower > 0 && CanUseDiceType(stat)
+                canAddPower
             );
 
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
                 DiceRollType.Accuracy,
-                canAllocate && remainingAccuracy > 0 && CanUseDiceType(stat)
+                canAddAccuracy
             );
             
             Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(
@@ -236,11 +236,25 @@ public class CombatInputHandler : MonoBehaviour
         return GetDiceMaxValueForType(diceType) > 0;
     }
 
-    private int GetRemainingDiceCount(DiceRollType diceRollType)
+    /// <summary>
+    /// O primeiro dado de cada teste (Power e Accuracy) é grátis e não consome o pool compartilhado.
+    /// Extras além disso consomem <see cref="Battler.CurrentActionDices"/> — mesma regra de <see cref="DiceService.RollMany"/>.
+    /// </summary>
+    private bool CanAddDiceToRoll(DiceRollType diceRollType)
     {
-        int MaxDicesPerTurn = diceRollType == DiceRollType.Power ? Combat.Player.CurrentPowerDices : Combat.Player.CurrentAccuracyDices;
-        int allocatedDices = diceRollType == DiceRollType.Power ? PowerDiceTypes.Count : AccuracyDiceTypes.Count;
-        return Mathf.Max(0, MaxDicesPerTurn - allocatedDices);
+        bool isFreeFirstDice = diceRollType == DiceRollType.Power
+            ? PowerDiceTypes.Count == 0
+            : AccuracyDiceTypes.Count == 0;
+
+        return isFreeFirstDice || GetRemainingDiceCount() > 0;
+    }
+
+    private int GetRemainingDiceCount()
+    {
+        int extraPower = Mathf.Max(0, PowerDiceTypes.Count - 1);
+        int extraAccuracy = Mathf.Max(0, AccuracyDiceTypes.Count - 1);
+        int totalExtraAllocated = extraPower + extraAccuracy;
+        return Mathf.Max(0, Combat.Player.CurrentActionDices - totalExtraAllocated);
     }
 
     private DiceStatType GetFirstAvailableDiceType()
@@ -259,26 +273,41 @@ public class CombatInputHandler : MonoBehaviour
 
         Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
-        (List<DiceStatType> powerTypes, List<int> powerFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
-        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
+        (List<DiceStatType> powerTypes, List<int> powerFaces, List<int> powerMinFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
+        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces, List<int> accuracyMinFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
 
         List<DiceStatType> aggregatedPowerTypes = GetAggregatedDiceTypes(PowerDiceTypes);
         List<int> aggregatedPowerFaces = GetDiceFacesForSelection(aggregatedPowerTypes, true);
         
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(powerTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(accuracyTypes, accuracyFaces);
-        (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power);
-        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy);
+        (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power, PowerDiceTypes.Count);
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy, AccuracyDiceTypes.Count);
+        int committedActionPower = Mathf.RoundToInt(Combat.GetEffectivePlayerActionPower() * (1f + 0.10f * Mathf.Max(0, PowerDiceTypes.Count - 1)));
+
+        // Alvo de "Rolagem Máxima" por stat = valor BASE da stat (mesma referência usada pelo DiceService
+        // na rolagem real), não a soma das faces dos dados. Isso mantém o alvo correto mesmo com dado extra de perk.
+        Dictionary<DiceStatType, int> statTargets = new()
+        {
+            { DiceStatType.Mind, Combat.Player.GetBaseStatValue(DiceStatType.Mind) },
+            { DiceStatType.Heart, Combat.Player.GetBaseStatValue(DiceStatType.Heart) },
+            { DiceStatType.Body, Combat.Player.GetBaseStatValue(DiceStatType.Body) },
+        };
 
         Combat.View.DiceAllocationView.UpdateSelectionPreview(
-            Combat.GetEffectivePlayerActionPower(),
+            committedActionPower,
             powerTypes,
             powerFaces,
+            powerMinFaces,
+            powerPrimaryStat,
             aggregatedPowerFaces,
             accuracyTypes,
             accuracyFaces,
+            accuracyMinFaces,
+            accuracyPrimaryStat,
             powerBoundaries,
-            accuracyBoundaries);
+            accuracyBoundaries,
+            statTargets);
     }
 
     private static List<DiceStatType> GetAggregatedDiceTypes(List<DiceStatType> diceTypes)
@@ -355,8 +384,8 @@ public class CombatInputHandler : MonoBehaviour
         return isAggregated ? Combat.GetDiceService().ConvertToAggregatedFaces(Combat.Player, diceTypes) : Combat.GetDiceService().ConvertToFaces(Combat.Player, diceTypes);
     }
 
-    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType, int allocatedDiceCount = 1)
     {
-        return Combat.GetPlayerTierBoundaries(maxValue, statType, rollType);
+        return Combat.GetPlayerTierBoundaries(maxValue, statType, rollType, allocatedDiceCount);
     }
 }

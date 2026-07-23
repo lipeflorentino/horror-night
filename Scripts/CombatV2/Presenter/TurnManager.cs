@@ -54,8 +54,8 @@ public class TurnManager
             return;
 
         //TODO: adjust the number of dices to recover
-        player.RecoverDices(3);
-        enemy.RecoverDices(3);
+        player.RecoverDices(1);
+        enemy.RecoverDices(1);
         player.AddMomentum(1);
         enemy.AddMomentum(1);
         perkService.TickTurnEnd(player);

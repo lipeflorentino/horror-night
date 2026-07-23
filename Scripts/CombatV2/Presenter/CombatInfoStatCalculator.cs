@@ -32,8 +32,7 @@ public static class CombatInfoStatCalculator
         ("Focus", "Focus"),
         ("Str", "Strength"),
         ("Agi", "Agility"),
-        ("PowerDices", "Power dices"),
-        ("AccuracyDices", "Accuracy dices"),
+        ("PowerDices", "Action dices"),
     };
 
     public static StatDisplayData GetDisplayData(string statKey, Battler battler, Battler opposingBattler, PerkService perkService)
@@ -86,9 +85,7 @@ public static class CombatInfoStatCalculator
             case "Agi":
                 return BuildDisplayData(battler.Agility, 0);
             case "PowerDices":
-                return new StatDisplayData($"{battler.CurrentPowerDices}/{battler.MaxPowerDices}", string.Empty, false, true);
-            case "AccuracyDices":
-                return new StatDisplayData($"{battler.CurrentAccuracyDices}/{battler.MaxAccuracyDices}", string.Empty, false, true);
+                return new StatDisplayData($"{battler.CurrentDices}/{battler.MaxDices}", string.Empty, false, true);
             default:
                 return new StatDisplayData("0", string.Empty, false, true);
         }

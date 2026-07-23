@@ -46,6 +46,6 @@ public class EnemyInstance
     public int strength;
     public int agility;
     public int runTier;
-    public int currentPowerDices;
-    public int currentAccuracyDices;
+    public int currentDices;
+    public int maxDices;
 }

@@ -35,23 +35,28 @@ public class CombatDiceRollManager
         if (playerExtraPowerDice > 0)
         {
             List<DiceResult> playerExtraPowerRolls = RollExtraPowerDiceWithoutPool(player, playerExtraPowerDice, playerExtraStatType, player.Level, enemy.Level, diceService);
-            combatContext.PendingPlayerPowerRolls.AddRange(playerExtraPowerRolls);
+            diceService.ApplyExtraPowerDiceToAggregates(combatContext.PendingPlayerPowerRolls, playerExtraPowerRolls, player, enemy, action, player.Level, enemy.Level);
         }
 
         if (enemyExtraPowerDice > 0)
         {
             List<DiceResult> enemyExtraPowerRolls = RollExtraPowerDiceWithoutPool(enemy, enemyExtraPowerDice, enemyExtraStatType, enemy.Level, player.Level, diceService);
-            combatContext.PendingEnemyPowerRolls.AddRange(enemyExtraPowerRolls);
+            diceService.ApplyExtraPowerDiceToAggregates(combatContext.PendingEnemyPowerRolls, enemyExtraPowerRolls, enemy, player, enemyActionType, enemy.Level, player.Level);
         }
 
         DiceResult playerPowerDice = diceService.GetBestResult(combatContext.PendingPlayerPowerRolls);
         DiceResult enemyPowerDice = diceService.GetBestResult(combatContext.PendingEnemyPowerRolls);
 
-        ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice);
+        ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice, powerDiceTypes?.Count ?? 0, accuracyDiceTypes?.Count ?? 0);
         ActionInstance enemyActionInstance = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction : combatContext.CurrentTurn.AttackAction;
 
         enemyActionInstance.Definition = CombatResolutionManager.BuildDefinitionFromBattler(enemy, player, enemyActionInstance.Definition.Type, perkService);
-        enemyActionInstance = new ActionInstance(enemyActionInstance.Definition, enemyPowerDice, enemyAccuracyDice);
+        enemyActionInstance = new ActionInstance(
+            enemyActionInstance.Definition,
+            enemyPowerDice,
+            enemyAccuracyDice,
+            combatContext.PendingEnemyPowerDiceTypes?.Count ?? 0,
+            combatContext.PendingEnemyAccuracyDiceTypes?.Count ?? 0);
 
         if (combatContext.PlayerIsAttacker)
         {
@@ -97,12 +102,13 @@ public class CombatDiceRollManager
         DiceStatType statType,
         DiceRollType rollType,
         PerkService perkService,
-        CombatTurnContext combatContext)
+        CombatTurnContext combatContext,
+        int allocatedDiceCount = 1)
     {
         ActionType actionType = combatContext.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
         int focus = perkService.GetEffectiveFocus(player, enemy, actionType);
         int strength = perkService.GetEffectiveStrength(player, enemy, actionType);
-        return new CombatRollContext(player, enemy, actionType, rollType, statType, player.Level, enemy.Level, focus, strength, maxValue);
+        return new CombatRollContext(player, enemy, actionType, rollType, statType, player.Level, enemy.Level, focus, strength, maxValue, allocatedDiceCount);
     }
 
     public static (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(
@@ -113,9 +119,10 @@ public class CombatDiceRollManager
         DiceRollType rollType,
         DiceService diceService,
         PerkService perkService,
-        CombatTurnContext combatContext)
+        CombatTurnContext combatContext,
+        int allocatedDiceCount = 1)
     {
-        CombatRollContext context = BuildPlayerRollContext(player, enemy, maxValue, statType, rollType, perkService, combatContext);
+        CombatRollContext context = BuildPlayerRollContext(player, enemy, maxValue, statType, rollType, perkService, combatContext, allocatedDiceCount);
         return diceService.GetTierBoundaries(context);
     }
 }

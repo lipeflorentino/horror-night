@@ -56,8 +56,7 @@ public enum PerkModifierTarget
     Body,
     Accuracy,
     Agility,
-    PowerDicesCount,
-    AccuracyDicesCount,
+    ActionDicesCount,
     TrickCharges,
 }
 

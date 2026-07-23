@@ -4,8 +4,7 @@ public class CombatInitializer
 {
     public static (Battler player, Battler enemy, Sprite playerIcon, Sprite enemyIcon) InitializeBattlers(
         CombatSessionData sessionData, 
-        int defaultPowerDiceCount, 
-        int defaultAccuracyDiceCount, 
+        int defaultDiceCount, 
         int coreStatCap)
     {
         Battler player;
@@ -17,8 +16,8 @@ public class CombatInitializer
         if (sessionData == null)
         {
             Logger.Log("[Combat] No CombatSessionData found. Using default battlers.");
-            player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, defaultPowerDiceCount, defaultAccuracyDiceCount, true);
-            enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, defaultPowerDiceCount, defaultAccuracyDiceCount, false);
+            player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, defaultDiceCount, true);
+            enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, defaultDiceCount, false);
             if (enemyVisuals != null)
             {
                 enemyVisuals.SetEnemyVisual(null);
@@ -49,8 +48,7 @@ public class CombatInitializer
             Mathf.RoundToInt(playerSnapshot.attack),
             Mathf.RoundToInt(playerSnapshot.defense),
             Mathf.RoundToInt(playerSnapshot.initiative),
-            Mathf.Max(1, playerSnapshot.maxPowerDices > 0 ? playerSnapshot.maxPowerDices : defaultPowerDiceCount),
-            Mathf.Max(1, playerSnapshot.maxAccuracyDices > 0 ? playerSnapshot.maxAccuracyDices : defaultAccuracyDiceCount),
+            Mathf.Max(1, playerSnapshot.maxDices > 0 ? playerSnapshot.maxDices : defaultDiceCount),
             true,
             Mathf.RoundToInt(playerSnapshot.maxHp > 0 ? playerSnapshot.maxHp : playerSnapshot.hp),
             Mathf.RoundToInt(playerSnapshot.focus),
@@ -74,8 +72,7 @@ public class CombatInitializer
                 enemySnapshot.attack,
                 enemySnapshot.defense,
                 enemySnapshot.initiative,
-                enemySnapshot.currentPowerDices > 0 ? enemySnapshot.currentPowerDices : defaultPowerDiceCount,
-                enemySnapshot.currentAccuracyDices > 0 ? enemySnapshot.currentAccuracyDices : defaultAccuracyDiceCount,
+                enemySnapshot.currentDices > 0 ? enemySnapshot.currentDices : defaultDiceCount,
                 false,
                 -1,
                 enemySnapshot.focus,
@@ -89,7 +86,7 @@ public class CombatInitializer
         else
         {
             Logger.Log("[Combat] Enemy snapshot missing. Using default enemy.");
-            enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, defaultPowerDiceCount, defaultAccuracyDiceCount, false);
+            enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, defaultDiceCount, false);
         }
 
         return (player, enemy, playerIcon, enemyIcon);

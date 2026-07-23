@@ -169,16 +169,25 @@ public class DiceAllocationView : MonoBehaviour
         int actionPower,
         IReadOnlyList<DiceStatType> powerDiceTypes,
         IReadOnlyList<int> powerFaces,
+        IReadOnlyList<int> powerMinFaces,
+        DiceStatType powerPrimaryStat,
         IReadOnlyList<int> aggregatedPowerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
+        IReadOnlyList<int> accuracyMinFaces,
+        DiceStatType accuracyPrimaryStat,
         (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
-        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries,
+        IReadOnlyDictionary<DiceStatType, int> statBaseTargets)
     {
         RebuildAllocationContainer(powerDiceContainer, powerDiceTypes, powerFaces);
         RebuildAllocationContainer(accuracyDiceContainer, accuracyDiceTypes, accuracyFaces);
         UpdateDiceTiersLabel(powerTierBoundaries, accuracyTierBoundaries);
-        UpdateResultPanel(actionPower, powerDiceTypes, powerFaces, aggregatedPowerFaces, accuracyDiceTypes, accuracyFaces, powerTierBoundaries, accuracyTierBoundaries);
+        UpdateResultPanel(
+            actionPower,
+            powerDiceTypes, powerFaces, powerMinFaces, powerPrimaryStat, aggregatedPowerFaces,
+            accuracyDiceTypes, accuracyFaces, accuracyMinFaces, accuracyPrimaryStat,
+            powerTierBoundaries, accuracyTierBoundaries, statBaseTargets);
     }
 
     
@@ -295,21 +304,30 @@ public class DiceAllocationView : MonoBehaviour
             accuracyTierBoundaries.maxValue);
     }
 
+    // powerMinFaces/accuracyMinFaces/powerPrimaryStat/accuracyPrimaryStat/aggregatedPowerFaces: reservados
+    // para um refinamento futuro do Min Roll (hoje calculado sobre a distribuição combinada, o que já é
+    // correto; ficariam aqui se quisermos considerar agility por dado individualmente no futuro).
     private void UpdateResultPanel(
         int actionPower,
         IReadOnlyList<DiceStatType> powerDiceTypes,
         IReadOnlyList<int> powerFaces,
+        IReadOnlyList<int> powerMinFaces,
+        DiceStatType powerPrimaryStat,
         IReadOnlyList<int> aggregatedPowerFaces,
         IReadOnlyList<DiceStatType> accuracyDiceTypes,
         IReadOnlyList<int> accuracyFaces,
+        IReadOnlyList<int> accuracyMinFaces,
+        DiceStatType accuracyPrimaryStat,
         (int lowMax, int mediumMax, int highMin, int maxValue) powerTierBoundaries,
-        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries)
+        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries,
+        IReadOnlyDictionary<DiceStatType, int> statBaseTargets)
     {
         if (resultPanelText == null)
             return;
 
-        if (powerDiceTypes == null || powerDiceTypes.Count == 0 ||
-            accuracyDiceTypes == null || accuracyDiceTypes.Count == 0)
+        bool hasPower = powerDiceTypes != null && powerDiceTypes.Count > 0;
+        bool hasAccuracy = accuracyDiceTypes != null && accuracyDiceTypes.Count > 0;
+        if (!hasPower && !hasAccuracy)
         {
             resultPanelText.text = string.Empty;
             return;
@@ -319,31 +337,55 @@ public class DiceAllocationView : MonoBehaviour
         int criticalThreshold = accuracyTierBoundaries.highMin;
         int missThreshold = accuracyTierBoundaries.lowMax;
 
-        Dictionary<int, float> powerDistribution = CalculateBestRollDistribution(powerDiceTypes, powerFaces);
-        Dictionary<int, float> accuracyDistribution = CalculateBestRollDistribution(accuracyDiceTypes, accuracyFaces);
-        TierChances powerChances = CalculateTierChances(powerDistribution, powerTierBoundaries);
-        TierChances accuracyChances = CalculateTierChances(accuracyDistribution, accuracyTierBoundaries);
-        RollExtremes powerExtremes = CalculateRollExtremes(powerDistribution);
-        RollExtremes accuracyExtremes = CalculateRollExtremes(accuracyDistribution);
-        (int minPower, int maxPower) = GetDistributionBounds(powerDistribution);
-        float minDamage = actionPower * GetMultiplier(GetTier(minPower, powerTierBoundaries));
-        float maxDamage = actionPower * GetMultiplier(GetTier(maxPower, powerTierBoundaries));
+        Dictionary<int, float> powerDistribution = hasPower ? CalculateBestRollDistribution(powerDiceTypes, powerFaces) : null;
+        Dictionary<int, float> accuracyDistribution = hasAccuracy ? CalculateBestRollDistribution(accuracyDiceTypes, accuracyFaces) : null;
+        TierChances powerChances = hasPower ? CalculateTierChances(powerDistribution, powerTierBoundaries) : new TierChances();
+        TierChances accuracyChances = hasAccuracy ? CalculateTierChances(accuracyDistribution, accuracyTierBoundaries) : new TierChances();
 
-        var (consistencyLabel, consistencyColorHex) = GetAllocationConsistency(powerChances, accuracyChances);
-        float hitChance = accuracyChances.Medium + accuracyChances.High;
+        // Rolagem Mínima: chance de o resultado final (melhor grupo) cair no piso absoluto da distribuição.
+        // Não sofre o problema do dado extra (extra só adiciona valor, nunca facilita o piso).
+        float powerMinRollChance = hasPower ? CalculateMinRollChance(powerDistribution) : 0f;
+        float accuracyMinRollChance = hasAccuracy ? CalculateMinRollChance(accuracyDistribution) : 0f;
+
+        // Rolagem Máxima: chance de PELO MENOS UM grupo (stat) atingir seu alvo de referência —
+        // o valor BASE da stat (mesmo usado pelo DiceService/GetTierReferenceMaxValue), não a soma
+        // das faces dos dados daquele grupo. Corrige o caso de dado extra de perk (ex.: Heart 12,
+        // 1 dado base + 1 extra: alvo continua 12, alcançável pela SOMA dos dois, não só 12+12).
+        float powerMaxRollChance = hasPower ? CalculateMaxRollChance(powerDiceTypes, powerFaces, statBaseTargets) : 0f;
+        float accuracyMaxRollChance = hasAccuracy ? CalculateMaxRollChance(accuracyDiceTypes, accuracyFaces, statBaseTargets) : 0f;
+
+        (int minPower, int maxPower) = hasPower ? GetDistributionBounds(powerDistribution) : (0, 0);
+        float minDamage = hasPower ? actionPower * GetMultiplier(GetTier(minPower, powerTierBoundaries)) : 0f;
+        float maxDamage = hasPower ? actionPower * GetMultiplier(GetTier(maxPower, powerTierBoundaries)) : 0f;
         string missThresholdText = missThreshold > 0 ? $"{missThreshold}-" : "--";
 
         StringBuilder sb = new();
-        sb.AppendLine($"Result Instance: <color={consistencyColorHex}>[{consistencyLabel}]</color>");
-        sb.AppendLine($"Damage: {ColorValue(minDamage.ToString("F0"), GetTierColor(GetTier(minPower, powerTierBoundaries)))}-{ColorValue(maxDamage.ToString("F0"), GetTierColor(GetTier(maxPower, powerTierBoundaries)))}");
-        sb.AppendLine($"Rolagem Máxima/Mínima (Power): {ColorValue(powerExtremes.Maximum.ToString("P0"), GetGoodChanceColor(powerExtremes.Maximum))} / {ColorValue(powerExtremes.Minimum.ToString("P0"), GetBadChanceColor(powerExtremes.Minimum))}");
-        sb.AppendLine($"Rolagem Máxima/Mínima (Accuracy): {ColorValue(accuracyExtremes.Maximum.ToString("P0"), GetGoodChanceColor(accuracyExtremes.Maximum))} / {ColorValue(accuracyExtremes.Minimum.ToString("P0"), GetBadChanceColor(accuracyExtremes.Minimum))}");
-        sb.AppendLine($"Hit Threshold: {ColorValue($"{hitThreshold}+", GetLowerThresholdColor(hitThreshold, accuracyTierBoundaries.maxValue))}");
-        sb.AppendLine($"Hit Chance: {ColorValue(hitChance.ToString("P0"), GetGoodChanceColor(hitChance))}");
-        sb.AppendLine($"Miss Threshold: {ColorValue(missThresholdText, GetLowerThresholdColor(missThreshold, accuracyTierBoundaries.maxValue))}");
-        sb.AppendLine($"Miss Chance: {ColorValue(accuracyChances.Low.ToString("P0"), GetBadChanceColor(accuracyChances.Low))}");
-        sb.AppendLine($"Critical Threshold: {ColorValue(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--", GetLowerThresholdColor(criticalThreshold, accuracyTierBoundaries.maxValue))}");
-        sb.AppendLine($"Critical Chance: {ColorValue(accuracyChances.High.ToString("P0"), GetGoodChanceColor(accuracyChances.High))}");
+        if (hasPower)
+        {
+            sb.AppendLine("<b>POWER</b>");
+            sb.AppendLine($"Damage (Min/Max): {ColorValue(minDamage.ToString("F0"), GetTierColor(GetTier(minPower, powerTierBoundaries)))}-{ColorValue(maxDamage.ToString("F0"), GetTierColor(GetTier(maxPower, powerTierBoundaries)))}");
+            sb.AppendLine($"Low / Medium / High: {ColorValue(powerChances.Low.ToString("P0"), GetBadChanceColor(powerChances.Low))} / {ColorValue(powerChances.Medium.ToString("P0"), MediumColorHex)} / {ColorValue(powerChances.High.ToString("P0"), GetGoodChanceColor(powerChances.High))}");
+            sb.AppendLine($"Max / Min Roll: {ColorValue(powerMaxRollChance.ToString("P0"), GetGoodChanceColor(powerMaxRollChance))} / {ColorValue(powerMinRollChance.ToString("P0"), GetBadChanceColor(powerMinRollChance))}");
+        }
+
+        if (hasPower && hasAccuracy)
+            sb.AppendLine();
+
+        if (hasAccuracy)
+        {
+            sb.AppendLine("<b>ACCURACY</b>");
+            sb.AppendLine($"Miss: {ColorValue(missThresholdText, GetLowerThresholdColor(missThreshold, accuracyTierBoundaries.maxValue))} / {ColorValue(accuracyChances.Low.ToString("P0"), GetBadChanceColor(accuracyChances.Low))}");
+            sb.AppendLine($"Hit: {ColorValue($"{hitThreshold}+", GetLowerThresholdColor(hitThreshold, accuracyTierBoundaries.maxValue))} / {ColorValue((accuracyChances.Medium + accuracyChances.High).ToString("P0"), GetGoodChanceColor(accuracyChances.Medium + accuracyChances.High))}");
+            sb.AppendLine($"Critical: {ColorValue(criticalThreshold > 0 ? $"{criticalThreshold}+" : "--", GetLowerThresholdColor(criticalThreshold, accuracyTierBoundaries.maxValue))} / {ColorValue(accuracyChances.High.ToString("P0"), GetGoodChanceColor(accuracyChances.High))}");
+            sb.AppendLine($"Max / Min Roll: {ColorValue(accuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(accuracyMaxRollChance))} / {ColorValue(accuracyMinRollChance.ToString("P0"), GetBadChanceColor(accuracyMinRollChance))}");
+        }
+
+        if (hasPower && hasAccuracy)
+        {
+            var (consistencyLabel, consistencyColorHex) = GetAllocationConsistency(powerChances, accuracyChances);
+            sb.AppendLine();
+            sb.AppendLine($"Result: <color={consistencyColorHex}>[{consistencyLabel}]</color>");
+        }
         // TODO: append line for effects
         resultPanelText.text = sb.ToString();
     }
@@ -425,21 +467,7 @@ public class DiceAllocationView : MonoBehaviour
         Dictionary<int, float> bestDistribution = new() { { 0, 1f } };
         foreach (var group in groupFaces.Values)
         {
-            Dictionary<int, float> groupDistribution = new() { { 0, 1f } };
-            foreach (int faceCount in group)
-            {
-                Dictionary<int, float> nextDistribution = new();
-                foreach (var current in groupDistribution)
-                    for (int face = 1; face <= faceCount; face++)
-                    {
-                        int value = current.Key + face;
-                        float chance = current.Value / faceCount;
-                        nextDistribution[value] = nextDistribution.TryGetValue(value, out float accumulated)
-                            ? accumulated + chance
-                            : chance;
-                    }
-                groupDistribution = nextDistribution;
-            }
+            Dictionary<int, float> groupDistribution = CalculateGroupSumDistribution(group);
 
             Dictionary<int, float> nextBestDistribution = new();
             foreach (var best in bestDistribution)
@@ -457,6 +485,31 @@ public class DiceAllocationView : MonoBehaviour
         return bestDistribution;
     }
 
+    /// <summary>
+    /// Distribuição de probabilidade da SOMA dos dados de um único grupo (mesmo tipo de stat),
+    /// assumindo cada dado uniforme entre 1 e sua face. Reaproveitado tanto para o "melhor resultado"
+    /// (CalculateBestRollDistribution) quanto para o alvo de Rolagem Máxima (CalculateMaxRollChance).
+    /// </summary>
+    private Dictionary<int, float> CalculateGroupSumDistribution(List<int> faces)
+    {
+        Dictionary<int, float> distribution = new() { { 0, 1f } };
+        foreach (int faceCount in faces)
+        {
+            Dictionary<int, float> nextDistribution = new();
+            foreach (var current in distribution)
+                for (int face = 1; face <= faceCount; face++)
+                {
+                    int value = current.Key + face;
+                    float chance = current.Value / faceCount;
+                    nextDistribution[value] = nextDistribution.TryGetValue(value, out float accumulated)
+                        ? accumulated + chance
+                        : chance;
+                }
+            distribution = nextDistribution;
+        }
+        return distribution;
+    }
+
     private TierChances CalculateTierChances(Dictionary<int, float> distribution, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)
     {
         TierChances chances = new();
@@ -472,15 +525,64 @@ public class DiceAllocationView : MonoBehaviour
         return chances;
     }
 
-    private RollExtremes CalculateRollExtremes(Dictionary<int, float> distribution)
+    /// <summary>
+    /// Chance de o resultado final (melhor grupo) cair exatamente no piso absoluto da distribuição
+    /// combinada. Sem problema de "dado extra": mais dados só tornam o piso mais difícil (correto).
+    /// </summary>
+    private float CalculateMinRollChance(Dictionary<int, float> distribution)
     {
-        (int minimum, int maximum) = GetDistributionBounds(distribution);
+        (int minimum, _) = GetDistributionBounds(distribution);
+        return distribution.TryGetValue(minimum, out float chance) ? chance : 0f;
+    }
 
-        return new RollExtremes
+    /// <summary>
+    /// Chance de PELO MENOS UM grupo (stat) atingir seu alvo de Rolagem Máxima — o valor BASE da stat
+    /// (mesma referência de DiceService.GetTierReferenceMaxValue), não a soma das faces do grupo.
+    /// Com dado extra de perk (ex.: Heart base 12 + 1 extra, ambos d12), o alvo continua 12,
+    /// alcançável pela SOMA dos dois dados, não exigindo que os dois tirem 12 ao mesmo tempo.
+    /// </summary>
+    private float CalculateMaxRollChance(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces, IReadOnlyDictionary<DiceStatType, int> statBaseTargets)
+    {
+        if (types == null || faces == null || types.Count == 0 || types.Count != faces.Count)
+            return 0f;
+
+        var groupFaces = new Dictionary<DiceStatType, List<int>>();
+        for (int i = 0; i < types.Count; i++)
         {
-            Minimum = distribution.TryGetValue(minimum, out float minimumChance) ? minimumChance : 0f,
-            Maximum = distribution.TryGetValue(maximum, out float maximumChance) ? maximumChance : 0f
-        };
+            if (!groupFaces.TryGetValue(types[i], out var list))
+            {
+                list = new List<int>();
+                groupFaces[types[i]] = list;
+            }
+            list.Add(Mathf.Max(1, faces[i]));
+        }
+
+        float missChance = 1f;
+        foreach (var group in groupFaces)
+        {
+            Dictionary<int, float> groupDistribution = CalculateGroupSumDistribution(group.Value);
+
+            int target = statBaseTargets != null && statBaseTargets.TryGetValue(group.Key, out int statTarget)
+                ? statTarget
+                : SumFaces(group.Value); // fallback: sem alvo conhecido, usa a soma das faces do próprio grupo
+
+            float hitChance = 0f;
+            foreach (var outcome in groupDistribution)
+                if (outcome.Key >= target)
+                    hitChance += outcome.Value;
+
+            missChance *= 1f - Mathf.Clamp01(hitChance);
+        }
+
+        return 1f - missChance;
+    }
+
+    private static int SumFaces(List<int> faces)
+    {
+        int sum = 0;
+        for (int i = 0; i < faces.Count; i++)
+            sum += faces[i];
+        return sum;
     }
 
     private (int minimum, int maximum) GetDistributionBounds(Dictionary<int, float> distribution)
@@ -500,12 +602,6 @@ public class DiceAllocationView : MonoBehaviour
         public float Low;
         public float Medium;
         public float High;
-    }
-
-    private struct RollExtremes
-    {
-        public float Minimum;
-        public float Maximum;
     }
 
     private DiceTier GetTier(int value, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)

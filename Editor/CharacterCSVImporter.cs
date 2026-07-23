@@ -41,9 +41,9 @@ public class CharacterCSVImporter
             }
 
             string[] values = SplitCsvLine(line);
-            if (values.Length < 17)
+            if (values.Length < 16)
             {
-                Debug.LogWarning($"[CharacterCSVImporter] Linha ignorada. Esperados 17 campos, encontrados {values.Length}: {line}");
+                Debug.LogWarning($"[CharacterCSVImporter] Linha ignorada. Esperados 16 campos, encontrados {values.Length}: {line}");
                 continue;
             }
 
@@ -70,9 +70,8 @@ public class CharacterCSVImporter
             character.Focus = Mathf.Max(0, ParseInt(values[11]));
             character.Strength = Mathf.Max(0, ParseInt(values[12]));
             character.Agility = Mathf.Max(0, ParseInt(values[13]));
-            character.PowerDices = Mathf.Max(1, ParseInt(values[14]));
-            character.AccuracyDices = Mathf.Max(1, ParseInt(values[15]));
-            character.IdentityTricks = LoadTrickList(values[16]);
+            character.MaxDices = Mathf.Max(1, ParseInt(values[14]));
+            character.IdentityTricks = LoadTrickList(values[15]);
 
             EditorUtility.SetDirty(character);
             importedCount++;

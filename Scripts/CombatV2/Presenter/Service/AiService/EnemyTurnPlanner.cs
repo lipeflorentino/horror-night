@@ -21,18 +21,15 @@ public class EnemyTurnPlanner
     {
         ActionInstance action = enemyActionSelector.Select(attackDef, defenseDef);
 
-        int totalAvailableDice = enemy.CurrentPowerDices + enemy.CurrentAccuracyDices;
-        int allocatedAccuracyDice = 1;
-        int allocatedPowerDice = Mathf.Max(1, totalAvailableDice - 1);
-        
-        allocatedAccuracyDice = Mathf.Min(allocatedAccuracyDice, enemy.CurrentAccuracyDices);
-        allocatedPowerDice = Mathf.Min(allocatedPowerDice, enemy.CurrentPowerDices);
-        
-        List<DiceStatType> accuracyTypes = BuildStrategyStatTypeList(enemy, allocatedAccuracyDice);
-        List<DiceStatType> powerTypes = BuildStrategyStatTypeList(enemy, allocatedPowerDice);
+        int totalAvailableDice = enemy.CurrentActionDices;
+        int extraAccuracy = totalAvailableDice > 0 ? 1 : 0;
+        int extraPower = Mathf.Max(0, totalAvailableDice - extraAccuracy);
 
-        enemy.CurrentAccuracyDices = Mathf.Max(enemy.CurrentAccuracyDices - allocatedAccuracyDice, 0);
-        enemy.CurrentPowerDices = Mathf.Max(enemy.CurrentPowerDices - allocatedPowerDice, 0);
+        int totalAccuracyDice = 1 + extraAccuracy;
+        int totalPowerDice = 1 + extraPower;
+        
+        List<DiceStatType> accuracyTypes = BuildStrategyStatTypeList(enemy, totalAccuracyDice);
+        List<DiceStatType> powerTypes = BuildStrategyStatTypeList(enemy, totalPowerDice);
 
         return new EnemyTurnPlan
         {
