@@ -5625,7 +5625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &414684305
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14400,7 +14400,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &998475197
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18565,7 +18565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1323087012
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21883,8 +21883,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b891e405a8552474b81084219bdd0b3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultPowerDiceCount: 3
-  DefaultAccuracyDiceCount: 3
+  DefaultDiceCount: 3
   CoreStatCap: 20
   GameplaySceneName: DarkForest
   View: {fileID: 0}
@@ -29003,10 +29002,8 @@ MonoBehaviour:
   level: 1
   currentXp: 0
   maxXp: 10
-  currentPowerDices: 3
-  currentAccuracyDices: 3
-  maxPowerDices: 3
-  maxAccuracyDices: 3
+  currentDices: 3
+  maxDices: 3
   maxHeart: 10
   currentHeart: 10
   maxBody: 10

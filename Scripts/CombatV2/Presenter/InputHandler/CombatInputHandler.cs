@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CombatInputHandler : MonoBehaviour
 {
-    private CombatManager Combat;
-    private DiceAllocationView diceAllocationView;
+    [SerializeField] private CombatManager Combat;
+    [SerializeField] private DiceAllocationView diceAllocationView;
     private readonly List<DiceStatType> PowerDiceTypes = new();
     private readonly List<DiceStatType> AccuracyDiceTypes = new();
     private ActionType? SelectedAction = null;
@@ -268,67 +268,43 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshSelectionPreview()
     {
-        if (Combat == null || Combat.View == null || Combat.View.DiceAllocationView  == null)
+        if (Combat == null || Combat.View == null || Combat.View.DiceAllocationView == null)
             return;
 
         Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
-        (List<DiceStatType> powerTypes, List<int> powerFaces, List<int> powerMinFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
-        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces, List<int> accuracyMinFaces) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
-
-        List<DiceStatType> aggregatedPowerTypes = GetAggregatedDiceTypes(PowerDiceTypes);
-        List<int> aggregatedPowerFaces = GetDiceFacesForSelection(aggregatedPowerTypes, true);
+        (List<DiceStatType> powerTypes, List<int> powerFaces, _) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
+        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces, _) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
         
         (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(powerTypes, powerFaces);
         (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(accuracyTypes, accuracyFaces);
+        
         (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power, PowerDiceTypes.Count);
         (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy, AccuracyDiceTypes.Count);
-        int committedActionPower = Mathf.RoundToInt(Combat.GetEffectivePlayerActionPower() * (1f + 0.10f * Mathf.Max(0, PowerDiceTypes.Count - 1)));
+        
+        int baseActionPower = Combat.GetEffectivePlayerActionPower();
 
-        // Alvo de "Rolagem Máxima" por stat = valor BASE da stat (mesma referência usada pelo DiceService
-        // na rolagem real), não a soma das faces dos dados. Isso mantém o alvo correto mesmo com dado extra de perk.
         Dictionary<DiceStatType, int> statTargets = new()
         {
             { DiceStatType.Mind, Combat.Player.GetBaseStatValue(DiceStatType.Mind) },
             { DiceStatType.Heart, Combat.Player.GetBaseStatValue(DiceStatType.Heart) },
             { DiceStatType.Body, Combat.Player.GetBaseStatValue(DiceStatType.Body) },
         };
-
-        Combat.View.DiceAllocationView.UpdateSelectionPreview(
-            committedActionPower,
-            powerTypes,
-            powerFaces,
-            powerMinFaces,
-            powerPrimaryStat,
-            aggregatedPowerFaces,
-            accuracyTypes,
-            accuracyFaces,
-            accuracyMinFaces,
-            accuracyPrimaryStat,
-            powerBoundaries,
-            accuracyBoundaries,
-            statTargets);
-    }
-
-    private static List<DiceStatType> GetAggregatedDiceTypes(List<DiceStatType> diceTypes)
-    {
-        List<DiceStatType> aggregated = new();
-        Dictionary<DiceStatType, int> typeCount = new();
         
-        for (int i = 0; i < diceTypes.Count; i++)
-        {
-            DiceStatType type = diceTypes[i];
-            typeCount[type] = typeCount.TryGetValue(type, out int count) ? count + 1 : 1;
-        }
+        DiceAllocationContext previewData = DiceAllocationCalculator.CalculatePreview(
+            baseActionPower: baseActionPower,
+            powerDiceTypes: powerTypes,
+            powerFaces: powerFaces,
+            accuracyDiceTypes: accuracyTypes,
+            accuracyFaces: accuracyFaces,
+            powerTierBoundaries: powerBoundaries,
+            accuracyTierBoundaries: accuracyBoundaries,
+            statBaseTargets: statTargets,
+            powerPrimaryStat: powerPrimaryStat,
+            allocatedPowerDiceCount: PowerDiceTypes.Count
+        );
         
-        for (int i = 0; i < diceTypes.Count; i++)
-        {
-            DiceStatType type = diceTypes[i];
-            if (!aggregated.Contains(type))
-                aggregated.Add(type);
-        }
-        
-        return aggregated;
+        Combat.View.DiceAllocationView.UpdateSelectionPreview(previewData);
     }
 
     private static (int maxValue, DiceStatType primaryStat) GetPreviewMaxValueAndPrimaryStat(IReadOnlyList<DiceStatType> diceTypes, IReadOnlyList<int> faces)

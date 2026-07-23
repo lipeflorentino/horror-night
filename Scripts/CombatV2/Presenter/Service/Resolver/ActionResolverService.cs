@@ -272,13 +272,7 @@ public class ActionResolverService
         if (action == null || action.AccuracyDice == null)
             return ActionAccuracy.Missed;
 
-        return action.AccuracyDice.Tier switch
-        {
-            DiceTier.Low => ActionAccuracy.Missed,
-            DiceTier.Medium => ActionAccuracy.Hit,
-            DiceTier.High => ActionAccuracy.Critical,
-            _ => ActionAccuracy.Hit,
-        };
+        return CombatRules.GetAccuracyOutcome(action.AccuracyDice.Tier);
     }
 
     public int CalculatePower(ActionInstance action)
@@ -291,12 +285,11 @@ public class ActionResolverService
         if (action == null || action.PowerDice == null)
             return 0;
 
-        float multiplier = GetMultiplier(action.PowerDice);
-        int committedPowerDice = UnityEngine.Mathf.Max(1, action.AllocatedPowerDiceCount);
-        float commitmentMultiplier = 1f + 0.10f * (committedPowerDice - 1);
-        multiplier *= commitmentMultiplier;
-        multiplier = perkService?.GetPowerMultiplier(multiplier, action, actor, opponent, actionType) ?? multiplier;
-        return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * multiplier);
+        float combinedMultiplier = CombatRules.GetPowerMultiplier(action.PowerDice.StatType, action.PowerDice.Tier);
+        combinedMultiplier *= CombatRules.GetCommitmentMultiplier(action.AllocatedPowerDiceCount);
+        combinedMultiplier = perkService?.GetPowerMultiplier(combinedMultiplier, action, actor, opponent, actionType) ?? combinedMultiplier;
+        
+        return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * combinedMultiplier);
     }
 
     private int GetDamageBonus(ActionResolutionVariation variation)
@@ -366,37 +359,5 @@ public class ActionResolverService
         BattlerStateRuntimeInstance state = perkService.ApplyBattlerState(target, stateOrDrawbackId, source);
         if (state == null)
             Logger.Log($"[Resolve] Secondary effect '{stateOrDrawbackId}' was not applied because no state definition exists yet.");
-    }
-
-    private float GetMultiplier(DiceResult powerDice)
-    {
-        if (powerDice == null)
-            return 1f;
-
-        return powerDice.StatType switch
-        {
-            DiceStatType.Mind => powerDice.Tier switch
-            {
-                DiceTier.Low => 0.6f,
-                DiceTier.Medium => 1f,
-                DiceTier.High => 1.4f,
-                _ => 1f,
-            },
-            DiceStatType.Heart => powerDice.Tier switch
-            {
-                DiceTier.Low => 0.4f,
-                DiceTier.Medium => 1f,
-                DiceTier.High => 1.6f,
-                _ => 1f,
-            },
-            DiceStatType.Body => powerDice.Tier switch
-            {
-                DiceTier.Low => 0.4f,
-                DiceTier.Medium => 1f,
-                DiceTier.High => 1.5f,
-                _ => 1f,
-            },
-            _ => 1f,
-        };
     }
 }
