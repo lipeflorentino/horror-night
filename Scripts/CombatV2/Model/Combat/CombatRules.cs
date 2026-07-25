@@ -1,20 +1,37 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// Fonte Única de Verdade (SSOT) para os cálculos matemáticos do combate.
-/// Compartilhado tanto pelo Preview de Alocação quanto pela Resolução Real.
 /// </summary>
 public static class CombatRules
 {
-    public const float PowerDiceBonusPerExtraDice = 0.10f; // 10% por dado extra
+    public const float PowerDiceBonusPerExtraDice = 0.10f;
+
+    public enum ThresholdStrategy { Safe, Balanced, Risky }
+
+    // Presets de threshold (low / high). Medium é o intervalo restante entre eles.
+    private static readonly Dictionary<ThresholdStrategy, (float low, float high)> StrategyThresholds = new()
+    {
+        { ThresholdStrategy.Safe,     (0.20f, 0.90f) }, // 20% low / 70% medium / 10% high
+        { ThresholdStrategy.Balanced, (0.30f, 0.70f) }, // 30% low / 40% medium / 30% high
+        { ThresholdStrategy.Risky,    (0.40f, 0.60f) }, // 40% low / 20% medium / 40% high
+    };
+
+    public static ThresholdStrategy PlayerStrategy { get; private set; } = ThresholdStrategy.Balanced;
+
+    public static void SetPlayerStrategy(ThresholdStrategy strategy)
+    {
+        PlayerStrategy = strategy;
+    }
 
     public static float GetPowerMultiplier(DiceStatType statType, DiceTier tier)
     {
         return statType switch
         {
-            DiceStatType.Mind => tier switch { DiceTier.Low => 0.6f, DiceTier.Medium => 1f, DiceTier.High => 1.4f, _ => 1f },
-            DiceStatType.Heart => tier switch { DiceTier.Low => 0.4f, DiceTier.Medium => 1f, DiceTier.High => 1.6f, _ => 1f },
-            DiceStatType.Body => tier switch { DiceTier.Low => 0.4f, DiceTier.Medium => 1f, DiceTier.High => 1.5f, _ => 1f },
+            DiceStatType.Mind => tier switch { DiceTier.Low => 0.4f, DiceTier.Medium => 0.6f, DiceTier.High => 1f, _ => 1f },
+            DiceStatType.Heart => tier switch { DiceTier.Low => 0.2f, DiceTier.Medium => 1f, DiceTier.High => 1.6f, _ => 1f },
+            DiceStatType.Body => tier switch { DiceTier.Low => 0.8f, DiceTier.Medium => 1.4f, DiceTier.High => 1.8f, _ => 1f },
             _ => 1f,
         };
     }
@@ -27,9 +44,14 @@ public static class CombatRules
 
     public static int CalculateBaseDamage(int basePower, DiceStatType statType, DiceTier tier, int allocatedPowerDiceCount)
     {
+        return Mathf.RoundToInt(basePower * GetDamageMultiplier(statType, tier, allocatedPowerDiceCount));
+    }
+
+    public static float GetDamageMultiplier(DiceStatType statType, DiceTier tier, int allocatedPowerDiceCount)
+    {
         float statMult = GetPowerMultiplier(statType, tier);
         float commitMult = GetCommitmentMultiplier(allocatedPowerDiceCount);
-        return Mathf.RoundToInt(basePower * statMult * commitMult);
+        return statMult * commitMult;
     }
 
     public static DiceTier GetTierFromBoundaries(int value, (int lowMax, int mediumMax, int highMin, int maxValue) boundaries)
@@ -48,5 +70,65 @@ public static class CombatRules
             DiceTier.High => ActionAccuracy.Critical,
             _ => ActionAccuracy.Hit,
         };
+    }
+
+    /// <summary>
+    /// Calcula os limiares de probabilidade baseado na quantidade e tipo de dado alocado.
+    /// Lógica de limites: Aumentar o threshold Low = Mais falhas. Diminuir o threshold High = Mais críticos.
+    /// </summary>
+    public static (float low, float high) GetBaseThresholds(DiceStatType statType, DiceRollType rollType, int allocatedDiceCount, ThresholdStrategy strategy)
+    {
+        var (presetLow, presetHigh) = StrategyThresholds[strategy];
+        float low = presetLow;
+        float high = presetHigh;
+
+        // int count = Mathf.Max(1, allocatedDiceCount);
+
+        /* if (rollType == DiceRollType.Accuracy)
+        {
+            switch (statType)
+            {
+                case DiceStatType.Mind:
+                    // Diminui chance de low em 10% por dado
+                    low -= 0.10f * count;
+                    break;
+                case DiceStatType.Heart:
+                    // Aumenta chance dos extremos (Low e High) em 15% por dado
+                    low += 0.2f * count;  // Mais Low
+                    high += 0.2f * count; // Mais High
+                    break;
+                case DiceStatType.Body:
+                    // Aumenta medio diminuindo os extremos em 10% por dado
+                    low -= 0.15f * count;  // Menos Low
+                    high += 0.15f * count; // Menos High
+                    break;
+            }
+        }
+        else if (rollType == DiceRollType.Power)
+        {
+            switch (statType)
+            {
+                case DiceStatType.Mind:
+                    // Diminui chance de low em 10% por dado
+                    low -= 0.10f * count;
+                    break;
+                case DiceStatType.Heart:
+                    // Aumenta chance dos extremos (Low e High) em 15% por dado
+                    low += 0.2f * count;  // Mais Low
+                    high -= 0.2f * count; // Mais High
+                    break;
+                case DiceStatType.Body:
+                    // Aumenta medio diminuindo os extremos em 10% por dado
+                    low -= 0.15f * count;  // Menos Low
+                    high += 0.15f * count; // Menos High
+                    break;
+            }
+        } */
+
+        // Garante que o sistema nunca quebre a matemática (mantém mínimo de 5% para cada extremo)
+        low = Mathf.Clamp(low, 0.05f, 0.85f);
+        high = Mathf.Clamp(high, low + 0.10f, 0.95f);
+
+        return (low, high);
     }
 }

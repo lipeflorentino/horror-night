@@ -92,4 +92,12 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
             - Power Alto 2x dmg 
             - Accuracy Alto CriticalHit
 
+    - Verificar passar GetDamageBonus e GetSecondaryEffect para CombatRules
+
+    - Voltar com custo das stats base ao alocar dados 
+        - custo por dado gasto 
+            - low tier gasto dobrado
+
     - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects.
+        - melhor dados, mais inteligivel
+        - tooltip nos dados indicando efeito (1.4x damage, +low, etc)

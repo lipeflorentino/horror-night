@@ -118,6 +118,7 @@ public class CombatManager : MonoBehaviour
         
         RefreshCombatUI();
         TurnManager.UpdateTurnRoleUI(TurnState, View, Input);
+        CombatRules.SetPlayerStrategy(CombatRules.ThresholdStrategy.Balanced);
     }
 
     // =========================

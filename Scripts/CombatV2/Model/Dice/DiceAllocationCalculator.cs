@@ -4,12 +4,15 @@ using UnityEngine;
 public enum AllocationConsistency 
 { 
     Balanced, 
-    Consistent, 
-    Risky 
+    Favorable, 
+    Unfavorable, 
 }
-
 public static class DiceAllocationCalculator
 {
+    private const float NeutralBand = 0.15f;
+    private const int AccuracyWeight = 2;
+    private const int PowerWeight = 1;
+    private const int FavorableScoreThreshold = 2;
     public static DiceAllocationContext CalculatePreview(
         int baseActionPower, 
         IReadOnlyList<DiceStatType> powerDiceTypes,
@@ -62,6 +65,7 @@ public static class DiceAllocationCalculator
             
             data.MinDamage = CombatRules.CalculateBaseDamage(baseActionPower, powerPrimaryStat, data.MinPowerTier, allocatedPowerDiceCount);
             data.MaxDamage = CombatRules.CalculateBaseDamage(baseActionPower, powerPrimaryStat, data.MaxPowerTier, allocatedPowerDiceCount);
+            data.DamageMultiplier = CombatRules.GetDamageMultiplier(powerPrimaryStat, data.MaxPowerTier, allocatedPowerDiceCount);
         }
 
         if (data.HasPower && data.HasAccuracy)
@@ -74,16 +78,25 @@ public static class DiceAllocationCalculator
 
     private static AllocationConsistency GetAllocationConsistency(TierChances power, TierChances accuracy)
     {
-        float favorable = accuracy.High + accuracy.Medium * power.High;
-        float unfavorable = accuracy.Low + accuracy.Medium * power.Low;
-        float medium = accuracy.Medium * power.Medium;
+        // Accuracy é o fator que trava sucesso/falha (Low = Missed); Power só define magnitude do dano.
+        float accuracyLean = accuracy.Medium + accuracy.High - accuracy.Low;
+        float powerLean = power.High - power.Low;
 
-        if (medium >= favorable && medium >= unfavorable)
-            return AllocationConsistency.Balanced;
-        if (favorable > unfavorable)
-            return AllocationConsistency.Consistent;
-        
-        return AllocationConsistency.Risky;
+        int accuracyPoint = GetLeanPoint(accuracyLean);
+        int powerPoint = GetLeanPoint(powerLean);
+
+        int score = accuracyPoint * AccuracyWeight + powerPoint * PowerWeight;
+
+        if (score >= FavorableScoreThreshold) return AllocationConsistency.Favorable;
+        if (score <= -FavorableScoreThreshold) return AllocationConsistency.Unfavorable;
+        return AllocationConsistency.Balanced;
+    }
+
+    private static int GetLeanPoint(float lean)
+    {
+        if (lean > NeutralBand) return 1;
+        if (lean < -NeutralBand) return -1;
+        return 0;
     }
 
     private static Dictionary<int, float> CalculateBestRollDistribution(IReadOnlyList<DiceStatType> types, IReadOnlyList<int> faces)

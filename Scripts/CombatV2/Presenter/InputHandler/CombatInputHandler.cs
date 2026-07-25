@@ -17,13 +17,17 @@ public class CombatInputHandler : MonoBehaviour
     public void BindDiceAllocationView(DiceAllocationView view)
     {
         if (diceAllocationView != null)
+        {
             diceAllocationView.ConfirmClicked -= OnConfirmAction;
+            diceAllocationView.ThresholdStrategyChanged -= OnThresholdStrategySelected;
+        }
 
         diceAllocationView = view;
 
         if (diceAllocationView != null)
         {
             diceAllocationView.ConfirmClicked += OnConfirmAction;
+            diceAllocationView.ThresholdStrategyChanged += OnThresholdStrategySelected;
             diceAllocationView.SetConfirmInteractable(false);
             diceAllocationView.HideAllocationPanel();
         }
@@ -32,7 +36,16 @@ public class CombatInputHandler : MonoBehaviour
     private void OnDestroy()
     {
         if (diceAllocationView != null)
+        {
             diceAllocationView.ConfirmClicked -= OnConfirmAction;
+            diceAllocationView.ThresholdStrategyChanged -= OnThresholdStrategySelected;
+        }
+    }
+
+    public void OnThresholdStrategySelected(CombatRules.ThresholdStrategy strategy)
+    {
+        CombatRules.SetPlayerStrategy(strategy);
+        RefreshDiceAllocationUI();
     }
 
     public void Init(CombatManager cm)

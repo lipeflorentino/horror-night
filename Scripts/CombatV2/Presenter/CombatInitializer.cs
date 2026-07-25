@@ -16,8 +16,8 @@ public class CombatInitializer
         if (sessionData == null)
         {
             Logger.Log("[Combat] No CombatSessionData found. Using default battlers.");
-            player = new Battler("Player", 1, 20, 10, 10, 10, 10, 5, 5, defaultDiceCount, true);
-            enemy = new Battler("Enemy", 1, 20, 10, 10, 10, 6, 3, 5, defaultDiceCount, false);
+            player = new Battler("Player", 1, 30, 12, 12, 12, 10, 5, 5, defaultDiceCount, true);
+            enemy = new Battler("Enemy", 1, 20, 12, 12, 12, 6, 3, 3, defaultDiceCount, false);
             if (enemyVisuals != null)
             {
                 enemyVisuals.SetEnemyVisual(null);
@@ -86,7 +86,7 @@ public class CombatInitializer
         else
         {
             Logger.Log("[Combat] Enemy snapshot missing. Using default enemy.");
-            enemy = new Battler("Enemy", 1, 100, 10, 10, 10, 10, 5, 5, defaultDiceCount, false);
+            enemy = new Battler("Enemy", 1, 20, 12, 12, 12, 6, 3, 3, defaultDiceCount, false);
         }
 
         return (player, enemy, playerIcon, enemyIcon);

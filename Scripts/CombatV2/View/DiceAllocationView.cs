@@ -7,16 +7,15 @@ using UnityEngine.UI;
 
 public class DiceAllocationView : MonoBehaviour
 {
-    private const string BadColorHex = "#E05C5C";
-    private const string MediumColorHex = "#F59E0B";
-    private const string GoodColorHex = "#4CAF50";
 
     [Header("Selection Preview")]
     [SerializeField] private RectTransform powerDiceContainer;
     [SerializeField] private RectTransform accuracyDiceContainer;
     [SerializeField] private DiceAllocationItemUI allocationItemPrefab;
     [SerializeField] private TMP_Text diceTiersText;
-    [SerializeField] private TMP_Text resultPanelText;
+    [SerializeField] private TMP_Text accuracyResultPanelText;
+    [SerializeField] private TMP_Text powerResultPanelText;
+    [SerializeField] private TMP_Text overallResultPanelText;
     
     [Header("Painel de Alocação")]
     [SerializeField] private GameObject allocationPanel;
@@ -33,11 +32,22 @@ public class DiceAllocationView : MonoBehaviour
     [SerializeField] private DiceTierBarUI accuracyTierBar;
     [SerializeField] private DiceTierBarUI powerTierBar;
 
-    private DiceStatAllocatorUI[] diceAllocators;
+    [Header("Estratégia de Threshold")]
+    [SerializeField] private TMP_Dropdown thresholdStrategyDropdown;
 
+    private DiceStatAllocatorUI[] diceAllocators;
     public event Action<DiceStatType, DiceRollType> AddDiceClicked;
     public event Action<DiceStatType, DiceRollType> RemoveDiceClicked;
+    public event Action<CombatRules.ThresholdStrategy> ThresholdStrategyChanged;
     private CombatInputHandler boundInputHandler;
+
+    [Header("Colorização")]
+    private const string BadColorHex = "#E05C5C";
+    private const string MediumColorHex = "#F59E0B";
+    private const string GoodColorHex = "#4CAF50";
+    private const string PowerColorHex = "#EAA00E";
+    private const string AccuracyColorHex = "#FFFB00";
+
 
     public event Action ConfirmClicked;
 
@@ -51,6 +61,14 @@ public class DiceAllocationView : MonoBehaviour
         if (closeButton != null)
             closeButton.onClick.AddListener(HideAllocationPanel);
 
+        if (thresholdStrategyDropdown != null)
+        {
+            thresholdStrategyDropdown.ClearOptions();
+            thresholdStrategyDropdown.AddOptions(new List<string> { "Seguro", "Equilibrado", "Arriscado" });
+            thresholdStrategyDropdown.SetValueWithoutNotify((int)CombatRules.ThresholdStrategy.Balanced);
+            thresholdStrategyDropdown.onValueChanged.AddListener(HandleThresholdStrategyChanged);
+        }
+
         HideAllocationPanel();
     }
 
@@ -61,6 +79,9 @@ public class DiceAllocationView : MonoBehaviour
 
         if (closeButton != null)
             closeButton.onClick.RemoveAllListeners();
+
+        if (thresholdStrategyDropdown != null)
+            thresholdStrategyDropdown.onValueChanged.RemoveListener(HandleThresholdStrategyChanged);
 
         if (diceAllocators != null)
         {
@@ -244,47 +265,56 @@ public class DiceAllocationView : MonoBehaviour
 
     private void UpdateResultPanel(DiceAllocationContext data)
     {
-        if (resultPanelText == null)
+        if (accuracyResultPanelText == null || powerResultPanelText == null)
             return;
 
         if (!data.HasPower && !data.HasAccuracy)
         {
-            resultPanelText.text = string.Empty;
+            accuracyResultPanelText.text = string.Empty;
+            powerResultPanelText.text = string.Empty;
+            if (overallResultPanelText != null)
+                overallResultPanelText.text = string.Empty;
             return;
         }
 
-        StringBuilder sb = new();
+        StringBuilder accSb = new();
+        StringBuilder powSb = new();
 
         if (data.HasAccuracy)
         {
-            string missThresholdText = data.MissThreshold > 0 ? $"{data.MissThreshold}-" : "--";
+            string missThresholdText = data.MissThreshold > 0 ? $"1-{data.MissThreshold}" : "--";
             
-            sb.AppendLine("<b>ACCURACY</b>");
-            sb.AppendLine($"Miss: {ColorValue(missThresholdText, GetLowerThresholdColor(data.MissThreshold, data.AccuracyTierBoundaries.maxValue))} / {ColorValue(data.AccuracyChances.Low.ToString("P0"), GetBadChanceColor(data.AccuracyChances.Low))}");
-            sb.AppendLine($"Hit: {ColorValue($"{data.HitThreshold}+", GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))} / {ColorValue((data.AccuracyChances.Medium + data.AccuracyChances.High).ToString("P0"), GetGoodChanceColor(data.AccuracyChances.Medium + data.AccuracyChances.High))}");
-            sb.AppendLine($"Critical: {ColorValue(data.CriticalThreshold > 0 ? $"{data.CriticalThreshold}+" : "--", GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))} / {ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))}");
-            sb.AppendLine($"Max / Min Roll: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))} / {ColorValue(data.AccuracyMinRollChance.ToString("P0"), GetBadChanceColor(data.AccuracyMinRollChance))}");
+            accSb.AppendLine($"<color={AccuracyColorHex}><b><size=120%>ACCURACY</size></b></color>");
+            accSb.AppendLine();
+            accSb.AppendLine($"Miss Threshold: {ColorValue(missThresholdText, GetLowerThresholdColor(data.MissThreshold, data.AccuracyTierBoundaries.maxValue))}");
+            accSb.AppendLine($"Miss Chance:{ColorValue(data.AccuracyChances.Low.ToString("P0"), GetBadChanceColor(data.AccuracyChances.Low))}");
+            accSb.AppendLine($"Hit Threshold: {ColorValue($"{data.HitThreshold}+", GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))}");
+            accSb.AppendLine($"Hit Chance: {ColorValue((data.AccuracyChances.Medium + data.AccuracyChances.High).ToString("P0"), GetGoodChanceColor(data.AccuracyChances.Medium + data.AccuracyChances.High))}");
+            accSb.AppendLine($"Critical Threshold: {ColorValue(data.CriticalThreshold > 0 ? $"{data.CriticalThreshold}+" : "--", GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))}");
+            accSb.AppendLine($"Critical Chance: {ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))}");
+            accSb.AppendLine($"Max Accuracy Threshold: {ColorValue(data.AccuracyTierBoundaries.maxValue.ToString(), GetLowerThresholdColor(data.AccuracyTierBoundaries.maxValue, data.AccuracyTierBoundaries.maxValue))}");
+            accSb.AppendLine($"Max Accuracy Chance: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))}");
         }
-
-        if (data.HasPower && data.HasAccuracy)
-            sb.AppendLine();
         
         if (data.HasPower)
         {
-            sb.AppendLine("<b>POWER</b>");
-            sb.AppendLine($"Damage (Min/Max): {ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier))}-{ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier))}");
-            sb.AppendLine($"Low / Medium / High: {ColorValue(data.PowerChances.Low.ToString("P0"), GetBadChanceColor(data.PowerChances.Low))} / {ColorValue(data.PowerChances.Medium.ToString("P0"), MediumColorHex)} / {ColorValue(data.PowerChances.High.ToString("P0"), GetGoodChanceColor(data.PowerChances.High))}");
-            sb.AppendLine($"Max / Min Roll: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))} / {ColorValue(data.PowerMinRollChance.ToString("P0"), GetBadChanceColor(data.PowerMinRollChance))}");
+            powSb.AppendLine($"<color={PowerColorHex}><b><size=120%>POWER</size></b></color>");
+            powSb.AppendLine();
+            powSb.AppendLine($"Damage (Min/Max): {ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier))}-{ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier))}");
+            powSb.AppendLine($"Damage Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x");
+            powSb.AppendLine($"Max Power Threshold: {ColorValue(data.PowerTierBoundaries.maxValue.ToString(), GetLowerThresholdColor(data.PowerTierBoundaries.maxValue, data.PowerTierBoundaries.maxValue))}");
+            powSb.AppendLine($"Max Power Chance: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))}");
         }
 
         if (data.HasPower && data.HasAccuracy)
         {
             string consistencyColorHex = GetConsistencyColor(data.Consistency);
-            sb.AppendLine();
-            sb.AppendLine($"Result: <color={consistencyColorHex}>[{data.Consistency}]</color>");
+            if (overallResultPanelText != null)
+                overallResultPanelText.text = $"[ Overall <color={consistencyColorHex}>{data.Consistency}</color> ]";
         }
         
-        resultPanelText.text = sb.ToString();
+        accuracyResultPanelText.text = accSb.ToString();
+        powerResultPanelText.text = powSb.ToString();
     }
 
     // -------------------------------------------------------------------------
@@ -328,8 +358,8 @@ public class DiceAllocationView : MonoBehaviour
         return consistency switch
         {
             AllocationConsistency.Balanced => MediumColorHex,
-            AllocationConsistency.Consistent => GoodColorHex,
-            AllocationConsistency.Risky => BadColorHex,
+            AllocationConsistency.Favorable => GoodColorHex,
+            AllocationConsistency.Unfavorable => BadColorHex,
             _ => MediumColorHex
         };
     }
@@ -374,6 +404,9 @@ public class DiceAllocationView : MonoBehaviour
 
     private void HandleAllocatorRemovePressed(DiceStatType stat, DiceRollType roll)
         => RemoveDiceClicked?.Invoke(stat, roll);
+
+    private void HandleThresholdStrategyChanged(int index) 
+        => ThresholdStrategyChanged?.Invoke((CombatRules.ThresholdStrategy)index);
 
     private DiceStatAllocatorUI FindAllocator(DiceStatType stat, DiceRollType rollType)
     {
