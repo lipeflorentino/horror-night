@@ -91,21 +91,31 @@ Sistemas de Combate
 
     - Ajustar tela de Loot (textos, alinhamento, etc.)
     - Ouro não deve aparecer no slot do inventario de combate 
+
+    (Verificar se ainda ocorre)
     - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
+
+    (Importante)
+    - Forced Encounter não deve disparar imadiatamente um encounter 
+        - deve modificar o evento da proxima casa visitada para um encounter 
+        - evitar sobreposição de eventos 
+    
 
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
     - Ajustar cast de tricks 
-        - requisitos (outras stats alem de mind, heart, body)
-        - custo (momentum)
+        - Requisitos (outras stats alem de mind, heart, body)
+        - Custo (momentum)
         - Dar feedback quando falta recurso (highlight vermelho)
 
-    - Ajustar as views de Tricks (ajustar UI de triggered / cooldown / casted)    
+    - Ajustar as views de Tricks     
+        - Refinar animações e transições
         - Criar uma UI especifica para tricks de identidade e tricks temporarias
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
-        - Refinar animações e transições
-
-
+        - Ajustar UI de triggered / cooldown / casted
+        
+    - Corrigir HpText do inimigo
     
+    - Aplicar learned tricks 
