@@ -51,13 +51,17 @@ public enum PowerMaxSource
     Defense
 }
 
-public enum ActionResolutionSecondaryEffect
+public enum ActionEffectType
 {
-    None,
-    BrokenBones,
-    Bleeding,
-    Dying,
-    Stagger
+    Drawback,
+    BattlerState
+}
+
+public struct ActionEffectPayload
+{
+    public string EffectId;
+    public string EffectName;
+    public ActionEffectType Type;
 }
 
 public class ActionResolutionResult
@@ -68,7 +72,6 @@ public class ActionResolutionResult
     public ActionOutcome Outcome;
     public DefenseOutcome DefenseOutcome;
     public ActionResolutionVariation ResolutionVariation;
-    public ActionResolutionSecondaryEffect SecondaryEffect;
     public bool IgnoreAttack;
     public bool IgnoreDefense;
     public PowerMaxSource PowerMaxSource;

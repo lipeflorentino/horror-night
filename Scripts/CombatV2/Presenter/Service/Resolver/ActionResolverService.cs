@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine;
 
 public class ActionResolverService
 {
@@ -36,7 +37,6 @@ public class ActionResolverService
             Accuracy = attackAccuracy,
             FinalTarget = target,
             DamageBonus = 0,
-            SecondaryEffect = ActionResolutionSecondaryEffect.None
         };
 
         if (attackAccuracy == ActionAccuracy.Missed)
@@ -73,8 +73,6 @@ public class ActionResolverService
 
         int attackPower = CalculatePower(attack, attacker, target, ActionType.Attack);
         int defensePower = !ignoreDefense ? CalculatePower(defense, target, attacker, ActionType.Defense) : 0;
-        if (attack?.PowerDice?.StatType == DiceStatType.Body && attack.PowerDice.Tier == DiceTier.High)
-            defensePower = UnityEngine.Mathf.RoundToInt(defensePower * 0.85f);
         int damage = attackPower - defensePower;
 
         damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
@@ -88,9 +86,8 @@ public class ActionResolverService
         result.IgnoreDefense = ignoreDefense;
         result.PowerMaxSource = powerMaxSource;
         result.ResolutionVariation = ResolveVariation(result);
-        result.SecondaryEffect = GetSecondaryEffect(result.ResolutionVariation);
-        result.DamageBonus = GetDamageBonus(result.ResolutionVariation);
-        damage = UnityEngine.Mathf.Max(0, damage + result.DamageBonus);
+        result.DamageBonus = CombatRules.GetDamageBonus(result.ResolutionVariation);
+        damage = Mathf.Max(0, damage + result.DamageBonus);
 
         bool isDefensiveReductionVariation = result.ResolutionVariation == ActionResolutionVariation.IronWall ||
             result.ResolutionVariation == ActionResolutionVariation.Stronghold;
@@ -104,7 +101,6 @@ public class ActionResolverService
             result.IgnoreDefense = false;
             result.PowerMaxSource = powerMaxSource;
             result.ResolutionVariation = ActionResolutionVariation.Blocked;
-            result.SecondaryEffect = ActionResolutionSecondaryEffect.None;
             result.DamageBonus = 0;
             ApplyFeedback(result);
 
@@ -114,10 +110,17 @@ public class ActionResolverService
 
         result.Damage = damage;
 
-        ApplySecondaryEffect(result, attacker, target);
         ApplyFeedback(result);
-
         EvaluateTriggers(attacker, target, attack, defense, result);
+
+        if (attacker.ActionSecondaryEffects.TryGetValue(result.ResolutionVariation, out var effectsToApply))
+        {
+            foreach (var payload in effectsToApply)
+            {
+                ApplySecondaryEffectToTarget(target, payload, attacker);
+            }
+        }
+
         return result;
     }
 
@@ -126,11 +129,43 @@ public class ActionResolverService
         if (accuracyDice == null)
             return 0;
 
-        // Body é menos eficiente para acertar, mas uma Abertura perfeita pressiona a guarda.
-        return accuracyDice.Value + (accuracyDice.StatType == DiceStatType.Body && accuracyDice.IsMaxRoll ? 1 : 0);
+        return accuracyDice.Value + (accuracyDice.StatType == DiceStatType.Mind && accuracyDice.IsMaxRoll ? 1 : 0);
     }
 
-    // Diferencia Power Max de ataque, defesa ou ambos ao decidir a variação de resolução.
+    private void EvaluateTriggers(Battler attacker, Battler target, ActionInstance attack, ActionInstance defense, ActionResolutionResult result)
+    {
+        if (perkService != null)
+        {
+            perkService.EvaluateActionResolutionTriggers(attacker, target, attack.Definition?.Type ?? ActionType.Attack, result.Outcome, result.ResolutionVariation);
+            perkService.EvaluateActionResolutionTriggers(target, attacker, defense?.Definition?.Type ?? ActionType.Defense, result.Outcome, result.ResolutionVariation);
+        }
+    }
+
+    private ActionAccuracy CalculateAccuracy(ActionInstance action)
+    {
+        if (action == null || action.AccuracyDice == null)
+            return ActionAccuracy.Missed;
+
+        return CombatRules.GetAccuracyOutcome(action.AccuracyDice.Tier);
+    }
+
+    public int CalculatePower(ActionInstance action)
+    {
+        return CalculatePower(action, null, null, action?.Definition != null ? action.Definition.Type : ActionType.Attack);
+    }
+
+    public int CalculatePower(ActionInstance action, Battler actor, Battler opponent, ActionType actionType)
+    {
+        if (action == null || action.PowerDice == null)
+            return 0;
+
+        float combinedMultiplier = CombatRules.GetPowerMultiplier(action.PowerDice.StatType, action.PowerDice.Tier);
+        combinedMultiplier *= CombatRules.GetCommitmentMultiplier(action.AllocatedPowerDiceCount);
+        combinedMultiplier = perkService?.GetPowerMultiplier(combinedMultiplier, action, actor, opponent, actionType) ?? combinedMultiplier;
+        
+        return Mathf.RoundToInt(action.Definition.BasePower * combinedMultiplier);
+    }
+    
     private ActionResolutionVariation ResolveVariation(ActionResolutionResult result)
     {
         bool attackPowerMax = result.PowerMaxSource.HasFlag(PowerMaxSource.Attack);
@@ -186,8 +221,7 @@ public class ActionResolverService
             _ => ActionResolutionVariation.None
         };
     }
-
-    // Ponto único de geração dos feedbacks (ataque e defesa), a partir do estado já resolvido.
+    
     // Feedback de ataque só existe quando o ataque teve sucesso (Hit/CriticalHit) - sem block, evade ou parry.
     private void ApplyFeedback(ActionResolutionResult result)
     {
@@ -258,106 +292,26 @@ public class ActionResolverService
         };
     }
 
-    private void EvaluateTriggers(Battler attacker, Battler target, ActionInstance attack, ActionInstance defense, ActionResolutionResult result)
+    private void ApplySecondaryEffectToTarget(Battler target, ActionEffectPayload payload, Battler source)
     {
-        if (perkService != null)
-        {
-            perkService.EvaluateActionResolutionTriggers(attacker, target, attack.Definition?.Type ?? ActionType.Attack, result.Outcome, result.ResolutionVariation);
-            perkService.EvaluateActionResolutionTriggers(target, attacker, defense?.Definition?.Type ?? ActionType.Defense, result.Outcome, result.ResolutionVariation);
-        }
-    }
-
-    private ActionAccuracy CalculateAccuracy(ActionInstance action)
-    {
-        if (action == null || action.AccuracyDice == null)
-            return ActionAccuracy.Missed;
-
-        return CombatRules.GetAccuracyOutcome(action.AccuracyDice.Tier);
-    }
-
-    public int CalculatePower(ActionInstance action)
-    {
-        return CalculatePower(action, null, null, action?.Definition != null ? action.Definition.Type : ActionType.Attack);
-    }
-
-    public int CalculatePower(ActionInstance action, Battler actor, Battler opponent, ActionType actionType)
-    {
-        if (action == null || action.PowerDice == null)
-            return 0;
-
-        float combinedMultiplier = CombatRules.GetPowerMultiplier(action.PowerDice.StatType, action.PowerDice.Tier);
-        combinedMultiplier *= CombatRules.GetCommitmentMultiplier(action.AllocatedPowerDiceCount);
-        combinedMultiplier = perkService?.GetPowerMultiplier(combinedMultiplier, action, actor, opponent, actionType) ?? combinedMultiplier;
+        if (target == null || string.IsNullOrWhiteSpace(payload.EffectId) || perkService == null)
+            return;
         
-        return UnityEngine.Mathf.RoundToInt(action.Definition.BasePower * combinedMultiplier);
-    }
-
-    private int GetDamageBonus(ActionResolutionVariation variation)
-    {
-        return variation switch
+        if (payload.Type == ActionEffectType.Drawback)
         {
-            ActionResolutionVariation.IronWall => -3,
-            ActionResolutionVariation.Stronghold => -3,
-            ActionResolutionVariation.PiercingHit => 2,
-            ActionResolutionVariation.PowerHit => 3,
-            ActionResolutionVariation.CriticalHit => 4,
-            ActionResolutionVariation.ArmorShatter => 5,
-            ActionResolutionVariation.Overpower => 6,
-            ActionResolutionVariation.DevastatingStrike => 7,
-            ActionResolutionVariation.Deathstroke => 10,
-            ActionResolutionVariation.LegendaryClash => 8,
-            _ => 0
-        };
-    }
-
-    private ActionResolutionSecondaryEffect GetSecondaryEffect(ActionResolutionVariation variation)
-    {
-        return variation switch
-        {
-            ActionResolutionVariation.Overpower => ActionResolutionSecondaryEffect.BrokenBones,
-            ActionResolutionVariation.DevastatingStrike => ActionResolutionSecondaryEffect.Bleeding,
-            ActionResolutionVariation.Deathstroke => ActionResolutionSecondaryEffect.Dying,
-            ActionResolutionVariation.LegendaryClash => ActionResolutionSecondaryEffect.Stagger,
-            _ => ActionResolutionSecondaryEffect.None
-        };
-    }
-
-    private void ApplySecondaryEffect(ActionResolutionResult result, Battler attacker, Battler target)
-    {
-        if (result == null || perkService == null || result.SecondaryEffect == ActionResolutionSecondaryEffect.None)
-            return;
-
-        switch (result.SecondaryEffect)
-        {
-            case ActionResolutionSecondaryEffect.BrokenBones:
-                ApplySecondaryEffectToTarget(target, "broken-bones", attacker);
-                break;
-            case ActionResolutionSecondaryEffect.Bleeding:
-                ApplySecondaryEffectToTarget(target, "bleeding", attacker);
-                break;
-            case ActionResolutionSecondaryEffect.Dying:
-                ApplySecondaryEffectToTarget(target, "dying", attacker);
-                break;
-            case ActionResolutionSecondaryEffect.Stagger:
-                ApplySecondaryEffectToTarget(attacker, "stagger", target);
-                ApplySecondaryEffectToTarget(target, "stagger", attacker);
-                break;
+            DrawbackRuntimeInstance drawback = perkService.ApplyDrawback(target, payload.EffectId, source);
+            if (drawback == null)
+            {
+                Logger.Log($"[Resolve] Secondary effect '{payload.EffectName}' was not applied because no drawback definition exists yet.");
+            }
         }
-    }
-
-    private void ApplySecondaryEffectToTarget(Battler target, string stateOrDrawbackId, Battler source)
-    {
-        if (target == null || string.IsNullOrWhiteSpace(stateOrDrawbackId) || perkService == null)
-            return;
-
-        if (stateOrDrawbackId.Equals("bleeding", System.StringComparison.OrdinalIgnoreCase))
+        if (payload.Type == ActionEffectType.BattlerState)
         {
-            perkService.ApplyDrawback(target, stateOrDrawbackId, source);
-            return;
+            BattlerStateRuntimeInstance state = perkService.ApplyBattlerState(target, payload.EffectId, source);
+            if (state == null)
+            {
+                Logger.Log($"[Resolve] Secondary effect '{payload.EffectName}' was not applied because no state definition exists yet.");
+            }
         }
-
-        BattlerStateRuntimeInstance state = perkService.ApplyBattlerState(target, stateOrDrawbackId, source);
-        if (state == null)
-            Logger.Log($"[Resolve] Secondary effect '{stateOrDrawbackId}' was not applied because no state definition exists yet.");
     }
 }

@@ -108,14 +108,6 @@ public class PerkService
         if (battler == null)
             return;
 
-        // Dano contínuo de Sangramento (Bleeding)
-        bool isBleeding = battler.Drawbacks.Exists(d => d != null && d.IsActive() && d.Definition.Id.Equals("bleeding", System.StringComparison.OrdinalIgnoreCase));
-        if (isBleeding)
-        {
-            battler.ReceiveDamage(2);
-            Debug.Log($"[Drawback] {battler.Name} perdeu 2 HP por Bleeding. HP Restante: {battler.HP}");
-        }
-
         for (int i = battler.Perks.Count - 1; i >= 0; i--)
         {
             PerkRuntimeInstance perk = battler.Perks[i];

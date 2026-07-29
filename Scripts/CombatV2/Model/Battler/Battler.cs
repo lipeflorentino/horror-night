@@ -19,7 +19,6 @@ public class Battler
     public int Focus;
     public int Strength;
     public int Agility;
-
     public int CurrentDices;
     public int MaxDices;
     public bool IsPlayer;
@@ -27,6 +26,7 @@ public class Battler
     public List<PerkRuntimeInstance> Perks = new();
     public List<TrickRuntimeInstance> Tricks = new();
     public List<DrawbackRuntimeInstance> Drawbacks = new();
+    public Dictionary<ActionResolutionVariation, List<ActionEffectPayload>> ActionSecondaryEffects = new();
 
     public Battler(string name, int level, int hp, int heart, int mind, int body, int attack, int defense, int initiative, int maxDices, bool isPlayer, int maxHp = -1, int focus = 0, int strength = 0, int agility = 0, int baseHeart = -1, int baseBody = -1, int baseMind = -1)
     {

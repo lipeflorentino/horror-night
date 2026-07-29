@@ -87,6 +87,8 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - remover fundo dos icones ou melhorar frame na tela de CombatInfoPanel
         - Gerar icones novos para os AllocatedItens
 
+    - Mudar Math class para adicionar dependencia do Unity em classes puras
+
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
@@ -100,9 +102,8 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
         - Refinar animações e transições
-        - Mostrar indicativo visual dos resultados de Tiers 
-            - Power Alto 2x dmg 
-            - Accuracy Alto CriticalHit
 
-    - Verificar passar GetDamageBonus e GetSecondaryEffect para CombatRules
+    - Mostrar indicativo visual dos resultados de Tiers 
+        - Power Alto 2x dmg 
+        - Accuracy Alto CriticalHit
     

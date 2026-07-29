@@ -95,7 +95,7 @@ public static class CombatRules
         float low = presetLow;
         float high = presetHigh;
 
-        int count = Mathf.Max(1, allocatedDiceCount);
+        /* int count = Mathf.Max(1, allocatedDiceCount);
 
         if (rollType == DiceRollType.Accuracy && allocatedDiceCount > 0)
         {
@@ -136,7 +136,7 @@ public static class CombatRules
                     high += BodyExtremeReductionPerDice * count; // Menos High
                     break;
             }
-        }
+        } */
 
         // TODO: ajustar logica
         // Garante que o sistema nunca quebre a matemática (mantém mínimo de 5% para cada extremo)
@@ -144,5 +144,23 @@ public static class CombatRules
         high = Mathf.Clamp(high, low + ThresholdMinGap, ThresholdExtremeMax);
 
         return (low, high);
+    }
+
+    public static int GetDamageBonus(ActionResolutionVariation variation)
+    {
+        return variation switch
+        {
+            ActionResolutionVariation.IronWall => -3,
+            ActionResolutionVariation.Stronghold => -3,
+            ActionResolutionVariation.PiercingHit => 2,
+            ActionResolutionVariation.PowerHit => 3,
+            ActionResolutionVariation.CriticalHit => 4,
+            ActionResolutionVariation.ArmorShatter => 5,
+            ActionResolutionVariation.Overpower => 6,
+            ActionResolutionVariation.DevastatingStrike => 7,
+            ActionResolutionVariation.Deathstroke => 10,
+            ActionResolutionVariation.LegendaryClash => 8,
+            _ => 0
+        };
     }
 }
