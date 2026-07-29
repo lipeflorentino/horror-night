@@ -23,71 +23,75 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 
 🗄️ BACKLOG (Menor Prioridade)
     
-    - Implementar lógica do lucky_strike: abrir input de dado para o jogador decidir qual será o número da sorte (adicionar parâmetro no trick/perk)
-    - Implementar perks/tricks com efeito condicional (buffs/debuffs baseados em valores específicos tirados nos dados)
-    - Implementar manipulação de dados (possibilidade de excluir certos valores do dado ou manipular os thresholds momentaneamente)
-    - Implementar sistema de "Curses" (Maldições) que alteram diretamente os sistemas do jogo (UI, cor, sons, textos)
-    - Implementar Tricks que forçam "testes" escolhidos pelo jogador (uma rolagem clássica de RPG antes do cálculo de accuracy/power)
-    - Criar NPCEncounterSystem (sistema de sorteio similar a inimigos/loot, contendo tipos como loja, melhoria, troca, etc.)
-    - Implementar TreasureSystem (configurar drop de artefatos lendários/épicos, Perks e CombatStateCards)
-    - Sistema de Pergaminhos: Fazer com que Tricks sejam aprendidos por meio de pergaminhos (que podem conter vários tricks e ser adquiridos por loot ou NPCs)
-    - Estabelecer tricks para os inimigos (definir identity tricks e criar feedback visual/log para quando o inimigo usá-las)
-    - Criar CharacterSO (Nicolas) e gerar o ícone do personagem
-    - Ajustar lógica de type, behavior e style na IA de inimigos
-    - Criar nova perk usando a Skill (AntigravityAI) criada
-    - Jogador pode fugir de combates quando seu nível é maior do que o do inimigo (permitindo visualizar as recompensas antes)
-    - Criar UI de Drawback
-    - Adicionar informações no painel do player (XP e Gold)
+Sistemas Gerais (Baixa prioridade / complexo)
+    
+    - Criar NPCEncounterSystem
+    - Implementar sistema de Curse/Maldição
+        - Maldições que alteram diretamente sistemas do jogo (UI, cor, sons, textos)
+    - Novos eventos de spawn 
+        - Contendo tipos como loja, melhoria, troca, maldições, etc.
+        - Novo tipo de evento "Trick or Treat" entra na categoria de Event do Node
+    - Implementar TreasureSystem
+        - Configurar drop de artefatos lendários/épicos, Perks e CombatStateCards
+    - Sistema de Pergaminhos (loot de tricks)
+        - Fazer com que Tricks sejam aprendidos por meio de pergaminhos (loot ou NPCs)
+    - Analisar e ajustar fluxo de itens
+        - Garantir duração, consumo, etc.
+    - Meta progressão
+        - Árvore de upgrades
+
+Correções / Melhorias (Baixa prioridade / pouco valor)
+    
+    - Mudar Math class para adicionar dependencia do Unity em classes puras
+    - Corrigir ícones quebrados
+    - Remover fundo dos ícones ou melhorar frame na tela de CombatInfoPanel
+    - Gerar ícones novos para os AllocatedItems
+    - Migrar e criar novas animações de UI com DOTween
     - Ajustar exibição de recompensa de XP (definir se usará ícone ou texto)
-    - Transformar ações do inimigo em evento (canPlay) e devolve evento (enemyActions)
-    - Novo tipo de evento "Trick or Treat" entra na categoria de "Event" do node
     - Ajustar painel de resultado de ocorrência (não deve mostrar meta e roll quando não houver rolagem)
-    - Definir outra UI para rolagem de dados do inimigo 
-        - Ex. Mostrar apenas os dados com o resultado
-    - Melhorar logica de secondary effect no ActionResolverService  
-        - Está hardcoded
-        - Pode puxar do Battler (customizavel)
-    - Melhorar UI do inventorio
+    - Melhorar UI do inventário
     - Na Reward View colocar tooltip com descrição dos itens
-    - Analisar fluxo de itens (garantir duração, gasto, etc)
-    - Ajustar o combatLogView
-        - adicionar log de uso de item e outros updates (cooldown, etc)
-    - Ajustar aplicação de "bleeding" no TickEndTurn
-        - escalável por conta de outros efeitos (poisoning, pain, etc)
-        - feedback visual de bleeding e outros efeitos (drawbacks, state)
-    - Meta progressão 
-        - Arvore de upgrades
-            - Clamp min e max de dados 
-    - Migrar e criar novas animações de UI com DOTween.
+    - Criar CharacterSO (Nicolas) e gerar o ícone do personagem
 
+Componentes de UI
 
-🧪 TESTS & TASKS DE VALIDAÇÃO
-
-    - Executar Teste Estruturado 
-        - Adrenaline Surge:
-            1. Equipar a trick adrenaline_surge no slot do Player.
-            2. Alocar dados de Mind no Accuracy.
-            3. Realizar um Ataque.
-            4. Verificar no Console as tags: [Perk Triggered], [Adrenaline Surge] e [Flow] validando o bônus de dados extras.
-    - Testar fluxo completo de tricks / perks no combate
-    - Testar feedbacks visuais/console (blocked, evaded, missed)
-    - Implementar efeitos secundários 
-        - Blocked attack (-1 mind, -1 attack) // perk rachadura moral 
+    - Criar UI de Drawback / BattlerState
+    - Adicionar informações no painel do player (XP e Gold)
+    - (??) Definir outra UI para rolagem de dados do inimigo
+        - Mostrar apenas os dados com o resultado
+    - Ajustar o CombatLogView
+    - Adicionar log de uso de item e outros updates (cooldown, etc.)
+    - Feedback visual de bleeding e outros efeitos (Drawbacks, States)
     - Feedbacks 
         - nos icones e texts de stats (quando gasta, quando está baixo, etc)
 
+Sistemas de Combate
+
+    - Criar nova Perk usando a Skill (AntigravityAI)
+    - Ajustar lógica de Type, Behavior e Style na IA de inimigos
+    - Transformar ações do inimigo em evento (canPlay) e devolver evento (enemyActions)
+    - Jogador pode fugir de combates quando seu nível é maior que o do inimigo (permitindo visualizar as recompensas antes)
+    - Estabelecer Tricks para os inimigos
+        - Definir Identity Tricks
+        - Criar feedback visual/log quando forem utilizadas
+    - Implementar Tricks que forçam "testes" escolhidos pelo jogador
+        - Rolagem clássica de RPG antes do cálculo de Accuracy/Power
+    - Implementar perks/tricks com efeito condicional
+        - Buffs/Debuffs baseados em valores específicos dos dados
+    - Implementar manipulação de dados
+        - Excluir determinados valores do dado
+        - Manipular thresholds temporariamente
+    - Implementar lógica do Lucky Strike
+        - Abrir input para o jogador escolher o número da sorte
+        - Adicionar parâmetro no Trick/Perk   
+    - Implementar efeitos secundários 
+        - Blocked attack (-1 mind, -1 attack) // perk rachadura moral 
 
 🐛 BUGS & FIXES
 
     - Ajustar tela de Loot (textos, alinhamento, etc.)
     - Ouro não deve aparecer no slot do inventario de combate 
     - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
-
-    - Corrigir icones quebrados 
-        - remover fundo dos icones ou melhorar frame na tela de CombatInfoPanel
-        - Gerar icones novos para os AllocatedItens
-
-    - Mudar Math class para adicionar dependencia do Unity em classes puras
 
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
@@ -103,7 +107,5 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
         - Implementar área de active tricks com ícones
         - Refinar animações e transições
 
-    - Mostrar indicativo visual dos resultados de Tiers 
-        - Power Alto 2x dmg 
-        - Accuracy Alto CriticalHit
+
     
