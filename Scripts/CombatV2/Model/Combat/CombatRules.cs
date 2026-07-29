@@ -7,6 +7,19 @@ using UnityEngine;
 public static class CombatRules
 {
     public const float PowerDiceBonusPerExtraDice = 0.10f;
+    // TODO: integrar com sistema de progressão (level, mods) — hoje são valores fixos.
+    public const int MinCoreStatValue = 4;
+    public const int MaxCoreStatValue = 20;
+
+    // Deslocamento de threshold por dado alocado (ver GetBaseThresholds).
+    public const float MindLowReductionPerDice = 0.10f;
+    public const float HeartExtremeShiftPerDice = 0.20f;
+    public const float BodyExtremeReductionPerDice = 0.15f;
+
+    // Clamps de segurança para os thresholds finais (mantém a matemática sempre válida).
+    private const float ThresholdExtremeMin = 0.05f;
+    private const float ThresholdExtremeMax = 0.95f;
+    private const float ThresholdMinGap = 0.10f;
 
     public enum ThresholdStrategy { Safe, Balanced, Risky }
 
@@ -82,52 +95,53 @@ public static class CombatRules
         float low = presetLow;
         float high = presetHigh;
 
-        // int count = Mathf.Max(1, allocatedDiceCount);
+        int count = Mathf.Max(1, allocatedDiceCount);
 
-        /* if (rollType == DiceRollType.Accuracy)
+        if (rollType == DiceRollType.Accuracy && allocatedDiceCount > 0)
         {
             switch (statType)
             {
                 case DiceStatType.Mind:
                     // Diminui chance de low em 10% por dado
-                    low -= 0.10f * count;
+                    low -= MindLowReductionPerDice * count;
                     break;
                 case DiceStatType.Heart:
-                    // Aumenta chance dos extremos (Low e High) em 15% por dado
-                    low += 0.2f * count;  // Mais Low
-                    high += 0.2f * count; // Mais High
+                    // Aumenta chance dos extremos (Low e High) em 20% por dado
+                    low += HeartExtremeShiftPerDice * count;  // Mais Low
+                    high += HeartExtremeShiftPerDice * count; // Mais High
                     break;
                 case DiceStatType.Body:
-                    // Aumenta medio diminuindo os extremos em 10% por dado
-                    low -= 0.15f * count;  // Menos Low
-                    high += 0.15f * count; // Menos High
+                    // Aumenta medio diminuindo os extremos em 15% por dado
+                    low -= BodyExtremeReductionPerDice * count;  // Menos Low
+                    high += BodyExtremeReductionPerDice * count; // Menos High
                     break;
             }
         }
-        else if (rollType == DiceRollType.Power)
+        else if (rollType == DiceRollType.Power && allocatedDiceCount > 0)
         {
             switch (statType)
             {
                 case DiceStatType.Mind:
                     // Diminui chance de low em 10% por dado
-                    low -= 0.10f * count;
+                    low -= MindLowReductionPerDice * count;
                     break;
                 case DiceStatType.Heart:
-                    // Aumenta chance dos extremos (Low e High) em 15% por dado
-                    low += 0.2f * count;  // Mais Low
-                    high -= 0.2f * count; // Mais High
+                    // Aumenta chance dos extremos (Low e High) em 20% por dado
+                    low += HeartExtremeShiftPerDice * count;  // Mais Low
+                    high -= HeartExtremeShiftPerDice * count; // Mais High
                     break;
                 case DiceStatType.Body:
-                    // Aumenta medio diminuindo os extremos em 10% por dado
-                    low -= 0.15f * count;  // Menos Low
-                    high += 0.15f * count; // Menos High
+                    // Aumenta medio diminuindo os extremos em 15% por dado
+                    low -= BodyExtremeReductionPerDice * count;  // Menos Low
+                    high += BodyExtremeReductionPerDice * count; // Menos High
                     break;
             }
-        } */
+        }
 
+        // TODO: ajustar logica
         // Garante que o sistema nunca quebre a matemática (mantém mínimo de 5% para cada extremo)
-        low = Mathf.Clamp(low, 0.05f, 0.85f);
-        high = Mathf.Clamp(high, low + 0.10f, 0.95f);
+        low = Mathf.Clamp(low, ThresholdExtremeMin, ThresholdExtremeMax - ThresholdMinGap);
+        high = Mathf.Clamp(high, low + ThresholdMinGap, ThresholdExtremeMax);
 
         return (low, high);
     }

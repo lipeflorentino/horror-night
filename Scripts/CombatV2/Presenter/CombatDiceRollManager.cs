@@ -73,6 +73,34 @@ public class CombatDiceRollManager
         Logger.Log($"[Flow] Enemy rolled POWER best:{enemyPowerDice?.Value} | ACCURACY best:{enemyAccuracyDice?.Value} using {combatContext.PendingEnemyPowerRolls.Count} Power dices and {combatContext.PendingEnemyAccuracyRolls.Count} Accuracy dices.");
     }
 
+    public static Dictionary<DiceStatType, int> ApplyStatDiceCost(
+        Battler player, Battler enemy,
+        IReadOnlyList<DiceStatType> playerPowerDiceTypes,
+        IReadOnlyList<DiceStatType> playerAccuracyDiceTypes,
+        CombatTurnContext combatContext)
+    {
+        Dictionary<DiceStatType, int> playerCosts = new();
+        SpendDiceListCost(player, playerPowerDiceTypes, playerCosts);
+        SpendDiceListCost(player, playerAccuracyDiceTypes, playerCosts);
+        SpendDiceListCost(enemy, combatContext.PendingEnemyPowerDiceTypes);
+        SpendDiceListCost(enemy, combatContext.PendingEnemyAccuracyDiceTypes);
+        return playerCosts;
+    }
+
+    private static void SpendDiceListCost(Battler battler, IReadOnlyList<DiceStatType> diceTypes, Dictionary<DiceStatType, int> costAcc = null)
+    {
+        if (battler == null || diceTypes == null) return;
+        for (int i = 0; i < diceTypes.Count; i++)
+        {
+            battler.SpendStatDice(diceTypes[i], 1);
+            if (costAcc != null)
+            {
+                costAcc.TryGetValue(diceTypes[i], out int cur);
+                costAcc[diceTypes[i]] = cur + 1;
+            }
+        }
+    }
+
     public static List<DiceResult> RollExtraPowerDiceWithoutPool(
         Battler actor,
         int count,

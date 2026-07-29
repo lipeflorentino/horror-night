@@ -115,8 +115,7 @@ public class DiceService
             return new List<DiceResult> { Roll(fallbackContext, 1) };
         }
 
-        // O primeiro dado alocado de cada teste é grátis. Consome apenas os extras.
-        int spentDiceCount = Mathf.Max(0, (diceTypes?.Count ?? diceSpecs.Count) - 1);
+        int spentDiceCount = diceTypes?.Count ?? diceSpecs.Count;
         ConsumeDicePool(actor, rollType, spentDiceCount);
 
         List<DiceResult> rawResults = new(diceSpecs.Count);

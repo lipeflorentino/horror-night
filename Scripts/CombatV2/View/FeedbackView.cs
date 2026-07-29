@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -167,6 +168,14 @@ public class FeedbackView : MonoBehaviour
         }
 
         enemyFeedbacks.ShowStatusPopup(text, isAttackFeedback);
+    }
+
+    public void ShowDiceCostFeedback(Dictionary<DiceStatType, int> costs)
+    {
+        if (playerFeedbacks == null) { Debug.LogError("[FeedbackView] PlayerFeedbacks reference is missing."); return; }
+        foreach (var kvp in costs)
+            if (kvp.Value > 0)
+                playerFeedbacks.ShowResourceCostPopup(kvp.Key, kvp.Value);
     }
 
     public void ShowTurnStartFeedback(bool isPlayerTurn)

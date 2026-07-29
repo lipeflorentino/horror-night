@@ -141,6 +141,10 @@ public class CombatManager : MonoBehaviour
                 Logger.Log(rejectionReason);
             return;
         }
+        
+        Dictionary<DiceStatType, int> diceCosts = CombatDiceRollManager.ApplyStatDiceCost(Player, Enemy, powerDiceTypes, accuracyDiceTypes, TurnState);
+        View.ShowDiceCostFeedback(diceCosts);
+        RefreshCombatUI();
 
         StartCoroutine(ResolveTurnFlow(type, powerDiceTypes, accuracyDiceTypes));
     }

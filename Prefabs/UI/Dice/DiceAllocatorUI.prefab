@@ -292,7 +292,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6239747744527831940}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -333,6 +333,7 @@ MonoBehaviour:
   heartIcon: {fileID: 450645594, guid: 3ba77c6aff93bb3498af07afe3000272, type: 3}
   bodyIcon: {fileID: 638481977, guid: 3ba77c6aff93bb3498af07afe3000272, type: 3}
   statIconImage: {fileID: 5943748107310988957}
+  tooltipable: {fileID: 5177788064809595870}
 --- !u!1 &7074268606226069419
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,6 +599,7 @@ GameObject:
   - component: {fileID: 2319463738042416319}
   - component: {fileID: 1233673364198978839}
   - component: {fileID: 5943748107310988957}
+  - component: {fileID: 5177788064809595870}
   m_Layer: 0
   m_Name: Icon
   m_TagString: Untagged
@@ -646,7 +648,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -662,6 +664,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5177788064809595870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8650531723057881693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 703a8c7e93f267c4588f3fbe5a7abcad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltipText: 
+  tooltipColor: 2
 --- !u!1 &8842590234776361325
 GameObject:
   m_ObjectHideFlags: 0

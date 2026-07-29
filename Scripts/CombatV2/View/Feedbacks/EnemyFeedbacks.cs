@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Text.RegularExpressions;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -19,7 +19,6 @@ public class EnemyFeedbacks : MonoBehaviour
     [SerializeField] private Canvas worldPopupCanvas;
     [SerializeField] private GameObject enemyVisual;
     [SerializeField] private Color damageColor = new(1f, 0.1f, 0.1f, 1f);
-    [SerializeField] private Color statusColor = new(0.1f, 0.1f, 1f, 1f);
 
     private RectTransform popupRect;
     private TextMeshProUGUI popupText;
@@ -30,6 +29,10 @@ public class EnemyFeedbacks : MonoBehaviour
     [Header("Feedback Text Colors")]
     [SerializeField] private Color attackFeedbackColor = new(1f, 0.1f, 0.1f, 1f);
     [SerializeField] private Color defenseFeedbackColor = new(0.1f, 0.1f, 1f, 1f);
+
+    private Sequence popupSequence;
+    private Tween flashTween;
+    private Tween statusLogTween;
 
     void Start()
     {
@@ -64,13 +67,13 @@ public class EnemyFeedbacks : MonoBehaviour
     public void ShowDamagePopup(int damage)
     {
         ShowPopupText($"-{damage}", damageColor);
-        StartCoroutine(AnimateEnemyFlash());
+        AnimateEnemyFlash();
     }
 
     public void ShowStatusPopup(string text, bool isAttackFeedback)
     {
         actionLogPanel.SetActive(true);
-        StartCoroutine(AnimateActionLog(text, isAttackFeedback));
+        AnimateActionLog(text, isAttackFeedback);
     }
 
     private void ShowPopupText(string text, Color color)
@@ -85,62 +88,60 @@ public class EnemyFeedbacks : MonoBehaviour
         popupText.text = text;
         popupText.color = color;
 
-        StartCoroutine(AnimateEnemyPopup());
+        AnimateEnemyPopup();
     }
 
-    private IEnumerator AnimateEnemyPopup()
+    private void AnimateEnemyPopup()
     {
+        popupSequence?.Kill();
+
         Vector3 startPosition = popupRect.position;
         Vector3 endPosition = startPosition + Vector3.up * EnemyPopupRiseDistance;
 
-        float elapsed = 0f;
-        while (elapsed < EnemyPopupDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / EnemyPopupDuration);
-
-            popupRect.position = Vector3.Lerp(startPosition, endPosition, t);
-
-            float scaleT = Mathf.Sin(t * Mathf.PI);
-            float scale = Mathf.Lerp(EnemyPopupStartScale, EnemyPopupBounceScale, scaleT);
-            popupRect.localScale = Vector3.one * scale;
-
-            Color color = popupText.color;
-            color.a = 1f - t;
-            popupText.color = color;
-
-            yield return null;
-        }
-
-        popupObject.SetActive(false);
         popupRect.position = startPosition;
         popupRect.localScale = Vector3.one * EnemyPopupStartScale;
+
+        Color startColor = popupText.color;
+        startColor.a = 1f;
+        popupText.color = startColor;
+
+        popupSequence = DOTween.Sequence();
+        popupSequence.Join(popupRect.DOMove(endPosition, EnemyPopupDuration).SetEase(Ease.Linear));
+        popupSequence.Join(popupRect.DOScale(EnemyPopupBounceScale, EnemyPopupDuration * 0.5f).SetEase(Ease.OutSine).SetLoops(2, LoopType.Yoyo));
+        popupSequence.Join(popupText.DOFade(0f, EnemyPopupDuration).SetEase(Ease.Linear));
+        popupSequence.OnComplete(() =>
+        {
+            popupObject.SetActive(false);
+            popupRect.position = startPosition;
+            popupRect.localScale = Vector3.one * EnemyPopupStartScale;
+        });
     }
 
-    private IEnumerator AnimateEnemyFlash()
+    private void AnimateEnemyFlash()
     {
         if (enemySpriteRenderer == null)
         {
             Debug.LogError("[EnemyFeedbacks] Cannot animate flash, SpriteRenderer reference is missing.");
-            yield break;
+            return;
         }
+
+        flashTween?.Kill();
 
         Color initialColor = enemySpriteRenderer.color;
         enemySpriteRenderer.color = flashColor;
 
-        yield return FadeUtility.FadeSpriteAlpha(enemySpriteRenderer, EnemyFlashAlpha, 1f, EnemyFlashDuration);
-
-        enemySpriteRenderer.color = initialColor;
+        flashTween = enemySpriteRenderer
+            .DOFade(1f, EnemyFlashDuration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => enemySpriteRenderer.color = initialColor);
     }
 
-    
-
-    private IEnumerator AnimateActionLog(string text, bool isAttackFeedback)
+    private void AnimateActionLog(string text, bool isAttackFeedback)
     {
         Logger.Log($"[Feedback] {text}");
 
         Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
-        string damageColor = "#FFD700";
+        string damageTextColor = "#FFD700";
         enemyStatusText.color = textColor;
         
         if (Regex.IsMatch(text, @"[+-]\d+"))
@@ -149,14 +150,14 @@ public class EnemyFeedbacks : MonoBehaviour
             
             string baseText = text[..bonusIndex];
             string bonusText = text[bonusIndex..];
-            enemyStatusText.text = $"{baseText}<color={damageColor}>{bonusText}</color>";
+            enemyStatusText.text = $"{baseText}<color={damageTextColor}>{bonusText}</color>";
         }
         else
         {
             enemyStatusText.text = text;
         }
-        
-        yield return new WaitForSeconds(EnemyStatusDuration);
-        actionLogPanel.SetActive(false);
+
+        statusLogTween?.Kill();
+        statusLogTween = DOVirtual.DelayedCall(EnemyStatusDuration, () => actionLogPanel.SetActive(false));
     }
 }

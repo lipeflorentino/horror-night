@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 public class CombatInfoPanelView : MonoBehaviour
 {
-    // Resources.Load path is relative to a "Resources" folder and must not include the extension.
-    private const string StatsIconResourcePath = "UI/Stats/{0}Icon";
-
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private Button closeButton;
 
@@ -104,7 +101,7 @@ public class CombatInfoPanelView : MonoBehaviour
         {
             StatRowUI row = GetOrCreatePooledRow(pool, container, i);
             CombatInfoStatCalculator.StatRowEntry entry = rows[i];
-            row.Bind(GetStatIcon(entry.Key), entry.Label, entry.Value, entry.DeltaText, entry.ShowDelta, entry.PositiveDelta);
+            row.Bind(IconProvider.GetStatIcon(entry.Key), entry.Label, entry.Value, entry.DeltaText, entry.ShowDelta, entry.PositiveDelta);
             row.gameObject.SetActive(true);
         }
 
@@ -120,21 +117,6 @@ public class CombatInfoPanelView : MonoBehaviour
         StatRowUI row = Instantiate(statRowPrefab, container);
         pool.Add(row);
         return row;
-    }
-
-    private static Sprite GetStatIcon(string statKey)
-    {
-        if (_iconCache.TryGetValue(statKey, out Sprite cachedSprite))
-            return cachedSprite;
-
-        string path = string.Format(StatsIconResourcePath, statKey);
-        Sprite sprite = Resources.Load<Sprite>(path);
-
-        if (sprite == null)
-            Debug.LogWarning($"[CombatInfoPanelView] Icon not found at Resources/{path}.");
-
-        _iconCache[statKey] = sprite;
-        return sprite;
     }
 
     public void SetVisible(bool visible)

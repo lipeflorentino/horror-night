@@ -84,6 +84,11 @@ public class CombatView : MonoBehaviour
         FeedbackView.ShowTurnStartFeedback(isPlayerAttacker);
     }
 
+    public void ShowDiceCostFeedback(Dictionary<DiceStatType, int> costs)
+    {
+        FeedbackView.ShowDiceCostFeedback(costs);
+    }
+
     public void RefreshActiveTricks()
     {
         if (ActiveTricksView != null)

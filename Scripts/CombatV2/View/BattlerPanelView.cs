@@ -9,11 +9,10 @@ public class BattlerPanelView : MonoBehaviour
     [Header("HUD Text")]
     public TMP_Text NameText; 
     public TMP_Text LevelText;
-    public TMP_Text MindText;
-    public TMP_Text HeartText;
-    public TMP_Text BodyText;
-    public Image HpFill;
-    public TMP_Text HpText;
+    public StatHudBinding MindHud;
+    public StatHudBinding HeartHud;
+    public StatHudBinding BodyHud;
+    public StatHudBinding HpHud;
     public TMP_Text momentumText;
 
     public void Bind(Battler battler, PerkService perkService = null)
@@ -30,20 +29,13 @@ public class BattlerPanelView : MonoBehaviour
         if (LevelText != null)
             LevelText.text = "Lv. " + battler.Level.ToString();
 
-        if (MindText != null)
-            MindText.text = currentMind.ToString();
+        MindHud?.SetValue(currentMind, 0);
 
-        if (HeartText != null)
-            HeartText.text = currentHeart.ToString();
+        HeartHud?.SetValue(currentHeart, 0);
 
-        if (BodyText != null)
-            BodyText.text = currentBody.ToString();
+        BodyHud?.SetValue(currentBody, 0);
 
-        if (HpText != null)
-            HpText.text = battler.HP.ToString();
-
-        if (HpFill != null)
-            HpFill.fillAmount = Mathf.Clamp01((float)battler.HP / battler.MaxHp);
+        HpHud?.SetValue(battler.HP, battler.MaxHp);
 
         if (momentumText != null)
             momentumText.text = battler.Momentum.ToString();

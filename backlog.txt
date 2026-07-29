@@ -51,10 +51,14 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Na Reward View colocar tooltip com descrição dos itens
     - Analisar fluxo de itens (garantir duração, gasto, etc)
     - Ajustar o combatLogView
-        - adicionar log de uso de item e outros updates (cooldown, etc
+        - adicionar log de uso de item e outros updates (cooldown, etc)
     - Ajustar aplicação de "bleeding" no TickEndTurn
         - escalável por conta de outros efeitos (poisoning, pain, etc)
         - feedback visual de bleeding e outros efeitos (drawbacks, state)
+    - Meta progressão 
+        - Arvore de upgrades
+            - Clamp min e max de dados 
+    - Migrar e criar novas animações de UI com DOTween.
 
 
 🧪 TESTS & TASKS DE VALIDAÇÃO
@@ -67,6 +71,10 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
             4. Verificar no Console as tags: [Perk Triggered], [Adrenaline Surge] e [Flow] validando o bônus de dados extras.
     - Testar fluxo completo de tricks / perks no combate
     - Testar feedbacks visuais/console (blocked, evaded, missed)
+    - Implementar efeitos secundários 
+        - Blocked attack (-1 mind, -1 attack) // perk rachadura moral 
+    - Feedbacks 
+        - nos icones e texts de stats (quando gasta, quando está baixo, etc)
 
 
 🐛 BUGS & FIXES
@@ -74,6 +82,10 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
     - Ajustar tela de Loot (textos, alinhamento, etc.)
     - Ouro não deve aparecer no slot do inventario de combate 
     - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
+
+    - Corrigir icones quebrados 
+        - remover fundo dos icones ou melhorar frame na tela de CombatInfoPanel
+        - Gerar icones novos para os AllocatedItens
 
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
@@ -93,11 +105,4 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
             - Accuracy Alto CriticalHit
 
     - Verificar passar GetDamageBonus e GetSecondaryEffect para CombatRules
-
-    - Voltar com custo das stats base ao alocar dados 
-        - custo por dado gasto 
-            - low tier gasto dobrado
-
-    - Ajustar DiceAllocationView, painel de preview de resultado, remover placeholder de effects.
-        - melhor dados, mais inteligivel
-        - tooltip nos dados indicando efeito (1.4x damage, +low, etc)
+    

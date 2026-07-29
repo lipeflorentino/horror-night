@@ -112,8 +112,9 @@ public class CombatInputHandler : MonoBehaviour
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (!CanAddDiceToRoll(diceRollType)) return;
+        if (!CanAddDiceToRoll()) return;
         if (!CanUseDiceType(diceStatType)) return;
+        if (!CanAllocateStatDice(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
@@ -212,8 +213,8 @@ public class CombatInputHandler : MonoBehaviour
 
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
-            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll(DiceRollType.Power);
-            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll(DiceRollType.Accuracy);
+            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll() && CanAllocateStatDice(stat);
+            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll() && CanAllocateStatDice(stat);
 
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
@@ -249,25 +250,29 @@ public class CombatInputHandler : MonoBehaviour
         return GetDiceMaxValueForType(diceType) > 0;
     }
 
+    private int GetAllocatedStatCount(DiceStatType stat)
+    {
+        return PowerDiceTypes.FindAll(x => x == stat).Count + AccuracyDiceTypes.FindAll(x => x == stat).Count;
+    }
+
+    private bool CanAllocateStatDice(DiceStatType stat)
+    {
+        int projectedValue = Combat.Player.GetCurrentStatValue(stat) - GetAllocatedStatCount(stat) - 1;
+        return projectedValue >= CombatRules.MinCoreStatValue;
+    }
+
     /// <summary>
-    /// O primeiro dado de cada teste (Power e Accuracy) é grátis e não consome o pool compartilhado.
     /// Extras além disso consomem <see cref="Battler.CurrentActionDices"/> — mesma regra de <see cref="DiceService.RollMany"/>.
     /// </summary>
-    private bool CanAddDiceToRoll(DiceRollType diceRollType)
+    private bool CanAddDiceToRoll()
     {
-        bool isFreeFirstDice = diceRollType == DiceRollType.Power
-            ? PowerDiceTypes.Count == 0
-            : AccuracyDiceTypes.Count == 0;
-
-        return isFreeFirstDice || GetRemainingDiceCount() > 0;
+        return GetRemainingDiceCount() > 0;
     }
 
     private int GetRemainingDiceCount()
     {
-        int extraPower = Mathf.Max(0, PowerDiceTypes.Count - 1);
-        int extraAccuracy = Mathf.Max(0, AccuracyDiceTypes.Count - 1);
-        int totalExtraAllocated = extraPower + extraAccuracy;
-        return Mathf.Max(0, Combat.Player.CurrentActionDices - totalExtraAllocated);
+        int totalAllocated = PowerDiceTypes.Count + AccuracyDiceTypes.Count;
+        return Mathf.Max(0, Combat.Player.CurrentActionDices - totalAllocated);
     }
 
     private DiceStatType GetFirstAvailableDiceType()
@@ -318,6 +323,19 @@ public class CombatInputHandler : MonoBehaviour
         );
         
         Combat.View.DiceAllocationView.UpdateSelectionPreview(previewData);
+
+        Dictionary<DiceStatType, int> allocationCosts = new()
+        {
+            { DiceStatType.Mind, GetAllocatedStatCount(DiceStatType.Mind) },
+            { DiceStatType.Heart, GetAllocatedStatCount(DiceStatType.Heart) },
+            { DiceStatType.Body, GetAllocatedStatCount(DiceStatType.Body) },
+        };
+        Combat.View.DiceAllocationView.UpdateAllocationCostFeedback(allocationCosts);
+        Combat.View.DiceAllocationView.UpdateDicePoolDisplay(
+            Combat.Player.CurrentActionDices,
+            Combat.Player.MaxDices,
+            PowerDiceTypes.Count,
+            AccuracyDiceTypes.Count);
     }
 
     private static (int maxValue, DiceStatType primaryStat) GetPreviewMaxValueAndPrimaryStat(IReadOnlyList<DiceStatType> diceTypes, IReadOnlyList<int> faces)

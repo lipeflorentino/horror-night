@@ -41,22 +41,35 @@ public class DiceAllocationView : MonoBehaviour
     public event Action<CombatRules.ThresholdStrategy> ThresholdStrategyChanged;
     private CombatInputHandler boundInputHandler;
 
-    [Header("Colorização")]
-    private const string BadColorHex = "#E05C5C";
-    private const string MediumColorHex = "#F59E0B";
-    private const string GoodColorHex = "#4CAF50";
-    private const string PowerColorHex = "#EAA00E";
-    private const string AccuracyColorHex = "#FFFB00";
+    [Header("Feedback de Custo de Alocação")]
+    [SerializeField] private GameObject allocationCostPanel;      // pai que liga/desliga
+    [SerializeField] private RectTransform allocationCostContainer; // tem VerticalLayoutGroup no prefab/cena
+    [SerializeField] private DiceAllocationCostItemUI allocationCostItemPrefab;
 
+    private static readonly DiceStatType[] StatOrder = { DiceStatType.Mind, DiceStatType.Heart, DiceStatType.Body };
+    private readonly List<DiceAllocationCostItemUI> allocationCostPool = new();
+    private const string DiceIconKey = "Dices"; // espera Resources/UI/Stats/DiceIcon
+
+    [Header("Pool de Dados")]
+    [SerializeField] private TMP_Text dicePoolText;
+    [SerializeField] private TMP_Text powerDicePoolText;
+    [SerializeField] private TMP_Text accuracyDicePoolText;
 
     public event Action ConfirmClicked;
+
+    private const string ConfirmTooltipDefault = "Confirmar";
+    private const string ConfirmTooltipPowerPending = "Power dice not allocated";
+    private const string ConfirmTooltipAccuracyPending = "Accuracy dice not allocated";
 
     private void Awake()
     {
         InstantiateAllocators();
 
         if (confirmButton != null)
+        {
             confirmButton.onClick.AddListener(HandleConfirmClick);
+        }
+            
 
         if (closeButton != null)
             closeButton.onClick.AddListener(HideAllocationPanel);
@@ -171,7 +184,10 @@ public class DiceAllocationView : MonoBehaviour
             confirmButton.interactable = isInteractable;
     }
 
-    private void HandleConfirmClick() => ConfirmClicked?.Invoke();
+    private void HandleConfirmClick() {
+        confirmButton.GetComponent<Tooltipable>().HideTooltip();
+        ConfirmClicked?.Invoke();
+    }
 
     // -------------------------------------------------------------------------
     // API pública — Preview e Exibição
@@ -284,7 +300,7 @@ public class DiceAllocationView : MonoBehaviour
         {
             string missThresholdText = data.MissThreshold > 0 ? $"1-{data.MissThreshold}" : "--";
             
-            accSb.AppendLine($"<color={AccuracyColorHex}><b><size=120%>ACCURACY</size></b></color>");
+            accSb.AppendLine($"<color={Colorization.AccuracyColorHex}><b><size=120%>ACCURACY</size></b></color>");
             accSb.AppendLine();
             accSb.AppendLine($"Miss Threshold: {ColorValue(missThresholdText, GetLowerThresholdColor(data.MissThreshold, data.AccuracyTierBoundaries.maxValue))}");
             accSb.AppendLine($"Miss Chance:{ColorValue(data.AccuracyChances.Low.ToString("P0"), GetBadChanceColor(data.AccuracyChances.Low))}");
@@ -298,7 +314,7 @@ public class DiceAllocationView : MonoBehaviour
         
         if (data.HasPower)
         {
-            powSb.AppendLine($"<color={PowerColorHex}><b><size=120%>POWER</size></b></color>");
+            powSb.AppendLine($"<color={Colorization.PowerColorHex}><b><size=120%>POWER</size></b></color>");
             powSb.AppendLine();
             powSb.AppendLine($"Damage (Min/Max): {ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier))}-{ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier))}");
             powSb.AppendLine($"Damage Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x");
@@ -317,6 +333,85 @@ public class DiceAllocationView : MonoBehaviour
         powerResultPanelText.text = powSb.ToString();
     }
 
+    public void UpdateAllocationCostFeedback(IReadOnlyDictionary<DiceStatType, int> costsByStat)
+    {
+        int usedCount = 0;
+        int totalDiceCost = 0;
+
+        foreach (DiceStatType stat in StatOrder)
+        {
+            if (!costsByStat.TryGetValue(stat, out int amount) || amount <= 0)
+                continue;
+
+            DiceAllocationCostItemUI item = GetOrCreatePooledCostItem(usedCount);
+            item.Bind(stat, amount);
+            item.gameObject.SetActive(true);
+            usedCount++;
+            totalDiceCost += amount;
+        }
+
+        if (totalDiceCost > 0)
+        {
+            DiceAllocationCostItemUI diceItem = GetOrCreatePooledCostItem(usedCount);
+            diceItem.Bind(DiceIconKey, totalDiceCost);
+            diceItem.gameObject.SetActive(true);
+            usedCount++;
+        }
+
+        for (int i = usedCount; i < allocationCostPool.Count; i++)
+            allocationCostPool[i].gameObject.SetActive(false);
+
+        if (allocationCostPanel != null)
+            allocationCostPanel.SetActive(usedCount > 0);
+    }
+
+    public void UpdateDicePoolDisplay(int current, int max, int allocatedPowerDice, int allocatedAccuracyDice)
+    {
+        if (dicePoolText != null)
+            dicePoolText.text = $"{current}/{max}";
+
+        if (powerDicePoolText != null)
+            powerDicePoolText.text = $"<color={(allocatedPowerDice > 0 ? Colorization.WhiteColorHex : Colorization.BadColorHex)}>{allocatedPowerDice}/{current}</color>";
+
+        if (accuracyDicePoolText != null)
+            accuracyDicePoolText.text = $"<color={(allocatedAccuracyDice > 0 ? Colorization.WhiteColorHex : Colorization.BadColorHex)}>{allocatedAccuracyDice}/{current}</color>";
+
+        UpdateConfirmTooltip(allocatedPowerDice, allocatedAccuracyDice);
+    }
+
+    private void UpdateConfirmTooltip(int allocatedPowerDice, int allocatedAccuracyDice)
+    {
+        if (confirmButton == null)
+            return;
+
+        string tooltip = allocatedAccuracyDice <= 0
+            ? ConfirmTooltipAccuracyPending
+            : allocatedPowerDice <= 0
+                ? ConfirmTooltipPowerPending
+                : ConfirmTooltipDefault;
+
+        if (allocatedPowerDice <= 0 || allocatedAccuracyDice <= 0)
+        {
+            confirmButton.GetComponent<Tooltipable>().SetTooltipColor(TooltipUI.TooltipColor.Red);
+        }
+        else
+        {
+            confirmButton.GetComponent<Tooltipable>().SetTooltipColor(TooltipUI.TooltipColor.Default);
+        }
+
+        confirmButton.GetComponent<Tooltipable>().SetTooltipText(tooltip);
+    }
+
+    private DiceAllocationCostItemUI GetOrCreatePooledCostItem(int index)
+    {
+        if (index < allocationCostPool.Count)
+            return allocationCostPool[index];
+
+        DiceAllocationCostItemUI item = Instantiate(allocationCostItemPrefab, allocationCostContainer);
+        allocationCostPool.Add(item);
+        return item;
+    }
+
     // -------------------------------------------------------------------------
     // Funções de formatação e cor (Responsabilidade exclusiva da View)
     // -------------------------------------------------------------------------
@@ -325,31 +420,31 @@ public class DiceAllocationView : MonoBehaviour
 
     private string GetGoodChanceColor(float chance)
     {
-        return chance >= 0.60f ? GoodColorHex : chance >= 0.35f ? MediumColorHex : BadColorHex;
+        return chance >= 0.60f ? Colorization.GoodColorHex : chance >= 0.35f ? Colorization.MediumColorHex : Colorization.BadColorHex;
     }
 
     private string GetBadChanceColor(float chance)
     {
-        return chance <= 0.20f ? GoodColorHex : chance <= 0.45f ? MediumColorHex : BadColorHex;
+        return chance <= 0.20f ? Colorization.GoodColorHex : chance <= 0.45f ? Colorization.MediumColorHex : Colorization.BadColorHex;
     }
 
     private string GetLowerThresholdColor(int threshold, int maximum)
     {
         if (threshold <= 0 || maximum <= 0)
-            return GoodColorHex;
+            return Colorization.GoodColorHex;
 
         float relativeThreshold = threshold / (float)maximum;
-        return relativeThreshold <= 0.33f ? GoodColorHex : relativeThreshold <= 0.66f ? MediumColorHex : BadColorHex;
+        return relativeThreshold <= 0.33f ? Colorization.GoodColorHex : relativeThreshold <= 0.66f ? Colorization.MediumColorHex : Colorization.BadColorHex;
     }
 
     private string GetTierColor(DiceTier tier)
     {
         return tier switch
         {
-            DiceTier.Low => BadColorHex,
-            DiceTier.Medium => MediumColorHex,
-            DiceTier.High => GoodColorHex,
-            _ => MediumColorHex,
+            DiceTier.Low => Colorization.BadColorHex,
+            DiceTier.Medium => Colorization.MediumColorHex,
+            DiceTier.High => Colorization.GoodColorHex,
+            _ => Colorization.MediumColorHex,
         };
     }
 
@@ -357,10 +452,10 @@ public class DiceAllocationView : MonoBehaviour
     {
         return consistency switch
         {
-            AllocationConsistency.Balanced => MediumColorHex,
-            AllocationConsistency.Favorable => GoodColorHex,
-            AllocationConsistency.Unfavorable => BadColorHex,
-            _ => MediumColorHex
+            AllocationConsistency.Balanced => Colorization.MediumColorHex,
+            AllocationConsistency.Favorable => Colorization.GoodColorHex,
+            AllocationConsistency.Unfavorable => Colorization.BadColorHex,
+            _ => Colorization.MediumColorHex
         };
     }
 

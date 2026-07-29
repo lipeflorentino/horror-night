@@ -39,6 +39,9 @@ public class DiceStatAllocatorUI : MonoBehaviour
     [SerializeField] private Sprite bodyIcon;
     [SerializeField] private Image statIconImage;
 
+    // Cache resolvido via GetComponent (RequireComponent garante presença no mesmo GameObject).
+    [SerializeField] private Tooltipable tooltipable;
+
 
     // -------------------------------------------------------------------------
     // Eventos públicos
@@ -79,6 +82,9 @@ public class DiceStatAllocatorUI : MonoBehaviour
             statIconImage.sprite = heartIcon;
         else if (bodyIcon != null && stat == DiceStatType.Body)
             statIconImage.sprite = bodyIcon;
+
+        if (tooltipable != null)
+            tooltipable.SetTooltipText(GetBonusTooltipText(stat, roll));
     }
 
     private void Awake()
@@ -145,5 +151,48 @@ public class DiceStatAllocatorUI : MonoBehaviour
     {
         if (statValueText != null)
             statValueText.text = "d" + value.ToString();
+    }
+
+    // -------------------------------------------------------------------------
+    // Tooltip — texto descritivo do bônus. Os percentuais vêm diretamente das
+    // constantes nomeadas em CombatRules (SSOT), então acompanham qualquer
+    // ajuste de balanceamento automaticamente. A descrição de "o que aumenta/
+    // diminui" continua fixa aqui, pois é texto (não é derivável do número).
+    // -------------------------------------------------------------------------
+
+    private static string GetBonusTooltipText(DiceStatType stat, DiceRollType roll)
+    {
+        string mindPct = CombatRules.MindLowReductionPerDice.ToString("P0");
+        string heartPct = CombatRules.HeartExtremeShiftPerDice.ToString("P0");
+        string bodyPct = CombatRules.BodyExtremeReductionPerDice.ToString("P0");
+
+        if (roll == DiceRollType.Power)
+        {
+            return stat switch
+            {
+                DiceStatType.Mind =>
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.BadColorHex}>Low</color> (per dice).\n" +
+                    $"<color={Colorization.AccuracyColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.4 | <color={Colorization.MediumColorHex}>Medium</color> x0.6 | <color={Colorization.GoodColorHex}>High</color> x1.0.",
+                DiceStatType.Heart =>
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.BadColorHex}>Low</color> | -{heartPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n" +
+                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.2 | <color={Colorization.MediumColorHex}>Medium</color> x1.0 | <color={Colorization.GoodColorHex}>High</color> x1.6.",
+                DiceStatType.Body =>
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.BadColorHex}>Low</color> | +{bodyPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n" +
+                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.8 | <color={Colorization.MediumColorHex}>Medium</color> x1.4 | <color={Colorization.GoodColorHex}>High</color> x1.8.",
+                _ => string.Empty,
+            };
+        }
+
+        // DiceRollType.Accuracy
+        return stat switch
+        {
+            DiceStatType.Mind =>
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.BadColorHex}>Low</color> (per dice).",
+            DiceStatType.Heart =>
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.BadColorHex}>Low</color> | -{heartPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n",
+            DiceStatType.Body =>
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.BadColorHex}>Low</color> | +{bodyPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n",
+            _ => string.Empty,
+        };
     }
 }

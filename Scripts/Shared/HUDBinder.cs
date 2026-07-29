@@ -7,6 +7,8 @@ using UnityEngine.UI;
 [Serializable]
 public class StatHudBinding
 {
+    public Image icon;
+    public Image highlight;
     public Image fillImage;
     public TMP_Text valueText;
 
@@ -23,6 +25,7 @@ public class StatHudBinding
 [Serializable]
 public class StatBarBinding
 {
+    public Image icon;
     public Image fillImage;
     public TMP_Text valueText;
 
@@ -39,9 +42,9 @@ public class StatBarBinding
 [Serializable]
 public class CombatHudBinding
 {
-    public StatBarBinding heart;
-    public StatBarBinding body;
-    public StatBarBinding mind;
+    public StatHudBinding mind;
+    public StatHudBinding heart;
+    public StatHudBinding body;
 
     public void SetValues(int heartValue, int heartMax, int bodyValue, int bodyMax, int mindValue, int mindMax)
     {

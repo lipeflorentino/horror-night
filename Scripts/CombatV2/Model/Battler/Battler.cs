@@ -94,6 +94,37 @@ public class Battler
         CurrentDices = System.Math.Max(0, CurrentDices - amount);
     }
 
+    public void SpendStatDice(DiceStatType statType, int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        switch (statType)
+        {
+            case DiceStatType.Mind:
+                Mind = ClampCoreStat(Mind - amount);
+                break;
+            case DiceStatType.Heart:
+                Heart = ClampCoreStat(Heart - amount);
+                break;
+            case DiceStatType.Body:
+                Body = ClampCoreStat(Body - amount);
+                break;
+        }
+    }
+
+    public void RecoverStatDice()
+    {
+        Mind = ClampCoreStat(Mind + 1);
+        Heart = ClampCoreStat(Heart + 1);
+        Body = ClampCoreStat(Body + 1);
+    }
+
+    private static int ClampCoreStat(int value)
+    {
+        return System.Math.Clamp(value, CombatRules.MinCoreStatValue, CombatRules.MaxCoreStatValue);
+    }
+
     public void AddMomentum(int amount)
     {
         if (amount <= 0)

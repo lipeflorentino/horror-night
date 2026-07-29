@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Text.RegularExpressions;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +19,13 @@ public class PlayerFeedbacks : MonoBehaviour
     [Header("Feedback Text Colors")]
     [SerializeField] private Color attackFeedbackColor = new(1f, 0.1f, 0.1f, 1f);
     [SerializeField] private Color defenseFeedbackColor = new(0.1f, 0.1f, 1f, 1f);
+    [Header("Resource Cost Popup")]
+    [SerializeField] private ResourceCostPopupUI resourceCostPopupPrefab;
+    [SerializeField] private CombatHudBinding hudBinding;
+
+    private Tween flashTween;
+    private Tween statusLogTween;
+
     void Start()
     {
         if (screenFlashCanvas == null || playerFlashImage == null)
@@ -40,7 +46,7 @@ public class PlayerFeedbacks : MonoBehaviour
     public void ShowPlayerDamageFlash()
     {
         Logger.Log("[Feedback] Player damage flash triggered.");
-        StartCoroutine(AnimatePlayerFlash());
+        AnimatePlayerFlash();
     }
 
     public void ShowStatusText(string text, bool isAttackFeedback)
@@ -59,21 +65,83 @@ public class PlayerFeedbacks : MonoBehaviour
             return;
         }
 
-        StartCoroutine(AnimateActionLog(text, isAttackFeedback));
+        AnimateActionLog(text, isAttackFeedback);
     }
 
-    private IEnumerator AnimatePlayerFlash()
+    public void ShowResourceCostPopup(DiceStatType statType, int amount)
     {
+        RectTransform anchor = GetStatIconAnchor(statType);
+        if (resourceCostPopupPrefab == null || anchor == null || screenFlashCanvas == null)
+        {
+            Logger.Log("[PlayerFeedbacks] Cannot show resource cost popup, references missing.");
+            return;
+        }
+
+        var popup = Instantiate(resourceCostPopupPrefab, screenFlashCanvas.transform);
+        popup.transform.position = anchor.position;
+        Color color = ColorUtility.TryParseHtmlString(Colorization.BadColorHex, out Color c) ? c : Color.white;
+        popup.Show($"-{amount}", color);
+        Image hightlightImage = GetStatHightlightImage(statType);
+        AnimateHighlight(hightlightImage);
+    }
+
+    private RectTransform GetStatIconAnchor(DiceStatType statType) => statType switch
+    {
+        DiceStatType.Mind => hudBinding?.mind?.icon?.rectTransform,
+        DiceStatType.Heart => hudBinding?.heart?.icon?.rectTransform,
+        DiceStatType.Body => hudBinding?.body?.icon?.rectTransform,
+        _ => null
+    };
+
+    private Image GetStatHightlightImage(DiceStatType statType) => statType switch
+    {
+        DiceStatType.Mind => hudBinding?.mind?.highlight,
+        DiceStatType.Heart => hudBinding?.heart?.highlight,
+        DiceStatType.Body => hudBinding?.body?.highlight,
+        _ => null
+    };
+
+    private void AnimateHighlight(Image highlightImage)
+    {
+        if (highlightImage == null)
+            return;
+            
+        highlightImage.DOKill();
+
+        Color originalColor = highlightImage.color;
+        Color targetColor = new(1f, 0f, 0f, 0.5f);
+        Sequence highlightSeq = DOTween.Sequence();
+        
+        highlightSeq.Append(highlightImage.DOColor(targetColor, 0.2f))
+                    .SetLoops(2, LoopType.Yoyo) 
+                    .OnComplete(() => highlightImage.color = originalColor);
+    }
+
+    private void AnimatePlayerFlash()
+    {
+        if (playerFlashImage == null)
+            return;
+
+        flashTween?.Kill();
+
         playerFlashImage.gameObject.SetActive(true);
         playerFlashImage.enabled = true;
 
-        yield return FadeUtility.FadeImageAlpha(playerFlashImage, PlayerFlashAlpha, 0f, PlayerFlashDuration);
+        Color color = playerFlashImage.color;
+        color.a = PlayerFlashAlpha;
+        playerFlashImage.color = color;
 
-        playerFlashImage.enabled = false;
-        playerFlashImage.gameObject.SetActive(false);
+        flashTween = playerFlashImage
+            .DOFade(0f, PlayerFlashDuration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() =>
+            {
+                playerFlashImage.enabled = false;
+                playerFlashImage.gameObject.SetActive(false);
+            });
     }
 
-    private IEnumerator AnimateActionLog(string text, bool isAttackFeedback)
+    private void AnimateActionLog(string text, bool isAttackFeedback)
     {
         Logger.Log($"[Feedback] {text}");
 
@@ -81,8 +149,8 @@ public class PlayerFeedbacks : MonoBehaviour
 
         playerStatusText.color = textColor;
         playerStatusText.text = text;
-        
-        yield return new WaitForSeconds(PlayerStatusDuration);
-        actionLogPanel.SetActive(false);
+
+        statusLogTween?.Kill();
+        statusLogTween = DOVirtual.DelayedCall(PlayerStatusDuration, () => actionLogPanel.SetActive(false));
     }
 }
