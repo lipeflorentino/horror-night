@@ -27,9 +27,8 @@ MonoBehaviour:
   Focus: 1
   Strength: 1
   Agility: 1
-  PowerDices: 3
-  AccuracyDices: 3
+  MaxDices: 3
   IdentityTricks:
   - {fileID: 11400000, guid: bfc3bc31bcfb74b43815f71856ededbc, type: 2}
   - {fileID: 11400000, guid: aa33636fb73d76144a1dcc3235af0ba5, type: 2}
-  - {fileID: 11400000, guid: 051d7323b56fe8e4d924aa5f01eb9281, type: 2}
+  - {fileID: 11400000, guid: b48c1b21a6ad443469d54441fd65619f, type: 2}

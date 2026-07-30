@@ -7517,10 +7517,8 @@ MonoBehaviour:
   level: 1
   currentXp: 0
   maxXp: 10
-  currentPowerDices: 3
-  currentAccuracyDices: 3
-  maxPowerDices: 3
-  maxAccuracyDices: 3
+  currentDices: 3
+  maxDices: 3
   maxHeart: 8
   currentHeart: 8
   maxBody: 12
@@ -7531,8 +7529,7 @@ MonoBehaviour:
   currentHp: 25
   playerInventory: {fileID: 0}
   trickInventorySnapshot:
-    learnedTrickIds:
-    - vengence
+    learnedTrickIds: []
     identityTrickIds: []
     castedSlots: []
 --- !u!224 &1420438872995974988
@@ -10061,6 +10058,8 @@ MonoBehaviour:
   diceImage: {fileID: 2583571744984977316}
   diceValueText: {fileID: 2333620945265804796}
   bestText: {fileID: 0}
+  extraText: {fileID: 0}
+  maxRollText: {fileID: 0}
   dimmedAlpha: 0.3
   rollDuration: 0.65
   spinSpeed: 900

@@ -942,7 +942,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &58325000
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31992,7 +31992,8 @@ MonoBehaviour:
   currentHp: 100
   playerInventory: {fileID: 0}
   trickInventorySnapshot:
-    learnedTrickIds: []
+    learnedTrickIds:
+    - six_feet_under
     identityTrickIds: []
     castedSlots: []
 --- !u!4 &1413464973838994096
@@ -37922,8 +37923,8 @@ MonoBehaviour:
   HpHud:
     icon: {fileID: 0}
     highlight: {fileID: 0}
-    fillImage: {fileID: 0}
-    valueText: {fileID: 0}
+    fillImage: {fileID: 523073096}
+    valueText: {fileID: 2039809563}
   momentumText: {fileID: 0}
 --- !u!114 &3873325271730742034
 MonoBehaviour:

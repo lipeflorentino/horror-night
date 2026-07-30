@@ -108,6 +108,6 @@ DEPOIS:
 
 ---
 
-**Nenhuma mudança necessária em InventoryInputHandler, InventoryView ou BattlerPanelView**
+**Nenhuma mudança necessária em InventoryInputHandler, InventoryView ou BattlerHUDView**
 
 A sincronização é automática e transparente ✨

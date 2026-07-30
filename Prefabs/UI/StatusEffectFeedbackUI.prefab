@@ -469,10 +469,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5727b6863ff18be459be0a083911843c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icon: {fileID: 6462102067602448695}
-  durationText: {fileID: 6399643359674528474}
-  descriptionText: {fileID: 7487525498701126328}
-  nameText: {fileID: 908559084777650054}
+  icon: {fileID: 6606622326316243629}
+  durationText: {fileID: 1486633405008991216}
+  tooltipIcon: {fileID: 6462102067602448695}
+  tooltipDurationText: {fileID: 6399643359674528474}
+  tooltipDescriptionText: {fileID: 7487525498701126328}
+  tooltipNameText: {fileID: 908559084777650054}
   tooltip: {fileID: 2162364826533424935}
   enterDuration: 0.2
   exitDuration: 0.15

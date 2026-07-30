@@ -63,7 +63,7 @@
 └──────────────────────────────┬──────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  BattlerPanelView.Bind(Battler)                                          │
+│  BattlerHUDView.Bind(Battler)                                          │
 │                                                                          │
 │  ❌ EXIBE VALORES ANTIGOS:                                              │
 │     Heart=100, Body=50, Mind=75, Attack=10, Defense=5                  │
@@ -145,7 +145,7 @@ RESULTADO: ❌ UI não reflete mudanças
 └──────────────────────────────┬──────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  BattlerPanelView.Bind(Battler)                                          │
+│  BattlerHUDView.Bind(Battler)                                          │
 │                                                                          │
 │  ✅ EXIBE VALORES ATUALIZADOS:                                          │
 │     Heart=101, Body=50, Mind=75, Attack=12, Defense=8                  │
@@ -264,7 +264,7 @@ TIMELINE                        PlayerStatusManager    Battler Player      UI
       ✅ DEPOIS: SyncPlayerStatFromStatusManager()
                                       Attack: 12 ✅
                                       
-30ms: BattlerPanelView.Bind(Player)
+30ms: BattlerHUDView.Bind(Player)
       └─ AttackText = Player.Attack
       
       ✅ EXIBE: 12                   Attack: 12 ✅      Mostra: 12 ✅
@@ -300,7 +300,7 @@ TIMELINE                        PlayerStatusManager    Battler Player      UI
               
               └───────────────────────────→ Attack: 12 ✅
                                                 ↓
-                                            BattlerPanelView
+                                            BattlerHUDView
                                             AttackText = 12 ✅
 ```
 

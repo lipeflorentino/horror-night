@@ -301,7 +301,6 @@ public class PlayerStatusManager : MonoBehaviour
             playerInventory.RestoreSnapshot(snapshot.inventory);
             
         trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(snapshot.trickInventory);
-        Logger.Log($"[PlayerStatusManager] Snapshot restaurado.");
         RefreshAllBars();
     }
 

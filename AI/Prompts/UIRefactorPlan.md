@@ -15,7 +15,7 @@ Nossa varredura da cena `Combat.unity` e dos prefabs de UI (especificamente `Pla
 ### 2. Desalinhamento de Âncoras (Anchor Misplacements)
 *   **Âncoras Vazias:** `MainCanvas`, `PlayerCanvas` e `EnemyCanvas` existem como GameObjects raiz na cena, mas estão completamente vazios e sem uso.
 *   **Canvas Monolítico:** O GameObject `BattleCanvas` está atuando como um contêiner gigante e desorganizado para `ActionsUI`, `InfosUI`, `ActiveTricksUI`, `TurnUI`, `DiceRollsUI` e `PlayerBattleUI`.
-*   **Vazamento do HUD do Inimigo:** O HUD do inimigo (`BattlerPanelView`) está anexado diretamente a `Characters -> EnemySpawnPoint -> EnemyBattler` no espaço do mundo (World Space) do personagem. Ele deveria residir sob a âncora `EnemyCanvas` para isolar a renderização de UI da lógica física do mundo do jogo.
+*   **Vazamento do HUD do Inimigo:** O HUD do inimigo (`BattlerHUDView`) está anexado diretamente a `Characters -> EnemySpawnPoint -> EnemyBattler` no espaço do mundo (World Space) do personagem. Ele deveria residir sob a âncora `EnemyCanvas` para isolar a renderização de UI da lógica física do mundo do jogo.
 
 ### 3. Vazamentos de Responsabilidade (Responsibility Leaks)
 *   **ActionPanel Monolítico:** `ActionPanelView.cs` gerencia individualmente 12 botões de alocação de dados diferentes (Adicionar/Remover para Mente, Coração, Corpo em ambos os tipos de rolagem: Poder e Precisão) e 6 textos de contagem. O script possui mais de 18 campos serializados diretos apenas para alocação de dados.
@@ -51,10 +51,10 @@ Raiz da Cena (Scene Root)
 │   └── TurnOrderView [FeedbackView] (substitui TurnUI)
 │
 ├── PlayerCanvas (Screen Space - Overlay Canvas)
-│   └── PlayerHUDView [BattlerPanelView] (substitui BattleCanvas/PlayerBattleUI)
+│   └── PlayerHUDView [BattlerHUDView] (substitui BattleCanvas/PlayerBattleUI)
 │
 └── EnemyCanvas (Screen Space - Overlay ou World Space Canvas)
-    └── EnemyHUDView [BattlerPanelView] (extraído do GameObject do inimigo no espaço 3D)
+    └── EnemyHUDView [BattlerHUDView] (extraído do GameObject do inimigo no espaço 3D)
 ```
 
 ### 2. Estratégia de Componentização
@@ -67,7 +67,7 @@ Extrairemos as seções repetitivas ou complexas nos seguintes componentes de UI
     *   **Uso:** `ActionPanelView` terá apenas 6 referências de `DiceStatAllocatorUI` (Mente Poder, Coração Poder, Corpo Poder, Mente Precisão, Coração Precisão, Corpo Precisão) em vez de 18 campos de botões e textos avulsos.
 2.  **`ResourceBarUI` (Novo Componente):**
     *   **Propósito:** Widget reutilizável que representa um recurso (HP, Mente, Coração, Corpo) com barra de preenchimento, ícone e valor textual.
-    *   **Uso:** Substitui o layout duplicado e aninhado dentro de `BattlerPanelView` (HUDs de Jogador e Inimigo).
+    *   **Uso:** Substitui o layout duplicado e aninhado dentro de `BattlerHUDView` (HUDs de Jogador e Inimigo).
 
 ### 3. Redirecionamento do Fluxo de Dados
 

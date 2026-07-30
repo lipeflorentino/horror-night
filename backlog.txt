@@ -24,7 +24,7 @@ Ordem de Leitura/Execução: Comece de BAIXO para CIMA (O que está mais embaixo
 🗄️ BACKLOG (Menor Prioridade)
     
 Sistemas Gerais (Baixa prioridade / complexo)
-    
+    - Erros deve crashar o jogo para evitar travamentos
     - Criar NPCEncounterSystem
     - Implementar sistema de Curse/Maldição
         - Maldições que alteram diretamente sistemas do jogo (UI, cor, sons, textos)
@@ -114,8 +114,11 @@ Sistemas de Combate
         - Criar uma UI especifica para tricks de identidade e tricks temporarias
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
-        - Ajustar UI de triggered / cooldown / casted
         
-    - Corrigir HpText do inimigo
     
-    - Aplicar learned tricks 
+TASKS
+    - Ajustar UI de triggered / cooldown / casted
+    - Feedback para "falha em cast"
+    - Trick não está entrando em cooldown 
+    - Trick não está saindo da tela ao fim do duration 
+    

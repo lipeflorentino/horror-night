@@ -40,7 +40,7 @@
                        ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │  CombatView.UpdateView(Player, Enemy) ← Player está DESATUALIZADO│
-│  └─ BattlerPanelView.Bind(Player) ← Exibe valores ANTIGOS       │
+│  └─ BattlerHUDView.Bind(Player) ← Exibe valores ANTIGOS       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -64,7 +64,7 @@
 ❌ PlayerStatusManager.cs
    └─ ApplyStatDelta() não notifica CombatManager
 
-✓ BattlerPanelView.cs
+✓ BattlerHUDView.cs
    └─ Exibe valores corretos do Battler (mas Battler está desatualizado)
 ```
 
@@ -191,7 +191,7 @@ public void SyncPlayerStatsFromStatusManager()
                        ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │  CombatView.UpdateView(Player, Enemy)                            │
-│  └─ BattlerPanelView.Bind(Player) ← Exibe valores CORRETOS ✅   │
+│  └─ BattlerHUDView.Bind(Player) ← Exibe valores CORRETOS ✅   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -204,7 +204,7 @@ public void SyncPlayerStatsFromStatusManager()
 | **PlayerStatusManager** | Só retornava Heart/Body/Mind | Retorna Attack/Defense também | ✅ Expansão compatível |
 | **CombatManager.RefreshCombatUI()** | Atualizava diretamente | Sincroniza antes de atualizar | ✅ Corrigido |
 | **InventoryInputHandler** | Chamava RefreshCombatUI sem sincronização | Agora sincronização é automática | ✅ Funciona corretamente |
-| **BattlerPanelView** | Exibia stats desatualizado | Exibe stats atualizado | ✅ Corrigido |
+| **BattlerHUDView** | Exibia stats desatualizado | Exibe stats atualizado | ✅ Corrigido |
 
 ---
 

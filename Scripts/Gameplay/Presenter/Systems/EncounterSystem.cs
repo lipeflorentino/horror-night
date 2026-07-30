@@ -64,6 +64,10 @@ public class EncounterSystem : MonoBehaviour
             return;
             
         PlayerStatusSnapshot snapshot = playerStatusManager.GetSnapshot();
+
+        // TODO: Remove this line after testing, it's just to ensure the player has a trick for testing purposes.
+        snapshot.trickInventory.AddLearnedTrickId("six_feet_under");
+        
         CombatSessionData sessionData = new()
         {
             PlayerSnapshot = snapshot,

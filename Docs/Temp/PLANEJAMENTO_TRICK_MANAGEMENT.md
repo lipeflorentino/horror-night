@@ -253,9 +253,9 @@ CombatManager.EndTurn()
      └─ Reduz cooldown em cada slot
 ```
 
-### Com BattlerPanelView
+### Com BattlerHUDView
 ```
-BattlerPanelView.Initialize()
+BattlerHUDView.Initialize()
   ├─ perkDisplayView.Initialize(battler, perkService)
   └─ [NEW] trickInventoryView.Initialize(battler, trickInventory)
 ```

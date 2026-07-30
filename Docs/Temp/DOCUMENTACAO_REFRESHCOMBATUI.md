@@ -40,7 +40,7 @@ public void UpdateView(Battler player, Battler enemy)
 }
 ```
 
-### O que `BattlerPanelView.Bind()` atualiza:
+### O que `BattlerHUDView.Bind()` atualiza:
 
 ```
 ┌─ HP (barra + texto)

@@ -194,7 +194,7 @@ Para documentação detalhada e troubleshooting:
 **Nenhuma mudança necessária em:**
 - `InventoryInputHandler` ✓
 - `InventoryView` ✓
-- `BattlerPanelView` ✓
+- `BattlerHUDView` ✓
 - `CombatView` ✓
 
 A sincronização é **automática** e **transparente**.

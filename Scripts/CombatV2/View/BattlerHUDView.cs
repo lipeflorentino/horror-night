@@ -1,8 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
-public class BattlerPanelView : MonoBehaviour
+public class BattlerHUDView : MonoBehaviour
 {
     private int currentMind, currentBody, currentHeart;
 

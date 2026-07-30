@@ -33,6 +33,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
             trickService.OnTrickCasted -= HandleTrickCasted;
             trickService.OnTrickExpired -= HandleTrickExpired;
             trickService.OnTrickRemoved -= HandleTrickRemoved;
+            trickService.OnTrickChanged -= HandleTrickChanged;
         }
 
         ownerBattler = owner;
@@ -52,11 +53,13 @@ public class StatusEffectFeedbacks : MonoBehaviour
             trickService.OnTrickCasted += HandleTrickCasted;
             trickService.OnTrickExpired += HandleTrickExpired;
             trickService.OnTrickRemoved += HandleTrickRemoved;
+            trickService.OnTrickChanged += HandleTrickChanged;
         }
     }
 
     private void HandleTrickCasted(Battler battler, TrickRuntimeInstance trick)
     {
+        Logger.Log($"trick casted: {trick.Definition.DisplayName}, {trick.InstanceId}, {trick.RemainingTurns}");
         if (!ShouldHandleEvent(battler))
             return;
 
@@ -130,6 +133,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
     {
+        Logger.Log($"[HandleTrickExpired] Handling trick expired for {battler.Name}: {trick.Definition.DisplayName}");
         if (!ShouldHandleEvent(battler))
             return;
 
@@ -138,6 +142,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void HandleTrickRemoved(Battler battler, string trickId)
     {
+        Logger.Log($"[HandleTrickRemoved] Handling trick removed: {trickId}");
         if (!ShouldHandleEvent(battler))
             return;
 
@@ -151,6 +156,21 @@ public class StatusEffectFeedbacks : MonoBehaviour
                 RemovePopup(pair.Key);
                 break;
             }
+        }
+    }
+
+    private void HandleTrickChanged(Battler battler, TrickRuntimeInstance trick)
+    {
+        if (!ShouldHandleEvent(battler))
+            return;
+
+        if (trick == null || trick.Definition == null)
+            return;
+
+        string feedbackKey = GetFeedbackKey(trick.InstanceId, trick.Definition.Id);
+        if (popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObject) && popupObject != null && popupObject.TryGetComponent<StatusEffectUI>(out var popup))
+        {
+            popup.RefreshDuration(trick.RemainingTurns);
         }
     }
 
@@ -197,14 +217,17 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void RemovePopup(string feedbackKey)
     {
-        if (string.IsNullOrWhiteSpace(feedbackKey) || !popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObject))
+        popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObj);
+        if (string.IsNullOrWhiteSpace(feedbackKey) || !popupObj)
             return;
 
         popupByFeedbackKey.Remove(feedbackKey);
-        if (popupObject != null && popupObject.TryGetComponent<StatusEffectUI>(out var popup))
+        if (popupObj != null && popupObj.TryGetComponent<StatusEffectUI>(out var popup))
         {
             popup.PlayExitAnimation();
         }
+
+        Destroy(popupObj, 2f); // Delay destruction to allow exit animation to play
     }
 
     private static string GetFeedbackKey(string runtimeId, string fallbackId)

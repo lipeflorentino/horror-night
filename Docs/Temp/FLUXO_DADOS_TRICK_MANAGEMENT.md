@@ -9,7 +9,7 @@ CombatManager.Start()
     ├─ 🔧 TrickService = new TrickService(PerkService)
     ├─ 🔧 TrickDatabase.GetOrCreateRuntimeDatabase()
     │
-    ├─ 🎨 BattlerPanelView.Bind(Player)
+    ├─ 🎨 BattlerHUDView.Bind(Player)
     │   └─ TrickInventoryView trickView = FindObjectOfType<TrickInventoryView>()
     │       ├─ 📦 ITrickInventory inventory = BuildTrickInventory()
     │       │   └─ [4 Equipped Slots + 4 Identity Slots (empty initially)]

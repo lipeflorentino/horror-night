@@ -289,9 +289,9 @@ EndTurn()
 └─ [NEW] TrickInventory.TickSlotCooldowns()
 ```
 
-### Com BattlerPanelView.Initialize()
+### Com BattlerHUDView.Initialize()
 ```
-BattlerPanelView.Bind(battler)
+BattlerHUDView.Bind(battler)
 ├─ perkDisplayView.Initialize()
 └─ [NEW] trickInventoryView.Initialize()
 ```
@@ -362,7 +362,7 @@ TrickInventory.TryCastTrick()
 
 ### **Fase 4: Integration & Polish** (3-4 horas)
 - [ ] CombatManager integration
-- [ ] BattlerPanelView updates
+- [ ] BattlerHUDView updates
 - [ ] Audio feedback
 - [ ] E2E tests
 - [ ] Performance optimization

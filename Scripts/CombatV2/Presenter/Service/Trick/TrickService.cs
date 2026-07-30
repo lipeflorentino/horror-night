@@ -41,6 +41,8 @@ public class TrickService
             Logger.Log($"[TrickService] TickTrickEnd chamado para {battler.Name} sem inventário. Slots castados não serão limpos quando tricks expirarem!");
         }
 
+        List<TrickRuntimeInstance> tricksToRemove = new();
+
         for (int i = battler.Tricks.Count - 1; i >= 0; i--)
         {
             TrickRuntimeInstance trick = battler.Tricks[i];
@@ -84,30 +86,34 @@ public class TrickService
             
             if (trick.RemainingTurns == 0 && !trick.WasExpired)
             {
-                RemoveActivePerks(battler, trick);
-                trick.MarkExpired();
-                changed = true;
-
-                if (trick.SlotType == TrickSlotType.Casted && trick.SlotIndex >= 0)
-                {
-                    if (trickInventory != null)
-                    {
-                        trickInventory.RemoveCastedTrick(trick.SlotIndex);
-                    }
-                    else
-                    {
-                        Logger.Log($"[TrickService] Trick castado '{trick.Definition.DisplayName}' expirou para {battler.Name} mas inventário é null. Slot {trick.SlotIndex} permanecerá bloqueado!");
-                    }
-                }
+                tricksToRemove.Add(trick);
                 
-                battler.Tricks.RemoveAt(i);
-
-                OnTrickExpired?.Invoke(battler, trick);
-                continue;
             }
 
             if (changed)
                 OnTrickChanged?.Invoke(battler, trick);
+        }
+
+        foreach (var trickToRemove in tricksToRemove)
+        {
+            RemoveActivePerks(battler, trickToRemove);
+            trickToRemove.MarkExpired();
+
+            if (trickToRemove.SlotType == TrickSlotType.Casted && trickToRemove.SlotIndex >= 0)
+            {
+                if (trickInventory != null)
+                {
+                    trickInventory.RemoveCastedTrick(trickToRemove.SlotIndex);
+                }
+            }
+            
+            battler.Tricks.Remove(trickToRemove);
+
+            OnTrickExpired?.Invoke(battler, trickToRemove);
+            if (trickToRemove.Definition != null)
+            {
+                OnTrickRemoved?.Invoke(battler, trickToRemove.Definition.Id);
+            }
         }
     }
 
@@ -126,10 +132,16 @@ public class TrickService
     public bool TryCastTrick(Battler target, ITrickInventory trickInventory, TrickSO definition, Battler source = null)
     {
         if (target == null || trickInventory == null || definition == null)
+        {
+            Logger.Log($"[TrickService] Não foi possível castar o trick '{definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
             return false;
+        }
 
         if (!trickInventory.CastTrick(definition, out TrickRuntimeInstance instance) || instance == null)
+        {
+            Logger.Log($"[TrickService] Falha ao castar o trick '{definition.DisplayName}' para {target.Name}. Verifique slots castados, cooldown e recursos.");
             return false;
+        }
 
         instance.SetSource(source ?? target);
         ApplyTrick(target, instance, source ?? target);
@@ -142,7 +154,10 @@ public class TrickService
     public TrickRuntimeInstance ApplyTrick(Battler target, TrickRuntimeInstance trickInstance, Battler source = null)
     {
         if (target == null || trickInstance?.Definition == null)
+        {
+            Logger.Log($"[TrickService] Não foi possível aplicar o trick '{trickInstance?.Definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
             return null;
+        }
 
         trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
 
@@ -155,7 +170,7 @@ public class TrickService
         OnTrickCasted?.Invoke(target, trickInstance);
         OnTrickChanged?.Invoke(target, trickInstance);
 
-        Debug.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
+        Logger.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
                   $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, TimingTurns: {trickInstance.Definition.TimingTurns}");
 
         return trickInstance;
@@ -177,8 +192,6 @@ public class TrickService
         target.Tricks.Remove(instance);
         OnTrickRemoved?.Invoke(target, trickId);
         OnTrickChanged?.Invoke(target, instance);
-
-        Debug.Log($"[TrickService] Trick '{instance.Definition.DisplayName}' removido de {target.Name}");
     }
 
 
@@ -216,7 +229,9 @@ public class TrickService
     private void ApplyPerks(Battler target, TrickRuntimeInstance trickInstance, Battler source)
     {
         if (target == null || trickInstance?.Definition == null || trickInstance.HasAppliedPerks)
+        {
             return;
+        }
 
         trickInstance.ActivePerks.Clear();
 

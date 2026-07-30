@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Uma jarra cheia de biscoitos caseiros.
   weight: 40
   rarity: 0
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 38117ae958b6a2845b00b949f6df68d3, type: 3}
   levelRequirement: 2
   statBonus: hp+15:heart+5
   specialEffect: none

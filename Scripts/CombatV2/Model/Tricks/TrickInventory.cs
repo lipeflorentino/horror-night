@@ -60,9 +60,17 @@ public class TrickInventory : ITrickInventory
 
     public bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance)
     {
+        bool hasLearned = HasLearnedTrick(trick.Id);
+        bool isCasted = IsTrickCasted(trick.Id);
+        bool isCoolingDown = IsTrickCoolingDown(trick.Id);
+        bool canCast = trick.CanCast(owner, perkService);
+
+        Logger.Log($"[TrickInventory] CastTrick check '{trick.Id}': hasLearned={hasLearned}, isCasted={isCasted}, isCoolingDown={isCoolingDown}, canCast={canCast}");
+
         instance = null;
-        if (owner == null || trick == null || !HasLearnedTrick(trick.Id) || IsTrickCasted(trick.Id) || IsTrickCoolingDown(trick.Id) || !trick.CanCast(owner, perkService))
+        if (owner == null || trick == null || !hasLearned || isCasted || isCoolingDown || !canCast)
         {
+            Logger.Log($"[TrickInventory] Não foi possível castar o trick '{trick.Id ?? "null"}' para {owner?.Name ?? "null"}. Verifique se o trick foi aprendido, se já está castado, se está em cooldown ou se os requisitos são atendidos.");
             return false;
         }
 
@@ -70,6 +78,7 @@ public class TrickInventory : ITrickInventory
 
         if (freeSlot == null)
         {
+            Logger.Log($"[TrickInventory] Não foi possível castar o trick '{trick.Id ?? "null"}' para {owner?.Name ?? "null"}. Não há slots livres.");
             return false;
         }
 

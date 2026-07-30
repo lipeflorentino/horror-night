@@ -26,6 +26,17 @@ public class TrickInventorySnapshot
 
         return snapshot;
     }
+
+    public void AddLearnedTrickId(string trickId)
+    {
+        if (this == null || string.IsNullOrWhiteSpace(trickId))
+            return;
+
+        learnedTrickIds ??= new List<string>();
+
+        if (!learnedTrickIds.Contains(trickId))
+            learnedTrickIds.Add(trickId);
+    }
 }
 
 [Serializable]

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CombatView : MonoBehaviour
 {
-    public BattlerPanelView PlayerPanel;
-    public BattlerPanelView EnemyPanel;
+    public BattlerHUDView PlayerPanel;
+    public BattlerHUDView EnemyPanel;
     public ActionPanelView ActionPanel;
     public FeedbackView FeedbackView;
     public DiceRollView DiceRollView;
@@ -22,9 +22,9 @@ public class CombatView : MonoBehaviour
     public void Init(CombatManager combatManager)
     {
         this.combatManager = combatManager;
-        BattlerPanelView[] panels = FindObjectsOfType<BattlerPanelView>();
+        BattlerHUDView[] panels = FindObjectsOfType<BattlerHUDView>();
         
-        foreach (BattlerPanelView panel in panels)
+        foreach (BattlerHUDView panel in panels)
         {
             string panelName = panel.gameObject.name.ToLowerInvariant();
             if (PlayerPanel == null && panelName.Contains("player"))

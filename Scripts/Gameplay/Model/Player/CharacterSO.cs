@@ -45,8 +45,7 @@ public class CharacterSO : ScriptableObject
 
     public void ApplyDefaults()
     {
-        if (IdentityTricks == null)
-            IdentityTricks = new List<TrickSO>();
+        IdentityTricks ??= new List<TrickSO>();
 
         if (string.IsNullOrWhiteSpace(Id))
         {
@@ -85,7 +84,7 @@ public class CharacterSO : ScriptableObject
 
         for (int i = 0; i < source.Count; i++)
         {
-            string id = source[i]?.Id;
+            string id = source[i].Id;
             if (!string.IsNullOrWhiteSpace(id) && !target.Contains(id))
                 target.Add(id);
         }

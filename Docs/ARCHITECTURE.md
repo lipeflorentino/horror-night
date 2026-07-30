@@ -75,7 +75,7 @@ classDiagram
             +Init(CombatManager, ITrickInventory)
         }
         class ActionPanelView
-        class BattlerPanelView
+        class BattlerHUDView
         class DiceAllocationView
         class DiceRollView
         class FeedbackView
@@ -268,7 +268,7 @@ classDiagram
 
     %% ─── VIEW interno ───
     CombatView *-- ActionPanelView
-    CombatView *-- BattlerPanelView
+    CombatView *-- BattlerHUDView
     CombatView *-- DiceAllocationView
     CombatView *-- DiceRollView
     CombatView *-- FeedbackView
@@ -539,7 +539,7 @@ CombatV2/
     ├── UIComponents/     # Dice, Trick, Item, StatusEffect, CombatLog UI
     ├── CombatView.cs
     ├── ActionPanelView.cs
-    ├── BattlerPanelView.cs
+    ├── BattlerHUDView.cs
     ├── DiceAllocationView.cs
     ├── DiceRollView.cs
     ├── FeedbackView.cs

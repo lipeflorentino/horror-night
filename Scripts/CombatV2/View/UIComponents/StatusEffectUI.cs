@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -6,10 +7,14 @@ using UnityEngine.UI;
 
 public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [Header("Popup Settings")]
     [SerializeField] private Image icon;
-    [SerializeField] private TMP_Text durationText;   
-    [SerializeField] private TMP_Text descriptionText;
-    [SerializeField] private TMP_Text nameText;
+    [SerializeField] private TMP_Text durationText;
+    [Header("Tooltip Settings")]
+    [SerializeField] private Image tooltipIcon;
+    [SerializeField] private TMP_Text tooltipDurationText;   
+    [SerializeField] private TMP_Text tooltipDescriptionText;
+    [SerializeField] private TMP_Text tooltipNameText;
     [SerializeField] private GameObject tooltip;
     [SerializeField] private float enterDuration = 0.2f;
     [SerializeField] private float exitDuration = 0.15f;
@@ -24,26 +29,50 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (icon != null)
             icon.sprite = iconSprite;
 
+        if (tooltipIcon != null)
+            tooltipIcon.sprite = iconSprite;
+
         if (durationText != null)
+        {
             durationText.text = remainingTurns > 0 ? remainingTurns.ToString() : string.Empty;
+        }
 
-        if (descriptionText != null)
-            descriptionText.text = description;
+        if (tooltipDurationText != null)
+        {
+            tooltipDurationText.text = remainingTurns > 0 ? remainingTurns.ToString() : string.Empty;
+        }
 
-        if (nameText != null)
-            nameText.text = displayName;
+        if (tooltipDescriptionText != null)
+            tooltipDescriptionText.text = description;
+
+        if (tooltipNameText != null)
+            tooltipNameText.text = displayName;
+    }
+
+    public void RefreshDuration(int remainingTurns)
+    {
+        if (durationText != null)
+        {
+            durationText.text = remainingTurns > 0 ? remainingTurns.ToString() : string.Empty;
+        }
+
+        if (tooltipDurationText != null)
+        {
+            tooltipDurationText.text = remainingTurns > 0 ? remainingTurns.ToString() : string.Empty;
+        }
     }
 
     public void PlayEnterAnimation()
     {
-        StopAllCoroutines();
-        StartCoroutine(AnimateScale(Vector3.zero, enterScale, enterDuration));
+        transform.DOKill(); 
+        transform.localScale = Vector3.zero;
+        transform.DOScale(enterScale, enterDuration).SetEase(Ease.OutBack);
     }
 
     public void PlayExitAnimation()
     {
-        StopAllCoroutines();
-        StartCoroutine(AnimateScale(transform.localScale, exitScale, exitDuration));
+        transform.DOKill();
+        transform.DOScale(exitScale, exitDuration).SetEase(Ease.InBack);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -64,25 +93,6 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private void OnMouseExit()
     {
         HideTooltip();
-    }
-
-    private IEnumerator AnimateScale(Vector3 fromScale, Vector3 toScale, float duration)
-    {
-        RectTransform rectTransform = GetComponent<RectTransform>();
-        if (rectTransform == null)
-            yield break;
-
-        rectTransform.localScale = fromScale;
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = duration <= 0f ? 1f : Mathf.Clamp01(elapsed / duration);
-            rectTransform.localScale = Vector3.Lerp(fromScale, toScale, t);
-            yield return null;
-        }
-
-        rectTransform.localScale = toScale;
     }
 
     private void ShowTooltip()

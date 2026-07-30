@@ -45,7 +45,6 @@ public class PlayerFeedbacks : MonoBehaviour
 
     public void ShowPlayerDamageFlash()
     {
-        Logger.Log("[Feedback] Player damage flash triggered.");
         AnimatePlayerFlash();
     }
 
@@ -143,8 +142,6 @@ public class PlayerFeedbacks : MonoBehaviour
 
     private void AnimateActionLog(string text, bool isAttackFeedback)
     {
-        Logger.Log($"[Feedback] {text}");
-
         Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
 
         playerStatusText.color = textColor;

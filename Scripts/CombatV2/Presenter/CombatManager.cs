@@ -37,8 +37,6 @@ public class CombatManager : MonoBehaviour
     // =========================
     private DiceService DiceService;
     private PerkService PerkService;
-    public PerkService GetPerkService() => PerkService;
-    public TrickService GetTrickService() => TrickService;
     private TrickService TrickService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
@@ -83,6 +81,9 @@ public class CombatManager : MonoBehaviour
         Enemy = enemy;
         PlayerIcon = playerIcon;
         EnemyIcon = enemyIcon;
+
+        // TODO: Remove this line after testing, it's just to ensure the player has a trick for testing purposes.
+        player.AddMomentum(6);
 
         TurnManager.DefineStartingTurnByInitiative(Player, Enemy, InitiativeResolverService, TurnState);
 
@@ -163,7 +164,7 @@ public class CombatManager : MonoBehaviour
             return false;
 
         bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
-        View.ShowCombatLog($"[Trick] <color=yellow>{trick.name}</color> cast by <color=blue>{Player.Name}</color>");
+        if (casted) View.ShowCombatLog($"[Trick] <color=yellow>{trick.name}</color> cast by <color=blue>{Player.Name}</color>");
         RefreshCombatUI();
         return casted;
     }
@@ -285,8 +286,7 @@ public class CombatManager : MonoBehaviour
         return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, PerkService, TurnState, allocatedDiceCount);
     }
 
-    public DiceService GetDiceService()
-    {
-        return DiceService;
-    }
+    public DiceService GetDiceService() => DiceService;
+    public PerkService GetPerkService() => PerkService;
+    public TrickService GetTrickService() => TrickService;
 }
