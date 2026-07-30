@@ -120,5 +120,4 @@ TASKS
     - Ajustar UI de triggered / cooldown / casted
     - Feedback para "falha em cast"
     - Trick não está entrando em cooldown 
-    - Trick não está saindo da tela ao fim do duration 
     
