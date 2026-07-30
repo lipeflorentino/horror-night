@@ -5,14 +5,16 @@ using UnityEngine;
 public class TrickInventory : ITrickInventory
 {
     public const int DefaultIdentitySlotCount = 4;
-    public const int DefaultCastedSlotCount = 4;
+    public const int DefaultActiveCastedSlotCount = 4;
+    public const int DefaultPassiveCastedSlotCount = 4;
 
     private readonly Battler owner;
     private readonly TrickDatabase trickDatabase;
     private readonly PerkService perkService;
     private readonly List<TrickSlot> identitySlots = new();
     private readonly List<TrickSO> learnedTricks = new();
-    private readonly List<TrickSlot> castedSlots = new();
+    private readonly List<TrickSlot> activeCastedSlots = new();
+    private readonly List<TrickSlot> passiveCastedSlots = new();
 
     public event Action OnChanged;
 
@@ -21,20 +23,22 @@ public class TrickInventory : ITrickInventory
         TrickDatabase trickDatabase,
         TrickInventorySnapshot snapshot = null,
         int identitySlotCount = DefaultIdentitySlotCount,
-        int castedSlotCount = DefaultCastedSlotCount,
+        int activeCastedSlotCount = DefaultActiveCastedSlotCount,
+        int passiveCastedSlotCount = DefaultPassiveCastedSlotCount,
         PerkService perkService = null)
     {
         this.owner = owner;
         this.trickDatabase = trickDatabase ?? TrickDatabase.GetOrCreateRuntimeDatabase();
         this.perkService = perkService;
         
-        InitializeSlots(Mathf.Max(1, identitySlotCount), Mathf.Max(1, castedSlotCount));
+        InitializeSlots(Mathf.Max(1, identitySlotCount), Mathf.Max(1, activeCastedSlotCount), Mathf.Max(1, passiveCastedSlotCount));
         RestoreSnapshot(snapshot);
     }
 
     public IReadOnlyList<TrickSlot> IdentitySlots => identitySlots;
     public IReadOnlyList<TrickSO> LearnedTricks => learnedTricks;
-    public IReadOnlyList<TrickSlot> CastedSlots => castedSlots;
+    public IReadOnlyList<TrickSlot> ActiveCastedSlots => activeCastedSlots;
+    public IReadOnlyList<TrickSlot> PassiveCastedSlots => passiveCastedSlots;
 
     public bool LearnTrick(TrickSO trick)
     {
@@ -60,6 +64,14 @@ public class TrickInventory : ITrickInventory
 
     public bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance)
     {
+        instance = null;
+
+        if (owner == null || trick == null)
+        {
+            Logger.Log($"[TrickInventory] Não foi possível castar o trick '{trick?.Id ?? "null"}' para {owner?.Name ?? "null"}.");
+            return false;
+        }
+
         bool hasLearned = HasLearnedTrick(trick.Id);
         bool isCasted = IsTrickCasted(trick.Id);
         bool isCoolingDown = IsTrickCoolingDown(trick.Id);
@@ -67,14 +79,15 @@ public class TrickInventory : ITrickInventory
 
         Logger.Log($"[TrickInventory] CastTrick check '{trick.Id}': hasLearned={hasLearned}, isCasted={isCasted}, isCoolingDown={isCoolingDown}, canCast={canCast}");
 
-        instance = null;
-        if (owner == null || trick == null || !hasLearned || isCasted || isCoolingDown || !canCast)
+        if (!hasLearned || isCasted || isCoolingDown || !canCast)
         {
             Logger.Log($"[TrickInventory] Não foi possível castar o trick '{trick.Id ?? "null"}' para {owner?.Name ?? "null"}. Verifique se o trick foi aprendido, se já está castado, se está em cooldown ou se os requisitos são atendidos.");
             return false;
         }
 
-        TrickSlot freeSlot = castedSlots.Find(slot => slot != null && slot.IsEmpty && !slot.IsLocked);
+        List<TrickSlot> targetSlots = GetCastedSlotsForTrick(trick);
+        TrickSlotType slotType = GetCastedSlotTypeForTrick(trick);
+        TrickSlot freeSlot = targetSlots?.Find(slot => slot != null && slot.IsEmpty && !slot.IsLocked);
 
         if (freeSlot == null)
         {
@@ -84,7 +97,7 @@ public class TrickInventory : ITrickInventory
 
         owner.SpendMomentum(trick.MomentumCost);
         
-        instance = new TrickRuntimeInstance(trick, owner, trick.DurationTurns, trick.CooldownTurns, TrickSlotType.Casted, freeSlot.SlotIndex, owner);
+        instance = new TrickRuntimeInstance(trick, owner, trick.DurationTurns, trick.CooldownTurns, slotType, freeSlot.SlotIndex, owner);
         freeSlot.BindRuntimeInstance(instance);
 
         if (owner.Tricks != null && !owner.Tricks.Contains(instance))
@@ -96,12 +109,13 @@ public class TrickInventory : ITrickInventory
         return true;
     }
 
-    public bool RemoveCastedTrick(int slotIndex)
+    public bool RemoveCastedTrick(TrickSlotType slotType, int slotIndex)
     {
-        if (slotIndex < 0 || slotIndex >= castedSlots.Count)
+        List<TrickSlot> slots = GetCastedSlots(slotType);
+        if (slots == null || slotIndex < 0 || slotIndex >= slots.Count)
             return false;
 
-        TrickSlot slot = castedSlots[slotIndex];
+        TrickSlot slot = slots[slotIndex];
         if (slot == null || slot.IsEmpty || slot.IsLocked)
             return false;
 
@@ -140,9 +154,17 @@ public class TrickInventory : ITrickInventory
                 snapshot.identityTrickIds.Add(trick.Id);
         }
 
-        for (int i = 0; i < castedSlots.Count; i++)
+        AddCastedSlotsToSnapshot(snapshot, activeCastedSlots);
+        AddCastedSlotsToSnapshot(snapshot, passiveCastedSlots);
+
+        return snapshot;
+    }
+
+    private static void AddCastedSlotsToSnapshot(TrickInventorySnapshot snapshot, List<TrickSlot> slots)
+    {
+        for (int i = 0; i < slots.Count; i++)
         {
-            TrickSlot slot = castedSlots[i];
+            TrickSlot slot = slots[i];
             TrickRuntimeInstance runtimeInstance = slot?.RuntimeInstance;
             TrickSO trick = slot?.Definition;
             if (trick == null || string.IsNullOrWhiteSpace(trick.Id))
@@ -150,6 +172,7 @@ public class TrickInventory : ITrickInventory
 
             snapshot.castedSlots.Add(new CastedTrickSlotSnapshot
             {
+                slotType = slot.SlotType,
                 slotIndex = i,
                 trickId = trick.Id,
                 remainingTurns = runtimeInstance?.RemainingTurns ?? trick.DurationTurns,
@@ -157,26 +180,30 @@ public class TrickInventory : ITrickInventory
             });
         }
 
-        return snapshot;
     }
 
-    private void InitializeSlots(int identitySlotCount, int castedSlotCount)
+    private void InitializeSlots(int identitySlotCount, int activeCastedSlotCount, int passiveCastedSlotCount)
     {
         identitySlots.Clear();
-        castedSlots.Clear();
+        activeCastedSlots.Clear();
+        passiveCastedSlots.Clear();
 
         for (int i = 0; i < identitySlotCount; i++)
             identitySlots.Add(new TrickSlot(TrickSlotType.Identity, i));
 
-        for (int i = 0; i < castedSlotCount; i++)
-            castedSlots.Add(new TrickSlot(TrickSlotType.Casted, i));
+        for (int i = 0; i < activeCastedSlotCount; i++)
+            activeCastedSlots.Add(new TrickSlot(TrickSlotType.CastedActive, i));
+
+        for (int i = 0; i < passiveCastedSlotCount; i++)
+            passiveCastedSlots.Add(new TrickSlot(TrickSlotType.CastedPassive, i));
     }
 
     private void RestoreSnapshot(TrickInventorySnapshot snapshot)
     {
         learnedTricks.Clear();
         ClearSlots(identitySlots);
-        ClearSlots(castedSlots);
+        ClearSlots(activeCastedSlots);
+        ClearSlots(passiveCastedSlots);
 
         RestoreIdentitySlots(snapshot?.identityTrickIds);
         RestoreLearnedTricks(snapshot?.learnedTrickIds);
@@ -229,15 +256,16 @@ public class TrickInventory : ITrickInventory
         for (int i = 0; i < snapshots.Count; i++)
         {
             CastedTrickSlotSnapshot slotSnapshot = snapshots[i];
-            if (slotSnapshot.slotIndex < 0 || slotSnapshot.slotIndex >= castedSlots.Count)
+            List<TrickSlot> slots = GetCastedSlots(slotSnapshot.slotType);
+            if (slots == null || slotSnapshot.slotIndex < 0 || slotSnapshot.slotIndex >= slots.Count)
                 continue;
 
             TrickSO trick = FindTrick(slotSnapshot.trickId);
             if (trick == null)
                 continue;
 
-            TrickRuntimeInstance instance = new(trick, owner, slotSnapshot.remainingTurns, slotSnapshot.cooldownTurnsRemaining, TrickSlotType.Casted, slotSnapshot.slotIndex, owner);
-            castedSlots[slotSnapshot.slotIndex].BindRuntimeInstance(instance);
+            TrickRuntimeInstance instance = new(trick, owner, slotSnapshot.remainingTurns, slotSnapshot.cooldownTurnsRemaining, slotSnapshot.slotType, slotSnapshot.slotIndex, owner);
+            slots[slotSnapshot.slotIndex].BindRuntimeInstance(instance);
             if (owner?.Tricks != null && !owner.Tricks.Contains(instance))
                 owner.Tricks.Add(instance);
             
@@ -265,12 +293,34 @@ public class TrickInventory : ITrickInventory
 
     private bool IsTrickCasted(string trickId)
     {
-        return castedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId));
+        return activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId)) || passiveCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId));
     }
 
     private bool IsTrickCoolingDown(string trickId)
     {
-        return castedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
+        return activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown) || passiveCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
+    }
+
+    private List<TrickSlot> GetCastedSlotsForTrick(TrickSO trick)
+    {
+        return GetCastedSlots(GetCastedSlotTypeForTrick(trick));
+    }
+
+    private static TrickSlotType GetCastedSlotTypeForTrick(TrickSO trick)
+    {
+        return trick != null && trick.ActivationMode == TrickActivationMode.Passive
+            ? TrickSlotType.CastedPassive
+            : TrickSlotType.CastedActive;
+    }
+
+    private List<TrickSlot> GetCastedSlots(TrickSlotType slotType)
+    {
+        return slotType switch
+        {
+            TrickSlotType.CastedActive => activeCastedSlots,
+            TrickSlotType.CastedPassive => passiveCastedSlots,
+            _ => null,
+        };
     }
 
     private void NotifyChanged()

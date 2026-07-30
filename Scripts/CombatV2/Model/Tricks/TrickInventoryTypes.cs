@@ -12,7 +12,8 @@ public enum TrickInventoryLocation
 {
     LearnedTricks,
     IdentitySlot,
-    CastedSlot
+    CastedActiveSlot,
+    CastedPassiveSlot
 }
 
 [Serializable]
@@ -27,5 +28,5 @@ public struct TrickInventoryItemLocation
         SlotIndex = slotIndex;
     }
 
-    public readonly bool IsSlot => Location == TrickInventoryLocation.IdentitySlot || Location == TrickInventoryLocation.CastedSlot;
+    public readonly bool IsSlot => Location == TrickInventoryLocation.IdentitySlot || Location == TrickInventoryLocation.CastedActiveSlot || Location == TrickInventoryLocation.CastedPassiveSlot;
 }

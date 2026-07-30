@@ -37,7 +37,7 @@ public class TrickRuntimeInstance
         Battler owner,
         int durationTurns,
         int? cooldownTurnsRemaining = null,
-        TrickSlotType slotType = TrickSlotType.Casted,
+        TrickSlotType slotType = TrickSlotType.CastedActive,
         int slotIndex = -1,
         Battler source = null,
         string instanceId = null)

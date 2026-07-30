@@ -99,11 +99,11 @@ public class TrickService
             RemoveActivePerks(battler, trickToRemove);
             trickToRemove.MarkExpired();
 
-            if (trickToRemove.SlotType == TrickSlotType.Casted && trickToRemove.SlotIndex >= 0)
+            if ((trickToRemove.SlotType == TrickSlotType.CastedActive || trickToRemove.SlotType == TrickSlotType.CastedPassive) && trickToRemove.SlotIndex >= 0)
             {
                 if (trickInventory != null)
                 {
-                    trickInventory.RemoveCastedTrick(trickToRemove.SlotIndex);
+                    trickInventory.RemoveCastedTrick(trickToRemove.SlotType, trickToRemove.SlotIndex);
                 }
             }
             

@@ -26,7 +26,7 @@ public class CombatInventoryInitializer
     {
         TrickDatabase trickDatabase = TrickDatabase.GetOrCreateRuntimeDatabase();
         TrickInventorySnapshot snapshot = sessionData?.PlayerSnapshot.trickInventory;
-        return new TrickInventory(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, perkService);
+        return new TrickInventory(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultActiveCastedSlotCount, TrickInventory.DefaultPassiveCastedSlotCount, perkService);
     }
 
     public static ITrickInventory BuildEnemyTrickInventory(Battler owner, CombatSessionData sessionData, PerkService perkService)
@@ -39,7 +39,7 @@ public class CombatInventoryInitializer
             snapshot = sessionData.EnemyInstance.source.GetTrickInventorySnapshot();
         }
 
-        return new TrickInventory(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultCastedSlotCount, perkService);
+        return new TrickInventory(owner, trickDatabase, snapshot, TrickInventory.DefaultIdentitySlotCount, TrickInventory.DefaultActiveCastedSlotCount, TrickInventory.DefaultPassiveCastedSlotCount, perkService);
     }
 
     public static void ActivatePlayerIdentityTricks(Battler player, ITrickInventory playerTrickInventory, TrickService trickService)

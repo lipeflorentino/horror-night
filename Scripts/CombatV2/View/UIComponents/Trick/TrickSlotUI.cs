@@ -98,7 +98,7 @@ public class TrickSlotUI : MonoBehaviour
         if (inputKeyText == null)
             return;
 
-        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedSlot && boundTrick != null && boundTrick.IsActive
+        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedActiveSlot && boundTrick != null
             ? inputKeyOverride
             : "";
 

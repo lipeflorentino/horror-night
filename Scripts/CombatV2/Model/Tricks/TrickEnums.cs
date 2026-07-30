@@ -29,5 +29,6 @@ public enum TrickRarity
 public enum TrickSlotType
 {
     Identity,
-    Casted
+    CastedActive,
+    CastedPassive
 }

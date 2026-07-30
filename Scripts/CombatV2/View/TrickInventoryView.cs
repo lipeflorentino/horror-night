@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 public class TrickInventoryView : MonoBehaviour
 {
     [SerializeField] private Transform identitySlotsRoot;
     [SerializeField] private Transform learnedTricksRoot;
-    [SerializeField] private Transform castedSlotsRoot;
-    [SerializeField] private TrickSlotUI learnedTrickSlotPrefab, castedTrickSlotPrefab, identityTrickSlotPrefab;
+    [FormerlySerializedAs("castedSlotsRoot")]
+    [SerializeField] private Transform activeCastedSlotsRoot;
+    [SerializeField] private Transform passiveCastedSlotsRoot;
+    [SerializeField] private TrickSlotUI learnedTrickSlotPrefab;
+    [FormerlySerializedAs("castedTrickSlotPrefab")]
+    [SerializeField] private TrickSlotUI activeCastedTrickSlotPrefab;
+    [SerializeField] private TrickSlotUI passiveCastedTrickSlotPrefab;
+    [SerializeField] private TrickSlotUI identityTrickSlotPrefab;
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private Button closeButton;
     [SerializeField] private GameObject trickInventoryPanel;
@@ -69,7 +76,8 @@ public class TrickInventoryView : MonoBehaviour
 
         SpawnSlots(boundInventory.IdentitySlots, identitySlotsRoot, TrickInventoryLocation.IdentitySlot);
         SpawnLearnedTricks();
-        SpawnCastedSlots();
+        SpawnActiveCastedSlots();
+        SpawnPassiveCastedSlots();
 
         if (IsInventoryOpen())
             SelectDefaultTrick();
@@ -120,12 +128,21 @@ public class TrickInventoryView : MonoBehaviour
 
     private TrickRuntimeInstance FindCastedRuntime(TrickSO trick)
     {
-        if (trick == null || boundInventory?.CastedSlots == null)
+        if (trick == null || boundInventory == null)
             return null;
 
-        for (int i = 0; i < boundInventory.CastedSlots.Count; i++)
+        return FindCastedRuntimeInSlots(trick, boundInventory.ActiveCastedSlots)
+            ?? FindCastedRuntimeInSlots(trick, boundInventory.PassiveCastedSlots);
+    }
+
+    private TrickRuntimeInstance FindCastedRuntimeInSlots(TrickSO trick, IReadOnlyList<TrickSlot> slots)
+    {
+        if (slots == null)
+            return null;
+
+        for (int i = 0; i < slots.Count; i++)
         {
-            TrickSlot slot = boundInventory.CastedSlots[i];
+            TrickSlot slot = slots[i];
             if (slot?.Definition != null && string.Equals(slot.Definition.Id, trick.Id, StringComparison.OrdinalIgnoreCase))
                 return slot.RuntimeInstance;
         }
@@ -133,26 +150,23 @@ public class TrickInventoryView : MonoBehaviour
         return null;
     }
 
-    private void SpawnCastedSlots()
+    private void SpawnActiveCastedSlots()
     {
-        if (boundInventory?.CastedSlots == null)
+        if (boundInventory?.ActiveCastedSlots == null)
             return;
 
-        int activeTrickIndex = 0;
-        for (int i = 0; i < boundInventory.CastedSlots.Count; i++)
+        for (int i = 0; i < boundInventory.ActiveCastedSlots.Count; i++)
         {
-            TrickSlot slot = boundInventory.CastedSlots[i];
+            TrickSlot slot = boundInventory.ActiveCastedSlots[i];
             int slotIndex = slot?.SlotIndex ?? i;
-            string inputKey = string.Empty;
-
-            if (slot?.Definition != null && slot.Definition.IsActive)
-            {
-                inputKey = activeTrickIndex < CastedActiveInputKeys.Length ? CastedActiveInputKeys[activeTrickIndex] : string.Empty;
-                activeTrickIndex++;
-            }
-
-            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, castedSlotsRoot, new TrickInventoryItemLocation(TrickInventoryLocation.CastedSlot, slotIndex), slot != null && slot.IsLocked, inputKey);
+            string inputKey = i < CastedActiveInputKeys.Length ? CastedActiveInputKeys[i] : string.Empty;
+            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, activeCastedSlotsRoot, new TrickInventoryItemLocation(TrickInventoryLocation.CastedActiveSlot, slotIndex), slot != null && slot.IsLocked, inputKey);
         }
+    }
+
+    private void SpawnPassiveCastedSlots()
+    {
+        SpawnSlots(boundInventory?.PassiveCastedSlots, passiveCastedSlotsRoot, TrickInventoryLocation.CastedPassiveSlot);
     }
 
     private void SpawnSlots(IReadOnlyList<TrickSlot> slots, Transform parent, TrickInventoryLocation location)
@@ -175,7 +189,8 @@ public class TrickInventoryView : MonoBehaviour
         TrickSlotUI trickSlotPrefab = location.Location switch
         {
             TrickInventoryLocation.IdentitySlot => identityTrickSlotPrefab != null ? identityTrickSlotPrefab : null,
-            TrickInventoryLocation.CastedSlot => castedTrickSlotPrefab != null ? castedTrickSlotPrefab : null,
+            TrickInventoryLocation.CastedActiveSlot => activeCastedTrickSlotPrefab != null ? activeCastedTrickSlotPrefab : null,
+            TrickInventoryLocation.CastedPassiveSlot => passiveCastedTrickSlotPrefab != null ? passiveCastedTrickSlotPrefab : activeCastedTrickSlotPrefab,
             _ => learnedTrickSlotPrefab != null ? learnedTrickSlotPrefab : null,
         };
 
@@ -208,7 +223,8 @@ public class TrickInventoryView : MonoBehaviour
     {
         TrickSlotUI defaultSlot = FindFirstSelectableSlot(TrickInventoryLocation.IdentitySlot)
             ?? FindFirstSelectableSlot(TrickInventoryLocation.LearnedTricks)
-            ?? FindFirstSelectableSlot(TrickInventoryLocation.CastedSlot);
+            ?? FindFirstSelectableSlot(TrickInventoryLocation.CastedActiveSlot)
+            ?? FindFirstSelectableSlot(TrickInventoryLocation.CastedPassiveSlot);
 
         if (defaultSlot != null)
             HandleTrickSelected(defaultSlot);

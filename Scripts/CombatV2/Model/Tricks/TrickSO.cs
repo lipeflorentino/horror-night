@@ -42,7 +42,7 @@ public class TrickSO : ScriptableObject
     public TrickActivationMode ActivationMode = TrickActivationMode.Active;
 
     public bool IsPassive => ActivationMode == TrickActivationMode.Passive;
-    public bool IsActive => ActivationMode == TrickActivationMode.Active;
+    public bool IsActive => ActivationMode == TrickActivationMode.Active || ActivationMode == TrickActivationMode.ActiveCharge;
 
     [Header("Efeitos")]
     [Tooltip("IDs dos Perks que este Trick ativa. Devem ser encontrados em PerkDatabase.")]
