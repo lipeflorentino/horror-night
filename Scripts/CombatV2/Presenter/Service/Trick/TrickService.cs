@@ -33,13 +33,20 @@ public class TrickService
     /// </summary>
     public void TickTrickEnd(Battler battler, ITrickInventory trickInventory)
     {
-        if (battler == null || battler.Tricks.Count == 0)
+        if (battler == null)
             return;
 
         if (trickInventory == null)
         {
             Logger.Log($"[TrickService] TickTrickEnd chamado para {battler.Name} sem inventário. Slots castados não serão limpos quando tricks expirarem!");
         }
+        else
+        {
+            trickInventory.TickCooldowns();
+        }
+
+        if (battler.Tricks.Count == 0)
+            return;
 
         List<TrickRuntimeInstance> tricksToRemove = new();
 

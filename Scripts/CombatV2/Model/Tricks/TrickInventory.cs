@@ -15,6 +15,7 @@ public class TrickInventory : ITrickInventory
     private readonly List<TrickSO> learnedTricks = new();
     private readonly List<TrickSlot> activeCastedSlots = new();
     private readonly List<TrickSlot> passiveCastedSlots = new();
+    private readonly Dictionary<string, int> cooldownTurnsByTrickId = new(StringComparer.OrdinalIgnoreCase);
 
     public event Action OnChanged;
 
@@ -56,6 +57,7 @@ public class TrickInventory : ITrickInventory
             return false;
 
         bool removed = learnedTricks.Remove(trick) || learnedTricks.RemoveAll(t => IsSameTrick(t, trick.Id)) > 0;
+        ClearCooldown(trick.Id);
         if (removed)
             NotifyChanged();
 
@@ -127,6 +129,8 @@ public class TrickInventory : ITrickInventory
             slot.RuntimeInstance.ActivePerks.Clear();
         }
 
+        RegisterCooldown(slot.RuntimeInstance);
+
         if (owner?.Tricks != null && slot.RuntimeInstance != null)
             owner.Tricks.Remove(slot.RuntimeInstance);
 
@@ -134,6 +138,30 @@ public class TrickInventory : ITrickInventory
         NotifyChanged();
         
         return true;
+    }
+
+    public void TickCooldowns()
+    {
+        if (cooldownTurnsByTrickId.Count == 0)
+            return;
+
+        List<string> trickIds = new(cooldownTurnsByTrickId.Keys);
+        bool changed = false;
+
+        for (int i = 0; i < trickIds.Count; i++)
+        {
+            string trickId = trickIds[i];
+            int remainingTurns = Mathf.Max(0, cooldownTurnsByTrickId[trickId] - 1);
+            if (remainingTurns <= 0)
+                cooldownTurnsByTrickId.Remove(trickId);
+            else
+                cooldownTurnsByTrickId[trickId] = remainingTurns;
+
+            changed = true;
+        }
+
+        if (changed)
+            NotifyChanged();
     }
 
     public TrickInventorySnapshot GetSnapshot()
@@ -156,8 +184,24 @@ public class TrickInventory : ITrickInventory
 
         AddCastedSlotsToSnapshot(snapshot, activeCastedSlots);
         AddCastedSlotsToSnapshot(snapshot, passiveCastedSlots);
+        AddCooldownsToSnapshot(snapshot);
 
         return snapshot;
+    }
+
+    private void AddCooldownsToSnapshot(TrickInventorySnapshot snapshot)
+    {
+        foreach (KeyValuePair<string, int> cooldown in cooldownTurnsByTrickId)
+        {
+            if (string.IsNullOrWhiteSpace(cooldown.Key) || cooldown.Value <= 0)
+                continue;
+
+            snapshot.cooldowns.Add(new TrickCooldownSnapshot
+            {
+                trickId = cooldown.Key,
+                cooldownTurnsRemaining = cooldown.Value
+            });
+        }
     }
 
     private static void AddCastedSlotsToSnapshot(TrickInventorySnapshot snapshot, List<TrickSlot> slots)
@@ -201,12 +245,14 @@ public class TrickInventory : ITrickInventory
     private void RestoreSnapshot(TrickInventorySnapshot snapshot)
     {
         learnedTricks.Clear();
+        cooldownTurnsByTrickId.Clear();
         ClearSlots(identitySlots);
         ClearSlots(activeCastedSlots);
         ClearSlots(passiveCastedSlots);
 
         RestoreIdentitySlots(snapshot?.identityTrickIds);
         RestoreLearnedTricks(snapshot?.learnedTrickIds);
+        RestoreCooldowns(snapshot?.cooldowns);
         RestoreCastedSlots(snapshot?.castedSlots);
     }
 
@@ -298,8 +344,56 @@ public class TrickInventory : ITrickInventory
 
     private bool IsTrickCoolingDown(string trickId)
     {
-        return activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown) 
+        return HasRegisteredCooldown(trickId)
+            || activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown)
             || passiveCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
+    }
+
+    private bool HasRegisteredCooldown(string trickId)
+    {
+        return !string.IsNullOrWhiteSpace(trickId)
+            && cooldownTurnsByTrickId.TryGetValue(trickId, out int remainingTurns)
+            && remainingTurns > 0;
+    }
+
+    private void RegisterCooldown(TrickRuntimeInstance instance)
+    {
+        if (instance?.Definition == null || string.IsNullOrWhiteSpace(instance.Definition.Id) || instance.CooldownTurnsRemaining <= 0)
+            return;
+
+        cooldownTurnsByTrickId[instance.Definition.Id] = Mathf.Max(
+            GetRegisteredCooldown(instance.Definition.Id),
+            instance.CooldownTurnsRemaining);
+    }
+
+    private int GetRegisteredCooldown(string trickId)
+    {
+        return !string.IsNullOrWhiteSpace(trickId) && cooldownTurnsByTrickId.TryGetValue(trickId, out int remainingTurns)
+            ? remainingTurns
+            : 0;
+    }
+
+    private void ClearCooldown(string trickId)
+    {
+        if (!string.IsNullOrWhiteSpace(trickId))
+            cooldownTurnsByTrickId.Remove(trickId);
+    }
+
+    private void RestoreCooldowns(List<TrickCooldownSnapshot> cooldowns)
+    {
+        if (cooldowns == null)
+            return;
+
+        for (int i = 0; i < cooldowns.Count; i++)
+        {
+            TrickCooldownSnapshot cooldown = cooldowns[i];
+            if (string.IsNullOrWhiteSpace(cooldown.trickId) || cooldown.cooldownTurnsRemaining <= 0)
+                continue;
+
+            cooldownTurnsByTrickId[cooldown.trickId] = Mathf.Max(
+                GetRegisteredCooldown(cooldown.trickId),
+                cooldown.cooldownTurnsRemaining);
+        }
     }
 
     private List<TrickSlot> GetCastedSlotsForTrick(TrickSO trick)
