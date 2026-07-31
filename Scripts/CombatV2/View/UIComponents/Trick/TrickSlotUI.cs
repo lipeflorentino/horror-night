@@ -9,9 +9,11 @@ public class TrickSlotUI : MonoBehaviour
     [SerializeField] private Image iconImage;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text inputKeyText;
+    [SerializeField] private GameObject inputKeyField;
     [SerializeField] private GameObject emptyState;
     [SerializeField] private GameObject lockedState;
     [SerializeField] private GameObject highlightState;
+    [SerializeField] private GameObject cooldownState;
 
     [Header("Interaction")]
     [SerializeField] private Button interactButton;
@@ -34,6 +36,9 @@ public class TrickSlotUI : MonoBehaviour
 
         SetSelected(false);
         ShowInteractionPanel(false);
+        
+        if (lockedState != null) lockedState.SetActive(false);
+        if (cooldownState != null) cooldownState.SetActive(false);
     }
 
     private void OnDestroy()
@@ -64,9 +69,14 @@ public class TrickSlotUI : MonoBehaviour
 
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
         UpdateInputKeyText(itemLocation, inputKeyOverride);
+        
+        bool isCoolingDown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
-        if (interactButton != null) interactButton.interactable = trick != null && !isLocked;
+        if (cooldownState != null) cooldownState.SetActive(isCoolingDown);
+        if (interactButton != null) interactButton.interactable = trick != null && !isLocked && !isCoolingDown;
+        
         SetSelected(false);
     }
 
@@ -98,12 +108,17 @@ public class TrickSlotUI : MonoBehaviour
         if (inputKeyText == null)
             return;
 
-        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedActiveSlot && boundTrick != null
+        string inputKey = itemLocation.Location == TrickInventoryLocation.CastedActiveSlot 
             ? inputKeyOverride
             : "";
 
         inputKeyText.text = inputKey;
-        inputKeyText.gameObject.SetActive(!string.IsNullOrEmpty(inputKey));
+        
+        bool showKey = !string.IsNullOrEmpty(inputKey);
+        inputKeyText.gameObject.SetActive(showKey);
+        
+        if (inputKeyField != null)
+            inputKeyField.SetActive(showKey);
     }
 
     public void SetSelected(bool selected)

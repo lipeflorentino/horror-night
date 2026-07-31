@@ -298,7 +298,8 @@ public class TrickInventory : ITrickInventory
 
     private bool IsTrickCoolingDown(string trickId)
     {
-        return activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown) || passiveCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
+        return activeCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown) 
+            || passiveCastedSlots.Exists(slot => IsSameTrick(slot?.Definition, trickId) && slot.RuntimeInstance != null && slot.RuntimeInstance.IsCoolingDown);
     }
 
     private List<TrickSlot> GetCastedSlotsForTrick(TrickSO trick)

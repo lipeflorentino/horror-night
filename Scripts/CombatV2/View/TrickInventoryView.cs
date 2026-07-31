@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,17 +8,20 @@ using UnityEngine.Serialization;
 
 public class TrickInventoryView : MonoBehaviour
 {
+    [FormerlySerializedAs("Slots Root")]
     [SerializeField] private Transform identitySlotsRoot;
     [SerializeField] private Transform learnedTricksRoot;
-    [FormerlySerializedAs("castedSlotsRoot")]
     [SerializeField] private Transform activeCastedSlotsRoot;
     [SerializeField] private Transform passiveCastedSlotsRoot;
-    [SerializeField] private TrickSlotUI learnedTrickSlotPrefab;
-    [FormerlySerializedAs("castedTrickSlotPrefab")]
+    [FormerlySerializedAs("Prefabs")]
     [SerializeField] private TrickSlotUI activeCastedTrickSlotPrefab;
     [SerializeField] private TrickSlotUI passiveCastedTrickSlotPrefab;
     [SerializeField] private TrickSlotUI identityTrickSlotPrefab;
-    [SerializeField] private TMP_Text statusText;
+    [SerializeField] private TrickSlotUI learnedTrickSlotPrefab;
+    [Header("Settings")]
+    [SerializeField] private int maxLearnedSlots = 16;
+    [Header("Components")]
+    [SerializeField] private FeedbackPanelUI statusFeedbackPanel;
     [SerializeField] private Button closeButton;
     [SerializeField] private GameObject trickInventoryPanel;
     [SerializeField] private TrickInfoPanelUI trickInfoPanel;
@@ -85,10 +89,15 @@ public class TrickInventoryView : MonoBehaviour
             trickInfoPanel.HidePanel();
     }
 
+    /// <summary>
+    /// Delega o controle da mensagem e animação de feedback para o UIFeedbackPanel.
+    /// </summary>
     public void SetStatus(string message)
     {
-        if (statusText != null)
-            statusText.text = message;
+        if (statusFeedbackPanel != null)
+        {
+            statusFeedbackPanel.ShowStatus(message);
+        }
     }
 
     public void Open()
@@ -114,15 +123,12 @@ public class TrickInventoryView : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < boundInventory.LearnedTricks.Count; i++)
+        for (int i = 0; i < maxLearnedSlots; i++)
         {
-            TrickSO trick = boundInventory.LearnedTricks[i];
-            if (trick == null)
-            {
-                continue;
-            }
-
-            SpawnTrickView(trick, FindCastedRuntime(trick), learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks));
+            TrickSO trick = i < boundInventory.LearnedTricks.Count ? boundInventory.LearnedTricks[i] : null;
+            TrickRuntimeInstance runtime = FindCastedRuntime(trick);
+            bool isAlreadyCasted = runtime != null;
+            SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted);
         }
     }
 

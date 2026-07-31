@@ -646,7 +646,7 @@ GameObject:
   - component: {fileID: 771149431445082359}
   - component: {fileID: 9185628420703314075}
   m_Layer: 0
-  m_Name: IdentitySlot
+  m_Name: IdentityTrickSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
