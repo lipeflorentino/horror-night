@@ -81,8 +81,8 @@ public class TrickInventoryInputHandler : MonoBehaviour
             return;
         }
 
-        bool discarded = location.Location == TrickInventoryLocation.CastedSlot
-            ? playerTrickInventory.RemoveCastedTrick(location.SlotIndex)
+        bool discarded = (location.Location == TrickInventoryLocation.CastedActiveSlot || location.Location == TrickInventoryLocation.CastedPassiveSlot)
+            ? playerTrickInventory.RemoveCastedTrick(GetSlotType(location.Location), location.SlotIndex)
             : playerTrickInventory.DischardTrick(trick);
 
         if (trickInventoryView != null)
@@ -90,5 +90,12 @@ public class TrickInventoryInputHandler : MonoBehaviour
             trickInventoryView.SetStatus(discarded ? $"Descartou {trick.DisplayName}" : $"Falha ao descartar {trick.DisplayName}");
             trickInventoryView.Refresh();
         }
+    }
+
+    private static TrickSlotType GetSlotType(TrickInventoryLocation location)
+    {
+        return location == TrickInventoryLocation.CastedPassiveSlot
+            ? TrickSlotType.CastedPassive
+            : TrickSlotType.CastedActive;
     }
 }

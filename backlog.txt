@@ -86,6 +86,10 @@ Sistemas de Combate
         - Adicionar parâmetro no Trick/Perk   
     - Implementar efeitos secundários 
         - Blocked attack (-1 mind, -1 attack) // perk rachadura moral 
+    - Parametros que devem ser atribuidos do Battler 
+        - maxLearnedSlots
+        - maxCastedSlots
+        - maxIdentitySlots
 
 🐛 BUGS & FIXES
 
@@ -118,6 +122,7 @@ Sistemas de Combate
     
 TASKS
     - Ajustar UI de triggered / cooldown / casted
+    - Slots não preenchidos devem entrar como bloqueados caso o jogador nao tenha todos os slots abertos
     - Feedback para "falha em cast"
     - Trick não está entrando em cooldown 
     

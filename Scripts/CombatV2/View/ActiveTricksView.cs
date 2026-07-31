@@ -36,11 +36,11 @@ public class ActiveTricksView : MonoBehaviour
 
         ClearIcons();
 
-        IReadOnlyList<TrickSlot> castedSlots = combatManager.PlayerTrickInventory.CastedSlots;
+        IReadOnlyList<TrickSlot> castedSlots = combatManager.PlayerTrickInventory.ActiveCastedSlots;
         for (int i = 0; i < castedSlots.Count; i++)
         {
             TrickSlot slot = castedSlots[i];
-            if (slot == null || slot.IsEmpty || slot.RuntimeInstance == null || slot.Definition == null || slot.Definition.ActivationMode == TrickActivationMode.Passive)
+            if (slot == null || slot.IsEmpty || slot.RuntimeInstance == null || slot.Definition == null)
                 continue;
 
             TrickIconUI iconUI = Instantiate(trickIconPrefab, activeTricksRoot);

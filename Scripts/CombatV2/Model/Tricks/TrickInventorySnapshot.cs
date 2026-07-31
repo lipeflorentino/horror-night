@@ -42,6 +42,7 @@ public class TrickInventorySnapshot
 [Serializable]
 public struct CastedTrickSlotSnapshot
 {
+    public TrickSlotType slotType;
     public int slotIndex;
     public string trickId;
     public int remainingTurns;
