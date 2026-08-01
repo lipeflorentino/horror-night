@@ -14,6 +14,7 @@ public class TrickSlotUI : MonoBehaviour
     [SerializeField] private GameObject lockedState;
     [SerializeField] private GameObject highlightState;
     [SerializeField] private GameObject cooldownState;
+    [SerializeField] private TMP_Text cooldownText;
 
     [Header("Interaction")]
     [SerializeField] private Button interactButton;
@@ -70,11 +71,31 @@ public class TrickSlotUI : MonoBehaviour
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
         UpdateInputKeyText(itemLocation, inputKeyOverride);
         
+        // 1. Lemos os estados matemáticos puros do Runtime Instance
         bool isCoolingDown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        bool isActive = runtimeInstance != null && runtimeInstance.RemainingTurns > 0 && !runtimeInstance.WasExpired;
+        bool showCooldownVisual;
+
+        if (location.Location == TrickInventoryLocation.LearnedTricks)
+        {
+            // No painel de inventário, mostramos o visual de cooldown imediatamente, 
+            // pois o jogador precisa saber que a habilidade não está pronta.
+            showCooldownVisual = isCoolingDown;
+        }
+        else
+        {
+            // Nas barras de combate (CastedActive / CastedPassive), o slot continua 
+            // "aceso" enquanto o efeito estiver durando (!isActive = false).
+            // O visual de cooldown só aparece depois que o RemainingTurns zera.
+            showCooldownVisual = isCoolingDown && !isActive;
+            if (cooldownText != null) cooldownText.text = boundRuntimeInstance?.CooldownTurnsRemaining.ToString("F0") ?? "";
+        }
         
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
-        if (cooldownState != null) cooldownState.SetActive(isCoolingDown);
+        if (cooldownState != null) cooldownState.SetActive(showCooldownVisual);
+
+        // Mantém o botão bloqueado caso esteja em cooldown (independentemente de onde esteja)
         if (interactButton != null) interactButton.interactable = trick != null && !isLocked && !isCoolingDown;
         
         SetSelected(false);

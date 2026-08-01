@@ -123,6 +123,5 @@ Sistemas de Combate
 TASKS
     - Ajustar UI de triggered / cooldown / casted
     - Slots não preenchidos devem entrar como bloqueados caso o jogador nao tenha todos os slots abertos
-    - Feedback para "falha em cast"
-    - Trick não está entrando em cooldown 
+    - Adicionar feedback para estados de tricks e tooltips (cooldown, locked, etc)
     

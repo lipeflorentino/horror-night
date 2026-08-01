@@ -67,7 +67,8 @@ public class TrickService
                 changed = true;
             }
 
-            if (trick.IsCoolingDown)
+            // CORREÇÃO AQUI: O cooldown só diminui se a trick já tiver expirado (duração finalizada)
+            if (trick.IsCoolingDown && trick.WasExpired)
             {
                 trick.DecreaseCooldown();
                 changed = true;
@@ -91,10 +92,21 @@ public class TrickService
                 changed = true;
             }
             
+            // Expiração do Efeito (Duração chega a zero)
+            // Note que como isso ocorre DEPOIS da checagem do cooldown lá em cima, 
+            // no turno em que ela expira, o cooldown ainda não conta. Só começa no próximo.
             if (trick.RemainingTurns == 0 && !trick.WasExpired)
             {
+                RemoveActivePerks(battler, trick);
+                trick.MarkExpired();
+                OnTrickExpired?.Invoke(battler, trick);
+                changed = true;
+            }
+
+            // Remoção do Slot (Duração 0 E Cooldown 0)
+            if (trick.RemainingTurns == 0 && !trick.IsCoolingDown)
+            {
                 tricksToRemove.Add(trick);
-                
             }
 
             if (changed)
@@ -103,8 +115,13 @@ public class TrickService
 
         foreach (var trickToRemove in tricksToRemove)
         {
-            RemoveActivePerks(battler, trickToRemove);
-            trickToRemove.MarkExpired();
+            // Garantia (caso a trick tenha duração 0 e cooldown 0 e caia aqui direto)
+            if (!trickToRemove.WasExpired)
+            {
+                RemoveActivePerks(battler, trickToRemove);
+                trickToRemove.MarkExpired();
+                OnTrickExpired?.Invoke(battler, trickToRemove);
+            }
 
             if ((trickToRemove.SlotType == TrickSlotType.CastedActive || trickToRemove.SlotType == TrickSlotType.CastedPassive) && trickToRemove.SlotIndex >= 0)
             {
@@ -114,9 +131,11 @@ public class TrickService
                 }
             }
             
-            battler.Tricks.Remove(trickToRemove);
+            if (battler.Tricks.Contains(trickToRemove))
+            {
+                battler.Tricks.Remove(trickToRemove);
+            }
 
-            OnTrickExpired?.Invoke(battler, trickToRemove);
             if (trickToRemove.Definition != null)
             {
                 OnTrickRemoved?.Invoke(battler, trickToRemove.Definition.Id);
