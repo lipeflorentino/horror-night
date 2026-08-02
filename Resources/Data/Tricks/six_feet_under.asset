@@ -32,8 +32,8 @@ MonoBehaviour:
     MinAgility: 0
   MomentumCost: 4
   TimingTurns: 0
-  DurationTurns: 2
-  CooldownTurns: 3
+  DurationTurns: 1
+  CooldownTurns: 2
   ActivationMode: 0
   PerkIds:
   - six_feet_under

@@ -56,7 +56,7 @@ public class TrickSlotUI : MonoBehaviour
         trickInfoPanelUI = panel;
     }
 
-    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "")
+    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "", int registeredCooldown = 0)
     {
         boundTrick = trick;
         boundRuntimeInstance = runtimeInstance;
@@ -71,31 +71,39 @@ public class TrickSlotUI : MonoBehaviour
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
         UpdateInputKeyText(itemLocation, inputKeyOverride);
         
-        // 1. Lemos os estados matemáticos puros do Runtime Instance
-        bool isCoolingDown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        // 1. Lemos os estados: O cooldown pode vir do RuntimeInstance OU do registro do Inventário
+        bool hasRuntimeCooldown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        bool isCoolingDown = hasRuntimeCooldown || registeredCooldown > 0;
+        
         bool isActive = runtimeInstance != null && runtimeInstance.RemainingTurns > 0 && !runtimeInstance.WasExpired;
         bool showCooldownVisual;
 
         if (location.Location == TrickInventoryLocation.LearnedTricks)
         {
-            // No painel de inventário, mostramos o visual de cooldown imediatamente, 
-            // pois o jogador precisa saber que a habilidade não está pronta.
             showCooldownVisual = isCoolingDown;
+            
+            if (cooldownText != null) 
+            {
+                int displayCooldown = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
+                cooldownText.text = displayCooldown > 0 ? displayCooldown.ToString("F0") : "";
+            }
         }
         else
         {
-            // Nas barras de combate (CastedActive / CastedPassive), o slot continua 
-            // "aceso" enquanto o efeito estiver durando (!isActive = false).
-            // O visual de cooldown só aparece depois que o RemainingTurns zera.
             showCooldownVisual = isCoolingDown && !isActive;
-            if (cooldownText != null) cooldownText.text = boundRuntimeInstance?.CooldownTurnsRemaining.ToString("F0") ?? "";
+            
+            if (cooldownText != null) 
+            {
+                int displayCooldown = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
+                cooldownText.text = showCooldownVisual && displayCooldown > 0 ? displayCooldown.ToString("F0") : "";
+            }
         }
         
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
         if (cooldownState != null) cooldownState.SetActive(showCooldownVisual);
 
-        // Mantém o botão bloqueado caso esteja em cooldown (independentemente de onde esteja)
+        // Bloqueia se estiver castado (isLocked) OU em cooldown (isCoolingDown)
         if (interactButton != null) interactButton.interactable = trick != null && !isLocked && !isCoolingDown;
         
         SetSelected(false);

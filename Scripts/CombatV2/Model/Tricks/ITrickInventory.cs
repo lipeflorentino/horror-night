@@ -13,5 +13,6 @@ public interface ITrickInventory
     bool CastTrick(TrickSO trick, out TrickRuntimeInstance instance);
     bool RemoveCastedTrick(TrickSlotType slotType, int slotIndex);
     void TickCooldowns();
+    int GetRegisteredCooldown(string trickId);
     TrickInventorySnapshot GetSnapshot();
 }

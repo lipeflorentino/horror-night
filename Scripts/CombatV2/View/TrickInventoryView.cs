@@ -127,8 +127,13 @@ public class TrickInventoryView : MonoBehaviour
         {
             TrickSO trick = i < boundInventory.LearnedTricks.Count ? boundInventory.LearnedTricks[i] : null;
             TrickRuntimeInstance runtime = FindCastedRuntime(trick);
+            
             bool isAlreadyCasted = runtime != null;
-            SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted);
+            
+            // Busca o cooldown armazenado no dicionário do inventário
+            int registeredCooldown = trick != null ? boundInventory.GetRegisteredCooldown(trick.Id) : 0;
+
+            SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted, "", registeredCooldown);
         }
     }
 
@@ -190,7 +195,7 @@ public class TrickInventoryView : MonoBehaviour
         }    
     }
 
-    private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false, string inputKey = "")
+    private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false, string inputKey = "", int registeredCooldown = 0)
     {
         TrickSlotUI trickSlotPrefab = location.Location switch
         {
@@ -213,7 +218,7 @@ public class TrickInventoryView : MonoBehaviour
         TrickSlotUI trickSlotView = Instantiate(trickSlotPrefab, parent);
         TrickInfoPanelUI panel = trickInfoPanel != null ? trickInfoPanel : FindObjectOfType<TrickInfoPanelUI>();
         trickSlotView.SetTrickInfoPanel(panel);
-        trickSlotView.Bind(trick, location, runtimeInstance, isLocked, inputKey);
+        trickSlotView.Bind(trick, location, runtimeInstance, isLocked, inputKey, registeredCooldown);
         trickSlotView.TrickSelected += HandleTrickSelected;
         trickSlotView.OnInteractWithTrick += HandleTrickInteraction;
         trickSlotView.ShowInteractionPanel(false);

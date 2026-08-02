@@ -125,3 +125,11 @@ TASKS
     - Slots não preenchidos devem entrar como bloqueados caso o jogador nao tenha todos os slots abertos
     - Adicionar feedback para estados de tricks e tooltips (cooldown, locked, etc)
     
+BUG
+
+     - Expose registered cooldowns to the inventory UI
+
+        When an expired casted trick still has CooldownTurnsRemaining, RemoveCastedTrick now moves that state into cooldownTurnsByTrickId and this line blocks future CastTrick attempts. 
+        However, once slot.Clear() runs there is no public way for the view to read that registered cooldown: learned slots only call FindCastedRuntime across active/passive slots (TrickInventoryView.cs:129-141), 
+        and TrickSlotUI.Bind only disables/shows cooldown when runtimeInstance.IsCoolingDown (TrickSlotUI.cs:73-78). In that post-expiry cooldown window the trick appears enabled but every click fails, 
+        so the cooldown state needs to be exposed or represented in the learned-slot runtime/UI.

@@ -366,7 +366,7 @@ public class TrickInventory : ITrickInventory
             instance.CooldownTurnsRemaining);
     }
 
-    private int GetRegisteredCooldown(string trickId)
+    public int GetRegisteredCooldown(string trickId)
     {
         return !string.IsNullOrWhiteSpace(trickId) && cooldownTurnsByTrickId.TryGetValue(trickId, out int remainingTurns)
             ? remainingTurns
