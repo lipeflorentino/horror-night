@@ -7,6 +7,7 @@ public class TrickInventorySnapshot
     public List<string> learnedTrickIds = new();
     public List<string> identityTrickIds = new();
     public List<CastedTrickSlotSnapshot> castedSlots = new();
+    public List<TrickCooldownSnapshot> cooldowns = new();
     
     /// <summary>
     /// Snapshot persistido fora do combate. Tricks aprendidas e de identidade ficam no jogador,
@@ -37,6 +38,13 @@ public class TrickInventorySnapshot
         if (!learnedTrickIds.Contains(trickId))
             learnedTrickIds.Add(trickId);
     }
+}
+
+[Serializable]
+public struct TrickCooldownSnapshot
+{
+    public string trickId;
+    public int cooldownTurnsRemaining;
 }
 
 [Serializable]

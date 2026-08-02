@@ -14,6 +14,7 @@ public class TrickSlotUI : MonoBehaviour
     [SerializeField] private GameObject lockedState;
     [SerializeField] private GameObject highlightState;
     [SerializeField] private GameObject cooldownState;
+    [SerializeField] private TMP_Text cooldownText;
 
     [Header("Interaction")]
     [SerializeField] private Button interactButton;
@@ -55,7 +56,7 @@ public class TrickSlotUI : MonoBehaviour
         trickInfoPanelUI = panel;
     }
 
-    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "")
+    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "", int registeredCooldown = 0)
     {
         boundTrick = trick;
         boundRuntimeInstance = runtimeInstance;
@@ -70,11 +71,39 @@ public class TrickSlotUI : MonoBehaviour
         if (nameText != null) nameText.text = trick != null ? trick.DisplayName : "";
         UpdateInputKeyText(itemLocation, inputKeyOverride);
         
-        bool isCoolingDown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        // 1. Lemos os estados: O cooldown pode vir do RuntimeInstance OU do registro do Inventário
+        bool hasRuntimeCooldown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
+        bool isCoolingDown = hasRuntimeCooldown || registeredCooldown > 0;
+        
+        bool isActive = runtimeInstance != null && runtimeInstance.RemainingTurns > 0 && !runtimeInstance.WasExpired;
+        bool showCooldownVisual;
+
+        if (location.Location == TrickInventoryLocation.LearnedTricks)
+        {
+            showCooldownVisual = isCoolingDown;
+            
+            if (cooldownText != null) 
+            {
+                int displayCooldown = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
+                cooldownText.text = displayCooldown > 0 ? displayCooldown.ToString("F0") : "";
+            }
+        }
+        else
+        {
+            showCooldownVisual = isCoolingDown && !isActive;
+            
+            if (cooldownText != null) 
+            {
+                int displayCooldown = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
+                cooldownText.text = showCooldownVisual && displayCooldown > 0 ? displayCooldown.ToString("F0") : "";
+            }
+        }
         
         if (emptyState != null) emptyState.SetActive(trick == null && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
-        if (cooldownState != null) cooldownState.SetActive(isCoolingDown);
+        if (cooldownState != null) cooldownState.SetActive(showCooldownVisual);
+
+        // Bloqueia se estiver castado (isLocked) OU em cooldown (isCoolingDown)
         if (interactButton != null) interactButton.interactable = trick != null && !isLocked && !isCoolingDown;
         
         SetSelected(false);

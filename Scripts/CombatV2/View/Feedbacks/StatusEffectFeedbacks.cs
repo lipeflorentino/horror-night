@@ -227,7 +227,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
             popup.PlayExitAnimation();
         }
 
-        Destroy(popupObj, 2f); // Delay destruction to allow exit animation to play
+        Destroy(popupObj, 4f); // Delay destruction to allow exit animation to play
     }
 
     private static string GetFeedbackKey(string runtimeId, string fallbackId)
