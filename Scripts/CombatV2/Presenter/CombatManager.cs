@@ -171,12 +171,25 @@ public class CombatManager : MonoBehaviour
 
     public void ExecuteManualTrickActivation(TrickRuntimeInstance instance)
     {
+        Logger.Log($"[CombatManager] Attempting manual activation of trick: {instance?.Definition?.name ?? "null"}");
+        
         if (TurnState.CombatEnded || instance == null || instance.Owner == null || PerkService == null)
             return;
 
+        // Verificação de segurança baseada na nova propriedade
+        if (!instance.IsReadyToTrigger) 
+            return;
+
         PerkService.ExecuteManualActivation(instance.Owner, instance);
-        View.ShowCombatLog($"[Trick] <color=yellow>{instance.Definition.name}</color> manually activated by <color=blue>{instance.Owner.Name}</color>");
+        
+        // Dispara log visualmente rico utilizando o ícone da habilidade
+        string displayName = string.IsNullOrWhiteSpace(instance.Definition.DisplayName) ? instance.Definition.Id : instance.Definition.DisplayName;
+        View.ShowCombatLog($"<color=white>{displayName}</color> ativado!", instance.Definition.Icon);
+        
         RefreshCombatUI();
+        
+        // Força a atualização da barra de Tricks para renderizar cooldowns/consumo imediatamente
+        View.RefreshActiveTricks(); 
     }
 
     // =========================

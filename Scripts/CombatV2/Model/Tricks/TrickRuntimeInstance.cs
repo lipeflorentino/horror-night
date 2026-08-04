@@ -23,7 +23,22 @@ public class TrickRuntimeInstance
     public bool HasAppliedPerks { get; private set; }
     public float CastTime { get; private set; }
     public float CurrentCharges { get; private set; }
-    public bool IsReadyToTrigger => CurrentCharges >= 1f;
+    public bool IsReadyToTrigger 
+    {
+        get 
+        {
+            // Só bloqueia por cooldown se a trick realmente já estiver na fase de recarga (expirada)
+            if (IsCoolingDown && WasExpired) 
+                return false;
+                
+            // Se requer cargas, valida se tem pelo menos 1
+            if (Definition != null && Definition.ActivationMode == TrickActivationMode.ActiveCharge)
+                return CurrentCharges >= 1f;
+                
+            // Se for Active normal, e não expirou/está na fase de recarga, está pronto
+            return !WasExpired;
+        }
+    }
 
     /// <summary>
     /// Perks que foram ativados por este Trick.

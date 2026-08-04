@@ -66,7 +66,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
         if (trick == null || trick.Definition == null)
             return;
 
-        if (trick.Definition.DurationTurns < 0 || trick.SlotType == TrickSlotType.Identity)
+        if (trick.Definition.DurationTurns < 0 || trick.SlotType == TrickSlotType.Identity || trick.SlotType == TrickSlotType.CastedActive)
             return;
 
         ShowFeedbackPopup(

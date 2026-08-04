@@ -4,17 +4,21 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-/// <summary>
-/// Exibe um ícone de Trick (card/ability) na UI com suporte a tooltip.
-/// </summary>
-[RequireComponent(typeof(Button))]
-public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [Header("Componentes Core")]
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI inputKeyText;
     [SerializeField] private TMP_Text turnCountText;    
     [SerializeField] private Image rarityBorder;
     [SerializeField] private Button releaseButton;
+    [SerializeField] private GameObject chargesContainer;
+    [SerializeField] private GameObject inputkeyContainer;
+
+    [Header("Componentes Novos - Cargas e Cooldown")]
+    [SerializeField] private TMP_Text chargesText;
+    [SerializeField] private GameObject cooldownOverlay;
+    [SerializeField] private TMP_Text cooldownTurnsText;
 
     private TrickSO trickDefinition;
     private TrickRuntimeInstance runtimeInstance;
@@ -25,9 +29,6 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public TrickRuntimeInstance RuntimeInstance => runtimeInstance;
     public event Action<TrickRuntimeInstance> OnReleaseClicked;
 
-    /// <summary>
-    /// Configura o ícone com dados do trick
-    /// </summary>
     public void Setup(TrickSO definition, string inputKeyOverride, TrickRuntimeInstance instance = null)
     {
         trickDefinition = definition;
@@ -40,9 +41,7 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             turnCountText.text = instance != null ? instance.RemainingTurns.ToString() : string.Empty;
 
         if (inputKeyText != null)
-        {
             inputKeyText.text = inputKeyOverride;
-        }
 
         if (rarityBorder != null)
             rarityBorder.color = GetRarityColor(definition.Rarity);
@@ -51,8 +50,42 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
             releaseButton.onClick.AddListener(OnReleaseClickedHandler);
-            UpdateReleaseButtonState();
         }
+
+        UpdateUI();
+    }
+
+    /// <summary>
+    /// Sincroniza visualmente as cargas, o overlay de cooldown e o botão
+    /// </summary>
+    public void UpdateUI()
+    {
+        if (trickDefinition == null || runtimeInstance == null) return;
+
+        // Feedback visual de Cooldown
+        bool isActuallyCoolingDown = runtimeInstance.IsCoolingDown && runtimeInstance.WasExpired;
+
+        // Feedback visual de Cargas
+        if (trickDefinition.ActivationMode == TrickActivationMode.ActiveCharge)
+        {
+            if (chargesText != null)
+            {
+                chargesText.text = Mathf.FloorToInt(runtimeInstance.CurrentCharges).ToString();
+            }
+        }
+
+        chargesContainer.SetActive(trickDefinition.ActivationMode == TrickActivationMode.ActiveCharge && !isActuallyCoolingDown);
+        inputkeyContainer.SetActive(!isActuallyCoolingDown);
+        
+        if (cooldownOverlay != null) 
+            cooldownOverlay.SetActive(isActuallyCoolingDown);
+            
+        if (cooldownTurnsText != null)
+        {
+            cooldownTurnsText.text = runtimeInstance.CooldownTurnsRemaining.ToString();
+        }
+
+        UpdateReleaseButtonState();
     }
 
     public void UpdateReleaseButtonState()
@@ -60,7 +93,8 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (releaseButton == null) return;
 
         bool canRelease = trickDefinition != null && 
-                          trickDefinition.ActivationMode == TrickActivationMode.ActiveCharge && 
+                          (trickDefinition.ActivationMode == TrickActivationMode.ActiveCharge || 
+                           trickDefinition.ActivationMode == TrickActivationMode.Active) && 
                           runtimeInstance != null && 
                           runtimeInstance.IsReadyToTrigger;
                           
@@ -69,13 +103,10 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void OnReleaseClickedHandler()
     {
-        if (runtimeInstance != null)
+        if (runtimeInstance != null && runtimeInstance.IsReadyToTrigger)
             OnReleaseClicked?.Invoke(runtimeInstance);
     }
 
-    /// <summary>
-    /// Retorna cor baseada na raridade
-    /// </summary>
     private Color GetRarityColor(TrickRarity rarity)
     {
         return rarity switch
@@ -97,14 +128,9 @@ public class TrickIconUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
     }
 
-    public void PlayEnterAnimation()
+    public void PlayActivationAnimation()
     {
         // TODO: Implementar animação de entrada
-    }
-
-    public void PlayExitAnimation()
-    {
-        // TODO: Implementar animação de saída
     }
 
     public void OnPointerEnter(PointerEventData eventData)

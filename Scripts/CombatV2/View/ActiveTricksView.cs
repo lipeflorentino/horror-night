@@ -4,11 +4,11 @@ using UnityEngine;
 public class ActiveTricksView : MonoBehaviour
 {
     [SerializeField] private CombatManager combatManager;
-    [SerializeField] private TrickIconUI trickIconPrefab;
+    [SerializeField] private ActiveTrickUI activeTrickPrefab;
     [SerializeField] private Transform activeTricksRoot;
     private static readonly string[] ActiveInputKeys = { "Q", "W", "E", "R" };
 
-    private readonly List<TrickIconUI> instantiatedIcons = new();
+    private readonly List<ActiveTrickUI> instantiatedIcons = new();
 
     public void Init(CombatManager combatManager)
     {
@@ -31,7 +31,7 @@ public class ActiveTricksView : MonoBehaviour
 
     public void Refresh()
     {
-        if (combatManager == null || combatManager.PlayerTrickInventory == null || trickIconPrefab == null || activeTricksRoot == null)
+        if (combatManager == null || combatManager.PlayerTrickInventory == null || activeTrickPrefab == null || activeTricksRoot == null)
             return;
 
         ClearIcons();
@@ -43,7 +43,7 @@ public class ActiveTricksView : MonoBehaviour
             if (slot == null || slot.IsEmpty || slot.RuntimeInstance == null || slot.Definition == null)
                 continue;
 
-            TrickIconUI iconUI = Instantiate(trickIconPrefab, activeTricksRoot);
+            ActiveTrickUI iconUI = Instantiate(activeTrickPrefab, activeTricksRoot);
             iconUI.Setup(slot.Definition, ActiveInputKeys[i], slot.RuntimeInstance);
             iconUI.OnReleaseClicked += HandleReleaseClicked;
             instantiatedIcons.Add(iconUI);

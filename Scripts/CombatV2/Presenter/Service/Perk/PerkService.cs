@@ -449,17 +449,26 @@ public class PerkService
         if (battler == null || trickInstance == null || trickInstance.Definition == null)
             return;
 
-        int charges = Mathf.FloorToInt(trickInstance.CurrentCharges);
-        if (charges <= 0)
-            return;
+        int chargesToUse = 1; // Valor padrão para Active normal
+
+        if (trickInstance.Definition.ActivationMode == TrickActivationMode.ActiveCharge)
+        {
+            chargesToUse = Mathf.FloorToInt(trickInstance.CurrentCharges);
+            if (chargesToUse <= 0)
+                return; // Aborta apenas se for ActiveCharge e não tiver cargas suficientes
+        }
+        else
+        {
+            // Se for Active normal, aborta se estiver em Cooldown
+            if (trickInstance.IsCoolingDown) return;
+        }
 
         // ETAPA A: Positive Release & ETAPA C (partial): Cleanup charge perks
         for (int i = 0; i < trickInstance.Definition.PerkIds.Count; i++)
         {
             string perkId = trickInstance.Definition.PerkIds[i];
             PerkSO perkDef = GetPerkDefinition(perkId);
-            if (perkDef == null)
-                continue;
+            if (perkDef == null) continue;
 
             bool hasManualTrigger = false;
             if (perkDef.Rules != null)
@@ -476,19 +485,17 @@ public class PerkService
 
             if (hasManualTrigger)
             {
-                ApplyPerk(battler, perkDef, battler, -1, charges);
+                // Usa as chargesToUse computadas
+                ApplyPerk(battler, perkDef, battler, -1, chargesToUse);
             }
             else
             {
                 PerkRuntimeInstance existing = battler.Perks.Find(p => p.Definition == perkDef && p.SourceTrickInstanceId == trickInstance.InstanceId);
-                if (existing != null)
-                {
-                    RemovePerkInstance(battler, existing);
-                }
+                if (existing != null) RemovePerkInstance(battler, existing);
             }
         }
 
-        // ETAPA B: Drawback
+        // ETAPA B: Drawback (Mantém-se igual)
         if (trickInstance.Definition.DrawbackIds != null && trickInstance.Definition.DrawbackIds.Count > 0)
         {
             DrawbackDatabase drawbackDb = DrawbackDatabase.GetOrCreateRuntimeDatabase();
@@ -505,17 +512,26 @@ public class PerkService
                     for (int j = 0; j < drawback.PerkIds.Count; j++)
                     {
                         PerkRuntimeInstance appliedPerk = ApplyPerk(battler, drawback.PerkIds[j], battler, rolledDuration, 1);
-                        if (appliedPerk != null)
-                        {
-                            drawbackInstance.ActivePerks.Add(appliedPerk);
-                        }
+                        if (appliedPerk != null) drawbackInstance.ActivePerks.Add(appliedPerk);
                     }
                 }
             }
         }
 
         // ETAPA C: Cleanup
-        trickInstance.ConsumeCharges();
+        if (trickInstance.Definition.ActivationMode == TrickActivationMode.ActiveCharge)
+        {
+            trickInstance.ConsumeCharges();
+            // Se ActiveCharge precisar entrar em cooldown entre usos sem expirar, você terá 
+            // que ajustar o TrickService.TickTrickEnd para descer o cooldown mesmo se WasExpired for false.
+        }
+        else if (trickInstance.Definition.ActivationMode == TrickActivationMode.Active)
+        {
+            // Força a expiração do Active Trick normal para que o Cooldown inicie na UI e no TrickService
+            trickInstance.RemainingTurns = 0;
+            trickInstance.MarkExpired();
+        }
+        
         trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
     }
 }

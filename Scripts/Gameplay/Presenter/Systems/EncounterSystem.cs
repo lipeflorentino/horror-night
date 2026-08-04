@@ -67,6 +67,8 @@ public class EncounterSystem : MonoBehaviour
 
         // TODO: Remove this line after testing, it's just to ensure the player has a trick for testing purposes.
         snapshot.trickInventory.AddLearnedTrickId("six_feet_under");
+        snapshot.trickInventory.AddLearnedTrickId("adrenaline_surge");
+        snapshot.trickInventory.AddLearnedTrickId("vengeance");
         
         CombatSessionData sessionData = new()
         {
