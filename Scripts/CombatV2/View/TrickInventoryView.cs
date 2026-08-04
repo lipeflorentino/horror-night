@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
+using DG.Tweening; // Importação necessária para animação do cursor
 
 public class TrickInventoryView : MonoBehaviour
 {
@@ -26,12 +27,33 @@ public class TrickInventoryView : MonoBehaviour
     [SerializeField] private GameObject trickInventoryPanel;
     [SerializeField] private TrickInfoPanelUI trickInfoPanel;
 
+    [Header("Highlight Cursor")]
+    [SerializeField] private RectTransform highlightCursor; // <- O NOVO CURSOR
+
     private readonly List<TrickSlotUI> spawnedSlots = new();
     private ITrickInventory boundInventory;
     private TrickSlotUI lastSelectedView;
     private static readonly string[] CastedActiveInputKeys = { "Q", "W", "E", "R" };
+    
+    // Controles das animações do cursor
+    private Tween cursorMoveTween;
+    private Tween cursorPulseTween;
+    private Coroutine initialSnapCoroutine;
 
     public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithInventoryTrick;
+
+    private void Start()
+    {
+        // Inicia a animação de pulso contínuo para o cursor
+        if (highlightCursor != null)
+        {
+            cursorPulseTween = highlightCursor.DOScale(1.05f, 0.5f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine);
+                
+            highlightCursor.gameObject.SetActive(false);
+        }
+    }
 
     private void OnEnable()
     {
@@ -52,6 +74,10 @@ public class TrickInventoryView : MonoBehaviour
     {
         if (boundInventory != null)
             boundInventory.OnChanged -= Refresh;
+
+        // Limpa os Tweens para evitar memory leak
+        cursorMoveTween?.Kill();
+        cursorPulseTween?.Kill();
     }
 
     public void BindInventory(ITrickInventory trickInventory)
@@ -62,9 +88,7 @@ public class TrickInventoryView : MonoBehaviour
         boundInventory = trickInventory;
 
         if (boundInventory != null)
-        {
             boundInventory.OnChanged += Refresh;
-        }
 
         Refresh();
     }
@@ -73,15 +97,15 @@ public class TrickInventoryView : MonoBehaviour
     {
         ClearSpawnedSlots();
 
-        if (boundInventory == null)
-        {
-            return;
-        }
+        if (boundInventory == null) return;
 
         SpawnSlots(boundInventory.IdentitySlots, identitySlotsRoot, TrickInventoryLocation.IdentitySlot);
         SpawnLearnedTricks();
         SpawnActiveCastedSlots();
         SpawnPassiveCastedSlots();
+
+        // Isso garante que os transforms tenham as posições corretas na tela.
+        Canvas.ForceUpdateCanvases();
 
         if (IsInventoryOpen())
             SelectDefaultTrick();
@@ -89,15 +113,10 @@ public class TrickInventoryView : MonoBehaviour
             trickInfoPanel.HidePanel();
     }
 
-    /// <summary>
-    /// Delega o controle da mensagem e animação de feedback para o UIFeedbackPanel.
-    /// </summary>
     public void SetStatus(string message)
     {
         if (statusFeedbackPanel != null)
-        {
             statusFeedbackPanel.ShowStatus(message);
-        }
     }
 
     public void Open()
@@ -118,19 +137,13 @@ public class TrickInventoryView : MonoBehaviour
 
     private void SpawnLearnedTricks()
     {
-        if (boundInventory?.LearnedTricks == null)
-        {
-            return;
-        }
+        if (boundInventory?.LearnedTricks == null) return;
 
         for (int i = 0; i < maxLearnedSlots; i++)
         {
             TrickSO trick = i < boundInventory.LearnedTricks.Count ? boundInventory.LearnedTricks[i] : null;
             TrickRuntimeInstance runtime = FindCastedRuntime(trick);
-            
             bool isAlreadyCasted = runtime != null;
-            
-            // Busca o cooldown armazenado no dicionário do inventário
             int registeredCooldown = trick != null ? boundInventory.GetRegisteredCooldown(trick.Id) : 0;
 
             SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted, "", registeredCooldown);
@@ -139,8 +152,7 @@ public class TrickInventoryView : MonoBehaviour
 
     private TrickRuntimeInstance FindCastedRuntime(TrickSO trick)
     {
-        if (trick == null || boundInventory == null)
-            return null;
+        if (trick == null || boundInventory == null) return null;
 
         return FindCastedRuntimeInSlots(trick, boundInventory.ActiveCastedSlots)
             ?? FindCastedRuntimeInSlots(trick, boundInventory.PassiveCastedSlots);
@@ -148,8 +160,7 @@ public class TrickInventoryView : MonoBehaviour
 
     private TrickRuntimeInstance FindCastedRuntimeInSlots(TrickSO trick, IReadOnlyList<TrickSlot> slots)
     {
-        if (slots == null)
-            return null;
+        if (slots == null) return null;
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -157,14 +168,12 @@ public class TrickInventoryView : MonoBehaviour
             if (slot?.Definition != null && string.Equals(slot.Definition.Id, trick.Id, StringComparison.OrdinalIgnoreCase))
                 return slot.RuntimeInstance;
         }
-
         return null;
     }
 
     private void SpawnActiveCastedSlots()
     {
-        if (boundInventory?.ActiveCastedSlots == null)
-            return;
+        if (boundInventory?.ActiveCastedSlots == null) return;
 
         for (int i = 0; i < boundInventory.ActiveCastedSlots.Count; i++)
         {
@@ -182,10 +191,7 @@ public class TrickInventoryView : MonoBehaviour
 
     private void SpawnSlots(IReadOnlyList<TrickSlot> slots, Transform parent, TrickInventoryLocation location)
     {
-        if (slots == null)
-        {
-            return;
-        }
+        if (slots == null) return;
         
         for (int i = 0; i < slots.Count; i++)
         {
@@ -205,23 +211,16 @@ public class TrickInventoryView : MonoBehaviour
             _ => learnedTrickSlotPrefab != null ? learnedTrickSlotPrefab : null,
         };
 
-        if (trickSlotPrefab == null)
-        {
-            return;
-        }
-        
-        if (parent == null)
-        {
-            return;
-        }
+        if (trickSlotPrefab == null || parent == null) return;
 
         TrickSlotUI trickSlotView = Instantiate(trickSlotPrefab, parent);
         TrickInfoPanelUI panel = trickInfoPanel != null ? trickInfoPanel : FindObjectOfType<TrickInfoPanelUI>();
+        
         trickSlotView.SetTrickInfoPanel(panel);
         trickSlotView.Bind(trick, location, runtimeInstance, isLocked, inputKey, registeredCooldown);
         trickSlotView.TrickSelected += HandleTrickSelected;
         trickSlotView.OnInteractWithTrick += HandleTrickInteraction;
-        trickSlotView.ShowInteractionPanel(false);
+        
         spawnedSlots.Add(trickSlotView);    
     }
 
@@ -254,7 +253,6 @@ public class TrickInventoryView : MonoBehaviour
             if (view != null && view.HasTrick && view.Location.Location == location)
                 return view;
         }
-
         return null;
     }
 
@@ -262,28 +260,37 @@ public class TrickInventoryView : MonoBehaviour
     {
         if (lastSelectedView != null && lastSelectedView != selectedView)
         {
-            lastSelectedView.SetSelected(false);
             lastSelectedView.ShowInteractionPanel(false);
         }
         
         for (int i = 0; i < spawnedSlots.Count; i++)
         {
             TrickSlotUI view = spawnedSlots[i];
-            if (view == null)
-                continue;
+            if (view == null) continue;
 
             if (view == selectedView)
             {
-                view.SetSelected(true);
                 view.ShowInteractionPanel(true);
-            }
-            else if (view != lastSelectedView)
-            {
-                view.SetSelected(false);
             }
         }
 
         lastSelectedView = selectedView;
+
+        // --- LÓGICA DO CURSOR DE HIGHLIGHT ---
+        if (highlightCursor != null)
+        {
+            if (selectedView != null && selectedView.HasTrick)
+            {   
+                highlightCursor.gameObject.SetActive(true);
+                // Usa a Coroutine para esperar o Unity arrumar o Layout
+                if (initialSnapCoroutine != null) StopCoroutine(initialSnapCoroutine);
+                initialSnapCoroutine = StartCoroutine(SnapHighlightAfterLayout(selectedView.TargetHighlightTransform));
+            }
+            else
+            {
+                highlightCursor.gameObject.SetActive(false);
+            }
+        }
     }
 
     private void HandleTrickInteraction(TrickSO trick, TrickInventoryAction action, TrickInventoryItemLocation location)
@@ -300,29 +307,54 @@ public class TrickInventoryView : MonoBehaviour
             {
                 slotView.TrickSelected -= HandleTrickSelected;
                 slotView.OnInteractWithTrick -= HandleTrickInteraction;
-                slotView.SetSelected(false);
                 Destroy(slotView.gameObject);
             }
         }
 
         spawnedSlots.Clear();
         lastSelectedView = null;
+        
+        if (highlightCursor != null) 
+            highlightCursor.gameObject.SetActive(false);
     }
 
     private void CloseAllInteractionPanels()
     {
         for (int i = 0; i < spawnedSlots.Count; i++)
+        {
             if (spawnedSlots[i] != null)
-            {
                 spawnedSlots[i].ShowInteractionPanel(false);
-                spawnedSlots[i].SetSelected(false);
-            }
+        }
+        
+        if (highlightCursor != null) 
+            highlightCursor.gameObject.SetActive(false);
     }
 
     private void ClearSlotSelections()
     {
-        for (int i = 0; i < spawnedSlots.Count; i++)
-            if (spawnedSlots[i] != null)
-                spawnedSlots[i].SetSelected(false);
+        if (highlightCursor != null) 
+            highlightCursor.gameObject.SetActive(false);
+    }
+
+    private IEnumerator SnapHighlightAfterLayout(Transform targetTransform)
+    {
+        // 1. Adiciona (se não tiver) um CanvasGroup e deixa invisível 
+        // para o jogador não ver o cursor na posição errada piscando na tela.
+        if (!highlightCursor.TryGetComponent<CanvasGroup>(out var cg))
+        {
+            cg = highlightCursor.gameObject.AddComponent<CanvasGroup>();
+        }
+        cg.alpha = 0f;
+
+        // 2. Aguarda o fim do frame atual, que é quando o Unity FINALIZA
+        // os cálculos do VerticalLayoutGroup e posiciona os itens perfeitamente.
+        yield return new WaitForEndOfFrame();
+
+        // 3. Agora sim a posição do targetTransform está 100% precisa
+        if (highlightCursor != null && targetTransform != null)
+        {
+            highlightCursor.position = targetTransform.position;
+            cg.alpha = 1f; // Traz a imagem de volta
+        }
     }
 }

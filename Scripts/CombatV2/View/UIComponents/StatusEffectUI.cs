@@ -1,5 +1,4 @@
 using DG.Tweening;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -25,7 +24,7 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     [Header("Pulse / Punch Settings")]
     [Tooltip("Força do pulso ao aparecer/desaparecer (ex: 0.3 = infla 30% antes de estabilizar)")]
-    [SerializeField] private Vector3 punchScale = new Vector3(0.35f, 0.35f, 0.35f);
+    [SerializeField] private Vector3 punchScale = new(0.35f, 0.35f, 0.35f);
     [SerializeField] private int punchVibrato = 5;
     [SerializeField] private float punchElasticity = 0.5f;
 
@@ -82,7 +81,7 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         if (tooltipDurationText != null)
         {
-            tooltipDurationText.text = remainingTurns > 0 ? remainingTurns.ToString() : string.Empty;
+            tooltipDurationText.text = remainingTurns > 0 ? remainingTurns.ToString() + " turns" : string.Empty;
         }
     }
 
@@ -91,31 +90,22 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     /// </summary>
     public void PlayEnterAnimation()
     {
-        // Cancela animações anteriores no Transform e CanvasGroup
         transform.DOKill(); 
         if (canvasGroup != null) canvasGroup.DOKill();
 
-        // Estado Inicial
         transform.localScale = Vector3.zero;
         if (canvasGroup != null) canvasGroup.alpha = 0f;
 
-        // Criamos uma sequência para coordenar o aparecimento, pulso e piscar
         Sequence enterSeq = DOTween.Sequence();
-
-        // 1. Aparição com Scale até o tamanho alvo
         enterSeq.Join(transform.DOScale(targetScale, enterDuration).SetEase(Ease.OutBack));
 
-        // 2. Fade in do CanvasGroup
         if (canvasGroup != null)
             enterSeq.Join(canvasGroup.DOFade(1f, enterDuration * 0.5f));
 
-        // 3. Efeito Pulsante (Impacto que infla e oscila até o tamanho normal)
         enterSeq.Append(transform.DOPunchScale(punchScale, enterDuration, punchVibrato, punchElasticity));
 
-        // 4. Efeito de Piscar (Flash) no CanvasGroup
         if (enableBlinkOnEnter && canvasGroup != null)
         {
-            // Apaga e acende 'blinkCount' vezes rapidamente
             Sequence blinkSeq = DOTween.Sequence();
             blinkSeq.Append(canvasGroup.DOFade(0.2f, 0.06f));
             blinkSeq.Append(canvasGroup.DOFade(1f, 0.06f));
@@ -135,10 +125,7 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         Sequence exitSeq = DOTween.Sequence();
 
-        // 1. Um pequeno pulso rápido de aviso antes de sumir
         exitSeq.Append(transform.DOPunchScale(punchScale * 0.5f, exitDuration * 0.5f, 3, 0.5f));
-
-        // 2. Encolhe até zero e esvanece o alpha
         exitSeq.Append(transform.DOScale(Vector3.zero, exitDuration).SetEase(Ease.InBack));
 
         if (canvasGroup != null)
@@ -165,7 +152,7 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void HideTooltip()
     {
-        if (tooltip != null) return;
+        if (tooltip == null) return;
         tooltip.SetActive(false);
     }
 }
