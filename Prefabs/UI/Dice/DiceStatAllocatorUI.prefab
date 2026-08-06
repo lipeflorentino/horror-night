@@ -279,7 +279,7 @@ GameObject:
   - component: {fileID: 8290314254871874610}
   - component: {fileID: 1962452469038072975}
   m_Layer: 0
-  m_Name: DiceAllocatorUI
+  m_Name: DiceStatAllocatorUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

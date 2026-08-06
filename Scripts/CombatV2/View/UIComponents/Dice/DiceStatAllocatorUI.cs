@@ -84,7 +84,10 @@ public class DiceStatAllocatorUI : MonoBehaviour
             statIconImage.sprite = bodyIcon;
 
         if (tooltipable != null)
+        {
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default, gameObject);
             tooltipable.SetTooltipText(GetBonusTooltipText(stat, roll));
+        }
     }
 
     private void Awake()
@@ -171,14 +174,14 @@ public class DiceStatAllocatorUI : MonoBehaviour
             return stat switch
             {
                 DiceStatType.Mind =>
-                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.BadColorHex}>Low</color> (per dice).\n" +
-                    $"<color={Colorization.AccuracyColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.4 | <color={Colorization.MediumColorHex}>Medium</color> x0.6 | <color={Colorization.GoodColorHex}>High</color> x1.0.",
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.LowColorHex}>Low</color> (per dice).\n" +
+                    $"<color={Colorization.AccuracyColorHex}>Pow:</color> <color={Colorization.LowColorHex}>Low</color> x0.4 | <color={Colorization.MediumColorHex}>Medium</color> x0.6 | <color={Colorization.HighColorHex}>High</color> x1.0.",
                 DiceStatType.Heart =>
-                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.BadColorHex}>Low</color> | -{heartPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n" +
-                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.2 | <color={Colorization.MediumColorHex}>Medium</color> x1.0 | <color={Colorization.GoodColorHex}>High</color> x1.6.",
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.LowColorHex}>Low</color> | -{heartPct} <color={Colorization.HighColorHex}>High</color> (per dice)\n" +
+                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.LowColorHex}>Low</color> x0.2 | <color={Colorization.MediumColorHex}>Medium</color> x1.0 | <color={Colorization.HighColorHex}>High</color> x1.6.",
                 DiceStatType.Body =>
-                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.BadColorHex}>Low</color> | +{bodyPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n" +
-                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.BadColorHex}>Low</color> x0.8 | <color={Colorization.MediumColorHex}>Medium</color> x1.4 | <color={Colorization.GoodColorHex}>High</color> x1.8.",
+                    $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.LowColorHex}>Low</color> | +{bodyPct} <color={Colorization.HighColorHex}>High</color> (per dice)\n" +
+                    $"<color={Colorization.PowerColorHex}>Pow:</color> <color={Colorization.LowColorHex}>Low</color> x0.8 | <color={Colorization.MediumColorHex}>Medium</color> x1.4 | <color={Colorization.HighColorHex}>High</color> x1.8.",
                 _ => string.Empty,
             };
         }
@@ -187,11 +190,11 @@ public class DiceStatAllocatorUI : MonoBehaviour
         return stat switch
         {
             DiceStatType.Mind =>
-                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.BadColorHex}>Low</color> (per dice).",
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{mindPct} <color={Colorization.LowColorHex}>Low</color> (per dice).",
             DiceStatType.Heart =>
-                $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.BadColorHex}>Low</color> | -{heartPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n",
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> +{heartPct} <color={Colorization.LowColorHex}>Low</color> | -{heartPct} <color={Colorization.HighColorHex}>High</color> (per dice)\n",
             DiceStatType.Body =>
-                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.BadColorHex}>Low</color> | +{bodyPct} <color={Colorization.GoodColorHex}>High</color> (per dice)\n",
+                $"<color={Colorization.AccuracyColorHex}>Acc:</color> -{bodyPct} <color={Colorization.LowColorHex}>Low</color> | +{bodyPct} <color={Colorization.HighColorHex}>High</color> (per dice)\n",
             _ => string.Empty,
         };
     }

@@ -127,3 +127,4 @@ Sistemas de Combate
     
 TASKS
     - CombatLog para trick expired!
+    - Substituir GetComponent por GetOrAddComponent

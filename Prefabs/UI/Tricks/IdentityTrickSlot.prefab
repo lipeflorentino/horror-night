@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 4269657566233491432}
   - component: {fileID: 145951256231443195}
   - component: {fileID: 4105298194503069584}
+  - component: {fileID: 1461357283744939324}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -484,6 +485,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1461357283744939324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8628338636733256078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 703a8c7e93f267c4588f3fbe5a7abcad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltipText: 
+  tooltipColor: 0
+  isDisabled: 0
 --- !u!1 &8731885785178890245
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,3 +633,4 @@ MonoBehaviour:
   cooldownState: {fileID: 0}
   cooldownText: {fileID: 0}
   interactButton: {fileID: 145951256231443195}
+  tooltipable: {fileID: 1461357283744939324}

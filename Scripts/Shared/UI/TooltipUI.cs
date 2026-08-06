@@ -6,15 +6,7 @@ using UnityEngine;
 public class TooltipUI : MonoBehaviour
 {
     public static TooltipUI Instance { get; private set; }
-
-    public enum TooltipColor
-    {
-        Default,
-        Red,
-        Yellow,
-        Blue
-    }
-
+    public enum TooltipColor { Default, Red, Yellow, Blue }
     private static readonly Color DefaultColor = ParseHex("#C3C099");
     private static readonly Color RedColor = ParseHex("#D65A5A");
     private static readonly Color YellowColor = ParseHex("#D6C15A");
@@ -35,6 +27,7 @@ public class TooltipUI : MonoBehaviour
     private RectTransform panelRectTransform;
     private CanvasGroup canvasGroup;
     private Tween fadeTween;
+    private object currentOwner;
 
     private void Awake()
     {
@@ -71,8 +64,11 @@ public class TooltipUI : MonoBehaviour
         fadeTween?.Kill();
     }
 
-    public void Show(string text, Vector3 position, TooltipColor color = TooltipColor.Default)
+    public void Show(string text, Vector3 position, TooltipColor color = TooltipColor.Default, object owner = null)
     {
+        currentOwner = owner;
+        ResetToDefaults();
+        
         if (tooltipText != null)
         {
             tooltipText.text = text;
@@ -94,8 +90,13 @@ public class TooltipUI : MonoBehaviour
             fadeTween = canvasGroup.DOFade(1f, fadeDuration);
     }
 
-    public void Hide()
+    public void Hide(object owner = null)
     {
+        if (owner != null && currentOwner != owner)
+            return;
+
+        currentOwner = null;
+
         if (tooltipPanel == null)
             return;
 
@@ -137,6 +138,20 @@ public class TooltipUI : MonoBehaviour
             rectTransform.sizeDelta = new Vector2(width, height);
     }
 
+    private void ResetToDefaults()
+    {
+        // Garante a cor padrão usando o método que você já criou
+        if (tooltipText != null)
+        {
+            tooltipText.color = GetColor(TooltipColor.Default);
+            
+            // Futuras expansões de estado padrão entram aqui. Exemplos:
+            // tooltipText.fontSize = 18f;
+            // tooltipText.alignment = TextAlignmentOptions.TopLeft;
+            // tooltipIcon.gameObject.SetActive(false);
+        }
+    }
+
     private static Color GetColor(TooltipColor color)
     {
         return color switch
@@ -153,4 +168,6 @@ public class TooltipUI : MonoBehaviour
         ColorUtility.TryParseHtmlString(hex, out Color color);
         return color;
     }
+
+    public object Owner => currentOwner;
 }

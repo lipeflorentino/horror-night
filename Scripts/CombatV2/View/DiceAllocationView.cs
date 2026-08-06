@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,6 +61,7 @@ public class DiceAllocationView : MonoBehaviour
     private const string ConfirmTooltipDefault = "Confirmar";
     private const string ConfirmTooltipPowerPending = "Power dice not allocated";
     private const string ConfirmTooltipAccuracyPending = "Accuracy dice not allocated";
+    private Tooltipable tooltipable;
 
     private void Awake()
     {
@@ -83,6 +85,7 @@ public class DiceAllocationView : MonoBehaviour
         }
 
         HideAllocationPanel();
+        tooltipable = confirmButton.GetOrAddComponent<Tooltipable>();
     }
 
     private void OnDestroy()
@@ -392,14 +395,14 @@ public class DiceAllocationView : MonoBehaviour
 
         if (allocatedPowerDice <= 0 || allocatedAccuracyDice <= 0)
         {
-            confirmButton.GetComponent<Tooltipable>().SetTooltipColor(TooltipUI.TooltipColor.Red);
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Red, gameObject);
         }
         else
         {
-            confirmButton.GetComponent<Tooltipable>().SetTooltipColor(TooltipUI.TooltipColor.Default);
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default, gameObject);
         }
 
-        confirmButton.GetComponent<Tooltipable>().SetTooltipText(tooltip);
+        tooltipable.SetTooltipText(tooltip);
     }
 
     private DiceAllocationCostItemUI GetOrCreatePooledCostItem(int index)

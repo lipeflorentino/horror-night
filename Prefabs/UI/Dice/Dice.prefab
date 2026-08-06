@@ -53,9 +53,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   diceImage: {fileID: 2583571745162478997}
   diceValueText: {fileID: 2333620945070018509}
+  bestText: {fileID: 0}
+  extraText: {fileID: 0}
+  maxRollText: {fileID: 0}
+  dimmedAlpha: 0.3
   rollDuration: 0.65
   spinSpeed: 900
   updateInterval: 0.06
+  mindDiceIcon: {fileID: 0}
+  heartDiceIcon: {fileID: 0}
+  bodyDiceIcon: {fileID: 0}
 --- !u!1 &6114375653774256184
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,7 +337,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1137882488, guid: 367023a8a30a5d746ba1225293591b6b, type: 3}
+  m_Sprite: {fileID: 2133987229, guid: 1ac2741ed224a1c4788572be0179e647, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

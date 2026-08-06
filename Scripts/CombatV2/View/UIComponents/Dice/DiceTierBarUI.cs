@@ -28,7 +28,7 @@ public class DiceTierBarUI : MonoBehaviour
 
         float lowPct    = Mathf.Max(0f, lowMax) / safeMaxValue;
         float mediumPct = Mathf.Max(0f, mediumMax - lowMax) / safeMaxValue;
-        float highPct   = Mathf.Max(0f, safeMaxValue - (highMin - 1)) / safeMaxValue;
+        float highPct = highMin > 0 ? Mathf.Max(0f, safeMaxValue - (highMin - 1)) / safeMaxValue : 0f;
 
         float minPixelWidth = 4f; 
         float lowPixels    = Mathf.Max(minPixelWidth, lowPct * barWidth);
@@ -66,6 +66,7 @@ public class DiceTierBarUI : MonoBehaviour
     public void SetVisible(bool visible)
     {
         gameObject.SetActive(visible);
+        if (visible) ResetHighlight();
     }
 
     public void SetIndicatorVisible(bool visible)
@@ -86,5 +87,38 @@ public class DiceTierBarUI : MonoBehaviour
         indicatorRect.anchorMin = new Vector2(rollPct, indicatorRect.anchorMin.y);
         indicatorRect.anchorMax = new Vector2(rollPct, indicatorRect.anchorMax.y);
         indicatorRect.anchoredPosition = new Vector2(0f, indicatorRect.anchoredPosition.y);
+    }
+
+    public void SetHighlightTier(DiceTier tier)
+    {
+        SetTierAlpha(lowRect, lowLabel, tier == DiceTier.Low);
+        SetTierAlpha(mediumRect, mediumLabel, tier == DiceTier.Medium);
+        SetTierAlpha(highRect, highLabel, tier == DiceTier.High);
+    }
+
+    public void ResetHighlight()
+    {
+        SetTierAlpha(lowRect, lowLabel, true);
+        SetTierAlpha(mediumRect, mediumLabel, true);
+        SetTierAlpha(highRect, highLabel, true);
+    }
+
+    // Método auxiliar para aplicar a transparência
+    private void SetTierAlpha(RectTransform rect, TMP_Text label, bool isHighlighted)
+    {
+        float targetAlpha = isHighlighted ? 1f : 0.3f;
+        if (rect != null && rect.TryGetComponent<Image>(out var image))
+        {
+            Color color = image.color;
+            color.a = targetAlpha;
+            image.color = color;
+        }
+
+        if (label != null)
+        {
+            Color color = label.color;
+            color.a = targetAlpha;
+            label.color = color;
+        }
     }
 }

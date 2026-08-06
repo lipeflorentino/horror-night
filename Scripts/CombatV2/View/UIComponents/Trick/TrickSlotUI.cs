@@ -2,9 +2,8 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; 
 
-public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class TrickSlotUI : MonoBehaviour
 {
     [Header("Trick Info")]
     [SerializeField] private Image iconImage;
@@ -37,11 +36,16 @@ public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public event Action<TrickSlotUI> TrickSelected;
     public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithTrick;
     public Transform TargetHighlightTransform => transform;
+    
+    [SerializeField] private Tooltipable tooltipable;
 
     private void Awake()
     {
         if (interactButton != null)
-            interactButton.onClick.AddListener(HandleSelectClick);
+        {
+            interactButton.onClick.AddListener(HandleSelectClick);   
+            tooltipable = interactButton.gameObject.GetOrAddComponent<Tooltipable>();
+        }
 
         ShowInteractionPanel(false);
         
@@ -65,14 +69,11 @@ public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "", int registeredCooldown = 0)
     {
-        // 1. Configurações Iniciais
         boundTrick = trick;
         boundRuntimeInstance = runtimeInstance;
         location = itemLocation;
         
         bool isEmpty = trick == null;
-
-        // 2. Atualização Visual Básica (Ícone, Nome, Tecla)
         if (iconImage != null)
         {
             iconImage.sprite = !isEmpty ? trick.Icon : null;
@@ -84,20 +85,17 @@ public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         UpdateInputKeyText(itemLocation, inputKeyOverride);
         
-        // 3. Avaliação de Estados (Flags Booleanas)
         bool hasRuntimeCooldown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
         bool isCoolingDown = hasRuntimeCooldown || registeredCooldown > 0;
         bool isActive = runtimeInstance != null && runtimeInstance.RemainingTurns > 0 && !runtimeInstance.WasExpired;
         
         int currentCooldownTurns = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
+        bool showCooldownVisual = false;
         
-        // 4. Valores Padrões do Tooltip (Evita dezenas de 'elses' depois)
         shouldShowTooltip = true;
         tooltipMessage = isEmpty ? "Empty Slot" : "";
         tooltipColor = TooltipUI.TooltipColor.Default;
-        bool showCooldownVisual = false;
 
-        // 5. Regras Específicas Baseadas no Tipo de Slot
         switch (location.Location)
         {
             case TrickInventoryLocation.LearnedTricks:
@@ -154,17 +152,21 @@ public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 break;
         }
         
-        // 6. Aplicação dos Textos e Estados Visuais
         if (cooldownText != null) 
             cooldownText.text = showCooldownVisual && currentCooldownTurns > 0 ? currentCooldownTurns.ToString("F0") : "";
 
         if (emptyState != null) emptyState.SetActive(isEmpty && !isLocked);
         if (lockedState != null) lockedState.SetActive(isLocked);
         if (cooldownState != null) cooldownState.SetActive(showCooldownVisual);
-
-        // 7. Controle de Interação do Botão
         if (interactButton != null) 
             interactButton.interactable = !isEmpty && !isLocked && !isCoolingDown;
+
+        if (tooltipable != null)
+        {
+            tooltipable.SetTooltipColor(tooltipColor, gameObject);
+            tooltipable.SetTooltipText(tooltipMessage);
+            tooltipable.DisableTooltip(!shouldShowTooltip);
+        }
     }
 
     public void ShowInteractionPanel(bool visible)
@@ -217,17 +219,5 @@ public class TrickSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             OnInteractWithTrick?.Invoke(boundTrick, action, location);
 
         ShowInteractionPanel(false);
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (shouldShowTooltip && TooltipUI.Instance != null)
-            TooltipUI.Instance.Show(tooltipMessage, transform.position, tooltipColor);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (TooltipUI.Instance != null)
-            TooltipUI.Instance.Hide();
     }
 }

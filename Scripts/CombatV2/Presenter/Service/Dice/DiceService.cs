@@ -308,14 +308,8 @@ public class DiceService
     {
         if (battler == null)
             return 0;
-
-        return diceType switch
-        {
-            DiceStatType.Mind => Mathf.Max(0, battler.Mind),
-            DiceStatType.Heart => Mathf.Max(0, battler.Heart),
-            DiceStatType.Body => Mathf.Max(0, battler.Body),
-            _ => 0
-        };
+            
+        return Mathf.Max(0, battler.GetBaseStatValue(diceType));
     }
 
     private int GetTierReferenceMaxValue(CombatRollContext context)

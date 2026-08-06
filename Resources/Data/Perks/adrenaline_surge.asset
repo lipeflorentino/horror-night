@@ -30,6 +30,6 @@ MonoBehaviour:
     FilterByStatType: 1
     Tier: 2
     FilterByTier: 1
-    ConditionKey: 0
+    ConditionKey: 4
     ConditionValue: 
     Value: 2

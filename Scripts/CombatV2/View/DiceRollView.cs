@@ -196,7 +196,8 @@ public class DiceRollView : MonoBehaviour
         SetHighlightedIndex(activeFinalSlots, highlightedIndex);
         HighlightResolvedRollStates(activeFinalSlots, playerRolls);
 
-        tierBar.SetRollIndicatorPosition(GetBetterRollValue(playerRolls, usedCount), maxValue);
+        tierBar.SetRollIndicatorPosition(GetBetterDice(playerRolls, usedCount).Value, maxValue);
+        tierBar.SetHighlightTier(GetBetterDice(playerRolls, usedCount).Tier);
     }
 
     public void ShowDiceResolution(bool status)
@@ -295,10 +296,10 @@ public class DiceRollView : MonoBehaviour
         return bestIndex;
     }
 
-    public int GetBetterRollValue(IReadOnlyList<DiceResult> rolls, int usedCount)
+    public DiceResult GetBetterDice(IReadOnlyList<DiceResult> rolls, int usedCount)
     {
         if (rolls == null || usedCount <= 0)
-            return -1;
+            return null;
 
         int bestIndex = 0;
         for (int i = 1; i < usedCount; i++)
@@ -307,7 +308,7 @@ public class DiceRollView : MonoBehaviour
                 bestIndex = i;
         }
 
-        return rolls[bestIndex].Value;
+        return rolls[bestIndex];
     }
 
     private bool IsBetterRoll(DiceResult candidate, DiceResult currentBest)
