@@ -218,6 +218,6 @@ public class TrickSlotUI : MonoBehaviour
         if (action != TrickInventoryAction.Close)
             OnInteractWithTrick?.Invoke(boundTrick, action, location);
 
-        ShowInteractionPanel(false);
+        ShowInteractionPanel(action != TrickInventoryAction.Close);
     }
 }

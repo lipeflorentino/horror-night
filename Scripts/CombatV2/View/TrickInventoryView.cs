@@ -104,9 +104,6 @@ public class TrickInventoryView : MonoBehaviour
         SpawnActiveCastedSlots();
         SpawnPassiveCastedSlots();
 
-        // Isso garante que os transforms tenham as posições corretas na tela.
-        Canvas.ForceUpdateCanvases();
-
         if (IsInventoryOpen())
             SelectDefaultTrick();
         else if (trickInfoPanel != null)
