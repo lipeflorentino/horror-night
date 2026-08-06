@@ -76,7 +76,7 @@ public static class PerkCsvParser
         if (target == PerkModifierTarget.DamagePercent || target == PerkModifierTarget.MomentumPoints)
             return PerkTrigger.AfterResolve;
 
-        if (target == PerkModifierTarget.Strength || target == PerkModifierTarget.Focus)
+        if (target == PerkModifierTarget.Strength || target == PerkModifierTarget.Focus || target == PerkModifierTarget.TrickCharges)
             return PerkTrigger.OnActionResolved;
 
         if (target == PerkModifierTarget.ExtraDice && filterByTier)

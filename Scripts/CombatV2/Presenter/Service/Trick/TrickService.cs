@@ -67,7 +67,6 @@ public class TrickService
                 changed = true;
             }
 
-            // CORREÇÃO AQUI: O cooldown só diminui se a trick já tiver expirado (duração finalizada)
             if (trick.IsCoolingDown && trick.WasExpired)
             {
                 trick.DecreaseCooldown();

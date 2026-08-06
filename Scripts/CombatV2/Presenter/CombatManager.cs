@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -129,6 +130,7 @@ public class CombatManager : MonoBehaviour
     {
         View.UpdateView(Player, Enemy);
         Input.RefreshDiceAllocationUI();
+        View.RefreshActiveTricks();
     }
 
     // =========================
@@ -171,24 +173,18 @@ public class CombatManager : MonoBehaviour
 
     public void ExecuteManualTrickActivation(TrickRuntimeInstance instance)
     {
-        Logger.Log($"[CombatManager] Attempting manual activation of trick: {instance?.Definition?.name ?? "null"}");
-        
         if (TurnState.CombatEnded || instance == null || instance.Owner == null || PerkService == null)
             return;
-
-        // Verificação de segurança baseada na nova propriedade
+            
         if (!instance.IsReadyToTrigger) 
             return;
 
-        PerkService.ExecuteManualActivation(instance.Owner, instance);
+        PerkService.ExecuteManualActivation(instance.Owner, GetActionType(), instance);
         
-        // Dispara log visualmente rico utilizando o ícone da habilidade
         string displayName = string.IsNullOrWhiteSpace(instance.Definition.DisplayName) ? instance.Definition.Id : instance.Definition.DisplayName;
         View.ShowCombatLog($"<color=white>{displayName}</color> ativado!", instance.Definition.Icon);
         
         RefreshCombatUI();
-        
-        // Força a atualização da barra de Tricks para renderizar cooldowns/consumo imediatamente
         View.RefreshActiveTricks(); 
     }
 
@@ -290,8 +286,10 @@ public class CombatManager : MonoBehaviour
     // =========================
     public int GetEffectivePlayerActionPower()
     {
-        ActionType actionType = TurnState.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        return PerkService.GetEffectiveActionPower(Player, Enemy, actionType);
+        ActionType actionType = GetActionType();
+        return actionType == ActionType.Attack
+            ? PerkService.GetEffectiveAttack(Player)
+            : PerkService.GetEffectiveDefense(Player);
     }
 
     public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType, int allocatedDiceCount = 1)
@@ -299,6 +297,7 @@ public class CombatManager : MonoBehaviour
         return CombatDiceRollManager.GetPlayerTierBoundaries(Player, Enemy, maxValue, statType, rollType, DiceService, PerkService, TurnState, allocatedDiceCount);
     }
 
+    public ActionType GetActionType() => TurnState.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
     public DiceService GetDiceService() => DiceService;
     public PerkService GetPerkService() => PerkService;
     public TrickService GetTrickService() => TrickService;

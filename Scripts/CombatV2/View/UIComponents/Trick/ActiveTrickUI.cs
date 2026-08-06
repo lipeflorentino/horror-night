@@ -155,12 +155,12 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private void ShowTooltip()
     {
-        if (tooltip != null || tooltipPrefab == null || trickDefinition == null)
+        if (tooltip != null || tooltipPrefab == null || runtimeInstance == null)
             return;
 
         tooltip = Instantiate(tooltipPrefab, transform).GetComponent<TrickTooltip>();
         if (tooltip != null)
-            tooltip.Show(trickDefinition);
+            tooltip.Show(runtimeInstance);
     }
 
     private void HideTooltip()

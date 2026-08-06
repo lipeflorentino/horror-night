@@ -59,7 +59,6 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void HandleTrickCasted(Battler battler, TrickRuntimeInstance trick)
     {
-        Logger.Log($"trick casted: {trick.Definition.DisplayName}, {trick.InstanceId}, {trick.RemainingTurns}");
         if (!ShouldHandleEvent(battler))
             return;
 
@@ -142,7 +141,6 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void HandleTrickRemoved(Battler battler, string trickId)
     {
-        Logger.Log($"[HandleTrickRemoved] Handling trick removed: {trickId}");
         if (!ShouldHandleEvent(battler))
             return;
 

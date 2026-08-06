@@ -20,9 +20,9 @@ public class CombatLogView : MonoBehaviour
 
     public void ShowTriggerFeedback(PerkTriggeredEvent evt)
     {
-        string rarityColor = GetRarityColor(evt.SourceTrick.Definition.Rarity);
         if (evt.SourceTrick?.Definition != null)
         {
+            string rarityColor = GetRarityColor(evt.SourceTrick.Definition.Rarity);
             string displayName = string.IsNullOrWhiteSpace(evt.SourceTrick.Definition.DisplayName)
                 ? evt.SourceTrick.Definition.Id
                 : evt.SourceTrick.Definition.DisplayName;

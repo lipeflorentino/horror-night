@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: vengeance_release
   DefaultDurationTurns: -1
-  MaxStacks: 3
-  StackMode: 0
+  MaxStacks: 9
+  StackMode: 1
   Tags: 
   Rules:
   - Trigger: 0
-    ModifierTarget: 14
-    Operation: 0
+    ModifierTarget: 17
+    Operation: 4
     OwnerRole: 0
     ActionType: 0
     FilterByActionType: 0

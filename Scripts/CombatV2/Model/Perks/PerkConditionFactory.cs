@@ -23,6 +23,7 @@ public static class PerkConditionFactory
         Register(PerkConditionKey.RollSumEqualsAttackersRollSum, new RollSumEqualsAttackersCondition());
         Register(PerkConditionKey.BlockedAttack, new BlockedAttackCondition());
         Register(PerkConditionKey.ResolutionVariationEquals, new ResolutionVariationEqualsCondition());
+        Register(PerkConditionKey.DamageTaken, new DamageTakenCondition());
     }
 
     /// <summary>
@@ -149,6 +150,19 @@ public class ResolutionVariationEqualsCondition : IPerkCondition
 
         return Enum.TryParse(conditionValue, true, out ActionResolutionVariation expectedVariation)
             && resolution.ResolutionVariation == expectedVariation;
+    }
+}
+
+public class DamageTakenCondition : IPerkCondition
+{
+    public PerkConditionKey ConditionType => PerkConditionKey.DamageTaken;
+
+    public bool Evaluate(object context, string conditionValue)
+    {
+        if (context is not ActionResolutionContext resolution)
+            return false;
+
+        return resolution.Damage > 0 && resolution.Actor == resolution.FinalTarget;
     }
 }
 

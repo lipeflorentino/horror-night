@@ -74,6 +74,7 @@ public static class TrickCsvImporter
         target.DurationTurns = source.DurationTurns;
         target.CooldownTurns = source.CooldownTurns;
         target.ActivationMode = source.ActivationMode;
+        target.MinChargesRequired = source.MinChargesRequired;
         target.PerkIds = new List<string>(source.PerkIds);
         target.DrawbackIds = new List<string>(source.DrawbackIds);
         target.Rarity = source.Rarity;

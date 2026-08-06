@@ -3,58 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Avaliador centralizado de Perk Triggers.
-/// Responsável por:
-/// 1. Validar se as condições de um perk foram satisfeitas
-/// 2. Disparar eventos de perk acionado
-/// 3. Fornecer contexto completo sobre o trigger
-/// 
-/// Separado de PerkService para manter responsabilidade única.
+/// Avaliador centralizado de Perk Triggers. Responsável exclusivamente por validar condições de disparo e calcular os valores aplicados, notificando o sistema sem mutar estado diretamente.
 /// </summary>
 public class PerkTriggerEvaluator
 {
     public event Action<PerkTriggeredEvent> OnPerkTriggered;
 
-    public PerkTriggerEvaluator(PerkDatabase database = null)
-    {
-        // O database é mantido apenas para compatibilidade de construtor.
-        // A partir da Fase 3, a fonte única de perks efetivos vem do PerkService.
-    }
+    public PerkTriggerEvaluator(){}
 
     /// <summary>
     /// Avalia perks efetivos acionados por roll (BeforeRoll trigger).
     /// Chama esta função ANTES de aplicar modificadores de roll.
     /// </summary>
-    public void EvaluateRollTriggers(
-        Battler owner,
-        CombatRollContext context,
-        PerkTrigger expectedTrigger,
-        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
-        List<DiceResult> rolledDices = null)
+    public void EvaluateRollTriggers(Battler owner, CombatRollContext context, PerkTrigger expectedTrigger, IReadOnlyList<PerkRuntimeInstance> effectivePerks, List<DiceResult> rolledDices = null)
     {
-        if (owner == null || effectivePerks == null || effectivePerks.Count == 0)
-            return;
+        if (owner == null || effectivePerks == null || effectivePerks.Count == 0) return;
 
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null)
-                continue;
+            if (perk?.Definition?.Rules == null) continue;
 
             for (int j = 0; j < perk.Definition.Rules.Count; j++)
             {
                 PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger)
-                    continue;
-
-                if (!IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                if (!rule.MatchesRoll(context))
-                    continue;
-
-                if (!ValidateCondition(rule, context))
-                    continue;
+                if (rule == null || rule.Trigger != expectedTrigger) continue;
+                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+                if (!rule.MatchesRoll(context)) continue;
+                if (!ValidateCondition(rule, context)) continue;
 
                 NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
             }
@@ -66,60 +42,37 @@ public class PerkTriggerEvaluator
     /// antes dos dados de Poder serem rolados.
     /// Retorna a quantidade total de dados extras de Poder a adicionar e o StatType a usar.
     /// </summary>
-    public int EvaluateAfterAccuracyTriggers(
-        Battler owner,
-        DiceResult accuracyResult,
-        ActionType actionType,
-        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
-        out DiceStatType extraDiceStatType)
+    public int EvaluateAfterAccuracyTriggers(Battler owner, DiceResult accuracyResult, ActionType actionType, IReadOnlyList<PerkRuntimeInstance> effectivePerks, out DiceStatType extraDiceStatType)
     {
         extraDiceStatType = DiceStatType.Body;
         int totalExtraDice = 0;
 
-        if (owner == null || accuracyResult == null || effectivePerks == null || effectivePerks.Count == 0)
-            return 0;
+        if (owner == null || accuracyResult == null || effectivePerks == null || effectivePerks.Count == 0) return 0;
 
         CombatActionContext actionContext = new(owner, null, actionType);
 
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null)
-                continue;
+            if (perk?.Definition?.Rules == null) continue;
 
             for (int j = 0; j < perk.Definition.Rules.Count; j++)
             {
                 PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != PerkTrigger.AfterAccuracyRoll)
-                    continue;
-
-                if (rule.ModifierTarget != PerkModifierTarget.ExtraDice)
-                    continue;
-
-                if (!IsRoleMatch(owner, actionContext, rule.OwnerRole))
-                    continue;
-
-                if (rule.FilterByActionType && rule.ActionType != actionType)
-                    continue;
-
-                if (rule.FilterByTier && rule.Tier != accuracyResult.Tier)
-                    continue;
-
-                if (rule.FilterByStatType && rule.StatType != accuracyResult.StatType)
-                    continue;
+                if (rule == null || rule.Trigger != PerkTrigger.AfterAccuracyRoll) continue;
+                if (rule.ModifierTarget != PerkModifierTarget.ExtraDice) continue;
+                if (!PerkRuntimeHelper.IsRoleMatch(owner, actionContext, rule.OwnerRole)) continue;
+                if (rule.FilterByActionType && rule.ActionType != actionType) continue;
+                if (rule.FilterByTier && rule.Tier != accuracyResult.Tier) continue;
+                if (rule.FilterByStatType && rule.StatType != accuracyResult.StatType) continue;
 
                 int extraDice = Mathf.Max(0, Mathf.RoundToInt(rule.Value * Mathf.Max(1, perk.Stacks)));
-                if (extraDice <= 0)
-                    continue;
+                if (extraDice <= 0) continue;
 
-                // O StatType dos dados extras é o StatType do filtro do perk (ex: Mind)
-                if (rule.FilterByStatType)
-                    extraDiceStatType = rule.StatType;
-                else
-                    extraDiceStatType = accuracyResult.StatType;
+                if (rule.FilterByStatType) extraDiceStatType = rule.StatType;
+                else extraDiceStatType = accuracyResult.StatType;
 
                 totalExtraDice += extraDice;
-
                 NotifyPerkTriggered(owner, perk, rule, actionContext, rule.Value);
             }
         }
@@ -127,107 +80,81 @@ public class PerkTriggerEvaluator
         return totalExtraDice;
     }
 
-
     /// <summary>
     /// Avalia perks efetivos acionados por dados (PowerMultiplier e AfterResolve triggers).
     /// Chama esta função com os dados já rolados.
     /// </summary>
-    public void EvaluateDiceTriggers(
-        Battler owner,
-        CombatActionContext context,
-        DiceResult dice,
-        PerkTrigger expectedTrigger,
-        IReadOnlyList<PerkRuntimeInstance> effectivePerks,
-        List<DiceResult> allDices = null,
-        List<DiceResult> opposingDices = null)
+    public void EvaluateDiceTriggers(Battler owner, CombatActionContext context, DiceResult dice, PerkTrigger expectedTrigger, IReadOnlyList<PerkRuntimeInstance> effectivePerks, List<DiceResult> allDices = null, List<DiceResult> opposingDices = null)
     {
-        if (owner == null || dice == null || effectivePerks == null || effectivePerks.Count == 0)
-            return;
+        if (owner == null || dice == null || effectivePerks == null || effectivePerks.Count == 0) return;
 
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null)
-                continue;
+            if (perk?.Definition?.Rules == null) continue;
 
             for (int j = 0; j < perk.Definition.Rules.Count; j++)
             {
                 PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger)
-                    continue;
-
-                if (!IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                if (!rule.MatchesAction(context))
-                    continue;
-
-                if (!rule.MatchesDice(dice))
-                    continue;
-
-                if (!ValidateDiceCondition(rule, dice, allDices, opposingDices))
-                    continue;
+                if (rule == null || rule.Trigger != expectedTrigger) continue;
+                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+                if (!rule.MatchesAction(context)) continue;
+                if (!rule.MatchesDice(dice)) continue;
+                if (!ValidateDiceCondition(rule, dice, allDices, opposingDices)) continue;
 
                 NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
             }
         }
     }
 
-    public void EvaluateActionResolutionTriggers(
-        Battler owner,
-        ActionResolutionContext context,
-        IReadOnlyList<PerkRuntimeInstance> effectivePerks)
+    /// <summary>
+    /// Avalia perks efetivos acionados após a resolução de uma ação.
+    /// </summary>
+    public void EvaluateActionResolutionTriggers(Battler owner, ActionResolutionContext context, IReadOnlyList<PerkRuntimeInstance> effectivePerks)
     {
-        if (owner == null || context == null || effectivePerks == null || effectivePerks.Count == 0)
-            return;
+        if (owner == null || context == null || effectivePerks == null || effectivePerks.Count == 0) return;
 
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null)
-                continue;
+            if (perk?.Definition?.Rules == null) continue;
 
             for (int j = 0; j < perk.Definition.Rules.Count; j++)
             {
                 PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != PerkTrigger.OnActionResolved)
-                    continue;
-
-                if (!IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                if (!rule.MatchesAction(context))
-                    continue;
-
-                if (!ValidateCondition(rule, context))
-                    continue;
-
-                int stacks = Mathf.Max(1, perk.Stacks);
-                if (rule.ModifierTarget == PerkModifierTarget.Focus)
-                {
-                    owner.Focus = Mathf.RoundToInt(ApplyModifier(owner.Focus, rule.Operation, rule.Value, stacks));
-                }
-                else if (rule.ModifierTarget == PerkModifierTarget.Strength)
-                {
-                    owner.Strength = Mathf.RoundToInt(ApplyModifier(owner.Strength, rule.Operation, rule.Value, stacks));
-                }
-
-                NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
+                if (rule == null || rule.Trigger != PerkTrigger.OnActionResolved) continue;
+                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+                if (!rule.MatchesAction(context)) continue;
+                if (!ValidateCondition(rule, context)) continue;
+                    
+                float appliedValue = rule.Value;
+                NotifyPerkTriggered(owner, perk, rule, context, appliedValue);
             }
+        }
+    }
+
+    /// <summary>
+    /// Avalia e dispara regras de um perk recém-aplicado via ativação manual de um Trick.
+    /// </summary>
+    public void EvaluateManualActivationTriggers(Battler owner, ActionType actionType, PerkRuntimeInstance perk)
+    {
+        if (owner == null || perk?.Definition?.Rules == null) return;
+        
+        CombatActionContext manualContext = new(owner, null, actionType);
+        for (int i = 0; i < perk.Definition.Rules.Count; i++)
+        {
+            PerkRule rule = perk.Definition.Rules[i];
+            
+            if (rule == null || rule.Trigger != PerkTrigger.OnManualActivation) continue;
+            
+            NotifyPerkTriggered(owner, perk, rule, manualContext, rule.Value);
         }
     }
 
     private bool ValidateCondition(PerkRule rule, ActionResolutionContext context)
     {
-        try
-        {
-            return PerkConditionFactory.Evaluate(rule.ConditionKey, context, rule.ConditionValue);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogWarning($"Erro ao validar condição {rule.ConditionKey}: {ex.Message}");
-            return false;
-        }
+        try { return PerkConditionFactory.Evaluate(rule.ConditionKey, context, rule.ConditionValue); }
+        catch { return false; }
     }
 
     /// <summary>
@@ -235,15 +162,8 @@ public class PerkTriggerEvaluator
     /// </summary>
     private bool ValidateCondition(PerkRule rule, CombatRollContext context)
     {
-        try
-        {
-            return PerkConditionFactory.Evaluate(rule.ConditionKey, context, rule.ConditionValue);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogWarning($"Erro ao validar condição {rule.ConditionKey}: {ex.Message}");
-            return false;
-        }
+        try { return PerkConditionFactory.Evaluate(rule.ConditionKey, context, rule.ConditionValue); }
+        catch { return false; }
     }
 
     /// <summary>
@@ -253,72 +173,34 @@ public class PerkTriggerEvaluator
     {
         try
         {
-            if (rule.ConditionKey == PerkConditionKey.RollValueEquals ||
-                rule.ConditionKey == PerkConditionKey.RollTierEquals)
-            {
+            if (rule.ConditionKey == PerkConditionKey.RollValueEquals || rule.ConditionKey == PerkConditionKey.RollTierEquals)
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, dice, rule.ConditionValue);
-            }
 
             if (rule.ConditionKey == PerkConditionKey.RollSumEquals && allDices != null)
             {
-                if (allDices.Count == 0 || dice != allDices[0])
-                    return false;
-
-                var sumContext = new DiceRollSumContext { TotalSum = SumDice(allDices), Dices = allDices };
+                if (allDices.Count == 0 || dice != allDices[0]) return false;
+                var sumContext = new DiceRollSumContext { TotalSum = DiceRuntimeHelper.SumDice(allDices), Dices = allDices };
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, sumContext, rule.ConditionValue);
             }
 
             if (rule.ConditionKey == PerkConditionKey.RollSumEqualsAttackersRollSum && allDices != null && opposingDices != null)
             {
-                if (allDices.Count == 0 || dice != allDices[0])
-                    return false;
-
-                var comparisonContext = new DefenseRollComparisonContext
-                {
-                    DefenderRollSum = SumDice(allDices),
-                    AttackerRollSum = SumDice(opposingDices)
-                };
+                if (allDices.Count == 0 || dice != allDices[0]) return false;
+                var comparisonContext = new DefenseRollComparisonContext { DefenderRollSum = DiceRuntimeHelper.SumDice(allDices), AttackerRollSum = DiceRuntimeHelper.SumDice(opposingDices) };
                 return PerkConditionFactory.Evaluate(rule.ConditionKey, comparisonContext, rule.ConditionValue);
             }
 
             return rule.ConditionKey == PerkConditionKey.Always;
         }
-        catch (Exception ex)
-        {
-            Debug.LogWarning($"Erro ao validar condição de dice {rule.ConditionKey}: {ex.Message}");
-            return false;
-        }
-    }
-
-    private static int SumDice(List<DiceResult> dices)
-    {
-        int sum = 0;
-        if (dices == null)
-            return sum;
-
-        for (int i = 0; i < dices.Count; i++)
-            sum += dices[i]?.Value ?? 0;
-
-        return sum;
+        catch { return false; }
     }
 
     /// <summary>
     /// Dispara o evento PerkTriggered com contexto completo.
     /// </summary>
-    private void NotifyPerkTriggered(
-        Battler owner,
-        PerkRuntimeInstance perk,
-        PerkRule rule,
-        ICombatContext context,
-        float appliedValue)
+    private void NotifyPerkTriggered(Battler owner, PerkRuntimeInstance perk, PerkRule rule, ICombatContext context, float appliedValue)
     {
-        if (perk?.Definition == null)
-            return;
-
-        if (rule.ModifierTarget == PerkModifierTarget.TrickCharges && perk.SourceTrick != null)
-        {
-            perk.SourceTrick.AddCharges(appliedValue * Mathf.Max(1, perk.Stacks));
-        }
+        if (perk?.Definition == null) return;
 
         var triggerEvent = new PerkTriggeredEvent
         {
@@ -329,74 +211,13 @@ public class PerkTriggerEvaluator
             SourceTrick = perk.SourceTrick,
             Trigger = rule.Trigger,
             ModifierTarget = rule.ModifierTarget,
+            Operation = rule.Operation,
             AppliedValue = appliedValue,
             StacksApplied = perk.Stacks,
             FullContext = context,
             TriggerTime = Time.time
         };
 
-        perk.SourceTrick?.MarkTriggered();
         OnPerkTriggered?.Invoke(triggerEvent);
-    }
-
-    /// <summary>
-    /// Valida se o owner do perk é compatível com o role especificado.
-    /// </summary>
-    private static bool IsRoleMatch(Battler owner, CombatRollContext context, PerkRole role)
-    {
-        return role switch
-        {
-            PerkRole.OwnerAsActor => owner == context.Actor,
-            PerkRole.OwnerAsOpponent => owner == context.Opponent,
-            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
-            _ => false
-        };
-    }
-
-    /// <summary>
-    /// Valida se o owner do perk é compatível com o role especificado (para ação).
-    /// </summary>
-    private static bool IsRoleMatch(Battler owner, CombatActionContext context, PerkRole role)
-    {
-        return role switch
-        {
-            PerkRole.OwnerAsActor => owner == context.Actor,
-            PerkRole.OwnerAsOpponent => owner == context.Opponent,
-            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
-            _ => false
-        };
-    }
-
-    private static bool IsRoleMatch(Battler owner, ActionResolutionContext context, PerkRole role)
-    {
-        return role switch
-        {
-            PerkRole.OwnerAsActor => owner == context.Actor,
-            PerkRole.OwnerAsOpponent => owner == context.Opponent,
-            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
-            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
-            _ => false
-        };
-    }
-
-    private static float ApplyModifier(float current, PerkOperation operation, float value, int stacks)
-    {
-        if (operation == PerkOperation.Override)
-            return value;
-
-        if (operation == PerkOperation.Multiply)
-        {
-            float multiplier = 1f;
-            for (int i = 0; i < stacks; i++)
-                multiplier *= value;
-            return current * multiplier;
-        }
-
-        return current + value * stacks;
     }
 }

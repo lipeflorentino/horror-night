@@ -39,6 +39,10 @@ public struct PerkTriggeredEvent
     /// O que foi modificado (dano, dados extras, etc).
     /// </summary>
     public PerkModifierTarget ModifierTarget { get; set; }
+    /// <summary>
+    /// Operação que foi aplicada (Override, Multiply, AddPerCharge, etc).
+    /// </summary>
+    public PerkOperation Operation { get; set; }
 
     /// <summary>
     /// Valor que foi aplicado (ex: 0.30 para +30% de dano).

@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: accumulated_rage_release_attack
   DefaultDurationTurns: -1
-  MaxStacks: 5
+  MaxStacks: 10
   StackMode: 0
   Tags: 
   Rules:
   - Trigger: 0
-    ModifierTarget: 14
-    Operation: 0
+    ModifierTarget: 17
+    Operation: 5
     OwnerRole: 0
     ActionType: 0
     FilterByActionType: 0

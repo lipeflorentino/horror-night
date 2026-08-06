@@ -31,9 +31,9 @@ public class TrickRuntimeInstance
             if (IsCoolingDown && WasExpired) 
                 return false;
                 
-            // Se requer cargas, valida se tem pelo menos 1
+            // Se requer cargas, valida se tem pelo menos o minimo configurado
             if (Definition != null && Definition.ActivationMode == TrickActivationMode.ActiveCharge)
-                return CurrentCharges >= 1f;
+                return CurrentCharges >= Definition.MinChargesRequired;
                 
             // Se for Active normal, e não expirou/está na fase de recarga, está pronto
             return !WasExpired;

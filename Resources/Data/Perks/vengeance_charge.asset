@@ -18,11 +18,11 @@ MonoBehaviour:
   StackMode: 1
   Tags: 
   Rules:
-  - Trigger: 0
-    ModifierTarget: 22
-    Operation: 0
+  - Trigger: 5
+    ModifierTarget: 24
+    Operation: 7
     OwnerRole: 0
-    ActionType: 0
+    ActionType: 1
     FilterByActionType: 0
     RollType: 0
     FilterByRollType: 0
@@ -30,6 +30,6 @@ MonoBehaviour:
     FilterByStatType: 0
     Tier: 0
     FilterByTier: 0
-    ConditionKey: 0
+    ConditionKey: 17
     ConditionValue: 
     Value: 1

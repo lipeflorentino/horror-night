@@ -46,7 +46,7 @@ public static class CombatInfoStatCalculator
                 {
                     int baseValue = battler.Attack;
                     int effectiveValue = perkService != null
-                        ? perkService.GetEffectiveActionPower(battler, opposingBattler, ActionType.Attack)
+                        ? perkService.GetEffectiveAttack(battler)
                         : baseValue;
                     return BuildDisplayData(effectiveValue, effectiveValue - baseValue);
                 }
@@ -54,7 +54,7 @@ public static class CombatInfoStatCalculator
                 {
                     int baseValue = battler.Defense;
                     int effectiveValue = perkService != null
-                        ? perkService.GetEffectiveActionPower(battler, opposingBattler, ActionType.Defense)
+                        ? perkService.GetEffectiveDefense(battler)
                         : baseValue;
                     return BuildDisplayData(effectiveValue, effectiveValue - baseValue);
                 }

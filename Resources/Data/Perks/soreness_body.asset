@@ -19,7 +19,7 @@ MonoBehaviour:
   Tags: 
   Rules:
   - Trigger: 0
-    ModifierTarget: 17
+    ModifierTarget: 20
     Operation: 0
     OwnerRole: 0
     ActionType: 0

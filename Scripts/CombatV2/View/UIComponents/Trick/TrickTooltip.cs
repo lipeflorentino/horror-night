@@ -9,35 +9,31 @@ public class TrickTooltip : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI descriptionText;
-    [SerializeField] private TextMeshProUGUI costText;
+    [SerializeField] private TextMeshProUGUI durationText;
     [SerializeField] private TextMeshProUGUI rarityText;
-    [SerializeField] private TextMeshProUGUI flavorText;
     [SerializeField] private Image iconImage;
 
     /// <summary>
     /// Exibe os dados do trick no tooltip
     /// </summary>
-    public void Show(TrickSO trickDefinition)
+    public void Show(TrickRuntimeInstance runtimeInstance)
     {
-        if (trickDefinition == null)
+        if (runtimeInstance == null)
             return;
         
         if (nameText != null)
-            nameText.text = trickDefinition.DisplayName;
+            nameText.text = runtimeInstance.Definition.DisplayName;
 
         if (descriptionText != null)
-            descriptionText.text = trickDefinition.Description;
+            descriptionText.text = runtimeInstance.Definition.Description;
         
-        if (costText != null)
-            costText.text = $"Requisitos: {trickDefinition.Requirements?.ToDisplayString() ?? "Nenhum"} | Momentum: {trickDefinition.MomentumCost}";
+        if (durationText != null)
+            durationText.text = runtimeInstance.RemainingTurns > 0 ? runtimeInstance.RemainingTurns.ToString() : string.Empty;
             
         if (rarityText != null)
-            rarityText.text = $"Raridade: {trickDefinition.Rarity}";
-        
-        if (flavorText != null)
-            flavorText.text = trickDefinition.FlavorText;
-
-        if (iconImage != null && trickDefinition.Icon != null)
-            iconImage.sprite = trickDefinition.Icon;
+            rarityText.text = $"Raridade: {runtimeInstance.Definition.Rarity}";
+            
+        if (iconImage != null && runtimeInstance.Definition.Icon != null)
+            iconImage.sprite = runtimeInstance.Definition.Icon;
     }
 }

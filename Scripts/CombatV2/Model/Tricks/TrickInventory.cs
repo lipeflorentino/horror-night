@@ -451,8 +451,38 @@ public class TrickInventory : ITrickInventory
             for (int i = 0; i < instance.Definition.PerkIds.Count; i++)
             {
                 string perkId = instance.Definition.PerkIds[i];
+                
+                // 1. Buscamos a definição para inspecionar as regras
+                PerkSO perkDef = perkService.GetPerkDefinition(perkId);
+                if (perkDef == null) continue;
+
+                // 2. Verificamos se este Perk tem o objetivo de gerar cargas para a Trick
+                bool isChargeGenerator = false;
+                if (perkDef.Rules != null)
+                {
+                    for (int j = 0; j < perkDef.Rules.Count; j++)
+                    {
+                        if (perkDef.Rules[j].ModifierTarget == PerkModifierTarget.TrickCharges)
+                        {
+                            isChargeGenerator = true;
+                            break;
+                        }
+                    }
+                }
+
+                // 3. Se a Trick exige ativação manual e o Perk é um modificador de Stats (não gera cargas),
+                // nós NÃO aplicamos ele no Cast. Ele será aplicado pelo PerkService.ExecuteManualActivation.
+                if ((instance.Definition.ActivationMode == TrickActivationMode.ActiveCharge || 
+                    instance.Definition.ActivationMode == TrickActivationMode.Active) 
+                    && !isChargeGenerator)
+                {
+                    continue;
+                }
+
+                // 4. Aplica normalmente os Perks passivos/geradores de carga
                 PerkRuntimeInstance perk = perkService.ApplyPerkFromTrick(
                     owner, perkId, instance, instance.Source ?? owner, instance.Definition.DurationTurns);
+                    
                 if (perk != null && !instance.ActivePerks.Contains(perk))
                     instance.ActivePerks.Add(perk);
             }

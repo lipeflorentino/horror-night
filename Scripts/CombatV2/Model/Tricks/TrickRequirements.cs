@@ -41,8 +41,8 @@ public class TrickRequirements
         if (mind < MinMind || heart < MinHeart || body < MinBody)
             return false;
 
-        int attack = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Attack) : battler.Attack;
-        int defense = perkService != null ? perkService.GetEffectiveActionPower(battler, null, ActionType.Defense) : battler.Defense;
+        int attack = perkService != null ? perkService.GetEffectiveAttack(battler) : battler.Attack;
+        int defense = perkService != null ? perkService.GetEffectiveDefense(battler) : battler.Defense;
 
         if (attack < MinAttack || defense < MinDefense || battler.Initiative < MinInitiative)
             return false;

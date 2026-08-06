@@ -19,8 +19,8 @@ MonoBehaviour:
   Tags: 
   Rules:
   - Trigger: 0
-    ModifierTarget: 13
-    Operation: 0
+    ModifierTarget: 16
+    Operation: 3
     OwnerRole: 0
     ActionType: 0
     FilterByActionType: 0

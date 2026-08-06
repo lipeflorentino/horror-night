@@ -91,5 +91,10 @@ public enum PerkOperation
 {
     Add,
     Multiply,
-    Override
+    Override,
+    AddPerCharge,
+    AddPer3Charges,
+    AddPer5Charges,
+    AddPer10Charges,
+    AddPerDamage,
 }

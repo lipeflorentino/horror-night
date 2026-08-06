@@ -133,8 +133,8 @@ public class ActionResolverService
     {
         if (perkService != null)
         {
-            perkService.EvaluateActionResolutionTriggers(attacker, target, attack.Definition?.Type ?? ActionType.Attack, result.Outcome, result.ResolutionVariation);
-            perkService.EvaluateActionResolutionTriggers(target, attacker, defense?.Definition?.Type ?? ActionType.Defense, result.Outcome, result.ResolutionVariation);
+            perkService.EvaluateActionResolutionTriggers(attacker, target, attack.Definition?.Type ?? ActionType.Attack, result.Outcome, result.ResolutionVariation, result.Damage, result.FinalTarget);
+            perkService.EvaluateActionResolutionTriggers(target, attacker, defense?.Definition?.Type ?? ActionType.Defense, result.Outcome, result.ResolutionVariation, result.Damage, result.FinalTarget);
         }
     }
 

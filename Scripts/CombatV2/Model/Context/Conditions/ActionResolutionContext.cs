@@ -8,4 +8,6 @@ public class ActionResolutionContext : ICombatContext, IPerkConditionContext
     public ActionType ActionType;
     public ActionOutcome Outcome;
     public ActionResolutionVariation ResolutionVariation;
+    public int Damage;
+    public Battler FinalTarget;
 }

@@ -32,6 +32,7 @@ public class CombatResolutionManager
         view.ShowCombatLog($"Player: <color=green>{player.HP}</color> | Enemy: <color=orange>{enemy.HP}</color>");
 
         view.UpdateView(player, enemy);
+        view.RefreshActiveTricks();
     }
 
     public static bool ResolveAttackAccuracy(CombatTurnContext state)
@@ -48,7 +49,14 @@ public class CombatResolutionManager
 
     public static ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType, PerkService perkService)
     {
-        int basePower = perkService != null ? perkService.GetEffectiveActionPower(battler, opponent, actionType) : battler?.GetBattlerActionPower(actionType == ActionType.Attack) ?? 0;
+        int basePower = actionType == ActionType.Attack
+            ? perkService != null 
+                ? perkService.GetEffectiveAttack(battler) 
+                : battler?.Attack ?? 0
+            : perkService != null 
+                ? perkService.GetEffectiveDefense(battler) 
+                : battler?.Defense ?? 0;
+
         string id = actionType == ActionType.Attack ? "attack" : "defense";
         return new ActionDefinition(id, actionType, basePower);
     }

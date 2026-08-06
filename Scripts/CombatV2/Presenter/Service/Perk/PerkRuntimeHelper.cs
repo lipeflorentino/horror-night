@@ -45,4 +45,79 @@ public static class PerkRuntimeHelper
 
         return $"direct:{perkId}";
     }
+
+    public static float ApplyModifier(float current, PerkOperation operation, float value, int stacks, ICombatContext context)
+    {
+        if (operation == PerkOperation.Override)
+            return value;
+
+        if (operation == PerkOperation.Multiply)
+        {
+            float multiplier = 1f;
+            for (int i = 0; i < stacks; i++)
+                multiplier *= value;
+            return current * multiplier;
+        }
+
+        if (operation == PerkOperation.AddPer10Charges)
+            return current + value * (stacks / 10);
+
+        if (operation == PerkOperation.AddPer5Charges)
+            return current + value * (stacks / 5);
+
+        if (operation == PerkOperation.AddPer3Charges)
+            return current + value * (stacks / 3);
+            
+        if (operation == PerkOperation.AddPerCharge)
+            return current + value * stacks;
+
+        if (operation == PerkOperation.AddPerDamage && context is ActionResolutionContext actionContext)
+            return current + (value * actionContext.Damage * stacks); 
+
+        return current + value * stacks;
+    }
+
+    public static bool IsRoleMatch(Battler owner, CombatRollContext context, PerkRole role)
+    {
+        return IsRoleMatch(owner, context.ToActionContext(), role); 
+        // Nota: Garanta que ToActionContext() ou a lógica interna equivalente esteja acessível.
+        // Ou copie a implementação direta que está no PerkTriggerEvaluator:
+        /*
+        return role switch
+        {
+            PerkRole.OwnerAsActor => owner == context.Actor,
+            PerkRole.OwnerAsOpponent => owner == context.Opponent,
+            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
+            _ => false
+        };
+        */
+    }
+
+    public static bool IsRoleMatch(Battler owner, CombatActionContext context, PerkRole role)
+    {
+        return role switch
+        {
+            PerkRole.OwnerAsActor => owner == context.Actor,
+            PerkRole.OwnerAsOpponent => owner == context.Opponent,
+            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
+            _ => false
+        };
+    }
+
+    public static bool IsRoleMatch(Battler owner, ActionResolutionContext context, PerkRole role)
+    {
+        return role switch
+        {
+            PerkRole.OwnerAsActor => owner == context.Actor,
+            PerkRole.OwnerAsOpponent => owner == context.Opponent,
+            PerkRole.OwnerAsAttacker => context.ActionType == ActionType.Attack ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsDefender => context.ActionType == ActionType.Defense ? owner == context.Actor : owner == context.Opponent,
+            PerkRole.OwnerAsTarget => context.ActionType == ActionType.Attack ? owner == context.Opponent : owner == context.Actor,
+            _ => false
+        };
+    }
 }

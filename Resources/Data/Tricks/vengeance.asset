@@ -33,12 +33,13 @@ MonoBehaviour:
     MinAgility: 0
   MomentumCost: 1
   TimingTurns: 0
-  DurationTurns: 6
-  CooldownTurns: 8
+  DurationTurns: 3
+  CooldownTurns: 2
   ActivationMode: 2
+  MinChargesRequired: 3
   PerkIds:
   - vengeance_charge
-  - vengance_release
+  - vengeance_release
   DrawbackIds: []
   Rarity: 2
   Tags:

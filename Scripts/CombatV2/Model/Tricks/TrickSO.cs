@@ -40,6 +40,8 @@ public class TrickSO : ScriptableObject
 
     [Header("Acionamento")]
     public TrickActivationMode ActivationMode = TrickActivationMode.Active;
+    [Tooltip("Min charges required to manually trigger this trick (for ActiveCharge).")]
+    public int MinChargesRequired = 1;
 
     public bool IsPassive => ActivationMode == TrickActivationMode.Passive;
     public bool IsActive => ActivationMode == TrickActivationMode.Active || ActivationMode == TrickActivationMode.ActiveCharge;
