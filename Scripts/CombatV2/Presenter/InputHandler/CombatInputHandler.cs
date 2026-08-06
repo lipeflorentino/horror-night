@@ -114,7 +114,6 @@ public class CombatInputHandler : MonoBehaviour
         if (IsWaitingTurnResolution) return;
         if (!CanAddDiceToRoll()) return;
         if (!CanUseDiceType(diceStatType)) return;
-        if (!CanAllocateStatDice(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
@@ -213,8 +212,8 @@ public class CombatInputHandler : MonoBehaviour
 
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
-            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll() && CanAllocateStatDice(stat);
-            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll() && CanAllocateStatDice(stat);
+            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
+            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
 
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
                 stat,
@@ -253,12 +252,6 @@ public class CombatInputHandler : MonoBehaviour
     private int GetAllocatedStatCount(DiceStatType stat)
     {
         return PowerDiceTypes.FindAll(x => x == stat).Count + AccuracyDiceTypes.FindAll(x => x == stat).Count;
-    }
-
-    private bool CanAllocateStatDice(DiceStatType stat)
-    {
-        int projectedValue = Combat.Player.GetCurrentStatValue(stat) - GetAllocatedStatCount(stat) - 1;
-        return projectedValue >= CombatRules.MinCoreStatValue;
     }
 
     /// <summary>

@@ -104,6 +104,8 @@ Sistemas de Combate
     - Forced Encounter não deve disparar imadiatamente um encounter 
         - deve modificar o evento da proxima casa visitada para um encounter 
         - evitar sobreposição de eventos 
+
+    - Verificar Trick/Perk adrenaline surge (aplicação de dados extras)
     
 
 
@@ -124,4 +126,4 @@ Sistemas de Combate
         
     
 TASKS
-    - Botão de adicionar dado de body travado
+    - CombatLog para trick expired!
