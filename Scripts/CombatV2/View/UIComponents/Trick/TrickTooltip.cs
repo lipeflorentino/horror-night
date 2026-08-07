@@ -12,6 +12,7 @@ public class TrickTooltip : MonoBehaviour
     [SerializeField] private TextMeshProUGUI durationText;
     [SerializeField] private TextMeshProUGUI rarityText;
     [SerializeField] private Image iconImage;
+    [SerializeField] private TextMeshProUGUI durationLabelText;
 
     /// <summary>
     /// Exibe os dados do trick no tooltip
@@ -28,12 +29,18 @@ public class TrickTooltip : MonoBehaviour
             descriptionText.text = runtimeInstance.Definition.Description;
         
         if (durationText != null)
-            durationText.text = runtimeInstance.RemainingTurns > 0 ? runtimeInstance.RemainingTurns.ToString() : string.Empty;
+            durationText.text = runtimeInstance.RemainingTurns > 0 ? runtimeInstance.RemainingTurns.ToString() : runtimeInstance.CooldownTurnsRemaining.ToString();
+            durationText.text += " turnos";
             
         if (rarityText != null)
             rarityText.text = $"Raridade: {runtimeInstance.Definition.Rarity}";
             
         if (iconImage != null && runtimeInstance.Definition.Icon != null)
             iconImage.sprite = runtimeInstance.Definition.Icon;
+
+        if (durationLabelText != null)
+        {
+            durationLabelText.text = runtimeInstance.RemainingTurns > 0 ? "Duração:" : "Em Cooldown:";
+        }
     }
 }

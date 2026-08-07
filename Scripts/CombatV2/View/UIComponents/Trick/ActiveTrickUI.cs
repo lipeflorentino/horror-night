@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,10 +16,13 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [SerializeField] private GameObject chargesContainer;
     [SerializeField] private GameObject inputkeyContainer;
 
-    [Header("Componentes Novos - Cargas e Cooldown")]
+    [Header("Cargas e Cooldown")]
     [SerializeField] private TMP_Text chargesText;
     [SerializeField] private GameObject cooldownOverlay;
     [SerializeField] private TMP_Text cooldownTurnsText;
+
+    [Header("Highlight Activation")]
+    [SerializeField] private RectTransform buttonActivationHighlight;
 
     private TrickSO trickDefinition;
     private TrickRuntimeInstance runtimeInstance;
@@ -28,6 +32,20 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public TrickSO TrickDefinition => trickDefinition;
     public TrickRuntimeInstance RuntimeInstance => runtimeInstance;
     public event Action<TrickRuntimeInstance> OnReleaseClicked;
+    private Tween cursorPulseTween;
+
+    private void Start()
+    {
+        // Inicia a animação de pulso contínuo para o cursor
+        if (buttonActivationHighlight != null)
+        {
+            cursorPulseTween = buttonActivationHighlight.DOScale(1.05f, 0.5f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine);
+                
+            // buttonActivationHighlight.gameObject.SetActive(false);
+        }
+    }
 
     public void Setup(TrickSO definition, string inputKeyOverride, TrickRuntimeInstance instance = null)
     {
@@ -98,7 +116,24 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
                           runtimeInstance != null && 
                           runtimeInstance.IsReadyToTrigger;
                           
-        releaseButton.gameObject.SetActive(canRelease);
+        releaseButton.interactable = canRelease;
+        // buttonActivationHighlight.gameObject.SetActive(canRelease);
+        if (!buttonActivationHighlight.TryGetComponent<CanvasGroup>(out var cg))
+        {
+            cg = buttonActivationHighlight.gameObject.AddComponent<CanvasGroup>();
+            if (canRelease)
+            {
+                cg.alpha = 1f;
+            }
+            else
+            {
+                cg.alpha = 0f;
+            }
+        }
+        if (releaseButton.TryGetComponent<Image>(out var buttonImage))
+        {
+            buttonImage.color = canRelease ? Color.red : Color.white;
+        }
     }
 
     private void OnReleaseClickedHandler()
@@ -126,6 +161,8 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         if (releaseButton != null)
             releaseButton.onClick.RemoveListener(OnReleaseClickedHandler);
+
+        cursorPulseTween?.Kill();
     }
 
     public void PlayActivationAnimation()

@@ -91,6 +91,7 @@ Sistemas de Combate
         - maxLearnedSlots
         - maxCastedSlots
         - maxIdentitySlots
+    - Substituir todos os GetComponent por GetOrAddComponent
 
 🐛 BUGS & FIXES
 
@@ -121,10 +122,9 @@ Sistemas de Combate
         - Criar uma UI especifica para tricks de identidade e tricks temporarias
         - Implementar overlay de cooldown nos slots do inventário
         - Implementar área de active tricks com ícones
-
-    - Ao diminuir stats (mind, heart, body) o MaxRoll está diminuindo junto (bug)
         
     
 TASKS
-    - CombatLog para trick expired!
-    - Substituir GetComponent por GetOrAddComponent
+    - Colocar momentum na tela de TrickInventory
+    - Colocar feedback para "sem recurso" na tela de TrickInventory
+    - Colocar background vermelho quando stats estão baixas (mind, heart, body)

@@ -18,17 +18,32 @@ public class CombatLogView : MonoBehaviour
 
     private readonly Queue<CombatLogItemUI> activeLogs = new();
 
-    public void ShowTriggerFeedback(PerkTriggeredEvent evt)
+    public void ShowTrickFeedback(TrickRuntimeInstance trick, string actionType = "triggered")
     {
-        if (evt.SourceTrick?.Definition != null)
-        {
-            string rarityColor = GetRarityColor(evt.SourceTrick.Definition.Rarity);
-            string displayName = string.IsNullOrWhiteSpace(evt.SourceTrick.Definition.DisplayName)
-                ? evt.SourceTrick.Definition.Id
-                : evt.SourceTrick.Definition.DisplayName;
-            ShowTextLog($"<color={rarityColor}>{displayName}</color> acionado", evt.SourceTrick.Definition.Icon, defaultColor);
+        if (trick == null || trick.Definition == null)
             return;
+
+        Color textColor = defaultColor;
+
+        if (actionType == "triggered")
+        {
+            textColor = Color.yellow;
         }
+        else if (actionType == "expired")
+        {
+            textColor = Color.red;
+        }
+        else if (actionType == "activated")
+        {
+            textColor = Color.green;
+        }
+
+        string rarityColor = GetRarityColor(trick.Definition.Rarity);
+        string displayName = string.IsNullOrWhiteSpace(trick.Definition.DisplayName)
+            ? trick.Definition.Id
+            : trick.Definition.DisplayName;
+
+        ShowTextLog($"<color={rarityColor}>{displayName}</color> {actionType}", trick.Definition.Icon, textColor);
     }
 
     public void ShowTextLog(string logText, Sprite icon = null, Color? textColor = null)

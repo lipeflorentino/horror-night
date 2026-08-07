@@ -144,4 +144,10 @@ public class CombatView : MonoBehaviour
         if (CombatLogView != null)
             CombatLogView.ShowTextLog(logText, icon, textColor);
     }
+
+    public void ShowTrickFeedback(TrickRuntimeInstance trick, string feedbackType)
+    {
+        if (CombatLogView != null)
+            CombatLogView.ShowTrickFeedback(trick, feedbackType);
+    }
 }

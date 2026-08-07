@@ -132,7 +132,6 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
     {
-        Logger.Log($"[HandleTrickExpired] Handling trick expired for {battler.Name}: {trick.Definition.DisplayName}");
         if (!ShouldHandleEvent(battler))
             return;
 

@@ -572,8 +572,8 @@ MonoBehaviour:
   descriptionText: {fileID: 1337007874829667649}
   durationText: {fileID: 3294120257090463011}
   rarityText: {fileID: 8976698465765065135}
-  flavorText: {fileID: 0}
   iconImage: {fileID: 3227663417189807822}
+  durationLabelText: {fileID: 3646730888757424230}
 --- !u!1 &7897141599839272164
 GameObject:
   m_ObjectHideFlags: 0

@@ -28,7 +28,7 @@ public class TrickInventoryView : MonoBehaviour
     [SerializeField] private TrickInfoPanelUI trickInfoPanel;
 
     [Header("Highlight Cursor")]
-    [SerializeField] private RectTransform highlightCursor; // <- O NOVO CURSOR
+    [SerializeField] private RectTransform highlightCursor;
 
     private readonly List<TrickSlotUI> spawnedSlots = new();
     private ITrickInventory boundInventory;

@@ -166,7 +166,6 @@ public class CombatManager : MonoBehaviour
             return false;
 
         bool casted = TrickService.TryCastTrick(Player, PlayerTrickInventory, trick, null);
-        if (casted) View.ShowCombatLog($"[Trick] <color=yellow>{trick.name}</color> cast by <color=blue>{Player.Name}</color>");
         RefreshCombatUI();
         return casted;
     }
@@ -180,9 +179,7 @@ public class CombatManager : MonoBehaviour
             return;
 
         PerkService.ExecuteManualActivation(instance.Owner, GetActionType(), instance);
-        
-        string displayName = string.IsNullOrWhiteSpace(instance.Definition.DisplayName) ? instance.Definition.Id : instance.Definition.DisplayName;
-        View.ShowCombatLog($"<color=white>{displayName}</color> ativado!", instance.Definition.Icon);
+        View.ShowTrickFeedback(instance, "activated");
         
         RefreshCombatUI();
         View.RefreshActiveTricks(); 

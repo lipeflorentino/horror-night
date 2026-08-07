@@ -103,7 +103,7 @@ public class TrickSlotUI : MonoBehaviour
 
                 if (isLocked && isActive) 
                 {
-                    tooltipMessage = "Blocked";
+                    tooltipMessage = "Casted";
                     tooltipColor = TooltipUI.TooltipColor.Yellow;
                 }
                 else if (isCoolingDown)

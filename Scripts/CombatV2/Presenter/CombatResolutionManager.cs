@@ -14,7 +14,7 @@ public class CombatResolutionManager
             state.CurrentTurn.Defender
         );
         
-        view.ShowCombatLog($"Outcome: <color=yellow>{result.Outcome}</color> <br>Damage: <color=red>{result.Damage}</color> <color=yellow>({(result.DamageBonus >= 0 ? "+" : string.Empty)}{result.DamageBonus} bonus)</color>");
+        view.ShowCombatLog($"Outcome: <color=yellow>{result.Outcome}</color> <br>Damage: <color=red>{result.Damage - result.DamageBonus}</color> <color=yellow>({(result.DamageBonus >= 0 ? "+" : string.Empty)}{result.DamageBonus} bonus)</color>");
         
         if (result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Hit) 
         {
@@ -28,9 +28,6 @@ public class CombatResolutionManager
         }
 
         view.ShowResolveFeedback(result, state.PlayerIsAttacker);
-
-        view.ShowCombatLog($"Player: <color=green>{player.HP}</color> | Enemy: <color=orange>{enemy.HP}</color>");
-
         view.UpdateView(player, enemy);
         view.RefreshActiveTricks();
     }

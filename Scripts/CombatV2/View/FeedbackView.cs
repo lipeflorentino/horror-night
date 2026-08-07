@@ -9,6 +9,7 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private StatusEffectFeedbacks enemyStatusEffectFeedbacks;
 
     private PerkService perkService;
+    private TrickService trickService;
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private CombatLogView combatLogView;
@@ -22,10 +23,18 @@ public class FeedbackView : MonoBehaviour
     public void Init(PerkService perkService, TrickService trickService, Battler playerBattler, Battler enemyBattler)
     {
         if (this.perkService != null)
+        {
             this.perkService.OnPerkTriggered -= HandlePerkTriggered;
+        }
+
+        if (this.trickService != null)
+        {
+            this.trickService.OnTrickExpired -= HandleTrickExpired;
+        }
 
         ResolveFeedbackDependencies();
         this.perkService = perkService;
+        this.trickService = trickService;
 
         if (playerStatusEffectFeedbacks != null)
             playerStatusEffectFeedbacks.Initialize(perkService, trickService, playerBattler);
@@ -34,7 +43,14 @@ public class FeedbackView : MonoBehaviour
             enemyStatusEffectFeedbacks.Initialize(perkService, trickService, enemyBattler);
 
         if (this.perkService != null)
+        {
             this.perkService.OnPerkTriggered += HandlePerkTriggered;
+        }
+
+        if (this.trickService != null)
+        {
+            this.trickService.OnTrickExpired += HandleTrickExpired;
+        }
     }
     
     private void ResolveFeedbackDependencies()
@@ -95,7 +111,14 @@ public class FeedbackView : MonoBehaviour
     private void HandlePerkTriggered(PerkTriggeredEvent evt)
     {
         if (combatLogView != null)
-            combatLogView.ShowTriggerFeedback(evt);
+            combatLogView.ShowTrickFeedback(evt.SourceTrick, "triggered");
+    }
+
+    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
+    {
+        Logger.Log("[HandleTrickExpired] Handling trick expired for " + battler.Name + ": " + trick.Definition.DisplayName);
+        if (combatLogView != null)
+            combatLogView.ShowTrickFeedback(trick, "expired");
     }
 
     public void ShowResolveFeedback(ActionResolutionResult result, bool attackerIsPlayer)
@@ -195,5 +218,8 @@ public class FeedbackView : MonoBehaviour
     {
         if (perkService != null)
             perkService.OnPerkTriggered -= HandlePerkTriggered;
+
+        if (trickService != null)
+            trickService.OnTrickExpired -= HandleTrickExpired;
     }
 }

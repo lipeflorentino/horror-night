@@ -106,7 +106,7 @@ public class DiceTierBarUI : MonoBehaviour
     // Método auxiliar para aplicar a transparência
     private void SetTierAlpha(RectTransform rect, TMP_Text label, bool isHighlighted)
     {
-        float targetAlpha = isHighlighted ? 1f : 0.3f;
+        float targetAlpha = isHighlighted ? 1f : 0.15f;
         if (rect != null && rect.TryGetComponent<Image>(out var image))
         {
             Color color = image.color;
