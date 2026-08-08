@@ -38,10 +38,7 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         // Garante que exista um CanvasGroup no objeto para controlar o Alpha/Piscar
         if (canvasGroup == null)
-            canvasGroup = GetComponent<CanvasGroup>();
-
-        if (canvasGroup == null && enableBlinkOnEnter)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            canvasGroup = gameObject.GetOrAddComponent<CanvasGroup>();
     }
 
     /// <summary>
@@ -139,11 +136,6 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (canvasGroup != null) canvasGroup.DOKill();
     }
 
-    public void OnPointerEnter(PointerEventData eventData) => ShowTooltip();
-    public void OnPointerExit(PointerEventData eventData) => HideTooltip();
-    private void OnMouseEnter() => ShowTooltip();
-    private void OnMouseExit() => HideTooltip();
-
     private void ShowTooltip()
     {
         if (tooltip == null) return;
@@ -155,4 +147,9 @@ public class StatusEffectUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (tooltip == null) return;
         tooltip.SetActive(false);
     }
+
+    public void OnPointerEnter(PointerEventData eventData) => ShowTooltip();
+    public void OnPointerExit(PointerEventData eventData) => HideTooltip();
+    private void OnMouseEnter() => ShowTooltip();
+    private void OnMouseExit() => HideTooltip();
 }

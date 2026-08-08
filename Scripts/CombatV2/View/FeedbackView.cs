@@ -8,8 +8,10 @@ public class FeedbackView : MonoBehaviour
     [SerializeField] private StatusEffectFeedbacks playerStatusEffectFeedbacks;
     [SerializeField] private StatusEffectFeedbacks enemyStatusEffectFeedbacks;
 
-    private PerkService perkService;
+    private DrawbackService drawbackService;
+    private BattlerStateService battlerStateService;
     private TrickService trickService;
+    private PerkService perkService;
     [SerializeField] private PlayerFeedbacks playerFeedbacks;
     [SerializeField] private EnemyFeedbacks enemyFeedbacks;
     [SerializeField] private CombatLogView combatLogView;
@@ -20,36 +22,63 @@ public class FeedbackView : MonoBehaviour
         ResolveFeedbackDependencies();
     }
 
-    public void Init(PerkService perkService, TrickService trickService, Battler playerBattler, Battler enemyBattler)
+    public void Init(TrickService trickService, PerkService perkService, DrawbackService drawbackService, BattlerStateService battlerStateService, Battler playerBattler, Battler enemyBattler)
     {
-        if (this.perkService != null)
-        {
-            this.perkService.OnPerkTriggered -= HandlePerkTriggered;
-        }
-
         if (this.trickService != null)
         {
             this.trickService.OnTrickExpired -= HandleTrickExpired;
         }
 
+        if (this.perkService != null)
+        {
+            this.perkService.OnPerkTriggered -= HandlePerkTriggered;
+        }
+
+        if (this.drawbackService != null)
+        {
+            this.drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
+            this.drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+        }
+
+        if (this.battlerStateService != null)
+        {
+            this.battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
+            this.battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
+        }
+
         ResolveFeedbackDependencies();
-        this.perkService = perkService;
+
         this.trickService = trickService;
+        this.perkService = perkService;
+        this.drawbackService = drawbackService;
+        this.battlerStateService = battlerStateService;
 
         if (playerStatusEffectFeedbacks != null)
-            playerStatusEffectFeedbacks.Initialize(perkService, trickService, playerBattler);
+            playerStatusEffectFeedbacks.Initialize(drawbackService, battlerStateService, playerBattler);
 
         if (enemyStatusEffectFeedbacks != null)
-            enemyStatusEffectFeedbacks.Initialize(perkService, trickService, enemyBattler);
+            enemyStatusEffectFeedbacks.Initialize(drawbackService, battlerStateService, enemyBattler);
+
+        if (this.trickService != null)
+        {
+            this.trickService.OnTrickExpired += HandleTrickExpired;
+        }
 
         if (this.perkService != null)
         {
             this.perkService.OnPerkTriggered += HandlePerkTriggered;
         }
 
-        if (this.trickService != null)
+        if (this.drawbackService != null)
         {
-            this.trickService.OnTrickExpired += HandleTrickExpired;
+            this.drawbackService.OnDrawbackApplied += HandleDrawbackApplied;
+            this.drawbackService.OnDrawbackRemoved += HandleDrawbackRemoved;
+        }
+
+        if (this.battlerStateService != null)
+        {
+            this.battlerStateService.OnBattlerStateApplied += HandleBattlerStateApplied;
+            this.battlerStateService.OnBattlerStateRemoved += HandleBattlerStateRemoved;
         }
     }
     
@@ -79,6 +108,43 @@ public class FeedbackView : MonoBehaviour
         ResolveStatusEffectFeedbacks();
     }
 
+    private void HandlePerkTriggered(PerkTriggeredEvent evt)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowTrickFeedback(evt.SourceTrick, "triggered");
+    }
+
+    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
+    {
+        Logger.Log("[HandleTrickExpired] Handling trick expired for " + battler.Name + ": " + trick.Definition.DisplayName);
+        if (combatLogView != null)
+            combatLogView.ShowTrickFeedback(trick, "expired");
+    }
+
+    private void HandleDrawbackApplied(Battler battler, DrawbackRuntimeInstance drawback)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowDrawbackFeedback(battler, drawback, "applied");
+    }
+
+    private void HandleDrawbackRemoved(Battler battler, DrawbackRuntimeInstance drawback)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowDrawbackFeedback(battler, drawback, "expired");
+    }
+
+    private void HandleBattlerStateApplied(Battler battler, BattlerStateRuntimeInstance state)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowBattlerStateFeedback(battler, state, "applied");
+    }
+
+    private void HandleBattlerStateRemoved(Battler battler, BattlerStateRuntimeInstance state)
+    {
+        if (combatLogView != null)
+            combatLogView.ShowBattlerStateFeedback(battler, state, "expired");
+    }
+
     private void ResolveStatusEffectFeedbacks()
     {
         if (playerStatusEffectFeedbacks != null && enemyStatusEffectFeedbacks != null)
@@ -106,19 +172,6 @@ public class FeedbackView : MonoBehaviour
 
         if (enemyStatusEffectFeedbacks == null && feedbackViews.Length > 1)
             enemyStatusEffectFeedbacks = feedbackViews[1];
-    }
-
-    private void HandlePerkTriggered(PerkTriggeredEvent evt)
-    {
-        if (combatLogView != null)
-            combatLogView.ShowTrickFeedback(evt.SourceTrick, "triggered");
-    }
-
-    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
-    {
-        Logger.Log("[HandleTrickExpired] Handling trick expired for " + battler.Name + ": " + trick.Definition.DisplayName);
-        if (combatLogView != null)
-            combatLogView.ShowTrickFeedback(trick, "expired");
     }
 
     public void ShowResolveFeedback(ActionResolutionResult result, bool attackerIsPlayer)

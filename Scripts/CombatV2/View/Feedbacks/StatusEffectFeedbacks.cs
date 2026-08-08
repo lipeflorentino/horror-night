@@ -7,116 +7,46 @@ public class StatusEffectFeedbacks : MonoBehaviour
     [SerializeField] private Transform feedbackAnchor;
 
     private Battler ownerBattler;
-    private PerkService perkService;
-    private TrickService trickService;
+    private DrawbackService drawbackService;
+    private BattlerStateService battlerStateService;
     private readonly Dictionary<string, int> lastFeedbackFrameByEffect = new();
     private readonly Dictionary<string, GameObject> popupByFeedbackKey = new();
 
     public Battler OwnerBattler => ownerBattler;
 
-    public void Initialize(PerkService service, TrickService trickServiceInstance, Battler owner)
+    public void Initialize(DrawbackService drawbackServiceInstance, BattlerStateService battlerStateServiceInstance, Battler owner)
     {
-        if (perkService == service && trickService == trickServiceInstance && ownerBattler == owner)
+        if (battlerStateService == battlerStateServiceInstance && drawbackService == drawbackServiceInstance && ownerBattler == owner)
             return;
 
-        if (perkService != null)
+        if (battlerStateService != null)
         {
-            perkService.OnBattlerStateApplied -= HandleBattlerStateApplied;
-            perkService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
-            perkService.OnDrawbackApplied -= HandleDrawbackApplied;
-            perkService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+            battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
+            battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
         }
 
-        if (trickService != null)
+        if (drawbackService != null)
         {
-            trickService.OnTrickCasted -= HandleTrickCasted;
-            trickService.OnTrickExpired -= HandleTrickExpired;
-            trickService.OnTrickRemoved -= HandleTrickRemoved;
-            trickService.OnTrickChanged -= HandleTrickChanged;
+            drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
+            drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
         }
 
         ownerBattler = owner;
-        perkService = service;
-        trickService = trickServiceInstance;
+        battlerStateService = battlerStateServiceInstance;
+        drawbackService = drawbackServiceInstance;
 
-        if (perkService != null)
+        if (battlerStateService != null)
         {
-            perkService.OnBattlerStateApplied += HandleBattlerStateApplied;
-            perkService.OnBattlerStateRemoved += HandleBattlerStateRemoved;
-            perkService.OnDrawbackApplied += HandleDrawbackApplied;
-            perkService.OnDrawbackRemoved += HandleDrawbackRemoved;
+            battlerStateService.OnBattlerStateApplied += HandleBattlerStateApplied;
+            battlerStateService.OnBattlerStateRemoved += HandleBattlerStateRemoved;
         }
 
-        if (trickService != null)
+        if (drawbackService != null)
         {
-            trickService.OnTrickCasted += HandleTrickCasted;
-            trickService.OnTrickExpired += HandleTrickExpired;
-            trickService.OnTrickRemoved += HandleTrickRemoved;
-            trickService.OnTrickChanged += HandleTrickChanged;
+            drawbackService.OnDrawbackApplied += HandleDrawbackApplied;
+            drawbackService.OnDrawbackRemoved += HandleDrawbackRemoved;
         }
     }
-
-    private void HandleTrickCasted(Battler battler, TrickRuntimeInstance trick)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        if (trick == null || trick.Definition == null)
-            return;
-
-        if (trick.Definition.DurationTurns < 0 || trick.SlotType == TrickSlotType.Identity || trick.SlotType == TrickSlotType.CastedActive)
-            return;
-
-        ShowFeedbackPopup(
-            displayName: trick.Definition.DisplayName,
-            description: trick.Definition.Description,
-            icon: trick.Definition.Icon,
-            remainingTurns: trick.RemainingTurns,
-            feedbackKey: GetFeedbackKey(trick.InstanceId, trick.Definition.Id));
-    }
-
-
-    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        RemovePopupForTrick(trick);
-    }
-
-    private void HandleTrickRemoved(Battler battler, string trickId)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        if (string.IsNullOrWhiteSpace(trickId))
-            return;
-
-        foreach (var pair in new List<KeyValuePair<string, GameObject>>(popupByFeedbackKey))
-        {
-            if (pair.Key.Equals(trickId, System.StringComparison.OrdinalIgnoreCase))
-            {
-                RemovePopup(pair.Key);
-                break;
-            }
-        }
-    }
-
-    private void HandleTrickChanged(Battler battler, TrickRuntimeInstance trick)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        if (trick == null || trick.Definition == null)
-            return;
-
-        string feedbackKey = GetFeedbackKey(trick.InstanceId, trick.Definition.Id);
-        if (popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObject) && popupObject != null && popupObject.TryGetComponent<StatusEffectUI>(out var popup))
-        {
-            popup.RefreshDuration(trick.RemainingTurns);
-        }
-    }
-
     private void HandleBattlerStateApplied(Battler battler, BattlerStateRuntimeInstance state)
     {
         if (!ShouldHandleEvent(battler))
@@ -202,16 +132,6 @@ public class StatusEffectFeedbacks : MonoBehaviour
         popupByFeedbackKey[feedbackKey] = popupObject;
     }
 
-    private void RemovePopupForTrick(TrickRuntimeInstance trick)
-    {
-        if (trick == null)
-            return;
-
-        string feedbackKey = GetFeedbackKey(trick.InstanceId, trick.Definition?.Id);
-        if (!string.IsNullOrWhiteSpace(feedbackKey))
-            RemovePopup(feedbackKey);
-    }
-
     private void RemovePopup(string feedbackKey)
     {
         popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObj);
@@ -234,19 +154,16 @@ public class StatusEffectFeedbacks : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (perkService != null)
+        if (battlerStateService != null)
         {
-            perkService.OnBattlerStateApplied -= HandleBattlerStateApplied;
-            perkService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
-            perkService.OnDrawbackApplied -= HandleDrawbackApplied;
-            perkService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+            battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
+            battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
         }
 
-        if (trickService != null)
+        if (drawbackService != null)
         {
-            trickService.OnTrickCasted -= HandleTrickCasted;
-            trickService.OnTrickExpired -= HandleTrickExpired;
-            trickService.OnTrickRemoved -= HandleTrickRemoved;
+            drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
+            drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
         }
     }
 }

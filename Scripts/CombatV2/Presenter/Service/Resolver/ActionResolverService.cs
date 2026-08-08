@@ -3,10 +3,14 @@ using UnityEngine;
 public class ActionResolverService
 {
     private readonly PerkService perkService;
+    private readonly DrawbackService drawbackService;
+    private readonly BattlerStateService battlerStateService;
 
-    public ActionResolverService(PerkService perkService = null)
+    public ActionResolverService(PerkService perkService = null, DrawbackService drawbackService = null, BattlerStateService battlerStateService = null)
     {
         this.perkService = perkService;
+        this.drawbackService = drawbackService;
+        this.battlerStateService = battlerStateService;
     }
     public ActionResolutionResult Resolve(ActionInstance attack, ActionInstance defense, Battler attacker, Battler target)
     {
@@ -291,12 +295,12 @@ public class ActionResolverService
 
     private void ApplySecondaryEffectToTarget(Battler target, ActionEffectPayload payload, Battler source)
     {
-        if (target == null || string.IsNullOrWhiteSpace(payload.EffectId) || perkService == null)
+        if (target == null || string.IsNullOrWhiteSpace(payload.EffectId) || drawbackService == null)
             return;
         
         if (payload.Type == ActionEffectType.Drawback)
         {
-            DrawbackRuntimeInstance drawback = perkService.ApplyDrawback(target, payload.EffectId, source);
+            DrawbackRuntimeInstance drawback = drawbackService.ApplyDrawback(target, payload.EffectId, source);
             if (drawback == null)
             {
                 Logger.Log($"[Resolve] Secondary effect '{payload.EffectName}' was not applied because no drawback definition exists yet.");
@@ -304,7 +308,7 @@ public class ActionResolverService
         }
         if (payload.Type == ActionEffectType.BattlerState)
         {
-            BattlerStateRuntimeInstance state = perkService.ApplyBattlerState(target, payload.EffectId, source);
+            BattlerStateRuntimeInstance state = battlerStateService.ApplyBattlerState(target, payload.EffectId, source);
             if (state == null)
             {
                 Logger.Log($"[Resolve] Secondary effect '{payload.EffectName}' was not applied because no state definition exists yet.");

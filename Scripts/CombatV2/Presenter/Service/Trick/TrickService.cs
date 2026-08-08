@@ -12,25 +12,188 @@ using UnityEngine;
 /// </summary>
 public class TrickService
 {
-    private readonly TrickDatabase database;
+    // ==========================================
+    // DEPENDENCIES, STATE & EVENTS
+    // ==========================================
     private readonly PerkService perkService;
-
+    private readonly DrawbackService drawbackService;
+    
     public event Action<Battler, TrickRuntimeInstance> OnTrickCasted, OnTrickActivated;
     public event Action<Battler, string> OnTrickRemoved;
     public event Action<Battler, TrickRuntimeInstance> OnTrickExpired;
     public event Action<Battler, TrickRuntimeInstance> OnTrickChanged;
 
-    public TrickService(PerkService perkService = null)
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    public TrickService(PerkService perkService = null, DrawbackService drawbackService = null)
     {
-        database = TrickDatabase.GetOrCreateRuntimeDatabase();
         this.perkService = perkService;
+        this.drawbackService = drawbackService;
     }
 
-    /// <summary>
-    /// Processa fim de turno: reduz duração/cooldown e expira perks quando necessário.
-    /// Precisa receber o inventário para limpar corretamente slots castados quando tricks expiram.
-    /// É OBRIGATÓRIO passar o inventário para evitar que tricks castados bloqueiem slots permanentemente.
-    /// </summary>
+
+    // ==========================================
+    // TRICK CASTING & ACTIVATION
+    // ==========================================
+    public bool TryCastTrick(Battler target, ITrickInventory trickInventory, TrickSO definition, Battler source = null)
+    {
+        if (target == null || trickInventory == null || definition == null)
+        {
+            Logger.Log($"[TrickService] Não foi possível castar o trick '{definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
+            return false;
+        }
+
+        if (!trickInventory.CastTrick(definition, out TrickRuntimeInstance instance) || instance == null)
+        {
+            Logger.Log($"[TrickService] Falha ao castar o trick '{definition.DisplayName}' para {target.Name}. Verifique slots castados, cooldown e recursos.");
+            return false;
+        }
+
+        instance.SetSource(source ?? target);
+        ApplyTrick(target, instance, source ?? target);
+        return true;
+    }
+
+    public bool TryManualActivation(Battler target, ActionType actionType, TrickRuntimeInstance instance)
+    {
+        if (target == null || instance == null || instance.Definition == null) return false;
+        if (!instance.IsReadyToTrigger) return false;
+
+        int chargesToUse = 1;
+
+        if (instance.Definition.ActivationMode == TrickActivationMode.ActiveCharge)
+        {
+            chargesToUse = Mathf.FloorToInt(instance.CurrentCharges);
+            if (chargesToUse < 1) return false;
+        }
+        else
+        {
+            if (instance.IsCoolingDown) return false;
+        }
+
+        bool activatedAny = false;
+
+        if (perkService != null)
+        {
+            for (int i = 0; i < instance.Definition.PerkIds.Count; i++)
+            {
+                string perkId = instance.Definition.PerkIds[i];
+                PerkSO perkDef = perkService.GetPerkDefinition(perkId);
+                if (perkDef == null) continue;
+
+                bool isChargeGenerator = false;
+                bool hasManualTrigger = false;
+
+                if (perkDef.Rules != null)
+                {
+                    for (int j = 0; j < perkDef.Rules.Count; j++)
+                    {
+                        if (perkDef.Rules[j].ModifierTarget == PerkModifierTarget.TrickCharges)
+                            isChargeGenerator = true;
+
+                        if (perkDef.Rules[j].Trigger == PerkTrigger.OnManualActivation)
+                            hasManualTrigger = true;
+                    }
+                }
+
+                if (isChargeGenerator) continue;
+
+                PerkRuntimeInstance appliedPerk = perkService.ApplyPerk(target, perkDef, target, 1, chargesToUse);
+
+                if (hasManualTrigger && appliedPerk != null)
+                {
+                    perkService.EvaluateManualActivationTriggers(target, actionType, appliedPerk);
+                }
+                
+                activatedAny = true;
+            }
+        }
+
+        if (drawbackService != null && instance.Definition.DrawbackIds != null && instance.Definition.DrawbackIds.Count > 0)
+        {
+            DrawbackDatabase drawbackDb = DrawbackDatabase.GetOrCreateRuntimeDatabase();
+            for (int i = 0; i < instance.Definition.DrawbackIds.Count; i++)
+            {
+                DrawbackSO drawback = drawbackDb.GetById(instance.Definition.DrawbackIds[i]);
+                if (drawback != null)
+                {
+                    int rolledDuration = drawback.RollDuration();
+                    drawbackService.ApplyDrawback(target, drawback.Id, target, rolledDuration);
+                }
+            }
+        }
+
+        if (instance.Definition.ActivationMode == TrickActivationMode.ActiveCharge)
+        {
+            instance.ConsumeCharges();
+        }
+        else if (instance.Definition.ActivationMode == TrickActivationMode.Active)
+        {
+            instance.RemainingTurns = 0;
+            instance.MarkExpired();
+        }
+
+        Logger.Log($"[TrickService] Starting cooldown for trick '{instance.Definition.Id}'.");
+        instance.StartCooldown(instance.Definition.CooldownTurns);
+        
+        if (activatedAny)
+        {
+            OnTrickActivated?.Invoke(target, instance);
+        }
+
+        return true;
+    }
+
+    public TrickRuntimeInstance ApplyTrick(Battler target, TrickRuntimeInstance trickInstance, Battler source = null)
+    {
+        if (target == null || trickInstance?.Definition == null)
+        {
+            Logger.Log($"[TrickService] Não foi possível aplicar o trick '{trickInstance?.Definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
+            return null;
+        }
+
+        trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
+
+        if (trickInstance.ActivationDelayTurnsRemaining == 0)
+            ApplyPerks(target, trickInstance, source ?? target);
+
+        if (target.Tricks != null && !target.Tricks.Contains(trickInstance))
+            target.Tricks.Add(trickInstance);
+
+        OnTrickCasted?.Invoke(target, trickInstance);
+        OnTrickChanged?.Invoke(target, trickInstance);
+
+        Logger.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
+                  $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, TimingTurns: {trickInstance.Definition.TimingTurns}");
+
+        return trickInstance;
+    }
+
+
+    // ==========================================
+    // TRICK REMOVAL
+    // ==========================================
+    public void RemoveTrick(Battler target, string trickId)
+    {
+        if (target == null || target.Tricks.Count == 0)
+            return;
+
+        TrickRuntimeInstance instance = target.Tricks.Find(t => t.Definition.Id == trickId);
+        if (instance == null)
+            return;
+
+        RemoveActivePerks(target, instance);
+        target.Tricks.Remove(instance);
+        OnTrickRemoved?.Invoke(target, trickId);
+        OnTrickChanged?.Invoke(target, instance);
+    }
+
+
+    // ==========================================
+    // TURN LIFECYCLE & EXPIRATION
+    // ==========================================
     public void TickTrickEnd(Battler battler, ITrickInventory trickInventory)
     {
         if (battler == null)
@@ -91,9 +254,6 @@ public class TrickService
                 changed = true;
             }
             
-            // Expiração do Efeito (Duração chega a zero)
-            // Note que como isso ocorre DEPOIS da checagem do cooldown lá em cima, 
-            // no turno em que ela expira, o cooldown ainda não conta. Só começa no próximo.
             if (trick.RemainingTurns == 0 && !trick.WasExpired)
             {
                 RemoveActivePerks(battler, trick);
@@ -102,7 +262,6 @@ public class TrickService
                 changed = true;
             }
 
-            // Remoção do Slot (Duração 0 E Cooldown 0)
             if (trick.RemainingTurns == 0 && !trick.IsCoolingDown)
             {
                 tricksToRemove.Add(trick);
@@ -114,7 +273,6 @@ public class TrickService
 
         foreach (var trickToRemove in tricksToRemove)
         {
-            // Garantia (caso a trick tenha duração 0 e cooldown 0 e caia aqui direto)
             if (!trickToRemove.WasExpired)
             {
                 RemoveActivePerks(battler, trickToRemove);
@@ -142,108 +300,10 @@ public class TrickService
         }
     }
 
-    /// <summary>
-    /// Tenta fazer cast usando o TrickInventory, respeitando slots castados, recursos e cooldown.
-    /// </summary>
-    public bool TryCastTrick(Battler target, ITrickInventory trickInventory, string trickId, Battler source = null)
-    {
-        TrickSO definition = database.GetById(trickId);
-        return TryCastTrick(target, trickInventory, definition, source);
-    }
 
-    /// <summary>
-    /// Tenta fazer cast usando o TrickInventory, respeitando slots castados, recursos e cooldown.
-    /// </summary>
-    public bool TryCastTrick(Battler target, ITrickInventory trickInventory, TrickSO definition, Battler source = null)
-    {
-        if (target == null || trickInventory == null || definition == null)
-        {
-            Logger.Log($"[TrickService] Não foi possível castar o trick '{definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
-            return false;
-        }
-
-        if (!trickInventory.CastTrick(definition, out TrickRuntimeInstance instance) || instance == null)
-        {
-            Logger.Log($"[TrickService] Falha ao castar o trick '{definition.DisplayName}' para {target.Name}. Verifique slots castados, cooldown e recursos.");
-            return false;
-        }
-
-        instance.SetSource(source ?? target);
-        ApplyTrick(target, instance, source ?? target);
-        return true;
-    }
-
-    /// <summary>
-    /// Tenta ativar manualmente um trick que já está alocado em slot.
-    /// </summary>
-    public bool TryManualActivation(Battler target, ActionType actionType, TrickRuntimeInstance instance)
-    {
-        if (target == null || instance == null || instance.Definition == null)
-            return false;
-
-        if (!instance.IsReadyToTrigger)
-            return false;
-
-        bool activated = perkService?.ExecuteManualActivation(target, actionType, instance) ?? false;
-        if (activated)
-        {
-            OnTrickActivated?.Invoke(target, instance);
-        }
-
-        return activated;
-    }
-
-    /// <summary>
-    /// Ativa os perks de uma instância runtime já criada/alocada em slot.
-    /// </summary>
-    public TrickRuntimeInstance ApplyTrick(Battler target, TrickRuntimeInstance trickInstance, Battler source = null)
-    {
-        if (target == null || trickInstance?.Definition == null)
-        {
-            Logger.Log($"[TrickService] Não foi possível aplicar o trick '{trickInstance?.Definition?.Id ?? "null"}' para {target?.Name ?? "null"}.");
-            return null;
-        }
-
-        trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
-
-        if (trickInstance.ActivationDelayTurnsRemaining == 0)
-            ApplyPerks(target, trickInstance, source ?? target);
-
-        if (target.Tricks != null && !target.Tricks.Contains(trickInstance))
-            target.Tricks.Add(trickInstance);
-
-        OnTrickCasted?.Invoke(target, trickInstance);
-        OnTrickChanged?.Invoke(target, trickInstance);
-
-        Logger.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
-                  $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, TimingTurns: {trickInstance.Definition.TimingTurns}");
-
-        return trickInstance;
-    }
-
-    /// <summary>
-    /// Remove um trick manualmente (antes de expirar).
-    /// </summary>
-    public void RemoveTrick(Battler target, string trickId)
-    {
-        if (target == null || target.Tricks.Count == 0)
-            return;
-
-        TrickRuntimeInstance instance = target.Tricks.Find(t => t.Definition.Id == trickId);
-        if (instance == null)
-            return;
-
-        RemoveActivePerks(target, instance);
-        target.Tricks.Remove(instance);
-        OnTrickRemoved?.Invoke(target, trickId);
-        OnTrickChanged?.Invoke(target, instance);
-    }
-
-
-
-    /// <summary>
-    /// Retorna todos os tricks ativos do battler.
-    /// </summary>
+    // ==========================================
+    // UTILITY & HELPER METHODS
+    // ==========================================
     public List<TrickRuntimeInstance> GetActiveTricks(Battler battler)
     {
         if (battler == null)
@@ -252,9 +312,6 @@ public class TrickService
         return battler.Tricks.FindAll(t => t != null && t.IsActive());
     }
 
-    /// <summary>
-    /// Retorna todos os perks que vieram de tricks (agregado).
-    /// </summary>
     public List<PerkRuntimeInstance> GetPerksFromTricks(Battler battler)
     {
         List<PerkRuntimeInstance> perks = new();
@@ -271,6 +328,10 @@ public class TrickService
         return perks;
     }
 
+
+    // ==========================================
+    // INTERNAL PERK MANAGEMENT
+    // ==========================================
     private void ApplyPerks(Battler target, TrickRuntimeInstance trickInstance, Battler source)
     {
         if (target == null || trickInstance?.Definition == null || trickInstance.HasAppliedPerks)

@@ -38,6 +38,8 @@ public class CombatManager : MonoBehaviour
     // =========================
     private DiceService DiceService;
     private PerkService PerkService;
+    private DrawbackService DrawbackService;
+    private BattlerStateService BattlerStateService;
     private TrickService TrickService;
     private ActionResolverService Resolver;
     private InitiativeResolverService InitiativeResolverService;
@@ -66,6 +68,8 @@ public class CombatManager : MonoBehaviour
     void Start()
     {
         PerkService = new PerkService();
+        DrawbackService = new DrawbackService(PerkService);
+        BattlerStateService = new BattlerStateService(PerkService);
         TrickService = new TrickService(PerkService);
         DiceService = new DiceService(PerkService);
         Resolver = new ActionResolverService(PerkService);
@@ -300,5 +304,7 @@ public class CombatManager : MonoBehaviour
     public ActionType GetActionType() => TurnState.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
     public DiceService GetDiceService() => DiceService;
     public PerkService GetPerkService() => PerkService;
+    public DrawbackService GetDrawbackService() => DrawbackService;
+    public BattlerStateService GetBattlerStateService() => BattlerStateService;
     public TrickService GetTrickService() => TrickService;
 }

@@ -46,6 +46,52 @@ public class CombatLogView : MonoBehaviour
         ShowTextLog($"<color={rarityColor}>{displayName}</color> {actionType}", trick.Definition.Icon, textColor);
     }
 
+    public void ShowDrawbackFeedback(Battler battler, DrawbackRuntimeInstance drawback, string actionType = "applied")
+    {
+        if (drawback == null || drawback.Definition == null)
+            return;
+
+        Color textColor = defaultColor;
+
+        if (actionType == "applied")
+        {
+            textColor = Color.red;
+        }
+        else if (actionType == "expired")
+        {
+            textColor = Color.green;
+        }
+
+        string displayName = string.IsNullOrWhiteSpace(drawback.Definition.DisplayName)
+            ? drawback.Definition.Id
+            : drawback.Definition.DisplayName;
+
+        ShowTextLog($"<color=red>{displayName}</color> {actionType} to {battler.Name}", drawback.Definition.Icon, textColor);
+    }
+
+    public void ShowBattlerStateFeedback(Battler battler, BattlerStateRuntimeInstance state, string actionType = "applied")
+    {
+        if (state == null || state.Definition == null)
+            return;
+
+        Color textColor = defaultColor;
+
+        if (actionType == "applied")
+        {
+            textColor = Color.yellow;
+        }
+        else if (actionType == "expired")
+        {
+            textColor = Color.green;
+        }
+
+        string displayName = string.IsNullOrWhiteSpace(state.Definition.DisplayName)
+            ? state.Definition.Id
+            : state.Definition.DisplayName;
+
+        ShowTextLog($"<color=yellow>{displayName}</color> {actionType} to {battler.Name}", state.Definition.Icon, textColor);
+    }
+
     public void ShowTextLog(string logText, Sprite icon = null, Color? textColor = null)
     {
         if (string.IsNullOrWhiteSpace(logText) || contentRoot == null || logItemPrefab == null)
