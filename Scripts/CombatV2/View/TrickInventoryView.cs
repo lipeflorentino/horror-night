@@ -22,7 +22,7 @@ public class TrickInventoryView : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private int maxLearnedSlots = 16;
     [Header("Components")]
-    [SerializeField] private FeedbackPanelUI statusFeedbackPanel;
+    [SerializeField] private SystemMessagesUI systemMessagesUI;
     [SerializeField] private Button closeButton;
     [SerializeField] private GameObject trickInventoryPanel;
     [SerializeField] private TrickInfoPanelUI trickInfoPanel;
@@ -112,8 +112,8 @@ public class TrickInventoryView : MonoBehaviour
 
     public void SetStatus(string message)
     {
-        if (statusFeedbackPanel != null)
-            statusFeedbackPanel.ShowStatus(message);
+        if (systemMessagesUI != null)
+            systemMessagesUI.ShowStatus(message);
     }
 
     public void Open()

@@ -178,9 +178,12 @@ public class CombatManager : MonoBehaviour
         if (!instance.IsReadyToTrigger) 
             return;
 
-        PerkService.ExecuteManualActivation(instance.Owner, GetActionType(), instance);
-        View.ShowTrickFeedback(instance, "activated");
-        
+        bool activated = TrickService.TryManualActivation(instance.Owner, GetActionType(), instance);
+        if (activated)
+        {
+            View.ShowTrickFeedback(instance, "activated");
+        }
+
         RefreshCombatUI();
         View.RefreshActiveTricks(); 
     }

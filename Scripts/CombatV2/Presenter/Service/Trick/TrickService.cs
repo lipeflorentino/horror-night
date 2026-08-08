@@ -15,7 +15,7 @@ public class TrickService
     private readonly TrickDatabase database;
     private readonly PerkService perkService;
 
-    public event Action<Battler, TrickRuntimeInstance> OnTrickCasted;
+    public event Action<Battler, TrickRuntimeInstance> OnTrickCasted, OnTrickActivated;
     public event Action<Battler, string> OnTrickRemoved;
     public event Action<Battler, TrickRuntimeInstance> OnTrickExpired;
     public event Action<Battler, TrickRuntimeInstance> OnTrickChanged;
@@ -171,6 +171,26 @@ public class TrickService
         instance.SetSource(source ?? target);
         ApplyTrick(target, instance, source ?? target);
         return true;
+    }
+
+    /// <summary>
+    /// Tenta ativar manualmente um trick que já está alocado em slot.
+    /// </summary>
+    public bool TryManualActivation(Battler target, ActionType actionType, TrickRuntimeInstance instance)
+    {
+        if (target == null || instance == null || instance.Definition == null)
+            return false;
+
+        if (!instance.IsReadyToTrigger)
+            return false;
+
+        bool activated = perkService?.ExecuteManualActivation(target, actionType, instance) ?? false;
+        if (activated)
+        {
+            OnTrickActivated?.Invoke(target, instance);
+        }
+
+        return activated;
     }
 
     /// <summary>

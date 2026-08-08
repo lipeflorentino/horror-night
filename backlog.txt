@@ -128,3 +128,8 @@ TASKS
     - Colocar momentum na tela de TrickInventory
     - Colocar feedback para "sem recurso" na tela de TrickInventory
     - Colocar background vermelho quando stats estão baixas (mind, heart, body)
+
+    - Discretizar nos feedbacks de tricks (tooltip) os perks aplicados
+        - O statusEffect mostra o perk aplicado (duração, stat modificada, icon)
+        - Rever tooltips da ActiveTricks e PassiveTricks (effects)
+        - Criar area para PassiveTricks  

@@ -6,7 +6,12 @@ public class TrickRarityUI : MonoBehaviour
 {
     [Header("Rarity Info")]
     [SerializeField] private Image iconImage;
-    [SerializeField] private Tooltipable tooltipable;
+    private Tooltipable tooltipable;
+
+    void Awake()
+    {
+        tooltipable = gameObject.GetOrAddComponent<Tooltipable>();
+    }
 
     public void Setup(string rarityKey)
     {

@@ -38,9 +38,7 @@ public class DiceStatAllocatorUI : MonoBehaviour
     [SerializeField] private Sprite heartIcon;
     [SerializeField] private Sprite bodyIcon;
     [SerializeField] private Image statIconImage;
-
-    // Cache resolvido via GetComponent (RequireComponent garante presença no mesmo GameObject).
-    [SerializeField] private Tooltipable tooltipable;
+    private Tooltipable tooltipable;
 
 
     // -------------------------------------------------------------------------
@@ -82,6 +80,8 @@ public class DiceStatAllocatorUI : MonoBehaviour
             statIconImage.sprite = heartIcon;
         else if (bodyIcon != null && stat == DiceStatType.Body)
             statIconImage.sprite = bodyIcon;
+
+        tooltipable = statIconImage.gameObject.GetOrAddComponent<Tooltipable>();
 
         if (tooltipable != null)
         {

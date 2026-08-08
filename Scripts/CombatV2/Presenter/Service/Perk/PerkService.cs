@@ -408,20 +408,20 @@ public class PerkService
         if (target.Perks.Remove(instance)) OnPerkRemoved?.Invoke(target, instance.Definition?.Id);
     }
 
-    public void ExecuteManualActivation(Battler battler, ActionType type, TrickRuntimeInstance trickInstance)
+    public bool ExecuteManualActivation(Battler battler, ActionType type, TrickRuntimeInstance trickInstance)
     {
-        if (battler == null || trickInstance == null || trickInstance.Definition == null) return;
+        if (battler == null || trickInstance == null || trickInstance.Definition == null) return false;
 
         int chargesToUse = 1;
 
         if (trickInstance.Definition.ActivationMode == TrickActivationMode.ActiveCharge)
         {
             chargesToUse = Mathf.FloorToInt(trickInstance.CurrentCharges);
-            if (chargesToUse < 1) return;
+            if (chargesToUse < 1) return false;
         }
         else
         {
-            if (trickInstance.IsCoolingDown) return;
+            if (trickInstance.IsCoolingDown) return false;
         }
 
         for (int i = 0; i < trickInstance.Definition.PerkIds.Count; i++)
@@ -496,5 +496,6 @@ public class PerkService
         Logger.Log($"[PerkService] Starting cooldown for trick '{trickInstance.Definition.Id}'.");
         
         trickInstance.StartCooldown(trickInstance.Definition.CooldownTurns);
+        return true;
     }
 }

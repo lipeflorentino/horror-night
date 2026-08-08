@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class FeedbackPanelUI : MonoBehaviour
+public class SystemMessagesUI : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private TMP_Text statusText;

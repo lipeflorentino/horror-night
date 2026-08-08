@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -76,6 +75,48 @@ public class StatusEffectFeedbacks : MonoBehaviour
             feedbackKey: GetFeedbackKey(trick.InstanceId, trick.Definition.Id));
     }
 
+
+    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
+    {
+        if (!ShouldHandleEvent(battler))
+            return;
+
+        RemovePopupForTrick(trick);
+    }
+
+    private void HandleTrickRemoved(Battler battler, string trickId)
+    {
+        if (!ShouldHandleEvent(battler))
+            return;
+
+        if (string.IsNullOrWhiteSpace(trickId))
+            return;
+
+        foreach (var pair in new List<KeyValuePair<string, GameObject>>(popupByFeedbackKey))
+        {
+            if (pair.Key.Equals(trickId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                RemovePopup(pair.Key);
+                break;
+            }
+        }
+    }
+
+    private void HandleTrickChanged(Battler battler, TrickRuntimeInstance trick)
+    {
+        if (!ShouldHandleEvent(battler))
+            return;
+
+        if (trick == null || trick.Definition == null)
+            return;
+
+        string feedbackKey = GetFeedbackKey(trick.InstanceId, trick.Definition.Id);
+        if (popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObject) && popupObject != null && popupObject.TryGetComponent<StatusEffectUI>(out var popup))
+        {
+            popup.RefreshDuration(trick.RemainingTurns);
+        }
+    }
+
     private void HandleBattlerStateApplied(Battler battler, BattlerStateRuntimeInstance state)
     {
         if (!ShouldHandleEvent(battler))
@@ -128,47 +169,6 @@ public class StatusEffectFeedbacks : MonoBehaviour
             return;
 
         RemovePopup(GetFeedbackKey(drawback.InstanceId, drawback.Definition?.Id));
-    }
-
-    private void HandleTrickExpired(Battler battler, TrickRuntimeInstance trick)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        RemovePopupForTrick(trick);
-    }
-
-    private void HandleTrickRemoved(Battler battler, string trickId)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        if (string.IsNullOrWhiteSpace(trickId))
-            return;
-
-        foreach (var pair in new List<KeyValuePair<string, GameObject>>(popupByFeedbackKey))
-        {
-            if (pair.Key.Equals(trickId, System.StringComparison.OrdinalIgnoreCase))
-            {
-                RemovePopup(pair.Key);
-                break;
-            }
-        }
-    }
-
-    private void HandleTrickChanged(Battler battler, TrickRuntimeInstance trick)
-    {
-        if (!ShouldHandleEvent(battler))
-            return;
-
-        if (trick == null || trick.Definition == null)
-            return;
-
-        string feedbackKey = GetFeedbackKey(trick.InstanceId, trick.Definition.Id);
-        if (popupByFeedbackKey.TryGetValue(feedbackKey, out GameObject popupObject) && popupObject != null && popupObject.TryGetComponent<StatusEffectUI>(out var popup))
-        {
-            popup.RefreshDuration(trick.RemainingTurns);
-        }
     }
 
     private bool ShouldHandleEvent(Battler battler)

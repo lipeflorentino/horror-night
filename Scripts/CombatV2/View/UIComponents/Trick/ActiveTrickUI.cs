@@ -10,42 +10,27 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     [Header("Componentes Core")]
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI inputKeyText;
-    [SerializeField] private TMP_Text turnCountText;    
-    [SerializeField] private Image rarityBorder;
-    [SerializeField] private Button releaseButton;
+    [SerializeField] private TMP_Text turnCountText;  
     [SerializeField] private GameObject chargesContainer;
-    [SerializeField] private GameObject inputkeyContainer;
+    [SerializeField] private GameObject inputkeyContainer;  
+    [SerializeField] private Button releaseButton;
 
     [Header("Cargas e Cooldown")]
     [SerializeField] private TMP_Text chargesText;
-    [SerializeField] private GameObject cooldownOverlay;
     [SerializeField] private TMP_Text cooldownTurnsText;
+    [SerializeField] private GameObject cooldownOverlay;
 
     [Header("Highlight Activation")]
     [SerializeField] private RectTransform buttonActivationHighlight;
-
+    [Header("Tooltip")]
+    [SerializeField] private GameObject tooltipPrefab;
+    private TrickTooltip tooltip;
     private TrickSO trickDefinition;
     private TrickRuntimeInstance runtimeInstance;
-    private TrickTooltip tooltip;
-    [SerializeField] private GameObject tooltipPrefab;
-
     public TrickSO TrickDefinition => trickDefinition;
     public TrickRuntimeInstance RuntimeInstance => runtimeInstance;
     public event Action<TrickRuntimeInstance> OnReleaseClicked;
     private Tween cursorPulseTween;
-
-    private void Start()
-    {
-        // Inicia a animação de pulso contínuo para o cursor
-        if (buttonActivationHighlight != null)
-        {
-            cursorPulseTween = buttonActivationHighlight.DOScale(1.05f, 0.5f)
-                .SetLoops(-1, LoopType.Yoyo)
-                .SetEase(Ease.InOutSine);
-                
-            // buttonActivationHighlight.gameObject.SetActive(false);
-        }
-    }
 
     public void Setup(TrickSO definition, string inputKeyOverride, TrickRuntimeInstance instance = null)
     {
@@ -60,9 +45,6 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
         if (inputKeyText != null)
             inputKeyText.text = inputKeyOverride;
-
-        if (rarityBorder != null)
-            rarityBorder.color = GetRarityColor(definition.Rarity);
 
         if (releaseButton != null)
         {
@@ -117,7 +99,7 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
                           runtimeInstance.IsReadyToTrigger;
                           
         releaseButton.interactable = canRelease;
-        // buttonActivationHighlight.gameObject.SetActive(canRelease);
+        PlayActivationAnimation();
         if (!buttonActivationHighlight.TryGetComponent<CanvasGroup>(out var cg))
         {
             cg = buttonActivationHighlight.gameObject.AddComponent<CanvasGroup>();
@@ -142,19 +124,6 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             OnReleaseClicked?.Invoke(runtimeInstance);
     }
 
-    private Color GetRarityColor(TrickRarity rarity)
-    {
-        return rarity switch
-        {
-            TrickRarity.Common => Color.gray,
-            TrickRarity.Uncommon => Color.green,
-            TrickRarity.Rare => Color.cyan,
-            TrickRarity.Epic => new Color(1f, 0.5f, 1f), // Magenta
-            TrickRarity.Legendary => Color.yellow,
-            _ => Color.white
-        };
-    }
-
     private void OnDestroy()
     {
         HideTooltip();
@@ -167,7 +136,12 @@ public class ActiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void PlayActivationAnimation()
     {
-        // TODO: Implementar animação de entrada
+        if (buttonActivationHighlight != null)
+        {
+            cursorPulseTween = buttonActivationHighlight.DOScale(1.05f, 0.5f)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetEase(Ease.InOutSine);
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)

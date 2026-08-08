@@ -13,7 +13,7 @@ public class CombatView : MonoBehaviour
     public CombatEndView CombatEndView;
     public CombatInfoPanelView InfoPanelView;
     public CombatLogView CombatLogView;
-    public ActiveTricksView ActiveTricksView;
+    public CastedTricksView CastedTricksView;
 
     private Sprite playerIconSprite;
     private Sprite enemyIconSprite;
@@ -52,10 +52,10 @@ public class CombatView : MonoBehaviour
         CombatEndView = FindObjectOfType<CombatEndView>();
         InfoPanelView = FindObjectOfType<CombatInfoPanelView>();
         CombatLogView = FindObjectOfType<CombatLogView>();
-        ActiveTricksView = FindObjectOfType<ActiveTricksView>();
+        CastedTricksView = FindObjectOfType<CastedTricksView>();
             
         DiceRollView.HidePanel();
-        ActiveTricksView.Init(combatManager);
+        CastedTricksView.Init(combatManager);
         FeedbackView.Init(combatManager.GetPerkService(), combatManager.GetTrickService(), combatManager.Player, combatManager.Enemy);
 
         playerIconSprite = combatManager.PlayerIcon;
@@ -91,8 +91,8 @@ public class CombatView : MonoBehaviour
 
     public void RefreshActiveTricks()
     {
-        if (ActiveTricksView != null)
-            ActiveTricksView.Refresh();
+        if (CastedTricksView != null)
+            CastedTricksView.Refresh();
     }
 
     public IEnumerator PlayDiceResolution(
