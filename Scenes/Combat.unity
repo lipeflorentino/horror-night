@@ -7521,8 +7521,8 @@ Transform:
   m_Children:
   - {fileID: 1661073548}
   - {fileID: 1132663433}
-  - {fileID: 74901077}
   - {fileID: 107447867}
+  - {fileID: 74901077}
   - {fileID: 994789686}
   m_Father: {fileID: 1858818099}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14850,7 +14850,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 937509206}
-  - component: {fileID: 937509207}
   m_Layer: 5
   m_Name: PerkEffectsView
   m_TagString: Untagged
@@ -14879,20 +14878,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -399.2}
   m_SizeDelta: {x: 490, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &937509207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 937509205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53cc1aeca28b7c846a54d235653d5705, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StatusEffectPrefab: {fileID: 1294631821955276076, guid: 25d7177e8c098b34ab7253530dedc529, type: 3}
-  feedbackAnchor: {fileID: 812965577}
 --- !u!1 &937761975
 GameObject:
   m_ObjectHideFlags: 0
@@ -28985,6 +28970,8 @@ MonoBehaviour:
   enemyStatsContainer: {fileID: 1502567800}
   enemyIcon: {fileID: 1729675789}
   statRowPrefab: {fileID: 2089439689810185020, guid: 690a08eb2caf9fa4596216f9cee1fd0d, type: 3}
+  perkSlotPrefab: {fileID: 4239665732034281384, guid: e8d0d8e7f1a712943b4324f6c9d49a77, type: 3}
+  perkSlotContainer: {fileID: 812965577}
 --- !u!1 &1863680017
 GameObject:
   m_ObjectHideFlags: 0
@@ -29536,7 +29523,7 @@ GameObject:
   - component: {fileID: 1916957761}
   - component: {fileID: 1916957762}
   m_Layer: 5
-  m_Name: BattlerEffectsView
+  m_Name: StatusEffectsFeedbacks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

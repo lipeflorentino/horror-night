@@ -51,7 +51,7 @@ public static class PerkCSVImporter
         target.MaxStacks = source.MaxStacks;
         target.StackMode = source.StackMode;
         target.Tags = source.Tags;
-        target.Rules = new List<PerkRule>(source.Rules);
+        target.Rule = source.Rule;
     }
 
     private static void EnsureFolder(string folderPath)

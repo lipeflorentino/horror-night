@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class Colorization
 {
     public const string WhiteColorHex = "#FFFFFF";
@@ -10,4 +12,48 @@ public static class Colorization
     public const string HighColorHex = "#E05C5C";
     public const string DisabledColorHex = "#808080";
     public const string DefaultTextColorHex = "#FFFFFF";
+    public const string IdentityColorHex = "#0005FF";
+    public const string ActiveColorHex = "#FF2100";
+    public const string PassiveColorHex = "#F108EB";
+    public const string CommomColorHex = "#FFFFFF";
+    public const string UncommonColorHex = "#00FF00";
+    public const string RareColorHex = "#0000FF";
+    public const string EpicColorHex = "#800080";
+    public const string LegendaryColorHex = "#FFA500";
+    
+    public static string GetRarityColor(TrickRarity rarity)
+    {
+        return rarity switch
+        {
+            TrickRarity.Common => CommomColorHex,
+            TrickRarity.Uncommon => UncommonColorHex,
+            TrickRarity.Rare => RareColorHex,
+            TrickRarity.Epic => EpicColorHex,
+            TrickRarity.Legendary => LegendaryColorHex,
+            _ => CommomColorHex
+        };
+    }
+
+    public static string GetTrickTypeColor(TrickSlotType slotType)
+    {
+        return slotType switch
+        {
+            TrickSlotType.CastedActive => ActiveColorHex,
+            TrickSlotType.CastedPassive => PassiveColorHex,
+            _ => IdentityColorHex
+        };
+    }
+
+    public static Color HexToColor(string hex)
+    {
+        if (ColorUtility.TryParseHtmlString(hex, out Color color))
+        {
+            return color;
+        }
+        else
+        {
+            Debug.LogWarning($"Invalid hex color string: {hex}. Returning white color.");
+            return Color.white; 
+        }
+    }
 }

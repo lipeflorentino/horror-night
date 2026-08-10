@@ -8,6 +8,7 @@ public class PassiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [Header("Componentes Core")]
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text turnCountText;    
+    [SerializeField] private GameObject durationOverlay;
     [Header("Cooldown")]
     [SerializeField] private GameObject cooldownOverlay;
     [SerializeField] private TMP_Text cooldownTurnsText;
@@ -51,6 +52,9 @@ public class PassiveTrickUI : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         {
             cooldownTurnsText.text = runtimeInstance.CooldownTurnsRemaining.ToString();
         }
+
+        if (durationOverlay != null)
+            durationOverlay.SetActive(runtimeInstance.RemainingTurns > 0);
     }
 
     private void OnDestroy()

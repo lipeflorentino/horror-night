@@ -137,18 +137,12 @@ public class PerkEffectResolver
         for (int i = 0; i < perks.Count; i++)
         {
             PerkRuntimeInstance perk = perks[i];
-            IReadOnlyList<PerkRule> rules = perk.Definition?.Rules;
-            if (rules == null)
+            PerkRule rule = perk.Definition.Rule;
+                
+            if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
                 continue;
 
-            for (int j = 0; j < rules.Count; j++)
-            {
-                PerkRule rule = rules[j];
-                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, rule.Value, Mathf.Max(1, perk.Stacks), context);
-            }
+            value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, rule.Value, Mathf.Max(1, perk.Stacks), context);
         }
     }
 
@@ -168,19 +162,13 @@ public class PerkEffectResolver
         for (int i = 0; i < perks.Count; i++)
         {
             PerkRuntimeInstance perk = perks[i];
-            IReadOnlyList<PerkRule> rules = perk.Definition?.Rules;
-            if (rules == null)
+            PerkRule rule = perk.Definition.Rule;
+            
+            if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesRoll(context) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
                 continue;
 
-            for (int j = 0; j < rules.Count; j++)
-            {
-                PerkRule rule = rules[j];
-                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesRoll(context) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                float ruleValue = target == PerkModifierTarget.MinRollPercent && maxValue > 0 ? Mathf.Max(1, maxValue) * rule.Value : rule.Value;
-                value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks), context);
-            }
+            float ruleValue = target == PerkModifierTarget.MinRollPercent && maxValue > 0 ? Mathf.Max(1, maxValue) * rule.Value : rule.Value;
+            value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks), context);
         }
     }
 
@@ -199,19 +187,15 @@ public class PerkEffectResolver
         for (int i = 0; i < perks.Count; i++)
         {
             PerkRuntimeInstance perk = perks[i];
-            IReadOnlyList<PerkRule> rules = perk.Definition?.Rules;
-            if (rules == null)
+            PerkRule rule = perk.Definition?.Rule;
+            if (rule == null)
+                continue;
+                
+            if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !rule.MatchesDice(dice) || !MatchesDiceCondition(rule, dice, actionDice, opposingActionDice) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
                 continue;
 
-            for (int j = 0; j < rules.Count; j++)
-            {
-                PerkRule rule = rules[j];
-                if (rule == null || rule.Trigger != trigger || rule.ModifierTarget != target || !rule.MatchesAction(context) || !rule.MatchesDice(dice) || !MatchesDiceCondition(rule, dice, actionDice, opposingActionDice) || !PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole))
-                    continue;
-
-                float ruleValue = target == PerkModifierTarget.DamagePercent ? 1f + rule.Value : rule.Value;
-                value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks), context);
-            }
+            float ruleValue = target == PerkModifierTarget.DamagePercent ? 1f + rule.Value : rule.Value;
+            value = PerkRuntimeHelper.ApplyModifier(value, rule.Operation, ruleValue, Mathf.Max(1, perk.Stacks), context);
         }
     }
 

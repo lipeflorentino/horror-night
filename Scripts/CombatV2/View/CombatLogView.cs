@@ -38,7 +38,7 @@ public class CombatLogView : MonoBehaviour
             textColor = Color.green;
         }
 
-        string rarityColor = GetRarityColor(trick.Definition.Rarity);
+        string rarityColor = Colorization.GetRarityColor(trick.Definition.Rarity);
         string displayName = string.IsNullOrWhiteSpace(trick.Definition.DisplayName)
             ? trick.Definition.Id
             : trick.Definition.DisplayName;
@@ -152,18 +152,5 @@ public class CombatLogView : MonoBehaviour
 
         if (panelRoot != null && activeLogs.Count == 0)
             panelRoot.SetActive(false);
-    }
-
-    private string GetRarityColor(TrickRarity rarity)
-    {
-        return rarity switch
-        {
-            TrickRarity.Common => "#FFFFFF",
-            TrickRarity.Uncommon => "#00FF00",
-            TrickRarity.Rare => "#0000FF",
-            TrickRarity.Epic => "#800080",
-            TrickRarity.Legendary => "#FFA500",
-            _ => "#FFFFFF"
-        };
     }
 }

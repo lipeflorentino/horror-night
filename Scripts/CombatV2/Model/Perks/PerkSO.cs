@@ -12,5 +12,5 @@ public class PerkSO : ScriptableObject
     public int MaxStacks = 1;
     public PerkStackMode StackMode = PerkStackMode.RefreshDuration;
     public string Tags;
-    public List<PerkRule> Rules = new();
+    public PerkRule Rule;
 }

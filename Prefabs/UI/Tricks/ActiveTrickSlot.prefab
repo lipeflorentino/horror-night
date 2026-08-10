@@ -272,6 +272,7 @@ MonoBehaviour:
   chargesContainer: {fileID: 359395969384950564}
   inputkeyContainer: {fileID: 4847584858090693220}
   releaseButton: {fileID: 9075696588925570619}
+  trickTypeOverlay: {fileID: 0}
   chargesText: {fileID: 7225537484781072414}
   cooldownTurnsText: {fileID: 8222925284329022931}
   cooldownOverlay: {fileID: 6055765816920281171}

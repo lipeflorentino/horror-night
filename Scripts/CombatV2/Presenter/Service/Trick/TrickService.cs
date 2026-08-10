@@ -86,16 +86,13 @@ public class TrickService
                 bool isChargeGenerator = false;
                 bool hasManualTrigger = false;
 
-                if (perkDef.Rules != null)
+                if (perkDef.Rule != null)
                 {
-                    for (int j = 0; j < perkDef.Rules.Count; j++)
-                    {
-                        if (perkDef.Rules[j].ModifierTarget == PerkModifierTarget.TrickCharges)
-                            isChargeGenerator = true;
+                    if (perkDef.Rule.ModifierTarget == PerkModifierTarget.TrickCharges)
+                        isChargeGenerator = true;
 
-                        if (perkDef.Rules[j].Trigger == PerkTrigger.OnManualActivation)
-                            hasManualTrigger = true;
-                    }
+                    if (perkDef.Rule.Trigger == PerkTrigger.OnManualActivation)
+                        hasManualTrigger = true;
                 }
 
                 if (isChargeGenerator) continue;

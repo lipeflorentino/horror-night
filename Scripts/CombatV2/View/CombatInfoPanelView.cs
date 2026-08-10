@@ -27,12 +27,14 @@ public class CombatInfoPanelView : MonoBehaviour
     [Header("Stat Row Prefab")]
     [SerializeField] private StatRowUI statRowPrefab;
 
-    // Cache to avoid repeated Resources.Load calls for the same icon.
-    private static readonly Dictionary<string, Sprite> _iconCache = new();
+    [Header("Perk Configs")]
+    [SerializeField] private PerkSlotUI perkSlotPrefab;
+    [SerializeField] private Transform perkSlotContainer;
 
     // Row pools per container, reused across Bind() calls to avoid Instantiate/Destroy churn.
     private readonly List<StatRowUI> _playerRowPool = new();
     private readonly List<StatRowUI> _enemyRowPool = new();
+    private readonly List<PerkSlotUI> _playerPerkSlotPool = new();
 
     private void OnEnable()
     {
@@ -86,6 +88,7 @@ public class CombatInfoPanelView : MonoBehaviour
 
         BuildStatRows(playerStatRows, playerStatsContainer, _playerRowPool);
         BuildStatRows(enemyStatRows, enemyStatsContainer, _enemyRowPool);
+        BuildPerkSlots(player, _playerPerkSlotPool, perkSlotContainer);
     }
 
     // Reuses pooled StatRowUI instances instead of Instantiate/Destroy on every Bind().
@@ -109,6 +112,27 @@ public class CombatInfoPanelView : MonoBehaviour
             pool[i].gameObject.SetActive(false);
     }
 
+    private void BuildPerkSlots(Battler player, List<PerkSlotUI> pool, Transform container)
+    {
+        if (container == null || perkSlotPrefab == null || player == null)
+        {
+            Debug.LogWarning("[CombatInfoPanelView] Missing container, prefab, or player data.");
+            return;
+        }
+
+        IReadOnlyList<PerkRuntimeInstance> perks = player.GetEffectivePerks();
+        for (int i = 0; i < perks.Count; i++)
+        {
+            PerkRuntimeInstance perkInstance = perks[i];
+            PerkSlotUI slot = GetOrCreatePooledSlot(pool, container, i);
+            slot.Bind(perkInstance);
+            slot.gameObject.SetActive(true);
+        }
+
+        for (int i = perks.Count; i < pool.Count; i++)
+            pool[i].gameObject.SetActive(false);
+    }
+
     private StatRowUI GetOrCreatePooledRow(List<StatRowUI> pool, Transform container, int index)
     {
         if (index < pool.Count)
@@ -117,6 +141,16 @@ public class CombatInfoPanelView : MonoBehaviour
         StatRowUI row = Instantiate(statRowPrefab, container);
         pool.Add(row);
         return row;
+    }
+
+    private PerkSlotUI GetOrCreatePooledSlot(List<PerkSlotUI> pool, Transform container, int index)
+    {
+        if (index < pool.Count)
+            return pool[index];
+
+        PerkSlotUI slot = Instantiate(perkSlotPrefab, container);
+        pool.Add(slot);
+        return slot;
     }
 
     public void SetVisible(bool visible)

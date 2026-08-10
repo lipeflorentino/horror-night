@@ -66,6 +66,18 @@ Componentes de UI
     - Feedbacks 
         - nos icones e texts de stats (quando gasta, quando está baixo, etc)
 
+Sistema de Lore 
+    - Objetivo primario "escapar do limbo salvando o reino da Sombra"
+    - Completar o bestiário para que os Elders desenvolvam o "antidoto" contra a Sombra.
+    - As criaturas são spawnadas conforme condições são satisfeitas
+    - Algumas criaturas "lendarios/epicas" precisam ser sumonadas usando itens e artefatos
+
+Sistemas de Exploração 
+    - Itens coletaveis "soltos" no mapa para serem obtidos por meio de point and click
+    - Itens especiais possuem requisitos especiais para spawnar
+    - Certos itens so spawnam em certos locais 
+    - Certos locais são desbloqueados após completar missões/tarefas 
+
 Sistemas de Combate
 
     - Criar nova Perk usando a Skill (AntigravityAI)
@@ -112,24 +124,16 @@ Sistemas de Combate
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
-    - Ajustar cast de tricks 
-        - Requisitos (outras stats alem de mind, heart, body)
-        - Custo (momentum)
-        - Dar feedback quando falta recurso (highlight vermelho)
-
     - Ajustar as views de Tricks     
-        - Refinar animações e transições
-        - Criar uma UI especifica para tricks de identidade e tricks temporarias
-        - Implementar overlay de cooldown nos slots do inventário
-        - Implementar área de active tricks com ícones
+        - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
         
     
 TASKS
     - Colocar momentum na tela de TrickInventory
     - Colocar feedback para "sem recurso" na tela de TrickInventory
     - Colocar background vermelho quando stats estão baixas (mind, heart, body)
-
-    - Discretizar nos feedbacks de tricks (tooltip) os perks aplicados
-        - O statusEffect mostra o perk aplicado (duração, stat modificada, icon)
-        - Rever tooltips da ActiveTricks e PassiveTricks (effects)
-        - Criar area para PassiveTricks  
+        
+    - Ajustar cast de tricks 
+        - Requisitos (outras stats alem de mind, heart, body)
+        - Custo (momentum)
+        - Dar feedback quando falta recurso (highlight vermelho)

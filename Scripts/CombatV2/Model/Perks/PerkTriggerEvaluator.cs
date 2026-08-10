@@ -22,18 +22,16 @@ public class PerkTriggerEvaluator
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null) continue;
+            if (perk.Definition.Rule == null) continue;
 
-            for (int j = 0; j < perk.Definition.Rules.Count; j++)
-            {
-                PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger) continue;
-                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
-                if (!rule.MatchesRoll(context)) continue;
-                if (!ValidateCondition(rule, context)) continue;
+            PerkRule rule = perk.Definition.Rule;
 
-                NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
-            }
+            if (rule == null || rule.Trigger != expectedTrigger) continue;
+            if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+            if (!rule.MatchesRoll(context)) continue;
+            if (!ValidateCondition(rule, context)) continue;
+
+            NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
         }
     }
 
@@ -54,27 +52,24 @@ public class PerkTriggerEvaluator
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null) continue;
+            if (perk.Definition.Rule == null) continue;
 
-            for (int j = 0; j < perk.Definition.Rules.Count; j++)
-            {
-                PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != PerkTrigger.AfterAccuracyRoll) continue;
-                if (rule.ModifierTarget != PerkModifierTarget.ExtraDice) continue;
-                if (!PerkRuntimeHelper.IsRoleMatch(owner, actionContext, rule.OwnerRole)) continue;
-                if (rule.FilterByActionType && rule.ActionType != actionType) continue;
-                if (rule.FilterByTier && rule.Tier != accuracyResult.Tier) continue;
-                if (rule.FilterByStatType && rule.StatType != accuracyResult.StatType) continue;
+            PerkRule rule = perk.Definition.Rule;
+            if (rule == null || rule.Trigger != PerkTrigger.AfterAccuracyRoll) continue;
+            if (rule.ModifierTarget != PerkModifierTarget.ExtraDice) continue;
+            if (!PerkRuntimeHelper.IsRoleMatch(owner, actionContext, rule.OwnerRole)) continue;
+            if (rule.FilterByActionType && rule.ActionType != actionType) continue;
+            if (rule.FilterByTier && rule.Tier != accuracyResult.Tier) continue;
+            if (rule.FilterByStatType && rule.StatType != accuracyResult.StatType) continue;
 
-                int extraDice = Mathf.Max(0, Mathf.RoundToInt(rule.Value * Mathf.Max(1, perk.Stacks)));
-                if (extraDice <= 0) continue;
+            int extraDice = Mathf.Max(0, Mathf.RoundToInt(rule.Value * Mathf.Max(1, perk.Stacks)));
+            if (extraDice <= 0) continue;
 
-                if (rule.FilterByStatType) extraDiceStatType = rule.StatType;
-                else extraDiceStatType = accuracyResult.StatType;
+            if (rule.FilterByStatType) extraDiceStatType = rule.StatType;
+            else extraDiceStatType = accuracyResult.StatType;
 
-                totalExtraDice += extraDice;
-                NotifyPerkTriggered(owner, perk, rule, actionContext, rule.Value);
-            }
+            totalExtraDice += extraDice;
+            NotifyPerkTriggered(owner, perk, rule, actionContext, rule.Value);
         }
 
         return totalExtraDice;
@@ -91,19 +86,16 @@ public class PerkTriggerEvaluator
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null) continue;
+            if (perk.Definition.Rule == null) continue;
 
-            for (int j = 0; j < perk.Definition.Rules.Count; j++)
-            {
-                PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != expectedTrigger) continue;
-                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
-                if (!rule.MatchesAction(context)) continue;
-                if (!rule.MatchesDice(dice)) continue;
-                if (!ValidateDiceCondition(rule, dice, allDices, opposingDices)) continue;
+            PerkRule rule = perk.Definition.Rule;
+            if (rule == null || rule.Trigger != expectedTrigger) continue;
+            if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+            if (!rule.MatchesAction(context)) continue;
+            if (!rule.MatchesDice(dice)) continue;
+            if (!ValidateDiceCondition(rule, dice, allDices, opposingDices)) continue;
 
-                NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
-            }
+            NotifyPerkTriggered(owner, perk, rule, context, rule.Value);
         }
     }
 
@@ -117,19 +109,16 @@ public class PerkTriggerEvaluator
         for (int i = 0; i < effectivePerks.Count; i++)
         {
             PerkRuntimeInstance perk = effectivePerks[i];
-            if (perk?.Definition?.Rules == null) continue;
+            if (perk?.Definition.Rule == null) continue;
 
-            for (int j = 0; j < perk.Definition.Rules.Count; j++)
-            {
-                PerkRule rule = perk.Definition.Rules[j];
-                if (rule == null || rule.Trigger != PerkTrigger.OnActionResolved) continue;
-                if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
-                if (!rule.MatchesAction(context)) continue;
-                if (!ValidateCondition(rule, context)) continue;
-                    
-                float appliedValue = rule.Value;
-                NotifyPerkTriggered(owner, perk, rule, context, appliedValue);
-            }
+            PerkRule rule = perk.Definition.Rule;
+            if (rule == null || rule.Trigger != PerkTrigger.OnActionResolved) continue;
+            if (!PerkRuntimeHelper.IsRoleMatch(owner, context, rule.OwnerRole)) continue;
+            if (!rule.MatchesAction(context)) continue;
+            if (!ValidateCondition(rule, context)) continue;
+                
+            float appliedValue = rule.Value;
+            NotifyPerkTriggered(owner, perk, rule, context, appliedValue);
         }
     }
 
@@ -138,17 +127,12 @@ public class PerkTriggerEvaluator
     /// </summary>
     public void EvaluateManualActivationTriggers(Battler owner, ActionType actionType, PerkRuntimeInstance perk)
     {
-        if (owner == null || perk?.Definition?.Rules == null) return;
+        if (owner == null || perk.Definition.Rule == null) return;
         
         CombatActionContext manualContext = new(owner, null, actionType);
-        for (int i = 0; i < perk.Definition.Rules.Count; i++)
-        {
-            PerkRule rule = perk.Definition.Rules[i];
-            
-            if (rule == null || rule.Trigger != PerkTrigger.OnManualActivation) continue;
-            
-            NotifyPerkTriggered(owner, perk, rule, manualContext, rule.Value);
-        }
+        PerkRule rule = perk.Definition.Rule;
+        if (rule == null || rule.Trigger != PerkTrigger.OnManualActivation) return;
+        NotifyPerkTriggered(owner, perk, rule, manualContext, rule.Value);
     }
 
     private bool ValidateCondition(PerkRule rule, ActionResolutionContext context)

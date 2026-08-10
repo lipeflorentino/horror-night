@@ -17,8 +17,8 @@ MonoBehaviour:
   MaxStacks: 1
   StackMode: 0
   Tags: 
-  Rules:
-  - Trigger: 0
+  Rule:
+    Trigger: 0
     ModifierTarget: 20
     Operation: 0
     OwnerRole: 0

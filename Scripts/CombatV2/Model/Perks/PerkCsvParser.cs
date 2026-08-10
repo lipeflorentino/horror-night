@@ -29,7 +29,7 @@ public static class PerkCsvParser
             perk.MaxStacks = Math.Max(1, ParseInt(Get(row, columns, "MaxStacks"), 1));
             perk.StackMode = ParseEnum(Get(row, columns, "StackMode"), PerkStackMode.RefreshDuration);
             perk.Tags = Get(row, columns, "Tags");
-            perk.Rules.Add(ParseRule(row, columns));
+            perk.Rule = ParseRule(row, columns);
             perks.Add(perk);
         }
 

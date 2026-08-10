@@ -458,15 +458,11 @@ public class TrickInventory : ITrickInventory
 
                 // 2. Verificamos se este Perk tem o objetivo de gerar cargas para a Trick
                 bool isChargeGenerator = false;
-                if (perkDef.Rules != null)
+                if (perkDef.Rule != null)
                 {
-                    for (int j = 0; j < perkDef.Rules.Count; j++)
+                    if (perkDef.Rule.ModifierTarget == PerkModifierTarget.TrickCharges)
                     {
-                        if (perkDef.Rules[j].ModifierTarget == PerkModifierTarget.TrickCharges)
-                        {
-                            isChargeGenerator = true;
-                            break;
-                        }
+                        isChargeGenerator = true;
                     }
                 }
 
