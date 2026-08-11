@@ -74,8 +74,8 @@ public class CombatView : MonoBehaviour
         PlayerPanel.Bind(player, perkService);
         EnemyPanel.Bind(enemy, perkService);
 
-        List<CombatInfoStatCalculator.StatRowEntry> playerStatRows = CombatInfoStatCalculator.BuildStatRows(player, enemy, perkService);
-        List<CombatInfoStatCalculator.StatRowEntry> enemyStatRows = CombatInfoStatCalculator.BuildStatRows(enemy, player, perkService);
+        List<CombatInfoStatCalculator.StatRowEntry> playerStatRows = CombatInfoStatCalculator.BuildStatRows(player, perkService);
+        List<CombatInfoStatCalculator.StatRowEntry> enemyStatRows = CombatInfoStatCalculator.BuildStatRows(enemy, perkService);
         InfoPanelView.Bind(player, playerIconSprite, playerStatRows, enemy, enemyIconSprite, enemyStatRows);
     }
 

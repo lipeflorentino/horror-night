@@ -12,7 +12,7 @@ public class TrickInventory : ITrickInventory
     private readonly TrickDatabase trickDatabase;
     private readonly PerkService perkService;
     private readonly List<TrickSlot> identitySlots = new();
-    private readonly List<TrickSO> learnedTricks = new();
+    private readonly List<TrickSlot> learnedTricks = new();
     private readonly List<TrickSlot> activeCastedSlots = new();
     private readonly List<TrickSlot> passiveCastedSlots = new();
     private readonly Dictionary<string, int> cooldownTurnsByTrickId = new(StringComparer.OrdinalIgnoreCase);
@@ -37,7 +37,7 @@ public class TrickInventory : ITrickInventory
     }
 
     public IReadOnlyList<TrickSlot> IdentitySlots => identitySlots;
-    public IReadOnlyList<TrickSO> LearnedTricks => learnedTricks;
+    public IReadOnlyList<TrickSlot> LearnedTricks => learnedTricks;
     public IReadOnlyList<TrickSlot> ActiveCastedSlots => activeCastedSlots;
     public IReadOnlyList<TrickSlot> PassiveCastedSlots => passiveCastedSlots;
 
@@ -46,7 +46,18 @@ public class TrickInventory : ITrickInventory
         if (trick == null || string.IsNullOrWhiteSpace(trick.Id) || HasLearnedTrick(trick.Id) || HasIdentityTrick(trick.Id))
             return false;
 
-        learnedTricks.Add(trick);
+        // Try to find an existing empty learned slot
+        TrickSlot freeSlot = learnedTricks.Find(s => s != null && s.IsEmpty && !s.IsLocked);
+        if (freeSlot != null)
+        {
+            freeSlot.BindDefinition(trick);
+        }
+        else
+        {
+            TrickSlot slot = new TrickSlot(TrickSlotType.Learned, learnedTricks.Count, owner);
+            slot.BindDefinition(trick);
+            learnedTricks.Add(slot);
+        }
         NotifyChanged();
         return true;
     }
@@ -55,8 +66,19 @@ public class TrickInventory : ITrickInventory
     {
         if (trick == null || HasIdentityTrick(trick.Id) || IsTrickCasted(trick.Id))
             return false;
+        bool removed = false;
 
-        bool removed = learnedTricks.Remove(trick) || learnedTricks.RemoveAll(t => IsSameTrick(t, trick.Id)) > 0;
+        for (int i = learnedTricks.Count - 1; i >= 0; i--)
+        {
+            TrickSlot slot = learnedTricks[i];
+            if (slot != null && IsSameTrick(slot.Definition, trick.Id))
+            {
+                slot.Clear();
+                learnedTricks.RemoveAt(i);
+                removed = true;
+            }
+        }
+
         ClearCooldown(trick.Id);
         if (removed)
             NotifyChanged();
@@ -170,7 +192,7 @@ public class TrickInventory : ITrickInventory
 
         for (int i = 0; i < learnedTricks.Count; i++)
         {
-            TrickSO trick = learnedTricks[i];
+            TrickSO trick = learnedTricks[i]?.Definition;
             if (trick != null && !string.IsNullOrWhiteSpace(trick.Id))
                 snapshot.learnedTrickIds.Add(trick.Id);
         }
@@ -233,13 +255,13 @@ public class TrickInventory : ITrickInventory
         passiveCastedSlots.Clear();
 
         for (int i = 0; i < identitySlotCount; i++)
-            identitySlots.Add(new TrickSlot(TrickSlotType.Identity, i));
+            identitySlots.Add(new TrickSlot(TrickSlotType.Identity, i, owner));
 
         for (int i = 0; i < activeCastedSlotCount; i++)
-            activeCastedSlots.Add(new TrickSlot(TrickSlotType.CastedActive, i));
+            activeCastedSlots.Add(new TrickSlot(TrickSlotType.CastedActive, i, owner));
 
         for (int i = 0; i < passiveCastedSlotCount; i++)
-            passiveCastedSlots.Add(new TrickSlot(TrickSlotType.CastedPassive, i));
+            passiveCastedSlots.Add(new TrickSlot(TrickSlotType.CastedPassive, i, owner));
     }
 
     private void RestoreSnapshot(TrickInventorySnapshot snapshot)
@@ -289,7 +311,9 @@ public class TrickInventory : ITrickInventory
             TrickSO trick = FindTrick(trickIds[i]);
             if (trick != null)
             {
-                LearnTrick(trick);
+                TrickSlot slot = new TrickSlot(TrickSlotType.Learned, learnedTricks.Count, owner);
+                slot.BindDefinition(trick);
+                learnedTricks.Add(slot);
             }
         }
     }
@@ -329,7 +353,7 @@ public class TrickInventory : ITrickInventory
 
     private bool HasLearnedTrick(string trickId)
     {
-        return learnedTricks.Exists(trick => IsSameTrick(trick, trickId));
+        return learnedTricks.Exists(slot => IsSameTrick(slot?.Definition, trickId));
     }
 
     private bool HasIdentityTrick(string trickId)

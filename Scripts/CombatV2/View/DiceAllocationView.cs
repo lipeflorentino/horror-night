@@ -395,11 +395,11 @@ public class DiceAllocationView : MonoBehaviour
 
         if (allocatedPowerDice <= 0 || allocatedAccuracyDice <= 0)
         {
-            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Red, gameObject);
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Red);
         }
         else
         {
-            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default, gameObject);
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default);
         }
 
         tooltipable.SetTooltipText(tooltip);

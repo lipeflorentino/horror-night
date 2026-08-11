@@ -10,11 +10,21 @@ public class TrickRarityUI : MonoBehaviour
 
     void Awake()
     {
-        tooltipable = gameObject.GetOrAddComponent<Tooltipable>();
+        EnsureTooltipable();
+    }
+
+    private void EnsureTooltipable()
+    {
+        if (tooltipable == null)
+        {
+            tooltipable = gameObject.GetOrAddComponent<Tooltipable>();
+        }
     }
 
     public void Setup(string rarityKey)
     {
+        EnsureTooltipable(); // Garante que a referência existe antes de usá-la
+        
         if (iconImage != null) iconImage.sprite = IconProvider.GetTrickRarityIcon(rarityKey);
         if (tooltipable != null) tooltipable.SetTooltipText(rarityKey);
     }

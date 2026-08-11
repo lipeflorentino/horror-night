@@ -35,7 +35,7 @@ public static class CombatInfoStatCalculator
         ("PowerDices", "Action dices"),
     };
 
-    public static StatDisplayData GetDisplayData(string statKey, Battler battler, Battler opposingBattler, PerkService perkService)
+    public static StatDisplayData GetDisplayData(string statKey, Battler battler, PerkService perkService)
     {
         if (battler == null)
             return new StatDisplayData("0", string.Empty, false, true);
@@ -122,13 +122,13 @@ public static class CombatInfoStatCalculator
     }
 
     // Builds the full ordered list of stat rows for a battler, ready for the View to render.
-    public static List<StatRowEntry> BuildStatRows(Battler battler, Battler opposingBattler, PerkService perkService)
+    public static List<StatRowEntry> BuildStatRows(Battler battler, PerkService perkService)
     {
         var rows = new List<StatRowEntry>(StatDefinitions.Length);
 
         foreach (var (Key, Label) in StatDefinitions)
         {
-            StatDisplayData data = GetDisplayData(Key, battler, opposingBattler, perkService);
+            StatDisplayData data = GetDisplayData(Key, battler, perkService);
             rows.Add(new StatRowEntry(Key, Label, data));
         }
 

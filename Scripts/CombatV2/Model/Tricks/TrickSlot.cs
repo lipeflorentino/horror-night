@@ -10,14 +10,16 @@ public class TrickSlot
     public int SlotIndex { get; private set; }
     public TrickSO Definition { get; private set; }
     public TrickRuntimeInstance RuntimeInstance { get; private set; }
+    public Battler Owner { get; private set; }
     public bool IsLocked { get; private set; }
     public bool IsEmpty => Definition == null && RuntimeInstance == null;
 
-    public TrickSlot(TrickSlotType slotType, int slotIndex, bool isLocked = false)
+    public TrickSlot(TrickSlotType slotType, int slotIndex, Battler owner = null, bool isLocked = false)
     {
         SlotType = slotType;
         SlotIndex = Math.Max(0, slotIndex);
         IsLocked = isLocked;
+        Owner = owner;
     }
 
     public void BindDefinition(TrickSO definition)

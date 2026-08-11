@@ -230,4 +230,22 @@ public class Battler
     {
         return Drawbacks.FindAll(d => d != null && d.IsActive());
     }
+
+    public int GetStatValue(string statKey, PerkService perkService)
+    {
+        return statKey switch
+        {
+            "Heart" => perkService != null ? perkService.GetEffectiveHeart(this) : Heart,
+            "Mind" => perkService != null ? perkService.GetEffectiveMind(this) : Mind,
+            "Body" => perkService != null ? perkService.GetEffectiveBody(this) : Body,
+            "Initiative" => Initiative,
+            "Focus" => Focus,
+            "Strength" => Strength,
+            "Agility" => Agility,
+            "PowerDices" => CurrentDices,
+            "Attack" => perkService != null ? perkService.GetEffectiveAttack(this) : Attack,
+            "Defense" => perkService != null ? perkService.GetEffectiveDefense(this) : Defense,
+            _ => 0
+        };
+    }
 }

@@ -445,7 +445,6 @@ MonoBehaviour:
   cooldownState: {fileID: 5665954330813008585}
   cooldownText: {fileID: 0}
   interactButton: {fileID: 3739799229453996066}
-  tooltipable: {fileID: 0}
 --- !u!1 &7703910050008318023
 GameObject:
   m_ObjectHideFlags: 0

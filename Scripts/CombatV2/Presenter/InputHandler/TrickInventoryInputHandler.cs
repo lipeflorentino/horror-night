@@ -15,7 +15,7 @@ public class TrickInventoryInputHandler : MonoBehaviour
 
         if (trickInventoryView != null)
         {
-            trickInventoryView.BindInventory(playerTrickInventory);
+            trickInventoryView.BindInventory(playerTrickInventory, Combat.GetPerkService());
             trickInventoryView.OnInteractWithInventoryTrick += HandleTrickInteraction;
         }
     }
@@ -28,15 +28,15 @@ public class TrickInventoryInputHandler : MonoBehaviour
         trickInventoryView.OnInteractWithInventoryTrick -= HandleTrickInteraction;
     }
 
-    private void HandleTrickInteraction(TrickSO trick, TrickInventoryAction action, TrickInventoryItemLocation location)
+    private void HandleTrickInteraction(TrickSlot slot, TrickInventoryAction action, TrickInventoryItemLocation location)
     {
         switch (action)
         {
             case TrickInventoryAction.Cast:
-                OnCastTrick(trick);
+                OnCastTrick(slot?.Definition);
                 break;
             case TrickInventoryAction.Dischard:
-                OnDischardTrick(trick, location);
+                OnDischardTrick(slot?.Definition, location);
                 break;
         }
 

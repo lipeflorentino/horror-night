@@ -28,6 +28,7 @@ public enum TrickRarity
 /// </summary>
 public enum TrickSlotType
 {
+    Learned,
     Identity,
     CastedActive,
     CastedPassive

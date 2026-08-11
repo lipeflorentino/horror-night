@@ -39,8 +39,9 @@ public class TrickInventoryView : MonoBehaviour
     private Tween cursorMoveTween;
     private Tween cursorPulseTween;
     private Coroutine initialSnapCoroutine;
+    private PerkService boundPerkService;
 
-    public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithInventoryTrick;
+    public event Action<TrickSlot, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithInventoryTrick;
 
     private void Start()
     {
@@ -53,6 +54,8 @@ public class TrickInventoryView : MonoBehaviour
                 
             highlightCursor.gameObject.SetActive(false);
         }
+
+        systemMessagesUI = FindObjectOfType<SystemMessagesUI>();
     }
 
     private void OnEnable()
@@ -80,7 +83,7 @@ public class TrickInventoryView : MonoBehaviour
         cursorPulseTween?.Kill();
     }
 
-    public void BindInventory(ITrickInventory trickInventory)
+    public void BindInventory(ITrickInventory trickInventory, PerkService perkService)
     {
         if (boundInventory != null)
             boundInventory.OnChanged -= Refresh;
@@ -89,6 +92,8 @@ public class TrickInventoryView : MonoBehaviour
 
         if (boundInventory != null)
             boundInventory.OnChanged += Refresh;
+
+        boundPerkService = perkService;
 
         Refresh();
     }
@@ -138,12 +143,13 @@ public class TrickInventoryView : MonoBehaviour
 
         for (int i = 0; i < maxLearnedSlots; i++)
         {
-            TrickSO trick = i < boundInventory.LearnedTricks.Count ? boundInventory.LearnedTricks[i] : null;
+            TrickSlot slot = i < boundInventory.LearnedTricks.Count ? boundInventory.LearnedTricks[i] : null;
+            TrickSO trick = slot?.Definition;
             TrickRuntimeInstance runtime = FindCastedRuntime(trick);
             bool isAlreadyCasted = runtime != null;
             int registeredCooldown = trick != null ? boundInventory.GetRegisteredCooldown(trick.Id) : 0;
 
-            SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted, "", registeredCooldown);
+            SpawnTrickView(trick, runtime, learnedTricksRoot, new TrickInventoryItemLocation(TrickInventoryLocation.LearnedTricks, i), isAlreadyCasted, "", registeredCooldown, slot);
         }
     }
 
@@ -177,7 +183,7 @@ public class TrickInventoryView : MonoBehaviour
             TrickSlot slot = boundInventory.ActiveCastedSlots[i];
             int slotIndex = slot?.SlotIndex ?? i;
             string inputKey = i < CastedActiveInputKeys.Length ? CastedActiveInputKeys[i] : string.Empty;
-            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, activeCastedSlotsRoot, new TrickInventoryItemLocation(TrickInventoryLocation.CastedActiveSlot, slotIndex), slot != null && slot.IsLocked, inputKey);
+            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, activeCastedSlotsRoot, new TrickInventoryItemLocation(TrickInventoryLocation.CastedActiveSlot, slotIndex), slot != null && slot.IsLocked, inputKey, 0, slot);
         }
     }
 
@@ -194,11 +200,11 @@ public class TrickInventoryView : MonoBehaviour
         {
             TrickSlot slot = slots[i];
             int slotIndex = slot?.SlotIndex ?? i;
-            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, parent, new TrickInventoryItemLocation(location, slotIndex), slot != null && slot.IsLocked);
+            SpawnTrickView(slot?.Definition, slot?.RuntimeInstance, parent, new TrickInventoryItemLocation(location, slotIndex), slot != null && slot.IsLocked, "", 0, slot);
         }    
     }
 
-    private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false, string inputKey = "", int registeredCooldown = 0)
+    private void SpawnTrickView(TrickSO trick, TrickRuntimeInstance runtimeInstance, Transform parent, TrickInventoryItemLocation location, bool isLocked = false, string inputKey = "", int registeredCooldown = 0, TrickSlot slot = null)
     {
         TrickSlotUI trickSlotPrefab = location.Location switch
         {
@@ -212,13 +218,31 @@ public class TrickInventoryView : MonoBehaviour
 
         TrickSlotUI trickSlotView = Instantiate(trickSlotPrefab, parent);
         TrickInfoPanelUI panel = trickInfoPanel != null ? trickInfoPanel : FindObjectOfType<TrickInfoPanelUI>();
-        
+        panel.BindPerkService(boundPerkService);
+
         trickSlotView.SetTrickInfoPanel(panel);
-        trickSlotView.Bind(trick, location, runtimeInstance, isLocked, inputKey, registeredCooldown);
+        // Prefer binding the provided real slot
+        if (slot != null)
+        {
+            trickSlotView.Bind(slot, location, isLocked, inputKey, registeredCooldown, runtimeInstance);
+        }
+        else
+        {
+            // Bind using a temporary slot wrapper when only trick/runtime provided
+            TrickSlot tempSlot = trick != null || runtimeInstance != null ? new TrickSlot(TrickSlotType.Learned, 0, null) : null;
+            if (tempSlot != null)
+            {
+                if (trick != null) tempSlot.BindDefinition(trick);
+                if (runtimeInstance != null) tempSlot.BindRuntimeInstance(runtimeInstance);
+            }
+
+            trickSlotView.Bind(tempSlot, location, isLocked, inputKey, registeredCooldown, runtimeInstance);
+        }
+
         trickSlotView.TrickSelected += HandleTrickSelected;
         trickSlotView.OnInteractWithTrick += HandleTrickInteraction;
-        
-        spawnedSlots.Add(trickSlotView);    
+
+        spawnedSlots.Add(trickSlotView);
     }
 
     private bool IsInventoryOpen()
@@ -279,7 +303,6 @@ public class TrickInventoryView : MonoBehaviour
             if (selectedView != null && selectedView.HasTrick)
             {   
                 highlightCursor.gameObject.SetActive(true);
-                // Usa a Coroutine para esperar o Unity arrumar o Layout
                 if (initialSnapCoroutine != null) StopCoroutine(initialSnapCoroutine);
                 initialSnapCoroutine = StartCoroutine(SnapHighlightAfterLayout(selectedView.TargetHighlightTransform));
             }
@@ -290,9 +313,9 @@ public class TrickInventoryView : MonoBehaviour
         }
     }
 
-    private void HandleTrickInteraction(TrickSO trick, TrickInventoryAction action, TrickInventoryItemLocation location)
+    private void HandleTrickInteraction(TrickSlot slot, TrickInventoryAction action, TrickInventoryItemLocation location)
     {
-        OnInteractWithInventoryTrick?.Invoke(trick, action, location);
+        OnInteractWithInventoryTrick?.Invoke(slot, action, location);
     }
 
     private void ClearSpawnedSlots()
@@ -335,23 +358,17 @@ public class TrickInventoryView : MonoBehaviour
 
     private IEnumerator SnapHighlightAfterLayout(Transform targetTransform)
     {
-        // 1. Adiciona (se não tiver) um CanvasGroup e deixa invisível 
-        // para o jogador não ver o cursor na posição errada piscando na tela.
         if (!highlightCursor.TryGetComponent<CanvasGroup>(out var cg))
         {
             cg = highlightCursor.gameObject.AddComponent<CanvasGroup>();
         }
         cg.alpha = 0f;
-
-        // 2. Aguarda o fim do frame atual, que é quando o Unity FINALIZA
-        // os cálculos do VerticalLayoutGroup e posiciona os itens perfeitamente.
         yield return new WaitForEndOfFrame();
-
-        // 3. Agora sim a posição do targetTransform está 100% precisa
+        
         if (highlightCursor != null && targetTransform != null)
         {
             highlightCursor.position = targetTransform.position;
-            cg.alpha = 1f; // Traz a imagem de volta
+            cg.alpha = 1f; 
         }
     }
 }

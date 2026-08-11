@@ -69,7 +69,7 @@ Componentes de UI
 Sistema de Lore 
     - Objetivo primario "escapar do limbo salvando o reino da Sombra"
     - Completar o bestiário para que os Elders desenvolvam o "antidoto" contra a Sombra.
-    - As criaturas são spawnadas conforme condições são satisfeitas
+    - As criaturas são spawnadas conforme condições são satisfeitas (artefatos, itens, stats, nivel, locais, etc)
     - Algumas criaturas "lendarios/epicas" precisam ser sumonadas usando itens e artefatos
 
 Sistemas de Exploração 
@@ -129,11 +129,4 @@ Sistemas de Combate
         
     
 TASKS
-    - Colocar momentum na tela de TrickInventory
-    - Colocar feedback para "sem recurso" na tela de TrickInventory
     - Colocar background vermelho quando stats estão baixas (mind, heart, body)
-        
-    - Ajustar cast de tricks 
-        - Requisitos (outras stats alem de mind, heart, body)
-        - Custo (momentum)
-        - Dar feedback quando falta recurso (highlight vermelho)

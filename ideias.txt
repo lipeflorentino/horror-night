@@ -89,3 +89,15 @@ Criar script que irá escutar evento dispardo quando player chega ao node.
 
 8) Sistema de criaturas
     - verificar implementar "Creatures", como cartas de criaturas do magic, que atacam e defendem pelo jogador
+
+
+9) Inimigo profere insultos, ameaças, falas, etc
+
+    Trechos da história contados a cada mapa aberto 
+
+    Sistemas de ocorrência atinge stats específicas, pode atingir HP por exemplo ao se deparar com uma armadilha
+
+    Level possui número fixo de "casas" o jogador explora as casas até atingir objetivo (derrotar Boss, encontrar vila, item, NPC)
+
+    - diferentes ataques 
+    - feedback do nome do ataque

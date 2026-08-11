@@ -12,7 +12,7 @@ public class Tooltipable : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         tooltipText = text;
     }
 
-    public void SetTooltipColor(TooltipUI.TooltipColor color, GameObject owner = null)
+    public void SetTooltipColor(TooltipUI.TooltipColor color)
     {
         tooltipColor = color;
     }

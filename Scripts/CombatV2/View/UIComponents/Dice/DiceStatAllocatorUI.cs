@@ -85,7 +85,7 @@ public class DiceStatAllocatorUI : MonoBehaviour
 
         if (tooltipable != null)
         {
-            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default, gameObject);
+            tooltipable.SetTooltipColor(TooltipUI.TooltipColor.Default);
             tooltipable.SetTooltipText(GetBonusTooltipText(stat, roll));
         }
     }

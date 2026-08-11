@@ -91,14 +91,6 @@ public class TrickRuntimeInstance
         CurrentCharges = 0;
     }
 
-    /// <summary>
-    /// Compatibilidade com chamadas antigas que consultavam cooldown por método.
-    /// </summary>
-    public bool HasCooldown()
-    {
-        return IsCoolingDown;
-    }
-
     public void BindSlot(TrickSlotType slotType, int slotIndex)
     {
         SlotType = slotType;

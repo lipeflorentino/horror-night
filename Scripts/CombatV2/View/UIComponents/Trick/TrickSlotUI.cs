@@ -20,8 +20,9 @@ public class TrickSlotUI : MonoBehaviour
     [SerializeField] private Button interactButton;
 
     private TrickInfoPanelUI trickInfoPanelUI;
-    private TrickSO boundTrick;
-    private TrickRuntimeInstance boundRuntimeInstance;
+    private TrickSlot boundSlot;
+    private TrickSO boundTrick => boundSlot?.Definition;
+    private TrickRuntimeInstance boundRuntimeInstance => boundSlot?.RuntimeInstance;
     private TrickInventoryItemLocation location;
     private bool isPanelOpen;
 
@@ -34,10 +35,10 @@ public class TrickSlotUI : MonoBehaviour
     public TrickInventoryItemLocation Location => location;
 
     public event Action<TrickSlotUI> TrickSelected;
-    public event Action<TrickSO, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithTrick;
+    public event Action<TrickSlot, TrickInventoryAction, TrickInventoryItemLocation> OnInteractWithTrick;
     public Transform TargetHighlightTransform => transform;
     
-    [SerializeField] private Tooltipable tooltipable;
+    private Tooltipable tooltipable;
 
     private void Awake()
     {
@@ -67,12 +68,17 @@ public class TrickSlotUI : MonoBehaviour
         trickInfoPanelUI = panel;
     }
 
-    public void Bind(TrickSO trick, TrickInventoryItemLocation itemLocation, TrickRuntimeInstance runtimeInstance = null, bool isLocked = false, string inputKeyOverride = "", int registeredCooldown = 0)
+    private TrickRuntimeInstance overrideRuntimeInstance;
+
+    public void Bind(TrickSlot slot, TrickInventoryItemLocation itemLocation, bool isLocked = false, string inputKeyOverride = "", int registeredCooldown = 0, TrickRuntimeInstance runtimeInstanceOverride = null)
     {
-        boundTrick = trick;
-        boundRuntimeInstance = runtimeInstance;
+        boundSlot = slot;
         location = itemLocation;
-        
+        overrideRuntimeInstance = runtimeInstanceOverride;
+
+        TrickSO trick = boundTrick;
+        TrickRuntimeInstance runtimeInstance = overrideRuntimeInstance ?? boundRuntimeInstance;
+
         bool isEmpty = trick == null;
         if (iconImage != null)
         {
@@ -84,14 +90,14 @@ public class TrickSlotUI : MonoBehaviour
             nameText.text = !isEmpty ? trick.DisplayName : "";
 
         UpdateInputKeyText(itemLocation, inputKeyOverride);
-        
+
         bool hasRuntimeCooldown = runtimeInstance != null && runtimeInstance.IsCoolingDown;
         bool isCoolingDown = hasRuntimeCooldown || registeredCooldown > 0;
         bool isActive = runtimeInstance != null && runtimeInstance.RemainingTurns > 0 && !runtimeInstance.WasExpired;
-        
+
         int currentCooldownTurns = hasRuntimeCooldown ? runtimeInstance.CooldownTurnsRemaining : registeredCooldown;
         bool showCooldownVisual = false;
-        
+
         shouldShowTooltip = true;
         tooltipMessage = isEmpty ? "Empty Slot" : "";
         tooltipColor = TooltipUI.TooltipColor.Default;
@@ -99,9 +105,9 @@ public class TrickSlotUI : MonoBehaviour
         switch (location.Location)
         {
             case TrickInventoryLocation.LearnedTricks:
-                showCooldownVisual = isCoolingDown;
+                showCooldownVisual = runtimeInstance != null || isCoolingDown;
 
-                if (isLocked && isActive) 
+                if (isLocked && isActive)
                 {
                     tooltipMessage = "Casted";
                     tooltipColor = TooltipUI.TooltipColor.Yellow;
@@ -163,7 +169,7 @@ public class TrickSlotUI : MonoBehaviour
 
         if (tooltipable != null)
         {
-            tooltipable.SetTooltipColor(tooltipColor, gameObject);
+            tooltipable.SetTooltipColor(tooltipColor);
             tooltipable.SetTooltipText(tooltipMessage);
             tooltipable.DisableTooltip(!shouldShowTooltip);
         }
@@ -178,7 +184,7 @@ public class TrickSlotUI : MonoBehaviour
         {
             if (boundTrick == null) return;
 
-            trickInfoPanelUI.SetTrickInfo(boundTrick, boundRuntimeInstance, location);
+            trickInfoPanelUI.SetTrickInfo(boundTrick, boundRuntimeInstance, boundSlot?.Owner, location);
             trickInfoPanelUI.OnRaiseInteraction += OnRaiseInteraction;
             trickInfoPanelUI.ShowPanel();
             isPanelOpen = true;
@@ -216,7 +222,7 @@ public class TrickSlotUI : MonoBehaviour
         if (boundTrick == null) return;
 
         if (action != TrickInventoryAction.Close)
-            OnInteractWithTrick?.Invoke(boundTrick, action, location);
+            OnInteractWithTrick?.Invoke(boundSlot, action, location);
 
         ShowInteractionPanel(action != TrickInventoryAction.Close);
     }
