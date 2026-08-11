@@ -14,12 +14,13 @@ public class BattlerHUDView : MonoBehaviour
     public StatHudBinding HpHud;
     public TMP_Text momentumText;
 
-    public void Bind(Battler battler, PerkService perkService = null)
+    public void Bind(Battler battler)
     {
-        // Bind Stats
-        currentMind = perkService != null ? perkService.GetEffectiveMind(battler) : battler.Mind;
-        currentHeart = perkService != null ? perkService.GetEffectiveHeart(battler) : battler.Heart;
-        currentBody = perkService != null ? perkService.GetEffectiveBody(battler) : battler.Body;
+        // Buscar o valor 'Current' em vez do Teto/Base, para refletir 
+        // a subtração imediata após a confirmação do painel de dados.
+        currentMind = battler.GetCurrentStatValue(DiceStatType.Mind);
+        currentHeart = battler.GetCurrentStatValue(DiceStatType.Heart);
+        currentBody = battler.GetCurrentStatValue(DiceStatType.Body);
 
         // Bind Texts
         if (NameText != null)
@@ -29,11 +30,8 @@ public class BattlerHUDView : MonoBehaviour
             LevelText.text = "Lv. " + battler.Level.ToString();
 
         MindHud?.SetValue(currentMind, 0);
-
         HeartHud?.SetValue(currentHeart, 0);
-
         BodyHud?.SetValue(currentBody, 0);
-
         HpHud?.SetValue(battler.HP, battler.MaxHp);
 
         if (momentumText != null)

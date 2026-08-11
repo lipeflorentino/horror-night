@@ -71,8 +71,8 @@ public class CombatView : MonoBehaviour
     public void UpdateView(Battler player, Battler enemy)
     {
         PerkService perkService = combatManager != null ? combatManager.GetPerkService() : null;
-        PlayerPanel.Bind(player, perkService);
-        EnemyPanel.Bind(enemy, perkService);
+        PlayerPanel.Bind(player);
+        EnemyPanel.Bind(enemy);
 
         List<CombatInfoStatCalculator.StatRowEntry> playerStatRows = CombatInfoStatCalculator.BuildStatRows(player, perkService);
         List<CombatInfoStatCalculator.StatRowEntry> enemyStatRows = CombatInfoStatCalculator.BuildStatRows(enemy, perkService);

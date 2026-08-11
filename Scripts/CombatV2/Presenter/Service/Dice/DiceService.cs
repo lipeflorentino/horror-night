@@ -16,15 +16,17 @@ public class DiceService
     private readonly struct DiceRollSpec
     {
         public readonly int MinValue;
-        public readonly int MaxValue;
+        public readonly int MaxValue; // Current face
+        public readonly int BaseMaxValue; // Base face
         public readonly DiceStatType StatType;
         public readonly DiceRollType RollType;
         public readonly bool IsExtra;
 
-        public DiceRollSpec(int minValue, int maxValue, DiceStatType statType, DiceRollType rollType, bool isExtra = false)
+        public DiceRollSpec(int minValue, int maxValue, int baseMaxValue, DiceStatType statType, DiceRollType rollType, bool isExtra = false)
         {
             MinValue = minValue;
             MaxValue = maxValue;
+            BaseMaxValue = baseMaxValue;
             StatType = statType;
             RollType = rollType;
             IsExtra = isExtra;
@@ -47,18 +49,23 @@ public class DiceService
     public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int minValue = 1, int focus = 0, int strength = 0, bool isExtra = false)
     {
         CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
-        return Roll(context, minValue, isExtra);
+        // Em um roll direto onde não há fragmentação, Base e Current são iguais
+        return Roll(context, maxValue, minValue, isExtra);
     }
 
-    private DiceResult Roll(CombatRollContext context, int minValue = 1, bool isExtra = false)
+    private DiceResult Roll(CombatRollContext context, int baseMaxValue, int minValue = 1, bool isExtra = false)
     {
-        int safeMaxValue = Math.Max(1, context.MaxValue);
+        int safeMaxValue = Math.Max(1, context.MaxValue); // Face Baseada no Current Stat
         int safeMinValue = Mathf.Clamp(minValue, 1, safeMaxValue);
-        int value = random.Next(safeMinValue, safeMaxValue + 1);
+        
+        // A rolagem respeita as faces limitadas (Current)
+        int value = random.Next(safeMinValue, safeMaxValue + 1); 
+        
         CombatRollContext safeContext = context.WithRoll(context.RollType, context.StatType, safeMaxValue);
         DiceTier tier = GetTier(value, safeContext);
 
-        return new DiceResult(value, tier, safeMaxValue, context.StatType, context.RollType, safeMinValue)
+        // Instancia o DiceResult passando a Face Base e a Face Current
+        return new DiceResult(value, tier, baseMaxValue, safeMaxValue, context.StatType, context.RollType, safeMinValue)
         {
             IsExtra = isExtra
         };
@@ -123,7 +130,8 @@ public class DiceService
         {
             DiceRollSpec spec = diceSpecs[i];
             CombatRollContext context = new(actor, opponent, actionType, spec.RollType, spec.StatType, actorLevel, opponentLevel, focus, strength, spec.MaxValue);
-            rawResults.Add(Roll(context, spec.MinValue, spec.IsExtra));
+            // Passa o BaseMaxValue extraído do spec
+            rawResults.Add(Roll(context, spec.BaseMaxValue, spec.MinValue, spec.IsExtra)); 
         }
 
         CombatRollContext aggregateContext = new(actor, opponent, actionType, rollType, DiceStatType.Body, actorLevel, opponentLevel, focus, strength, 1, Mathf.Max(1, diceTypes?.Count ?? 1));
@@ -148,7 +156,8 @@ public class DiceService
             DiceResult roll = rawResults[i];
             if (!aggregatedByStat.TryGetValue(roll.StatType, out DiceResult aggregate))
             {
-                DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.StatType, roll.RollType, roll.MinValue);
+                // Passa roll.MaxValue e roll.CurrentFaceValue
+                DiceResult firstResult = new(roll.Value, roll.Tier, roll.MaxValue, roll.CurrentFaceValue, roll.StatType, roll.RollType, roll.MinValue);
                 firstResult.SubRolls.Add(roll);
                 aggregatedByStat[roll.StatType] = firstResult;
                 orderedResults.Add(firstResult);
@@ -159,8 +168,10 @@ public class DiceService
             aggregate.IsExtra = aggregate.IsExtra || roll.IsExtra;
             aggregate.Value += roll.Value;
             aggregate.MinValue += roll.MinValue;
-            aggregate.MaxValue += roll.MaxValue;
-            CombatRollContext aggregateContext = baseContext.WithRoll(aggregate.RollType, aggregate.StatType, aggregate.MaxValue);
+            aggregate.MaxValue += roll.MaxValue; 
+            aggregate.CurrentFaceValue += roll.CurrentFaceValue; // Agrega a face dinâmica também
+            
+            CombatRollContext aggregateContext = baseContext.WithRoll(aggregate.RollType, aggregate.StatType, aggregate.CurrentFaceValue); // Usa Current para Tier
             aggregate.Tier = GetTier(aggregate.Value, aggregateContext);
         }
         
@@ -268,40 +279,46 @@ public class DiceService
         int agility = Mathf.Max(0, battler?.Agility ?? 0);
         foreach (KeyValuePair<DiceStatType, int> pair in diceCountByType)
         {
-            int totalValue = GetDiceMaxValueForType(battler, pair.Key);
+            int currentTotalValue = GetDiceMaxValueForType(battler, pair.Key);
+            int baseTotalValue = battler?.GetBaseStatValue(pair.Key) ?? currentTotalValue;
             int baseDiceCount = Mathf.Max(0, pair.Value);
-            if (totalValue <= 0 || baseDiceCount <= 0)
+            
+            if (currentTotalValue <= 0 || baseDiceCount <= 0)
                 continue;
 
-            CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, totalValue);
+            CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, currentTotalValue);
             int extraDice = perkService?.GetExtraDiceCount(battler, opponent, perkContext, evaluateRollTriggers) ?? 0;
 
-            // Dados base dividem o valor total da stat entre si (aloc. do jogador).
-            int baseFace = Mathf.Max(1, totalValue / baseDiceCount);
-            int remainder = Mathf.Max(0, totalValue - (baseFace * baseDiceCount));
+            // Calcula o fatiamento do Current Stat (faces da rolagem)
+            int currentBaseFace = Mathf.Max(1, currentTotalValue / baseDiceCount);
+            int currentRemainder = Mathf.Max(0, currentTotalValue - (currentBaseFace * baseDiceCount));
+
+            // Calcula o fatiamento do Base Stat (identidade referencial)
+            int baseBaseFace = Mathf.Max(1, baseTotalValue / baseDiceCount);
+            int baseRemainder = Mathf.Max(0, baseTotalValue - (baseBaseFace * baseDiceCount));
 
             for (int i = 0; i < baseDiceCount; i++)
             {
-                int bonus = i < remainder ? 1 : 0;
-                int maxFace = baseFace + bonus;
-                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, maxFace, totalAllocatedDice, isExtra: false);
+                int currentMaxFace = currentBaseFace + (i < currentRemainder ? 1 : 0);
+                int baseMaxFace = baseBaseFace + (i < baseRemainder ? 1 : 0);
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, currentMaxFace, baseMaxFace, totalAllocatedDice, isExtra: false);
             }
 
-            // Dados extras concedidos por perk usam o valor total da stat com face própria,
-            // sem diluir os dados base já alocados pelo jogador.
             for (int i = 0; i < extraDice; i++)
-                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, Mathf.Max(1, totalValue), totalAllocatedDice, isExtra: true);
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, Mathf.Max(1, currentTotalValue), Mathf.Max(1, baseTotalValue), totalAllocatedDice, isExtra: true);
         }
 
         return diceSpecs;
     }
 
-    private void AddDiceSpec(List<DiceRollSpec> diceSpecs, Battler battler, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int focus, int strength, int agility, int maxFace, int totalAllocatedDice, bool isExtra)
+    private void AddDiceSpec(List<DiceRollSpec> diceSpecs, Battler battler, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int focus, int strength, int agility, int currentMaxFace, int baseMaxFace, int totalAllocatedDice, bool isExtra)
     {
-        int minFace = Mathf.Clamp(1 + agility, 1, maxFace);
-        CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, statType, actorLevel, opponentLevel, focus, strength, maxFace, totalAllocatedDice);
+        int minFace = Mathf.Clamp(1 + agility, 1, currentMaxFace);
+        CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, statType, actorLevel, opponentLevel, focus, strength, currentMaxFace, totalAllocatedDice);
         minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, false) ?? minFace;
-        diceSpecs.Add(new DiceRollSpec(minFace, maxFace, statType, rollType, isExtra));
+        
+        // Passa o currentMaxFace e o baseMaxFace
+        diceSpecs.Add(new DiceRollSpec(minFace, currentMaxFace, baseMaxFace, statType, rollType, isExtra));
     }
 
     public int GetDiceMaxValueForType(Battler battler, DiceStatType diceType)
@@ -309,7 +326,9 @@ public class DiceService
         if (battler == null)
             return 0;
             
-        return Mathf.Max(0, battler.GetBaseStatValue(diceType));
+        // TODO: definir se ira usar o valor base ou o valor atual da stat (com buffs/debuffs)
+        // return Mathf.Max(0, battler.GetBaseStatValue(diceType));
+        return Mathf.Max(0, battler.GetCurrentStatValue(diceType));
     }
 
     private int GetTierReferenceMaxValue(CombatRollContext context)

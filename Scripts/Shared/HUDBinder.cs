@@ -9,8 +9,10 @@ public class StatHudBinding
 {
     public Image icon;
     public Image highlight;
+    public Image alert;
     public Image fillImage;
     public TMP_Text valueText;
+    private readonly int minThreshold = CombatRules.MinCoreStatValue;
 
     public void SetValue(float current, float max)
     {
@@ -19,6 +21,17 @@ public class StatHudBinding
 
         if (valueText != null)
             valueText.text = Mathf.RoundToInt(current).ToString();
+
+        if (alert != null)
+        {
+            bool isCritical = current <= minThreshold;
+            alert.gameObject.SetActive(isCritical);
+            
+            if (isCritical)
+            {
+                alert.color = Color.red;
+            }
+        }  
     }
 }
 

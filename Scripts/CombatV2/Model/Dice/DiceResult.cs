@@ -8,7 +8,6 @@ public enum DiceTier
     High
 }
 
-
 public enum DiceStatType
 {
     Mind,
@@ -26,11 +25,14 @@ public class DiceResult
 {
     public int Value;
     public DiceTier Tier;
-    public int MaxValue;
+    public int MaxValue; // Representa o teto original do dado (Base Stat)
+    public int CurrentFaceValue; // Representa a face dinâmica do dado para a rolagem atual (Current Stat)
     public int MinValue;
     public DiceStatType StatType;
     public DiceRollType RollType;
     public bool IsExtra;
+    
+    // Agora o IsMaxRoll valida estritamente contra o MaxValue (Base Stat)
     public bool IsMaxRoll => MaxValue > 1 && Value >= GetMaxValueForStat(StatType, MaxValue);
 
     private static int GetMaxValueForStat(DiceStatType statType, int maxValue)
@@ -47,11 +49,13 @@ public class DiceResult
     }
     public List<DiceResult> SubRolls = new();
 
-    public DiceResult(int value, DiceTier tier, int maxValue, DiceStatType statType, DiceRollType rollType, int minValue = 1)
+    // Construtor atualizado para receber o CurrentFaceValue
+    public DiceResult(int value, DiceTier tier, int maxValue, int currentFaceValue, DiceStatType statType, DiceRollType rollType, int minValue = 1)
     {
         Value = value;
         Tier = tier;
         MaxValue = maxValue;
+        CurrentFaceValue = currentFaceValue;
         MinValue = minValue;
         StatType = statType;
         RollType = rollType;

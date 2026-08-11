@@ -129,4 +129,4 @@ Sistemas de Combate
         
     
 TASKS
-    - Colocar background vermelho quando stats estão baixas (mind, heart, body)
+    - 
