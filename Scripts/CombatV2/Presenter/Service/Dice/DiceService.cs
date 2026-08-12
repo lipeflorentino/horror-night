@@ -86,21 +86,32 @@ public class DiceService
         if (candidate.Value != currentBest.Value)
             return candidate.Value > currentBest.Value;
 
-        int candidatePriority = GetStatPriority(candidate.StatType);
-        int currentPriority = GetStatPriority(currentBest.StatType);
+        int candidatePriority = GetStatPriority(candidate.StatType, candidate.RollType);
+        int currentPriority = GetStatPriority(currentBest.StatType, currentBest.RollType);
         if (candidatePriority != currentPriority)
             return candidatePriority > currentPriority;
 
         return false;
     }
 
-    private int GetStatPriority(DiceStatType statType)
+    private int GetStatPriority(DiceStatType statType, DiceRollType rollType)
     {
-        return statType switch
+        return rollType switch
         {
-            DiceStatType.Mind => 3,
-            DiceStatType.Heart => 2,
-            DiceStatType.Body => 1,
+            DiceRollType.Accuracy => statType switch
+            {
+                DiceStatType.Mind => 3,
+                DiceStatType.Heart => 2,
+                DiceStatType.Body => 1,
+                _ => 0
+            },
+            DiceRollType.Power => statType switch
+            {
+                DiceStatType.Body => 3,
+                DiceStatType.Heart => 2,
+                DiceStatType.Mind => 1,
+                _ => 0
+            },
             _ => 0
         };
     }
@@ -123,7 +134,7 @@ public class DiceService
         }
 
         int spentDiceCount = diceTypes?.Count ?? diceSpecs.Count;
-        ConsumeDicePool(actor, rollType, spentDiceCount);
+        ConsumeDicePool(actor, spentDiceCount);
 
         List<DiceResult> rawResults = new(diceSpecs.Count);
         for (int i = 0; i < diceSpecs.Count; i++)
@@ -138,7 +149,7 @@ public class DiceService
         return AggregateDuplicateStatResults(rawResults, aggregateContext);
     }
 
-    private void ConsumeDicePool(Battler battler, DiceRollType rollType, int spentDiceCount)
+    private void ConsumeDicePool(Battler battler, int spentDiceCount)
     {
         if (battler == null || spentDiceCount <= 0)
             return;
@@ -195,17 +206,23 @@ public class DiceService
             DiceResult aggregate = aggregates.Find(result => result.StatType == extra.StatType);
             if (aggregate == null)
             {
-                aggregates.Add(extra);
+                DiceResult newAggregate = new(extra.Value, extra.Tier, extra.MaxValue, extra.CurrentFaceValue, extra.StatType, extra.RollType, extra.MinValue)
+                {
+                    IsExtra = true
+                };
+                newAggregate.SubRolls.Add(extra); 
+                aggregates.Add(newAggregate);
                 continue;
             }
 
             aggregate.Value += extra.Value;
             aggregate.MinValue += extra.MinValue;
+            aggregate.CurrentFaceValue += extra.CurrentFaceValue;
+            aggregate.MaxValue += extra.MaxValue;
             aggregate.IsExtra = true;
             aggregate.SubRolls.Add(extra);
 
-            // MaxValue permanece o do dado principal/agregado: o extra não transforma d12 em d24.
-            CombatRollContext context = new(actor, opponent, actionType, DiceRollType.Power, aggregate.StatType, actorLevel, opponentLevel, focus, strength, aggregate.MaxValue, aggregate.SubRolls.Count);
+            CombatRollContext context = new(actor, opponent, actionType, DiceRollType.Power, aggregate.StatType, actorLevel, opponentLevel, focus, strength, aggregate.MaxValue, aggregate.SubRolls.Count + 1);
             aggregate.Tier = GetTier(aggregate.Value, context);
         }
     }

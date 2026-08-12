@@ -116,7 +116,7 @@ public class CombatDiceRollManager
 
         for (int i = 0; i < count; i++)
         {
-            DiceResult extra = diceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power);
+            DiceResult extra = diceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power, 1, 0, 0, true);
             extras.Add(extra);
         }
 

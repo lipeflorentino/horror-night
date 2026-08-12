@@ -155,7 +155,7 @@ public class DiceRollView : MonoBehaviour
     {
         yield return new WaitForSeconds(mergeMoveDuration);
         baseSlot.SetValueText(aggregatedRoll.Value);
-        baseSlot.SetExtra(false);
+        baseSlot.SetExtra(aggregatedRoll.IsExtra);
         yield return StartCoroutine(baseSlot.PlayPulse(mergePulseDuration));
     }
 

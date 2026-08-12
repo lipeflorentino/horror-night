@@ -64,7 +64,8 @@ Componentes de UI
     - Adicionar log de uso de item e outros updates (cooldown, etc.)
     - Feedback visual de bleeding e outros efeitos (Drawbacks, States)
     - Feedbacks 
-        - nos icones e texts de stats (quando gasta, quando está baixo, etc)
+        - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
+    - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
 
 Sistema de Lore 
     - Objetivo primario "escapar do limbo salvando o reino da Sombra"
@@ -124,9 +125,10 @@ Sistemas de Combate
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
-    - Ajustar as views de Tricks     
-        - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
+    - 
         
     
 TASKS
-    - 
+    - Varificar ordem de precedencia de dados por rolagem 
+        - Acc: mind, heart, body 
+        - Pow: body, heart, mind 

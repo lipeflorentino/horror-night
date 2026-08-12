@@ -23,9 +23,9 @@ MonoBehaviour:
   Hp: 300
   Attack: 3
   Defense: 1
-  Initiative: 1
-  Focus: 1
-  Strength: 1
+  Initiative: 19
+  Focus: 3
+  Strength: 3
   Agility: 1
   MaxDices: 3
   IdentityTricks:
