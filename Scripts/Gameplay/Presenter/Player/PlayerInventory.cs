@@ -16,6 +16,8 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
     [SerializeField] private int baseBody = -1;
     [SerializeField] private int baseMind = -1;
     [SerializeField] private bool hasCoreStatBase;
+    [SerializeField] private int goldAmount = 0;
+    [SerializeField] private int maxGoldCapacity = 999;
     public List<ItemSO> items = new();
     public IReadOnlyList<ItemSO> Items => items;
     [SerializeField] private List<EquippedItemInstance> equippedWeapons = new();
@@ -32,14 +34,30 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
         if (item == null)
             return;
 
+        if (item.type == ItemType.Currency)
+        {
+            int value = Mathf.Max(1, item.currencyValue);
+            AddGold(value);
+            return;
+        }
+
         items.Add(item);
         Debug.Log("Item adicionado: " + item.itemName);
+        playerStatusManager?.RefreshInventoryDisplay();
+        playerStatusManager?.RefreshGoldDisplay();
     }
 
     public void AddManyItem(ItemSO item, int quantity)
     {
         if (item == null || quantity <= 0)
             return;
+
+        if (item.type == ItemType.Currency)
+        {
+            int value = Mathf.Max(1, item.currencyValue);
+            AddGold(value * quantity);
+            return;
+        }
 
         for (int i = 0; i < quantity; i++)
             AddItem(item);
@@ -72,9 +90,59 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
         if (item == null)
             return false;
 
+        if (item.type == ItemType.Currency)
+        {
+            int value = Mathf.Max(1, item.currencyValue);
+            return AddGold(value * quantity);
+        }
+
         AddManyItem(item, quantity);
         return true;
     }
+
+    public bool AddGold(int amount)
+    {
+        if (amount <= 0)
+            return false;
+
+        if (maxGoldCapacity <= 0)
+            maxGoldCapacity = 999;
+
+        int previousAmount = goldAmount;
+        goldAmount = Mathf.Clamp(goldAmount + amount, 0, maxGoldCapacity);
+
+        if (playerStatusManager != null)
+            playerStatusManager.RefreshGoldDisplay();
+
+        return goldAmount > previousAmount;
+    }
+
+    public bool SpendGold(int amount)
+    {
+        if (amount <= 0 || amount > goldAmount)
+            return false;
+
+        goldAmount -= amount;
+
+        if (playerStatusManager != null)
+            playerStatusManager.RefreshGoldDisplay();
+
+        return true;
+    }
+
+    public void UpgradeGoldCapacity(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        maxGoldCapacity = Mathf.Max(0, maxGoldCapacity + amount);
+
+        if (playerStatusManager != null)
+            playerStatusManager.RefreshGoldDisplay();
+    }
+
+    public int GetGoldAmount() => Mathf.Max(0, goldAmount);
+    public int GetMaxGoldCapacity() => Mathf.Max(0, maxGoldCapacity);
 
     public List<ItemSO> CreateSnapshot()
     {
@@ -110,7 +178,9 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             hasCoreStatBase = snapshotHasCoreStatBase && hasCoreStatBase,
             baseHeart = snapshotHasCoreStatBase ? baseHeart : playerStatusManager != null ? playerStatusManager.GetStatValue("heart") : 0,
             baseBody = snapshotHasCoreStatBase ? baseBody : playerStatusManager != null ? playerStatusManager.GetStatValue("body") : 0,
-            baseMind = snapshotHasCoreStatBase ? baseMind : playerStatusManager != null ? playerStatusManager.GetStatValue("mind") : 0
+            baseMind = snapshotHasCoreStatBase ? baseMind : playerStatusManager != null ? playerStatusManager.GetStatValue("mind") : 0,
+            goldAmount = goldAmount,
+            maxGoldCapacity = maxGoldCapacity
         };
 
         foreach (KeyValuePair<int, int> entry in countsByItemId.OrderBy(entry => entry.Key))
@@ -153,6 +223,12 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
                 if (item == null)
                     continue;
 
+                if (item.type == ItemType.Currency)
+                {
+                    AddGold(item.currencyValue * quantity);
+                    continue;
+                }
+
                 for (int j = 0; j < quantity; j++)
                     items.Add(item);
             }
@@ -160,6 +236,8 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
 
         RestoreEquippedSnapshot(snapshot.equippedWeapons, equippedWeapons);
         RestoreEquippedSnapshot(snapshot.equippedRelics, equippedRelics);
+        maxGoldCapacity = Mathf.Max(1, snapshot.maxGoldCapacity > 0 ? snapshot.maxGoldCapacity : maxGoldCapacity);
+        goldAmount = Mathf.Clamp(snapshot.goldAmount, 0, maxGoldCapacity);
         RestoreCoreStatBase(snapshot);
     }
 
@@ -538,5 +616,16 @@ public class PlayerInventory : MonoBehaviour, ICombatInventory
             "agilidade" => "agility",
             _ => normalized,
         };
+    }
+
+    public int GetItemCount()
+    {
+        return items.Count;
+    }
+
+    // TODO: Consider making this configurable or based on player progression in the future.
+    public int GetMaxItemCapacity()
+    {
+        return 99;
     }
 }

@@ -24,6 +24,7 @@ public class RunController : MonoBehaviour
 
         if (playerMovement == null)
             playerMovement = FindObjectOfType<PlayerGridMovement>();
+            
         if (fadeEffect == null)
             fadeEffect = FindObjectOfType<Fade>();
     }

@@ -19,11 +19,6 @@ public class InventoryView : MonoBehaviour
 
     public event Action<ItemSO, InventoryItemAction, InventoryItemLocation> OnInteractWithInventoryItem;
 
-    // TODO: remove start after tests
-    private void Start()
-    {
-    }
-
     private void OnEnable()
     {
         if (closeButton != null)

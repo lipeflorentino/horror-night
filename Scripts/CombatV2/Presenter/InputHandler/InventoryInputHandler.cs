@@ -3,16 +3,38 @@ using UnityEngine;
 public class InventoryInputHandler : MonoBehaviour
 {
     [SerializeField] private InventoryView inventoryView;
-    [SerializeField] private MonoBehaviour playerInventorySource;
     private ICombatInventory playerInventory;
     [SerializeField] private CombatManager Combat;
+    [SerializeField] private PlayerStatusManager playerStatusManager;
+
+    public void GameplayInit()
+    {
+        if (Combat == null)
+            Combat = FindObjectOfType<CombatManager>();
+
+        playerInventory ??= FindObjectOfType<PlayerInventory>();
+
+        if (inventoryView == null)
+            inventoryView = FindObjectOfType<InventoryView>();
+
+        if (playerStatusManager == null)
+            playerStatusManager = FindObjectOfType<PlayerStatusManager>();
+    
+        if (inventoryView != null)
+        {
+            inventoryView.BindInventory(playerInventory);
+            inventoryView.OnInteractWithInventoryItem += HandleItemInteraction;
+        }
+    }
 
     public void Init(CombatManager cm, ICombatInventory inventory)
     {
-        Combat = cm;
+        if (cm != null)
+            Combat = cm;
+
         inventoryView = FindObjectOfType<InventoryView>();
         playerInventory = inventory;
-        playerInventorySource = inventory as MonoBehaviour;
+        
         if (inventoryView != null)
         {
             inventoryView.BindInventory(playerInventory);
@@ -46,7 +68,8 @@ public class InventoryInputHandler : MonoBehaviour
                 break;
         }
 
-        Combat.RefreshCombatUI();
+        if (Combat != null)
+            Combat.RefreshCombatUI();
     }
 
     public void OnUseItem(ItemSO item)

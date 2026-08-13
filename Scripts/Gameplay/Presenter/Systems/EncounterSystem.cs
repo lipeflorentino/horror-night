@@ -40,14 +40,18 @@ public class EncounterSystem : MonoBehaviour
         TriggerEncounterInternal(false, true);
     }
 
+    // TODO: Define a proper way to trigger encounters from tension, this is just a placeholder for now.
     public void TriggerEncounterFromTension()
     {
-        TriggerEncounterInternal(false, false);
+        Logger.Log("[EncounterSystem] Triggering encounter from tension.");
+        // TriggerEncounterInternal(false, false);
     }
 
+    // TODO: Define a proper way to trigger encounters from tension, this is just a placeholder for now.
     public void TriggerForcedEncounter()
     {
-        TriggerEncounterInternal(true, true);
+        Logger.Log("[EncounterSystem] Triggering forced encounter.");
+        // TriggerEncounterInternal(true, true);
     }
 
     private void TriggerEncounterInternal(bool isForced, bool increaseTension)

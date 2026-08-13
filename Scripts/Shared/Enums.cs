@@ -60,7 +60,8 @@ public enum ItemType
     Weapon,
     Consumable,
     Relic,
-    Broken
+    Broken,
+    Currency
 }
 
 public enum PlayerArchetype

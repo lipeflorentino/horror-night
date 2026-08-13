@@ -15,6 +15,8 @@ public class CombatInventory : ICombatInventory
     private int baseBody = -1;
     private int baseMind = -1;
     private bool hasCoreStatBase;
+    private int goldAmount = 0;
+    private int maxGoldCapacity = 999;
 
     public CombatInventory(Battler battler, ItemDatabase itemDatabase, PlayerInventorySnapshot snapshot, int maxWeaponSlots = 2, int maxRelicSlots = 2)
     {
@@ -86,7 +88,9 @@ public class CombatInventory : ICombatInventory
             hasCoreStatBase = snapshotHasCoreStatBase && hasCoreStatBase,
             baseHeart = snapshotHasCoreStatBase ? baseHeart : battler != null ? battler.Heart : 0,
             baseBody = snapshotHasCoreStatBase ? baseBody : battler != null ? battler.Body : 0,
-            baseMind = snapshotHasCoreStatBase ? baseMind : battler != null ? battler.Mind : 0
+            baseMind = snapshotHasCoreStatBase ? baseMind : battler != null ? battler.Mind : 0,
+            goldAmount = goldAmount,
+            maxGoldCapacity = maxGoldCapacity
         };
 
         foreach (KeyValuePair<int, int> entry in countsByItemId)
@@ -121,6 +125,12 @@ public class CombatInventory : ICombatInventory
                 if (item == null || quantity <= 0)
                     continue;
 
+                if (item.type == ItemType.Currency)
+                {
+                    goldAmount = Mathf.Clamp(goldAmount + item.currencyValue * quantity, 0, maxGoldCapacity);
+                    continue;
+                }
+
                 for (int j = 0; j < quantity; j++)
                     items.Add(item);
             }
@@ -128,6 +138,8 @@ public class CombatInventory : ICombatInventory
 
         RestoreEquippedSnapshot(itemDatabase, snapshot.equippedWeapons, equippedWeapons);
         RestoreEquippedSnapshot(itemDatabase, snapshot.equippedRelics, equippedRelics);
+        maxGoldCapacity = Mathf.Max(1, snapshot.maxGoldCapacity > 0 ? snapshot.maxGoldCapacity : maxGoldCapacity);
+        goldAmount = Mathf.Clamp(snapshot.goldAmount, 0, maxGoldCapacity);
         RestoreCoreStatBase(snapshot);
     }
 

@@ -13,12 +13,12 @@ public class RewardService
         if (allItems == null || allItems.Length == 0)
             return loot;
 
-        ItemSO goldCoins = allItems.FirstOrDefault(item => item != null && string.Equals(item.itemName, "Moedas de Ouro", StringComparison.OrdinalIgnoreCase));
+        ItemSO goldCoins = allItems.FirstOrDefault(item => item != null && item.type == ItemType.Currency);
         if (goldCoins != null)
             loot[goldCoins] = Mathf.Max(1, GrantGoldCoinsReward(enemyLevel));
 
         List<ItemSO> candidateItems = allItems
-            .Where(item => item != null && item.weight > 0 && item != goldCoins)
+            .Where(item => item != null && item.weight > 0 && item.type != ItemType.Currency)
             .ToList();
 
         if (candidateItems.Count == 0)

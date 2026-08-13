@@ -35,8 +35,6 @@ Sistemas Gerais (Baixa prioridade / complexo)
         - Configurar drop de artefatos lendários/épicos, Perks e CombatStateCards
     - Sistema de Pergaminhos (loot de tricks)
         - Fazer com que Tricks sejam aprendidos por meio de pergaminhos (loot ou NPCs)
-    - Analisar e ajustar fluxo de itens
-        - Garantir duração, consumo, etc.
     - Meta progressão
         - Árvore de upgrades
 
@@ -53,38 +51,6 @@ Correções / Melhorias (Baixa prioridade / pouco valor)
     - Na Reward View colocar tooltip com descrição dos itens
     - Criar CharacterSO (Nicolas) e gerar o ícone do personagem
     - Slots não preenchidos devem entrar como bloqueados caso o jogador nao tenha todos os slots abertos
-
-Componentes de UI
-
-    - Criar UI de Drawback / BattlerState
-    - Adicionar informações no painel do player (XP e Gold)
-    - (??) Definir outra UI para rolagem de dados do inimigo
-        - Mostrar apenas os dados com o resultado
-    - Ajustar o CombatLogView
-    - Adicionar log de uso de item e outros updates (cooldown, etc.)
-    - Feedback visual de bleeding e outros efeitos (Drawbacks, States)
-    - Feedbacks 
-        - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
-    - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
-
-Sistema de Lore 
-    - Objetivo primario "escapar do limbo salvando o reino da Sombra"
-    - Completar o bestiário para que os Elders desenvolvam o "antidoto" contra a Sombra.
-    - As criaturas são spawnadas conforme condições são satisfeitas (artefatos, itens, stats, nivel, locais, etc)
-    - Algumas criaturas "lendarios/epicas" precisam ser sumonadas usando itens e artefatos
-
-Sistemas de Exploração 
-    - Itens coletaveis "soltos" no mapa para serem obtidos por meio de point and click
-    - Itens especiais possuem requisitos especiais para spawnar
-    - Certos itens so spawnam em certos locais 
-    - Certos locais são desbloqueados após completar missões/tarefas 
-
-Sistemas de Combate
-
-    - Criar nova Perk usando a Skill (AntigravityAI)
-    - Ajustar lógica de Type, Behavior e Style na IA de inimigos
-    - Transformar ações do inimigo em evento (canPlay) e devolver evento (enemyActions)
-    - Jogador pode fugir de combates quando seu nível é maior que o do inimigo (permitindo visualizar as recompensas antes)
     - Estabelecer Tricks para os inimigos
         - Definir Identity Tricks
         - Criar feedback visual/log quando forem utilizadas
@@ -104,31 +70,54 @@ Sistemas de Combate
         - maxLearnedSlots
         - maxCastedSlots
         - maxIdentitySlots
-    - Substituir todos os GetComponent por GetOrAddComponent
 
-🐛 BUGS & FIXES
+Componentes de UI
+    - Adicionar informações no painel do player (XP e Gold)
 
-    - Ajustar tela de Loot (textos, alinhamento, etc.)
-    - Ouro não deve aparecer no slot do inventario de combate 
+Sistema de Lore 
+    - Objetivo primario "escapar do limbo salvando o reino da Sombra"
+    - Completar o bestiário para que os Elders desenvolvam o "antidoto" contra a Sombra.
+    - As criaturas são spawnadas conforme condições são satisfeitas (artefatos, itens, stats, nivel, locais, etc)
+    - Algumas criaturas "lendarios/epicas" precisam ser sumonadas usando itens e artefatos
 
-    (Verificar se ainda ocorre)
-    - No Dice Roll está mantendo as Tiers Bars da rolagem anterior
-
-    (Importante)
+Sistemas de Exploração 
+    - Itens coletaveis "soltos" no mapa para serem obtidos por meio de point and click
+    - Itens especiais possuem requisitos especiais para spawnar
+    - Certos itens so spawnam em certos locais 
+    - Certos locais são desbloqueados após completar missões/tarefas 
     - Forced Encounter não deve disparar imadiatamente um encounter 
         - deve modificar o evento da proxima casa visitada para um encounter 
         - evitar sobreposição de eventos 
-
-    - Verificar Trick/Perk adrenaline surge (aplicação de dados extras)
     
+    - Reestruturar a Gameplay (manager -> handler -> view)
 
+Sistemas de Combate
+    - Criar nova Perk usando a Skill (AntigravityAI)
+    - Ajustar lógica de Type, Behavior e Style na IA de inimigos
+    - Transformar ações do inimigo em evento (canPlay) e devolver evento (enemyActions)
+    - Jogador pode fugir de combates quando seu nível é maior que o do inimigo (permitindo visualizar as recompensas antes)
+
+🐛 BUGS & FIXES
+
+    -
+    
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
     - 
+
+Refatorações
+    - Substituir todos os GetComponent por GetOrAddComponent
+    - Ajustar o CombatLogView
+    - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
         
     
 TASKS
-    - Varificar ordem de precedencia de dados por rolagem 
-        - Acc: mind, heart, body 
-        - Pow: body, heart, mind 
+    - Analisar e ajustar fluxo de itens
+        - Garantir duração, consumo, etc.
+    - Adicionar log de uso de item e outros updates (cooldown, etc.)
+    - Feedback visual de bleeding e outros efeitos (Drawbacks, States)
+    - Feedbacks 
+        - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
+    - Verificar Sistema/UI de Drawback / BattlerState
+    - Restruturar o CombatInputHanlder, parece grande e confuso

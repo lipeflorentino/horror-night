@@ -48,7 +48,16 @@ public class LootCSVImporter
             string statBonus = values[7];
             string specialEffect = values[8];
             ItemType itemType = (ItemType)System.Enum.Parse(typeof(ItemType), values[9]);
+            int currencyValue = 0;
+            if (itemType == ItemType.Currency)
+            {
+                currencyValue = 1;
+            }
             
+            int durability = -1;
+            if (values.Length > 10 && int.TryParse(values[10], out int parsedDurability))
+                durability = parsedDurability;
+
             string assetPath = outputFolder + id + ".asset";
 
             ItemSO item = AssetDatabase.LoadAssetAtPath<ItemSO>(assetPath);
@@ -68,6 +77,8 @@ public class LootCSVImporter
             item.statBonus = statBonus;
             item.specialEffect = specialEffect;
             item.type = itemType;
+            item.currencyValue = currencyValue;
+            item.durability = durability;
             item.icon = sprite;
 
             EditorUtility.SetDirty(item);

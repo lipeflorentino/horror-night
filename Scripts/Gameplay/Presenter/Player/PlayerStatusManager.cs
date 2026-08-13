@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(PlayerInventory))]
 public class PlayerStatusManager : MonoBehaviour
@@ -14,6 +15,8 @@ public class PlayerStatusManager : MonoBehaviour
     [SerializeField] private TMP_Text mindStatText;
     [SerializeField] private TMP_Text heartStatText;
     [SerializeField] private TMP_Text bodyStatText;
+    [SerializeField] private TMP_Text goldStatText;
+    [SerializeField] private TMP_Text inventoryStatText;
 
     [Header("Archetype")]
     [SerializeField] private PlayerArchetype initialArchetype = PlayerArchetype.Standard;
@@ -64,6 +67,7 @@ public class PlayerStatusManager : MonoBehaviour
             character.ApplyDefaults();
 
         ApplyCharacterDefaults();
+        
         currentArchetype = initialArchetype;
         maxHeart = ClampCoreStatMax(maxHeart);
         maxBody = ClampCoreStatMax(maxBody);
@@ -74,6 +78,8 @@ public class PlayerStatusManager : MonoBehaviour
         currentHp = Mathf.Clamp(currentHp, 0f, maxHp);
 
         RefreshAllBars();
+        RefreshGoldDisplay();
+        RefreshInventoryDisplay();
     }
 
     private void Start()
@@ -296,14 +302,14 @@ public class PlayerStatusManager : MonoBehaviour
         maxDices = Mathf.Max(1, snapshot.maxDices > 0 ? snapshot.maxDices : maxDices);
         currentArchetype = snapshot.currentArchetype;
         archetypePoints = snapshot.archetypePoints;
-        
+
         if (playerInventory != null)
             playerInventory.RestoreSnapshot(snapshot.inventory);
-            
+
         trickInventorySnapshot = TrickInventorySnapshot.CreatePersistentSnapshot(snapshot.trickInventory);
         RefreshAllBars();
+        RefreshGoldDisplay();
     }
-
 
     private void ApplyCharacterDefaults()
     {
@@ -341,6 +347,22 @@ public class PlayerStatusManager : MonoBehaviour
         heartStatText.text = currentHeart.ToString("F0");
         mindStatText.text = currentMind.ToString("F0");
         bodyStatText.text = currentBody.ToString("F0");
+    }
+
+    public void RefreshGoldDisplay()
+    {
+        if (goldStatText == null || playerInventory == null)
+            return;
+
+        goldStatText.text = $"{playerInventory.GetGoldAmount()}";
+    }
+
+    public void RefreshInventoryDisplay()
+    {
+        if (inventoryStatText == null || playerInventory == null)
+            return;
+
+        inventoryStatText.text = $"{playerInventory.GetItemCount()}";
     }
 
     private static float ClampCoreStat(float value, float maxValue)

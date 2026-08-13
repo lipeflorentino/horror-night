@@ -13,5 +13,6 @@ public class ItemSO : ScriptableObject
     public string statBonus = "none";
     public string specialEffect = "none";
     public ItemType type = ItemType.Consumable;
+    public int currencyValue = 0;
     public int durability = -1;
 }

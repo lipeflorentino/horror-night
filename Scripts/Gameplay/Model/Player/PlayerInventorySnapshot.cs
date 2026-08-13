@@ -12,6 +12,8 @@ public class PlayerInventorySnapshot
     public int baseMind;
     public List<EquippedItemSnapshot> equippedWeapons;
     public List<EquippedItemSnapshot> equippedRelics;
+    public int goldAmount;
+    public int maxGoldCapacity;
 }
 
 [Serializable]
