@@ -83,6 +83,7 @@ Sistema de Lore
 Sistemas de Exploração 
     - Itens coletaveis "soltos" no mapa para serem obtidos por meio de point and click
     - Itens especiais possuem requisitos especiais para spawnar
+    - Item que aumenta ataque não está sendo indicado como delta no CombatInfoUI (restruturar item management)
     - Certos itens so spawnam em certos locais 
     - Certos locais são desbloqueados após completar missões/tarefas 
     - Forced Encounter não deve disparar imadiatamente um encounter 
@@ -108,6 +109,7 @@ Sistemas de Combate
     - Ao encerrar o combate e iniciar novamente, os tiers e thresholds passam a usar os valores current e não o base inicial que deve puxar do CharacterSO.
 
 Refatorações
+    - Tela de reward, fazer um drop de itens e coleta manual com pointer
     - Substituir todos os GetComponent por GetOrAddComponent
     - Ajustar o CombatLogView
     - Rever tooltips da ActiveTricks e PassiveTricks (unificar com tooltipUI + tooltipable)
@@ -125,4 +127,3 @@ TASKS
     - Verificar funcionamento das Tricks/Perks 
         - BrutalForce e AnalyticPrecision
     - Restruturar o CombatInputHanlder, parece grande e confuso
-    - Item que aumenta ataque não está sendo indicado como delta no CombatInfoUI

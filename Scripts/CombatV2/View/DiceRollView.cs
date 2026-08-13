@@ -316,23 +316,12 @@ public class DiceRollView : MonoBehaviour
         if (candidate.Value != currentBest.Value)
             return candidate.Value > currentBest.Value;
 
-        int candidatePriority = GetStatPriority(candidate.StatType);
-        int currentPriority = GetStatPriority(currentBest.StatType);
+        int candidatePriority = CombatRules.GetStatPriority(candidate.StatType, candidate.RollType);
+        int currentPriority = CombatRules.GetStatPriority(currentBest.StatType, currentBest.RollType);
         if (candidatePriority != currentPriority)
             return candidatePriority > currentPriority;
 
         return false;
-    }
-
-    private int GetStatPriority(DiceStatType statType)
-    {
-        return statType switch
-        {
-            DiceStatType.Mind => 3,
-            DiceStatType.Heart => 2,
-            DiceStatType.Body => 1,
-            _ => 0
-        };
     }
 
     public void HidePanel()

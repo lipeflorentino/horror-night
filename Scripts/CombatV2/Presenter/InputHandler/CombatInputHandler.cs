@@ -2,26 +2,42 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Responsável apenas por receber o input do jogador, validar se a ação é permitida no estado atual,
+/// e solicitar atualizações à View ou enviar o comando final ao CombatManager.
+/// </summary>
 public class CombatInputHandler : MonoBehaviour
 {
+    // ==========================================
+    // SESSÃO: DEPENDÊNCIAS E ESTADO
+    // ==========================================
+    [Header("Dependencies")]
     [SerializeField] private CombatManager Combat;
     [SerializeField] private DiceAllocationView diceAllocationView;
+
+    // Estado da seleção atual do jogador (Model do Input)
     private readonly List<DiceStatType> PowerDiceTypes = new();
     private readonly List<DiceStatType> AccuracyDiceTypes = new();
+    
     private ActionType? SelectedAction = null;
     private ActionType AllowedAction = ActionType.Attack;
-    private bool IsWaitingTurnResolution = false;
+    
     private DiceStatType SelectedPowerDiceType = DiceStatType.Body;
     private DiceStatType SelectedAccuracyDiceType = DiceStatType.Mind;
+    
+    private bool IsWaitingTurnResolution = false;
+
+    // ==========================================
+    // SESSÃO: INICIALIZAÇÃO E CICLO DE VIDA
+    // ==========================================
+    public void Init(CombatManager cm)
+    {
+        Combat = cm;
+    }
 
     public void BindDiceAllocationView(DiceAllocationView view)
     {
-        if (diceAllocationView != null)
-        {
-            diceAllocationView.ConfirmClicked -= OnConfirmAction;
-            diceAllocationView.ThresholdStrategyChanged -= OnThresholdStrategySelected;
-        }
-
+        UnbindCurrentView();
         diceAllocationView = view;
 
         if (diceAllocationView != null)
@@ -33,7 +49,7 @@ public class CombatInputHandler : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    private void UnbindCurrentView()
     {
         if (diceAllocationView != null)
         {
@@ -42,53 +58,26 @@ public class CombatInputHandler : MonoBehaviour
         }
     }
 
-    public void OnThresholdStrategySelected(CombatRules.ThresholdStrategy strategy)
+    private void OnDestroy()
     {
-        CombatRules.SetPlayerStrategy(strategy);
-        RefreshDiceAllocationUI();
+        UnbindCurrentView();
     }
 
-    public void Init(CombatManager cm)
-    {
-        Combat = cm;
-    }
-
-    public void UpdateCombatView()
-    {
-        Combat.View.UpdateView(Combat.Player, Combat.Enemy);
-    }
-
-    public void RefreshDiceAllocationUI()
-    {
-        RefreshSelectionPreview();
-        RefreshDiceButtons();
-        UpdateConfirmAvailability();
-    }
-
+    // ==========================================
+    // SESSÃO: RECEPÇÃO DE INPUTS DA VIEW (AÇÕES)
+    // ==========================================
     public void SetAllowedAction(ActionType allowedAction)
     {
         AllowedAction = allowedAction;
-        SelectedAction = null;
-        IsWaitingTurnResolution = false;
-        PowerDiceTypes.Clear();
-        AccuracyDiceTypes.Clear();
-        SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
+        ResetSelectionState();
+        
         diceAllocationView.HideAllocationPanel();
-
-        RefreshSelectionPreview();
-        RefreshDiceButtons();
-        UpdateCombatView();
-        UpdateConfirmAvailability();
+        RefreshAllUI();
     }
 
     public void OnSelectAttack()
     {
-        if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Attack)
-        {
-            Debug.Log("[Input] Attack is disabled for this turn role");
-            return;
-        }
+        if (IsWaitingTurnResolution || AllowedAction != ActionType.Attack) return;
 
         SelectedAction = ActionType.Attack;
         diceAllocationView.ShowAllocationPanel("Attack");
@@ -97,12 +86,7 @@ public class CombatInputHandler : MonoBehaviour
 
     public void OnSelectDefend()
     {
-        if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Defense)
-        {
-            Debug.Log("[Input] Defense is disabled for this turn role");
-            return;
-        }
+        if (IsWaitingTurnResolution || AllowedAction != ActionType.Defense) return;
 
         SelectedAction = ActionType.Defense;
         diceAllocationView.ShowAllocationPanel("Defense");
@@ -111,9 +95,7 @@ public class CombatInputHandler : MonoBehaviour
 
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
-        if (IsWaitingTurnResolution) return;
-        if (!CanAddDiceToRoll()) return;
-        if (!CanUseDiceType(diceStatType)) return;
+        if (IsWaitingTurnResolution || !CanAddDiceToRoll() || !CanUseDiceType(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
@@ -126,49 +108,47 @@ public class CombatInputHandler : MonoBehaviour
             AccuracyDiceTypes.Add(SelectedAccuracyDiceType);
         } 
             
-        RefreshSelectionPreview();
-        UpdateCombatView();
-        RefreshDiceButtons();
-        UpdateConfirmAvailability();
+        RefreshAllUI();
     }
 
     public void OnRemoveDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
         if (IsWaitingTurnResolution) return;
-        if (diceRollType == DiceRollType.Power)
+
+        if (diceRollType == DiceRollType.Power && PowerDiceTypes.Count > 0)
         {
-            if (PowerDiceTypes.Count <= 0) return;
             PowerDiceTypes.Remove(diceStatType);
         }
-        else
+        else if (diceRollType == DiceRollType.Accuracy && AccuracyDiceTypes.Count > 0)
         {
-            if (AccuracyDiceTypes.Count <= 0) return;
             AccuracyDiceTypes.Remove(diceStatType);
         }
 
-        RefreshSelectionPreview();
-        UpdateCombatView();
-        RefreshDiceButtons();
-        UpdateConfirmAvailability();
+        RefreshAllUI();
     }
 
+    public void OnThresholdStrategySelected(CombatRules.ThresholdStrategy strategy)
+    {
+        CombatRules.SetPlayerStrategy(strategy);
+        RefreshAllUI(); // Agora encapsula a atualização geral
+    }
+
+    public void OnSelectInfoPanel()
+    {
+        Combat.View.SetInfoPanelVisible();
+    }
+
+    // ==========================================
+    // SESSÃO: COMANDOS DE RESOLUÇÃO DE TURNO
+    // ==========================================
     public void OnConfirmAction()
     {
-        if (IsWaitingTurnResolution) return;
-        if (SelectedAction == null)
-        {
-            Debug.Log("[Input] No action selected");
-            return;
-        }
-
-        if (PowerDiceTypes.Count <= 0 || AccuracyDiceTypes.Count <= 0)
-        {
-            Debug.Log("[Input] Both Power and Accuracy need at least one dice");
-            return;
-        }
+        if (IsWaitingTurnResolution || SelectedAction == null) return;
+        if (PowerDiceTypes.Count <= 0 || AccuracyDiceTypes.Count <= 0) return;
 
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerInput(SelectedAction.Value, new List<DiceStatType>(PowerDiceTypes), new List<DiceStatType>(AccuracyDiceTypes));
+        
         SelectedAction = null;
         diceAllocationView.HideAllocationPanel();
         UpdateConfirmAvailability();
@@ -176,24 +156,28 @@ public class CombatInputHandler : MonoBehaviour
 
     public void OnSkipTurn()
     {
-        if (IsWaitingTurnResolution) return;
-        if (AllowedAction != ActionType.Attack) return;
+        if (IsWaitingTurnResolution || AllowedAction != ActionType.Attack) return;
 
-        SelectedAction = null;
-        PowerDiceTypes.Clear();
-        AccuracyDiceTypes.Clear();
+        ResetSelectionState();
         diceAllocationView.HideAllocationPanel();
         RefreshSelectionPreview();
 
         IsWaitingTurnResolution = true;
         Combat.ReceivePlayerSkipTurn();
+        
         RefreshDiceButtons();
         UpdateConfirmAvailability();
     }
 
-    public void OnSelectInfoPanel()
+    // ==========================================
+    // SESSÃO: ORQUESTRAÇÃO DE VIEW (ATUALIZAÇÕES)
+    // ==========================================
+    public void RefreshAllUI()
     {
-        Combat.View.SetInfoPanelVisible();
+        RefreshSelectionPreview();
+        RefreshDiceButtons();
+        UpdateConfirmAvailability();
+        Combat.View.UpdateView(Combat.Player, Combat.Enemy);
     }
 
     private void UpdateConfirmAvailability()
@@ -205,96 +189,45 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshDiceButtons()
     {
-        if (Combat.View.DiceAllocationView == null)
-            return;
+        if (Combat.View.DiceAllocationView == null) return;
 
         bool canAllocate = !IsWaitingTurnResolution;
 
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
-            bool canAddPower = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
-            bool canAddAccuracy = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
+            bool canAdd = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
 
-            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
-                stat,
-                DiceRollType.Power,
-                canAddPower
-            );
-
-            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(
-                stat,
-                DiceRollType.Accuracy,
-                canAddAccuracy
-            );
+            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(stat, DiceRollType.Power, canAdd);
+            Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(stat, DiceRollType.Accuracy, canAdd);
             
-            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(
-                stat,
-                DiceRollType.Power,
-                PowerDiceTypes.Contains(stat)
-            );
-
-            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(
-                stat,
-                DiceRollType.Accuracy,
-                AccuracyDiceTypes.Contains(stat)
-            );
+            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(stat, DiceRollType.Power, PowerDiceTypes.Contains(stat));
+            Combat.View.DiceAllocationView.SetRemoveDiceButtonInteractable(stat, DiceRollType.Accuracy, AccuracyDiceTypes.Contains(stat));
 
             Combat.View.DiceAllocationView.SetAllocatorCount(stat, DiceRollType.Power, PowerDiceTypes.FindAll(x => x == stat).Count);
             Combat.View.DiceAllocationView.SetAllocatorCount(stat, DiceRollType.Accuracy, AccuracyDiceTypes.FindAll(x => x == stat).Count);
         }
     }
 
-    private bool CanUseDiceType(DiceStatType diceType)
-    {
-        return GetDiceMaxValueForType(diceType) > 0;
-    }
-
-    private int GetAllocatedStatCount(DiceStatType stat)
-    {
-        return PowerDiceTypes.FindAll(x => x == stat).Count + AccuracyDiceTypes.FindAll(x => x == stat).Count;
-    }
-
-    /// <summary>
-    /// Extras além disso consomem <see cref="Battler.CurrentActionDices"/> — mesma regra de <see cref="DiceService.RollMany"/>.
-    /// </summary>
-    private bool CanAddDiceToRoll()
-    {
-        return GetRemainingDiceCount() > 0;
-    }
-
-    private int GetRemainingDiceCount()
-    {
-        int totalAllocated = PowerDiceTypes.Count + AccuracyDiceTypes.Count;
-        return Mathf.Max(0, Combat.Player.CurrentActionDices - totalAllocated);
-    }
-
-    private DiceStatType GetFirstAvailableDiceType()
-    {
-        if (CanUseDiceType(DiceStatType.Body)) return DiceStatType.Body;
-        if (CanUseDiceType(DiceStatType.Heart)) return DiceStatType.Heart;
-        if (CanUseDiceType(DiceStatType.Mind)) return DiceStatType.Mind;
-
-        return DiceStatType.Body;
-    }
-
     private void RefreshSelectionPreview()
     {
-        if (Combat == null || Combat.View == null || Combat.View.DiceAllocationView == null)
-            return;
+        if (Combat?.View?.DiceAllocationView == null) return;
 
+        // 1. Base Stats Update
         Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
 
-        (List<DiceStatType> powerTypes, List<int> powerFaces, _) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
-        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces, _) = Combat.GetDiceService().ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
+        // 2. Coleta de Dados via Serviços
+        var diceService = Combat.GetDiceService();
+        (List<DiceStatType> powerTypes, List<int> powerFaces, _) = diceService.ConvertToFacesWithTypes(Combat.Player, PowerDiceTypes);
+        (List<DiceStatType> accuracyTypes, List<int> accuracyFaces, _) = diceService.ConvertToFacesWithTypes(Combat.Player, AccuracyDiceTypes);
         
-        (int powerMaxValue, DiceStatType powerPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(powerTypes, powerFaces);
-        (int accuracyMaxValue, DiceStatType accuracyPrimaryStat) = GetPreviewMaxValueAndPrimaryStat(accuracyTypes, accuracyFaces);
+        // USO DO NOVO CALCULATOR EXTERNO
+        (int powerMax, DiceStatType powerPrimStat) = DicePreviewCalculator.GetPreviewMaxValueAndPrimaryStat(powerTypes, powerFaces, DiceRollType.Power);
+        (int accMax, DiceStatType accPrimStat) = DicePreviewCalculator.GetPreviewMaxValueAndPrimaryStat(accuracyTypes, accuracyFaces, DiceRollType.Accuracy);
         
-        (int lowMax, int mediumMax, int highMin, int maxValue) powerBoundaries = GetPlayerTierBoundaries(powerMaxValue, powerPrimaryStat, DiceRollType.Power, PowerDiceTypes.Count);
-        (int lowMax, int mediumMax, int highMin, int maxValue) accuracyBoundaries = GetPlayerTierBoundaries(accuracyMaxValue, accuracyPrimaryStat, DiceRollType.Accuracy, AccuracyDiceTypes.Count);
+        var powerBoundaries = Combat.GetPlayerTierBoundaries(powerMax, powerPrimStat, DiceRollType.Power, PowerDiceTypes.Count);
+        var accuracyBoundaries = Combat.GetPlayerTierBoundaries(accMax, accPrimStat, DiceRollType.Accuracy, AccuracyDiceTypes.Count);
         
-        int baseActionPower = Combat.GetEffectivePlayerActionPower();
-
+        // 3. Montagem do Contexto e Envio para a View
         Dictionary<DiceStatType, int> statTargets = new()
         {
             { DiceStatType.Mind, Combat.Player.GetBaseStatValue(DiceStatType.Mind) },
@@ -303,89 +236,60 @@ public class CombatInputHandler : MonoBehaviour
         };
         
         DiceAllocationContext previewData = DiceAllocationCalculator.CalculatePreview(
-            baseActionPower: baseActionPower,
-            powerDiceTypes: powerTypes,
-            powerFaces: powerFaces,
-            accuracyDiceTypes: accuracyTypes,
-            accuracyFaces: accuracyFaces,
-            powerTierBoundaries: powerBoundaries,
-            accuracyTierBoundaries: accuracyBoundaries,
-            statBaseTargets: statTargets,
-            powerPrimaryStat: powerPrimaryStat,
+            baseActionPower: Combat.GetEffectivePlayerActionPower(),
+            powerDiceTypes: powerTypes, powerFaces: powerFaces,
+            accuracyDiceTypes: accuracyTypes, accuracyFaces: accuracyFaces,
+            powerTierBoundaries: powerBoundaries, accuracyTierBoundaries: accuracyBoundaries,
+            statBaseTargets: statTargets, powerPrimaryStat: powerPrimStat,
             allocatedPowerDiceCount: PowerDiceTypes.Count
         );
         
         Combat.View.DiceAllocationView.UpdateSelectionPreview(previewData);
 
+        // 4. Custos e Displays Finais
         Dictionary<DiceStatType, int> allocationCosts = new()
         {
             { DiceStatType.Mind, GetAllocatedStatCount(DiceStatType.Mind) },
             { DiceStatType.Heart, GetAllocatedStatCount(DiceStatType.Heart) },
             { DiceStatType.Body, GetAllocatedStatCount(DiceStatType.Body) },
         };
+
         Combat.View.DiceAllocationView.UpdateAllocationCostFeedback(allocationCosts);
         Combat.View.DiceAllocationView.UpdateDicePoolDisplay(
-            Combat.Player.CurrentActionDices,
-            Combat.Player.MaxDices,
-            PowerDiceTypes.Count,
-            AccuracyDiceTypes.Count);
+            Combat.Player.CurrentActionDices, Combat.Player.MaxDices, 
+            PowerDiceTypes.Count, AccuracyDiceTypes.Count);
     }
 
-    private static (int maxValue, DiceStatType primaryStat) GetPreviewMaxValueAndPrimaryStat(IReadOnlyList<DiceStatType> diceTypes, IReadOnlyList<int> faces)
+    // ==========================================
+    // SESSÃO: REGRAS DE VALIDAÇÃO (HELPERS LOCAIS)
+    // ==========================================
+    private void ResetSelectionState()
     {
-        if (diceTypes == null || faces == null || diceTypes.Count == 0 || faces.Count == 0)
-            return (1, DiceStatType.Body);
-
-        Dictionary<DiceStatType, int> maxValueByStat = new();
-        int itemCount = Mathf.Min(diceTypes.Count, faces.Count);
-
-        for (int i = 0; i < itemCount; i++)
-        {
-            DiceStatType statType = diceTypes[i];
-            int faceValue = Mathf.Max(1, faces[i]);
-            maxValueByStat[statType] = maxValueByStat.TryGetValue(statType, out int currentValue)
-                ? currentValue + faceValue
-                : faceValue;
-        }
-
-        int selectedMaxValue = 1;
-        DiceStatType selectedStat = DiceStatType.Body;
-
-        foreach (KeyValuePair<DiceStatType, int> pair in maxValueByStat)
-        {
-            if (pair.Value > selectedMaxValue || (pair.Value == selectedMaxValue && GetStatPriority(pair.Key) > GetStatPriority(selectedStat)))
-            {
-                selectedMaxValue = pair.Value;
-                selectedStat = pair.Key;
-            }
-        }
-
-        return (Mathf.Max(1, selectedMaxValue), selectedStat);
+        SelectedAction = null;
+        IsWaitingTurnResolution = false;
+        PowerDiceTypes.Clear();
+        AccuracyDiceTypes.Clear();
+        SelectedPowerDiceType = SelectedAccuracyDiceType = GetFirstAvailableDiceType();
     }
 
-    private static int GetStatPriority(DiceStatType statType)
+    private bool CanUseDiceType(DiceStatType diceType) => GetDiceMaxValueForType(diceType) > 0;
+
+    private bool CanAddDiceToRoll() => GetRemainingDiceCount() > 0;
+
+    private int GetRemainingDiceCount() => Mathf.Max(0, Combat.Player.CurrentActionDices - (PowerDiceTypes.Count + AccuracyDiceTypes.Count));
+
+    private int GetAllocatedStatCount(DiceStatType stat) => PowerDiceTypes.FindAll(x => x == stat).Count + AccuracyDiceTypes.FindAll(x => x == stat).Count;
+
+    private DiceStatType GetFirstAvailableDiceType()
     {
-        return statType switch
-        {
-            DiceStatType.Mind => 3,
-            DiceStatType.Heart => 2,
-            DiceStatType.Body => 1,
-            _ => 0
-        };
+        if (CanUseDiceType(DiceStatType.Body)) return DiceStatType.Body;
+        if (CanUseDiceType(DiceStatType.Heart)) return DiceStatType.Heart;
+        return DiceStatType.Mind;
     }
 
-    public int GetDiceMaxValueForType(DiceStatType diceType)
-    {
-        return Combat.GetDiceService().GetDiceMaxValueForType(Combat.Player, diceType);
-    }
-
-    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes, bool isAggregated = false)
-    {
-        return isAggregated ? Combat.GetDiceService().ConvertToAggregatedFaces(Combat.Player, diceTypes) : Combat.GetDiceService().ConvertToFaces(Combat.Player, diceTypes);
-    }
-
-    public (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(int maxValue, DiceStatType statType, DiceRollType rollType, int allocatedDiceCount = 1)
-    {
-        return Combat.GetPlayerTierBoundaries(maxValue, statType, rollType, allocatedDiceCount);
-    }
+    // Mantidos para compatibilidade externa, embora possam ser delegados no futuro
+    public int GetDiceMaxValueForType(DiceStatType diceType) => Combat.GetDiceService().GetDiceMaxValueForType(Combat.Player, diceType);
+    
+    public List<int> GetDiceFacesForSelection(IReadOnlyList<DiceStatType> diceTypes, bool isAggregated = false) => 
+        isAggregated ? Combat.GetDiceService().ConvertToAggregatedFaces(Combat.Player, diceTypes) : Combat.GetDiceService().ConvertToFaces(Combat.Player, diceTypes);
 }

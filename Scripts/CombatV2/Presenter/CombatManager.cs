@@ -133,7 +133,7 @@ public class CombatManager : MonoBehaviour
     public void RefreshCombatUI()
     {
         View.UpdateView(Player, Enemy);
-        Input.RefreshDiceAllocationUI();
+        Input.RefreshAllUI();
         View.RefreshActiveTricks();
     }
 

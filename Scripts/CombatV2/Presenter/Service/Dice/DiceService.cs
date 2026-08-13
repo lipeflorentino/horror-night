@@ -86,34 +86,12 @@ public class DiceService
         if (candidate.Value != currentBest.Value)
             return candidate.Value > currentBest.Value;
 
-        int candidatePriority = GetStatPriority(candidate.StatType, candidate.RollType);
-        int currentPriority = GetStatPriority(currentBest.StatType, currentBest.RollType);
+        int candidatePriority = CombatRules.GetStatPriority(candidate.StatType, candidate.RollType);
+        int currentPriority = CombatRules.GetStatPriority(currentBest.StatType, currentBest.RollType);
         if (candidatePriority != currentPriority)
             return candidatePriority > currentPriority;
 
         return false;
-    }
-
-    private int GetStatPriority(DiceStatType statType, DiceRollType rollType)
-    {
-        return rollType switch
-        {
-            DiceRollType.Accuracy => statType switch
-            {
-                DiceStatType.Mind => 3,
-                DiceStatType.Heart => 2,
-                DiceStatType.Body => 1,
-                _ => 0
-            },
-            DiceRollType.Power => statType switch
-            {
-                DiceStatType.Body => 3,
-                DiceStatType.Heart => 2,
-                DiceStatType.Mind => 1,
-                _ => 0
-            },
-            _ => 0
-        };
     }
 
     public List<DiceResult> RollMany(Battler battler, IReadOnlyList<DiceStatType> diceTypes, DiceRollType rollType, int attackerLevel = 1, int defenderLevel = 1)

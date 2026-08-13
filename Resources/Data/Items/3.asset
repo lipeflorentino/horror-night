@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   id: 3
-  itemName: 50 Moedas De Ouro
+  itemName: Moeda De Ouro
   description: ' Moedas de ouro usadas para comprar itens em lojas.'
-  weight: 20
+  weight: 100
   rarity: 0
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 54513873d617dd044afa2fc0364df1a6, type: 3}
   levelRequirement: 1
   statBonus: currency:50
   specialEffect: none

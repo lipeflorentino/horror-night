@@ -163,4 +163,26 @@ public static class CombatRules
             _ => 0
         };
     }
+
+    public static int GetStatPriority(DiceStatType statType, DiceRollType rollType)
+    {
+        return rollType switch
+        {
+            DiceRollType.Accuracy => statType switch
+            {
+                DiceStatType.Mind => 3,
+                DiceStatType.Heart => 2,
+                DiceStatType.Body => 1,
+                _ => 0
+            },
+            DiceRollType.Power => statType switch
+            {
+                DiceStatType.Body => 3,
+                DiceStatType.Heart => 2,
+                DiceStatType.Mind => 1,
+                _ => 0
+            },
+            _ => 0
+        };
+    }
 }
