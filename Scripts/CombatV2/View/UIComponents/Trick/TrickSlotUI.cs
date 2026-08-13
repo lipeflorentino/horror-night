@@ -119,8 +119,7 @@ public class TrickSlotUI : MonoBehaviour
                 }
                 else if (!isEmpty)
                 {
-                    tooltipMessage = "Ready to cast";
-                    tooltipColor = TooltipUI.TooltipColor.Blue;
+                    tooltipMessage = "Ready to cast " + $"<color={Colorization.GetRarityColor(trick.Rarity)}>{trick.DisplayName}</color>";
                 }
                 break;
 
@@ -130,8 +129,7 @@ public class TrickSlotUI : MonoBehaviour
 
                 if (isActive)
                 {
-                    tooltipMessage = "Ready to trigger";
-                    tooltipColor = TooltipUI.TooltipColor.Blue; 
+                    tooltipMessage = "Ready to trigger " + $"<color={Colorization.GetRarityColor(trick.Rarity)}>{trick.DisplayName}</color>";
                 }
                 else if (isCoolingDown)
                 {
@@ -148,8 +146,7 @@ public class TrickSlotUI : MonoBehaviour
             default: // IdentitySlot
                 if (!isEmpty)
                 {
-                    tooltipMessage = "Ready to trigger";
-                    tooltipColor = TooltipUI.TooltipColor.Blue;
+                    tooltipMessage = "Ready to trigger " + $"<color={Colorization.GetRarityColor(trick.Rarity)}>{trick.DisplayName}</color>";
                 }
                 else
                 {

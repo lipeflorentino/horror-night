@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: endurance_charge
   DefaultDurationTurns: -1
-  MaxStacks: 5
+  MaxStacks: 6
   StackMode: 1
   Tags: 
   Rule:
@@ -23,7 +23,7 @@ MonoBehaviour:
     Operation: 0
     OwnerRole: 0
     ActionType: 1
-    FilterByActionType: 1
+    FilterByActionType: 0
     RollType: 0
     FilterByRollType: 0
     StatType: 2

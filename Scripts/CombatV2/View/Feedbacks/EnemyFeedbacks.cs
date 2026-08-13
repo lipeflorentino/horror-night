@@ -138,10 +138,7 @@ public class EnemyFeedbacks : MonoBehaviour
 
     private void AnimateActionLog(string text, bool isAttackFeedback)
     {
-        Logger.Log($"[Feedback] {text}");
-
         Color textColor = isAttackFeedback ? attackFeedbackColor : defenseFeedbackColor;
-        string damageTextColor = "#FFD700";
         enemyStatusText.color = textColor;
         
         if (Regex.IsMatch(text, @"[+-]\d+"))
@@ -149,8 +146,7 @@ public class EnemyFeedbacks : MonoBehaviour
             int bonusIndex = text.IndexOfAny(new char[] { '+', '-' });
             
             string baseText = text[..bonusIndex];
-            string bonusText = text[bonusIndex..];
-            enemyStatusText.text = $"{baseText}<color={damageTextColor}>{bonusText}</color>";
+            enemyStatusText.text = $"{baseText} damage";
         }
         else
         {

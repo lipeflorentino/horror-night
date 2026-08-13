@@ -100,13 +100,12 @@ Sistemas de Combate
 
 🐛 BUGS & FIXES
 
-    -
+    - Ao trigar endurance com 1 carga cheia, esta pulando de 1 para 3 cargas 
     
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
-    - Não está ganhando ouro 
-    - Ao encerrar o combate e iniciar novamente, os tiers e thresholds passam a usar os valores current e não o base inicial que deve puxar do CharacterSO.
+    - 
 
 Refatorações
     - Tela de reward, fazer um drop de itens e coleta manual com pointer
@@ -124,5 +123,6 @@ TASKS
     - Feedbacks 
         - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
     - Verificar Sistema/UI de Drawback / BattlerState
-    - Verificar funcionamento das Tricks/Perks 
-        - BrutalForce e AnalyticPrecision
+
+    - Icone do ActionLog está hardcoded
+    - Mudar Result preview para ação de defesa, os textos não fazem sentido para defesa

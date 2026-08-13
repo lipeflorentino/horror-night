@@ -74,6 +74,7 @@ public class EncounterSystem : MonoBehaviour
         snapshot.trickInventory.AddLearnedTrickId("adrenaline_surge");
         snapshot.trickInventory.AddLearnedTrickId("vengeance");
         snapshot.trickInventory.AddLearnedTrickId("endurance");
+        snapshot.trickInventory.AddLearnedTrickId("terrifying_presence");
         
         CombatSessionData sessionData = new()
         {

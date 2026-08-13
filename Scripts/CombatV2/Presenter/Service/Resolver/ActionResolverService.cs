@@ -87,8 +87,6 @@ public class ActionResolverService
         result.IgnoreDefense = ignoreDefense;
         result.PowerMaxSource = powerMaxSource;
         result.ResolutionVariation = ResolveVariation(result);
-        result.DamageBonus = CombatRules.GetDamageBonus(result.ResolutionVariation);
-        damage = Mathf.Max(0, damage + result.DamageBonus);
 
         bool isDefensiveReductionVariation = result.ResolutionVariation == ActionResolutionVariation.IronWall ||
             result.ResolutionVariation == ActionResolutionVariation.Stronghold;
@@ -108,8 +106,9 @@ public class ActionResolverService
             EvaluateTriggers(attacker, target, attack, defense, result);
             return result;
         }
-
-        result.Damage = damage;
+        
+        result.DamageBonus = CombatRules.GetDamageBonus(result.ResolutionVariation);
+        result.Damage = Mathf.Max(0, damage + result.DamageBonus);
 
         ApplyFeedback(result);
         EvaluateTriggers(attacker, target, attack, defense, result);

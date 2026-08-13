@@ -23905,8 +23905,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventoryView: {fileID: 0}
-  playerInventorySource: {fileID: 0}
   Combat: {fileID: 0}
+  playerStatusManager: {fileID: 0}
 --- !u!1 &1604385176
 GameObject:
   m_ObjectHideFlags: 0

@@ -29,6 +29,7 @@ public class PerkStateApplicator
 
     public void HandlePerkTriggered(PerkTriggeredEvent evt)
     {
+        Logger.Log($"[PerkStateApplicator] Handling perk triggered event: {evt.PerkId}, {evt.StacksApplied} stacks, target: {evt.ModifierTarget}, value: {evt.AppliedValue}, operation: {evt.Operation}, owner: {evt.Owner?.Name}");
         if (evt.Owner == null) return;
         
         int stacks = Mathf.Max(1, evt.StacksApplied);

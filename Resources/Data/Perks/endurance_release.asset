@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: endurance_release
   DefaultDurationTurns: -1
-  MaxStacks: 3
+  MaxStacks: 9
   StackMode: 0
   Tags: 
   Rule:
     Trigger: 0
     ModifierTarget: 16
-    Operation: 3
+    Operation: 4
     OwnerRole: 0
-    ActionType: 0
+    ActionType: 1
     FilterByActionType: 0
     RollType: 0
     FilterByRollType: 0
