@@ -54,9 +54,9 @@ public class CombatInitializer
             Mathf.RoundToInt(playerSnapshot.focus),
             Mathf.RoundToInt(playerSnapshot.strength),
             Mathf.RoundToInt(playerSnapshot.agility),
-            ClampCoreStat(playerSnapshot.heart, coreStatCap),
-            ClampCoreStat(playerSnapshot.body, coreStatCap),
-            ClampCoreStat(playerSnapshot.mind, coreStatCap)
+            ClampCoreStat(playerSnapshot.maxHeart, coreStatCap),
+            ClampCoreStat(playerSnapshot.maxBody, coreStatCap),
+            ClampCoreStat(playerSnapshot.maxMind, coreStatCap)
         );
 
         if (enemySnapshot != null)

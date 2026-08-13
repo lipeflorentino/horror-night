@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: mind+3
   specialEffect: none
   type: 1
+  currencyValue: 0
   durability: -1

@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: initiative+5:defense+7
   specialEffect: none
   type: 0
-  durability: -1
+  currencyValue: 0
+  durability: 8

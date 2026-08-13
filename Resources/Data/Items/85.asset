@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 904aadd8d61dff44587f61383c85c95a, type: 3}
-  m_Name: 69
+  m_Name: 85
   m_EditorClassIdentifier: 
-  id: 69
-  itemName: Espada Runica de Gelo
-  description: Uma espada marcada por runas de gelo capaz de congelar inimigos.
-  weight: 7
-  rarity: 3
-  icon: {fileID: 21300000, guid: 351f4416a44e3084ebebd96b9a358902, type: 3}
-  levelRequirement: 14
-  statBonus: dexterity+28:attack+15
-  specialEffect: freeze
-  type: 0
-  currencyValue: 0
+  id: 85
+  itemName: 1 Moeda De Ouro
+  description: ' Moedas de ouro usadas para comprar itens em lojas.'
+  weight: 100
+  rarity: 0
+  icon: {fileID: 0}
+  levelRequirement: 1
+  statBonus: currency:1
+  specialEffect: none
+  type: 4
+  currencyValue: 1
   durability: -1

@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: body+6:attack+10
   specialEffect: fracture:bleeding
   type: 0
-  durability: -1
+  currencyValue: 0
+  durability: 15

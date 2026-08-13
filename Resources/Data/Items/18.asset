@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: attack+10
   specialEffect: poison
   type: 0
-  durability: -1
+  currencyValue: 0
+  durability: 20

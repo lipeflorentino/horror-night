@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: dexterity+28:attack+15
   specialEffect: stun
   type: 0
+  currencyValue: 0
   durability: -1

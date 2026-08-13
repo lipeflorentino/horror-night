@@ -21,13 +21,13 @@ MonoBehaviour:
   Body: 8
   Mind: 8
   Hp: 300
-  Attack: 3
-  Defense: 1
+  Attack: 10
+  Defense: 6
   Initiative: 19
   Focus: 3
   Strength: 3
   Agility: 1
-  MaxDices: 3
+  MaxDices: 5
   IdentityTricks:
   - {fileID: 11400000, guid: bfc3bc31bcfb74b43815f71856ededbc, type: 2}
   - {fileID: 11400000, guid: b48c1b21a6ad443469d54441fd65619f, type: 2}

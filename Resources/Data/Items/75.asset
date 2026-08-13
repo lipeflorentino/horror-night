@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: defense+15:mind+10
   specialEffect: magic
   type: 2
-  durability: -1
+  currencyValue: 0
+  durability: 25

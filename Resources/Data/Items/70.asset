@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: speed+14
   specialEffect: none
   type: 2
-  durability: -1
+  currencyValue: 0
+  durability: 20

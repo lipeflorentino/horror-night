@@ -104,7 +104,8 @@ Sistemas de Combate
 
 🔝 HOTFIXES (Maior Prioridade - Comece por aqui!)
 
-    - 
+    - Não está ganhando ouro 
+    - Ao encerrar o combate e iniciar novamente, os tiers e thresholds passam a usar os valores current e não o base inicial que deve puxar do CharacterSO.
 
 Refatorações
     - Substituir todos os GetComponent por GetOrAddComponent
@@ -113,6 +114,7 @@ Refatorações
         
     
 TASKS
+    - Na tabela de LootTable mudar id para string (nome)  
     - Analisar e ajustar fluxo de itens
         - Garantir duração, consumo, etc.
     - Adicionar log de uso de item e outros updates (cooldown, etc.)
@@ -120,4 +122,7 @@ TASKS
     - Feedbacks 
         - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
     - Verificar Sistema/UI de Drawback / BattlerState
+    - Verificar funcionamento das Tricks/Perks 
+        - BrutalForce e AnalyticPrecision
     - Restruturar o CombatInputHanlder, parece grande e confuso
+    - Item que aumenta ataque não está sendo indicado como delta no CombatInfoUI

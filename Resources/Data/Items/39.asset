@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: defense+6:heart+9
   specialEffect: curse
   type: 0
+  currencyValue: 0
   durability: -1

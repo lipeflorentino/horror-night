@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: hp+20:mind-5
   specialEffect: none
   type: 1
+  currencyValue: 0
   durability: -1

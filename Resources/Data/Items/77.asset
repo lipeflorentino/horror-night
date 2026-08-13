@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: hp+5:heart+2
   specialEffect: none
   type: 1
+  currencyValue: 0
   durability: -1

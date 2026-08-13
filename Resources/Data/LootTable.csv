@@ -1,7 +1,7 @@
 Id,Name,Description,IconName,Rarity,Weight,LevelRequirement,StatBonus,SpecialEffect,Type,Durability
 1,Espada Velha,Uma espada de ferro desgastada pelo tempo.,espada_velha,Common,50,1,attack+5,none,Weapon,10
 2,Anel Mágico,Aumenta a capacidade mental do usuário.,anel_magico,Rare,10,5,mind+10,none,Relic,none
-3,Ouro,Ouro do personagem, usado para comprar itens em lojas.,moedas_de_ouro,Common,100,1,none,none,Currency,none
+3,Moedas De Ouro, Moedas de ouro usadas para comprar itens em lojas.,moedas_de_ouro,Common,100,1,none,none,Currency,-1
 4,Cránio Amaldiçoado,Um artefato perigoso envolto em maldição.,cranio_amaldicoado,Epic,5,10,defense+12,curse,Relic,15
 5,Poção de Vida,Restaura parte da vida do usuário.,pocao_de_vida,Common,30,1,hp+20,none,Consumable,none
 6,Tomo Antigo,Contém segredos esquecidos de eras passadas.,tomo_antigo,Rare,15,8,mind+10,none,Relic,none

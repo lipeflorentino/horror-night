@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: attack+30:heart+10
   specialEffect: holy
   type: 0
+  currencyValue: 0
   durability: -1

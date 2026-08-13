@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: mind+26:body+10:heart+14
   specialEffect: none
   type: 1
+  currencyValue: 0
   durability: -1

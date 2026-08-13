@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: attack+5
   specialEffect: none
   type: 2
+  currencyValue: 0
   durability: -1

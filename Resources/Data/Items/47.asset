@@ -22,4 +22,5 @@ MonoBehaviour:
   statBonus: speed+11:attack+10
   specialEffect: reach
   type: 0
+  currencyValue: 0
   durability: -1
