@@ -126,5 +126,3 @@ TASKS
     - Verificar Sistema/UI de Drawback / BattlerState
     - Verificar funcionamento das Tricks/Perks 
         - BrutalForce e AnalyticPrecision
-
-    - Analisar e ajustar parametros de AAgility, Focus e Strength no DiceService
