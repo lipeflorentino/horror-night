@@ -12,7 +12,7 @@ public class CombatDiceRollManager
         PerkService perkService,
         CombatTurnContext combatContext)
     {
-        ActionDefinition playerAction = CombatResolutionManager.BuildDefinitionFromBattler(player, enemy, action, perkService);
+        ActionDefinition playerAction = CombatResolutionManager.BuildDefinitionFromBattler(player, action, perkService);
         ActionType enemyActionType = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction.Definition.Type : combatContext.CurrentTurn.AttackAction.Definition.Type;
 
         List<DiceResult> playerAccuracyRolls = diceService.RollMany(player, enemy, accuracyDiceTypes, action, DiceRollType.Accuracy, player.Level, enemy.Level);
@@ -23,8 +23,8 @@ public class CombatDiceRollManager
         DiceResult playerAccuracyDice = diceService.GetBestResult(playerAccuracyRolls);
         DiceResult enemyAccuracyDice = diceService.GetBestResult(enemyAccuracyRolls);
 
-        int playerExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(player, enemy, playerAccuracyDice, action, out DiceStatType playerExtraStatType);
-        int enemyExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(enemy, player, enemyAccuracyDice, enemyActionType, out DiceStatType enemyExtraStatType);
+        int playerExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(player, playerAccuracyDice, action, out DiceStatType playerExtraStatType);
+        int enemyExtraPowerDice = perkService.GetExtraPowerDiceAfterAccuracy(enemy, enemyAccuracyDice, enemyActionType, out DiceStatType enemyExtraStatType);
 
         List<DiceResult> playerPowerRolls = diceService.RollMany(player, enemy, powerDiceTypes, action, DiceRollType.Power, player.Level, enemy.Level);
         List<DiceResult> enemyPowerRolls = diceService.RollMany(enemy, player, combatContext.PendingEnemyPowerDiceTypes, enemyActionType, DiceRollType.Power, enemy.Level, player.Level);
@@ -50,7 +50,7 @@ public class CombatDiceRollManager
         ActionInstance playerActionInstance = new(playerAction, playerPowerDice, playerAccuracyDice, powerDiceTypes?.Count ?? 0, accuracyDiceTypes?.Count ?? 0);
         ActionInstance enemyActionInstance = combatContext.PlayerIsAttacker ? combatContext.CurrentTurn.DefenseAction : combatContext.CurrentTurn.AttackAction;
 
-        enemyActionInstance.Definition = CombatResolutionManager.BuildDefinitionFromBattler(enemy, player, enemyActionInstance.Definition.Type, perkService);
+        enemyActionInstance.Definition = CombatResolutionManager.BuildDefinitionFromBattler(enemy, enemyActionInstance.Definition.Type, perkService);
         enemyActionInstance = new ActionInstance(
             enemyActionInstance.Definition,
             enemyPowerDice,

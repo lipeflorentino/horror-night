@@ -138,7 +138,8 @@ public class PerkService
     public int GetEffectiveBody(Battler battler) => effectResolver.GetEffectiveBody(battler);
     public int GetEffectiveFocus(Battler actor, Battler opponent, ActionType actionType) => effectResolver.GetEffectiveFocus(actor, opponent, actionType);
     public int GetEffectiveStrength(Battler actor, Battler opponent, ActionType actionType) => effectResolver.GetEffectiveStrength(actor, opponent, actionType);
-    public int GetExtraPowerDiceAfterAccuracy(Battler actor, Battler opponent, DiceResult accuracyResult, ActionType actionType, out DiceStatType extraDiceStatType) 
+    public int GetEffectiveAgility(Battler actor, Battler opponent, ActionType actionType) => effectResolver.GetEffectiveAgility(actor, opponent, actionType);
+    public int GetExtraPowerDiceAfterAccuracy(Battler actor, DiceResult accuracyResult, ActionType actionType, out DiceStatType extraDiceStatType) 
         => triggerEvaluator.EvaluateAfterAccuracyTriggers(actor, accuracyResult, actionType, GetEffectivePerks(actor), out extraDiceStatType);
     public (float low, float high) GetModifiedRollThresholds(Battler actor, Battler opponent, CombatRollContext context, float low, float high) 
         => effectResolver.GetModifiedRollThresholds(actor, opponent, context, low, high);

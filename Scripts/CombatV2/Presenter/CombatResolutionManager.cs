@@ -44,7 +44,7 @@ public class CombatResolutionManager
         return defense != null && defense.AccuracyDice != null && defense.AccuracyDice.Tier != DiceTier.Low;
     }
 
-    public static ActionDefinition BuildDefinitionFromBattler(Battler battler, Battler opponent, ActionType actionType, PerkService perkService)
+    public static ActionDefinition BuildDefinitionFromBattler(Battler battler, ActionType actionType, PerkService perkService)
     {
         int basePower = actionType == ActionType.Attack
             ? perkService != null 

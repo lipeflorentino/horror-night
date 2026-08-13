@@ -31,6 +31,11 @@ public class PerkEffectResolver
         return GetEffectiveStat(actor, opponent, actionType, PerkModifierTarget.Strength, actor?.Strength ?? 0);
     }
 
+    public int GetEffectiveAgility(Battler actor, Battler opponent, ActionType actionType)
+    {
+        return GetEffectiveStat(actor, opponent, actionType, PerkModifierTarget.Agility, actor?.Agility ?? 0);
+    }
+
     public int GetEffectiveMind(Battler battler)
     {
         if (battler == null)
@@ -148,11 +153,11 @@ public class PerkEffectResolver
 
     private void ApplyRollModifiers(Battler actor, Battler opponent, CombatRollContext context, PerkTrigger trigger, PerkModifierTarget target, ref float value, int maxValue = 0)
     {
-        ApplyRollModifiersFromOwner(actor, actor, context, trigger, target, ref value, maxValue);
-        ApplyRollModifiersFromOwner(opponent, actor, context, trigger, target, ref value, maxValue);
+        ApplyRollModifiersFromOwner(actor, context, trigger, target, ref value, maxValue);
+        ApplyRollModifiersFromOwner(opponent, context, trigger, target, ref value, maxValue);
     }
 
-    private void ApplyRollModifiersFromOwner(Battler owner, Battler actor, CombatRollContext context, PerkTrigger trigger, PerkModifierTarget target, ref float value, int maxValue)
+    private void ApplyRollModifiersFromOwner(Battler owner, CombatRollContext context, PerkTrigger trigger, PerkModifierTarget target, ref float value, int maxValue)
     {
         if (owner == null)
             return;

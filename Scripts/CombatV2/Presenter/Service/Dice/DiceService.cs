@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class DiceService
 {
-    private const float CombatStatThresholdShift = 0.05f;
     private readonly System.Random random = new();
     private readonly PerkService perkService;
 
@@ -33,7 +32,6 @@ public class DiceService
         }
     }
 
-
     private struct ThresholdPair
     {
         public float Low;
@@ -49,7 +47,6 @@ public class DiceService
     public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int minValue = 1, int focus = 0, int strength = 0, bool isExtra = false)
     {
         CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
-        // Em um roll direto onde não há fragmentação, Base e Current são iguais
         return Roll(context, maxValue, minValue, isExtra);
     }
 
@@ -345,14 +342,14 @@ public class DiceService
             return DiceTier.Low;
 
         float normalized = (float)value / tierReferenceMaxValue;
-        ThresholdPair thresholds = GetThresholds(context, tierReferenceMaxValue);
+        ThresholdPair thresholds = GetThresholds(context);
 
         if (normalized <= thresholds.Low) return DiceTier.Low;
         if (normalized <= thresholds.High) return DiceTier.Medium;
         return DiceTier.High;
     }
 
-    private ThresholdPair GetThresholds(CombatRollContext context, int tierReferenceMaxValue)
+    private ThresholdPair GetThresholds(CombatRollContext context)
     {
         // 1. Consulta a Fonte Única de Verdade para as regras do jogador
         CombatRules.ThresholdStrategy strategy = context.Actor != null && context.Actor.IsPlayer
@@ -382,59 +379,6 @@ public class DiceService
         return thresholds;
     }
 
-    /* private ThresholdPair GetThresholdsByFullContext(CombatRollContext context, int tierReferenceMaxValue)
-    {
-        int safeMaxValue = Mathf.Max(1, tierReferenceMaxValue);
-        int delta = context.ActorLevel - context.OpponentLevel;
-
-        const float baseLowThreshold = 0.25f;
-        const float baseHighThreshold = 0.75f;
-
-        float granularity = Mathf.Clamp01((safeMaxValue - 1f) / 11f);
-        float deltaScale = Mathf.Lerp(7f, 4f, granularity);
-        float normalizedDelta = Mathf.Clamp(delta / deltaScale, -1f, 1f);
-
-        float maxShift = Mathf.Lerp(0.10f, 0.18f, granularity);
-        float levelShift = normalizedDelta * maxShift;
-        int combatStat = context.RollType == DiceRollType.Accuracy ? context.Focus : context.Strength;
-        float combatStatShift = Mathf.Max(0, combatStat) * CombatStatThresholdShift;
-        float risk = Mathf.Clamp01((3f - context.AllocatedDiceCount) / 2f);
-        float riskLowShift = risk * 0.10f;
-        float riskHighShift = risk * 0.10f;
-        float synergyLowShift = 0f;
-        float synergyHighShift = 0f;
-
-        if (context.RollType == DiceRollType.Accuracy)
-        {
-            switch (context.StatType)
-            {
-                case DiceStatType.Mind: synergyLowShift = -0.05f; synergyHighShift = 0.05f; break;
-                case DiceStatType.Heart: synergyLowShift = 0.05f; synergyHighShift = -0.05f; break;
-                case DiceStatType.Body: synergyLowShift = 0.03f; break;
-            }
-        }
-
-        float shift = levelShift + combatStatShift;
-
-        ThresholdPair thresholds = new(
-            baseLowThreshold - shift + riskLowShift + synergyLowShift,
-            baseHighThreshold - shift - riskHighShift + synergyHighShift);
-        if (perkService != null)
-        {
-            var (low, high) = perkService.GetModifiedRollThresholds(context.Actor, context.Opponent, context, thresholds.Low, thresholds.High);
-            thresholds.Low = low;
-            thresholds.High = high;
-        }
-
-        thresholds.Low = Mathf.Clamp(thresholds.Low, 0.05f, 0.45f);
-        thresholds.High = Mathf.Clamp(thresholds.High, 0.55f, 0.95f);
-
-        if (thresholds.High < thresholds.Low + 0.2f)
-            thresholds.High = Mathf.Min(0.95f, thresholds.Low + 0.2f);
-
-        return thresholds;
-    } */
-
     public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int focus = 0, int strength = 0)
     {
         CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
@@ -445,7 +389,7 @@ public class DiceService
     {
         int tierReferenceMaxValue = GetTierReferenceMaxValue(context);
         int safeMaxValue = Math.Max(1, tierReferenceMaxValue);
-        ThresholdPair thresholds = GetThresholds(context.WithRoll(context.RollType, context.StatType, safeMaxValue), safeMaxValue);
+        ThresholdPair thresholds = GetThresholds(context.WithRoll(context.RollType, context.StatType, safeMaxValue));
 
         int lowMax = 0;
         int mediumMax = 0;

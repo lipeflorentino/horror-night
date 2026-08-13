@@ -15,7 +15,7 @@ public class PerkTriggerEvaluator
     /// Avalia perks efetivos acionados por roll (BeforeRoll trigger).
     /// Chama esta função ANTES de aplicar modificadores de roll.
     /// </summary>
-    public void EvaluateRollTriggers(Battler owner, CombatRollContext context, PerkTrigger expectedTrigger, IReadOnlyList<PerkRuntimeInstance> effectivePerks, List<DiceResult> rolledDices = null)
+    public void EvaluateRollTriggers(Battler owner, CombatRollContext context, PerkTrigger expectedTrigger, IReadOnlyList<PerkRuntimeInstance> effectivePerks)
     {
         if (owner == null || effectivePerks == null || effectivePerks.Count == 0) return;
 
