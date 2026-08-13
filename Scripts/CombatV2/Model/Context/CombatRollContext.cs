@@ -7,12 +7,10 @@ public readonly struct CombatRollContext : ICombatContext
     public readonly DiceStatType StatType;
     public readonly int ActorLevel;
     public readonly int OpponentLevel;
-    public readonly int Focus;
-    public readonly int Strength;
     public readonly int MaxValue;
     public readonly int AllocatedDiceCount;
 
-    public CombatRollContext(Battler actor, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int focus, int strength, int maxValue, int allocatedDiceCount = 1)
+    public CombatRollContext(Battler actor, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int maxValue, int allocatedDiceCount = 1)
     {
         Actor = actor;
         Opponent = opponent;
@@ -21,8 +19,6 @@ public readonly struct CombatRollContext : ICombatContext
         StatType = statType;
         ActorLevel = actorLevel;
         OpponentLevel = opponentLevel;
-        Focus = focus;
-        Strength = strength;
         MaxValue = maxValue;
         AllocatedDiceCount = allocatedDiceCount;
     }
@@ -34,6 +30,6 @@ public readonly struct CombatRollContext : ICombatContext
 
     public CombatRollContext WithRoll(DiceRollType rollType, DiceStatType statType, int maxValue)
     {
-        return new CombatRollContext(Actor, Opponent, ActionType, rollType, statType, ActorLevel, OpponentLevel, Focus, Strength, maxValue, AllocatedDiceCount);
+        return new CombatRollContext(Actor, Opponent, ActionType, rollType, statType, ActorLevel, OpponentLevel, maxValue, AllocatedDiceCount);
     }
 }

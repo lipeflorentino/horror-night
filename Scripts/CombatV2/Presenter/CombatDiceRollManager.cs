@@ -116,7 +116,7 @@ public class CombatDiceRollManager
 
         for (int i = 0; i < count; i++)
         {
-            DiceResult extra = diceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power, 1, 0, 0, true);
+            DiceResult extra = diceService.Roll(maxValue, actorLevel, opponentLevel, statType, DiceRollType.Power, 1, true);
             extras.Add(extra);
         }
 
@@ -134,9 +134,7 @@ public class CombatDiceRollManager
         int allocatedDiceCount = 1)
     {
         ActionType actionType = combatContext.PlayerIsAttacker ? ActionType.Attack : ActionType.Defense;
-        int focus = perkService.GetEffectiveFocus(player, enemy, actionType);
-        int strength = perkService.GetEffectiveStrength(player, enemy, actionType);
-        return new CombatRollContext(player, enemy, actionType, rollType, statType, player.Level, enemy.Level, focus, strength, maxValue, allocatedDiceCount);
+        return new CombatRollContext(player, enemy, actionType, rollType, statType, player.Level, enemy.Level, maxValue, allocatedDiceCount);
     }
 
     public static (int lowMax, int mediumMax, int highMin, int maxValue) GetPlayerTierBoundaries(

@@ -44,9 +44,9 @@ public class DiceService
         }
     }
 
-    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int minValue = 1, int focus = 0, int strength = 0, bool isExtra = false)
+    public DiceResult Roll(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int minValue = 1, bool isExtra = false)
     {
-        CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
+        CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, maxValue);
         return Roll(context, maxValue, minValue, isExtra);
     }
 
@@ -98,13 +98,11 @@ public class DiceService
 
     public List<DiceResult> RollMany(Battler actor, Battler opponent, IReadOnlyList<DiceStatType> diceTypes, ActionType actionType, DiceRollType rollType, int actorLevel = 1, int opponentLevel = 1)
     {
-        int focus = perkService != null ? perkService.GetEffectiveFocus(actor, opponent, actionType) : actor?.Focus ?? 0;
-        int strength = perkService != null ? perkService.GetEffectiveStrength(actor, opponent, actionType) : actor?.Strength ?? 0;
-        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(actor, opponent, diceTypes, actionType, rollType, actorLevel, opponentLevel, focus, strength, evaluateRollTriggers: true);
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(actor, opponent, diceTypes, actionType, rollType, actorLevel, opponentLevel, evaluateRollTriggers: true);
 
         if (diceSpecs.Count == 0)
         {
-            CombatRollContext fallbackContext = new(actor, opponent, actionType, rollType, DiceStatType.Body, actorLevel, opponentLevel, focus, strength, 1);
+            CombatRollContext fallbackContext = new(actor, opponent, actionType, rollType, DiceStatType.Body, actorLevel, opponentLevel, 1);
             return new List<DiceResult> { Roll(fallbackContext, 1) };
         }
 
@@ -115,12 +113,11 @@ public class DiceService
         for (int i = 0; i < diceSpecs.Count; i++)
         {
             DiceRollSpec spec = diceSpecs[i];
-            CombatRollContext context = new(actor, opponent, actionType, spec.RollType, spec.StatType, actorLevel, opponentLevel, focus, strength, spec.MaxValue);
-            // Passa o BaseMaxValue extraído do spec
+            CombatRollContext context = new(actor, opponent, actionType, spec.RollType, spec.StatType, actorLevel, opponentLevel, spec.MaxValue);
             rawResults.Add(Roll(context, spec.BaseMaxValue, spec.MinValue, spec.IsExtra)); 
         }
 
-        CombatRollContext aggregateContext = new(actor, opponent, actionType, rollType, DiceStatType.Body, actorLevel, opponentLevel, focus, strength, 1, Mathf.Max(1, diceTypes?.Count ?? 1));
+        CombatRollContext aggregateContext = new(actor, opponent, actionType, rollType, DiceStatType.Body, actorLevel, opponentLevel, 1, Mathf.Max(1, diceTypes?.Count ?? 1));
         return AggregateDuplicateStatResults(rawResults, aggregateContext);
     }
 
@@ -173,9 +170,6 @@ public class DiceService
         if (aggregates == null || extras == null)
             return;
 
-        int focus = perkService != null ? perkService.GetEffectiveFocus(actor, opponent, actionType) : actor?.Focus ?? 0;
-        int strength = perkService != null ? perkService.GetEffectiveStrength(actor, opponent, actionType) : actor?.Strength ?? 0;
-
         foreach (DiceResult extra in extras)
         {
             DiceResult aggregate = aggregates.Find(result => result.StatType == extra.StatType);
@@ -197,14 +191,14 @@ public class DiceService
             aggregate.IsExtra = true;
             aggregate.SubRolls.Add(extra);
 
-            CombatRollContext context = new(actor, opponent, actionType, DiceRollType.Power, aggregate.StatType, actorLevel, opponentLevel, focus, strength, aggregate.MaxValue, aggregate.SubRolls.Count + 1);
+            CombatRollContext context = new(actor, opponent, actionType, DiceRollType.Power, aggregate.StatType, actorLevel, opponentLevel, aggregate.MaxValue, aggregate.SubRolls.Count + 1);
             aggregate.Tier = GetTier(aggregate.Value, context);
         }
     }
 
     public List<int> ConvertToAggregatedFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
-        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, battler?.Focus ?? 0, battler?.Strength ?? 0, evaluateRollTriggers: false);
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, evaluateRollTriggers: false);
         Dictionary<DiceStatType, int> facesByType = new();
         for (int i = 0; i < diceSpecs.Count; i++)
         {
@@ -224,7 +218,7 @@ public class DiceService
     public List<int> ConvertToFaces(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
         List<int> diceFaces = new();
-        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, battler?.Focus ?? 0, battler?.Strength ?? 0, evaluateRollTriggers: false);
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, evaluateRollTriggers: false);
         for (int i = 0; i < diceSpecs.Count; i++)
             diceFaces.Add(diceSpecs[i].MaxValue);
 
@@ -239,7 +233,7 @@ public class DiceService
     /// </summary>
     public (List<DiceStatType> types, List<int> faces, List<int> minFaces) ConvertToFacesWithTypes(Battler battler, IReadOnlyList<DiceStatType> diceTypes)
     {
-        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, battler?.Focus ?? 0, battler?.Strength ?? 0, evaluateRollTriggers: false);
+        List<DiceRollSpec> diceSpecs = BuildDiceRollSpecs(battler, null, diceTypes, ActionType.Attack, DiceRollType.Power, 1, 1, evaluateRollTriggers: false);
         List<DiceStatType> types = new(diceSpecs.Count);
         List<int> faces = new(diceSpecs.Count);
         List<int> minFaces = new(diceSpecs.Count);
@@ -253,7 +247,7 @@ public class DiceService
         return (types, faces, minFaces);
     }
 
-    private List<DiceRollSpec> BuildDiceRollSpecs(Battler battler, Battler opponent, IReadOnlyList<DiceStatType> diceTypes, ActionType actionType, DiceRollType rollType, int actorLevel, int opponentLevel, int focus, int strength, bool evaluateRollTriggers = true)
+    private List<DiceRollSpec> BuildDiceRollSpecs(Battler battler, Battler opponent, IReadOnlyList<DiceStatType> diceTypes, ActionType actionType, DiceRollType rollType, int actorLevel, int opponentLevel, bool evaluateRollTriggers = true)
     {
         List<DiceRollSpec> diceSpecs = new();
         if (diceTypes == null)
@@ -268,7 +262,6 @@ public class DiceService
             diceCountByType[type] = diceCountByType.TryGetValue(type, out int count) ? count + 1 : 1;
         }
 
-        int agility = Mathf.Max(0, battler?.Agility ?? 0);
         foreach (KeyValuePair<DiceStatType, int> pair in diceCountByType)
         {
             int currentTotalValue = GetDiceMaxValueForType(battler, pair.Key);
@@ -278,7 +271,7 @@ public class DiceService
             if (currentTotalValue <= 0 || baseDiceCount <= 0)
                 continue;
 
-            CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, currentTotalValue);
+            CombatRollContext perkContext = new(battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, currentTotalValue);
             int extraDice = perkService?.GetExtraDiceCount(battler, opponent, perkContext, evaluateRollTriggers) ?? 0;
 
             // Calcula o fatiamento do Current Stat (faces da rolagem)
@@ -293,20 +286,20 @@ public class DiceService
             {
                 int currentMaxFace = currentBaseFace + (i < currentRemainder ? 1 : 0);
                 int baseMaxFace = baseBaseFace + (i < baseRemainder ? 1 : 0);
-                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, currentMaxFace, baseMaxFace, totalAllocatedDice, isExtra: false);
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, currentMaxFace, baseMaxFace, totalAllocatedDice, isExtra: false);
             }
 
             for (int i = 0; i < extraDice; i++)
-                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, focus, strength, agility, Mathf.Max(1, currentTotalValue), Mathf.Max(1, baseTotalValue), totalAllocatedDice, isExtra: true);
+                AddDiceSpec(diceSpecs, battler, opponent, actionType, rollType, pair.Key, actorLevel, opponentLevel, Mathf.Max(1, currentTotalValue), Mathf.Max(1, baseTotalValue), totalAllocatedDice, isExtra: true);
         }
 
         return diceSpecs;
     }
 
-    private void AddDiceSpec(List<DiceRollSpec> diceSpecs, Battler battler, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int focus, int strength, int agility, int currentMaxFace, int baseMaxFace, int totalAllocatedDice, bool isExtra)
+    private void AddDiceSpec(List<DiceRollSpec> diceSpecs, Battler battler, Battler opponent, ActionType actionType, DiceRollType rollType, DiceStatType statType, int actorLevel, int opponentLevel, int currentMaxFace, int baseMaxFace, int totalAllocatedDice, bool isExtra)
     {
-        int minFace = Mathf.Clamp(1 + agility, 1, currentMaxFace);
-        CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, statType, actorLevel, opponentLevel, focus, strength, currentMaxFace, totalAllocatedDice);
+        int minFace = Mathf.Clamp(1, 1, currentMaxFace);
+        CombatRollContext minRollContext = new(battler, opponent, actionType, rollType, statType, actorLevel, opponentLevel, currentMaxFace, totalAllocatedDice);
         minFace = perkService?.GetMinimumRollValue(battler, opponent, minRollContext, minFace, false) ?? minFace;
         
         // Passa o currentMaxFace e o baseMaxFace
@@ -379,9 +372,9 @@ public class DiceService
         return thresholds;
     }
 
-    public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType, int focus = 0, int strength = 0)
+    public (int lowMax, int mediumMax, int highMin, int maxValue) GetTierBoundaries(int maxValue, int attackerLevel, int defenderLevel, DiceStatType statType, DiceRollType rollType)
     {
-        CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, focus, strength, maxValue);
+        CombatRollContext context = new(null, null, ActionType.Attack, rollType, statType, attackerLevel, defenderLevel, maxValue);
         return GetTierBoundaries(context);
     }
 
