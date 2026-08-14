@@ -8,7 +8,7 @@ public class CombatManager : MonoBehaviour
 {
     [Header("Settings")]
     [FormerlySerializedAs("DefaultPowerDiceCount")]
-    [SerializeField] private int DefaultDiceCount = 3;
+    [SerializeField] private int DefaultDiceCount = 5;
     [Tooltip("Maximum value for Heart, Mind, and Body stats")]
     [SerializeField] private int CoreStatCap = 20;
     [SerializeField] private string GameplaySceneName = "Gameplay";
@@ -242,6 +242,9 @@ public class CombatManager : MonoBehaviour
 
         CombatResolutionManager.Resolve(Resolver, TurnState, View, Player, Enemy);
 
+        CombatRules.VerifyWearness(powerDiceTypes, accuracyDiceTypes, Player, DrawbackService);
+        CombatRules.VerifyWearness(TurnState.PendingEnemyPowerDiceTypes, TurnState.PendingEnemyAccuracyDiceTypes, Enemy, DrawbackService);
+
         yield return WaitForSeconds2;
 
         if (TryHandleCombatEnd())
@@ -252,7 +255,7 @@ public class CombatManager : MonoBehaviour
 
     private void EndTurn()
     {
-        TurnManager.EndTurn(Player, Enemy, PerkService, TrickService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
+        TurnManager.EndTurn(Player, Enemy, PerkService, TrickService, DrawbackService, BattlerStateService, PlayerTrickInventory, EnemyTrickInventory, TurnState);
         RefreshCombatUI();
         if (TryHandleCombatEnd())
             return;

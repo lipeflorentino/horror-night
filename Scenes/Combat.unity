@@ -15243,6 +15243,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 994789685}
   m_CullTransparentMesh: 1
+--- !u!1 &998208559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 998208560}
+  - component: {fileID: 998208561}
+  m_Layer: 0
+  m_Name: DrawbackDatabase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &998208560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998208559}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1211341127}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &998208561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998208559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99c3b407f957ba342a4e56414e4b304e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allDrawbacks: []
 --- !u!1 &998475196
 GameObject:
   m_ObjectHideFlags: 0
@@ -18058,6 +18103,7 @@ Transform:
   - {fileID: 1885020070}
   - {fileID: 1358961862}
   - {fileID: 1007394374}
+  - {fileID: 998208560}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1214742870
@@ -30816,8 +30862,8 @@ MonoBehaviour:
   level: 1
   currentXp: 0
   maxXp: 10
-  currentDices: 3
-  maxDices: 3
+  currentDices: 5
+  maxDices: 5
   maxHeart: 10
   currentHeart: 10
   maxBody: 10

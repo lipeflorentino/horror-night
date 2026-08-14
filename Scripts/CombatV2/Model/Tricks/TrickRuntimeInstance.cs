@@ -13,6 +13,7 @@ public class TrickRuntimeInstance
     public Battler Owner { get; private set; }
     public Battler Source { get; private set; }
     public int RemainingTurns { get; set; }
+    public bool IsNew { get; set; } = true;
     public int CooldownTurnsRemaining { get; set; }
     public TrickSlotType SlotType { get; private set; }
     public int SlotIndex { get; private set; }

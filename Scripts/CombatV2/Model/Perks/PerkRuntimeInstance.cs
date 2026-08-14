@@ -7,6 +7,8 @@ public class PerkRuntimeInstance
     public string SourceTrickId;
     public string SourceTrickInstanceId;
     public TrickRuntimeInstance SourceTrick;
+    public DrawbackRuntimeInstance SourceDrawback;
+    public BattlerStateRuntimeInstance SourceState;
 
     public PerkRuntimeInstance(
         PerkSO definition,
@@ -32,5 +34,15 @@ public class PerkRuntimeInstance
         SourceTrick = sourceTrick;
         SourceTrickId = sourceTrick?.Definition?.Id;
         SourceTrickInstanceId = sourceTrick?.InstanceId;
+    }
+
+    public void SetSourceDrawback(DrawbackRuntimeInstance sourceDrawback)
+    {
+        SourceDrawback = sourceDrawback;
+    }
+
+    public void SetSourceState(BattlerStateRuntimeInstance sourceState)
+    {
+        SourceState = sourceState;
     }
 }

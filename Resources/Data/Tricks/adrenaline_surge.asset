@@ -16,25 +16,26 @@ MonoBehaviour:
   DisplayName: Golpe de Adrenalina
   Description: "Se o teste de Precis\xE3o com dados de Body for n\xEDvel Alto, voc\xEA
     ganha +2 dados de Poder para o ataque."
-  Icon: {fileID: 21300000, guid: b3d9803ff6299304ba5b4717d4fb72df, type: 3}
-  Thumbnail: {fileID: 21300000, guid: 6b2cfe6fb90212349bbffab673d5bf9f, type: 3}
-  Level: 1
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
+  Level: 2
   Requirements:
-    MinLevel: 1
+    MinLevel: 2
     MinMind: 0
-    MinHeart: 1
-    MinBody: 1
-    MinAttack: 1
+    MinHeart: 2
+    MinBody: 4
+    MinAttack: 2
     MinDefense: 0
     MinInitiative: 1
     MinFocus: 0
-    MinStrength: 0
-    MinAgility: 0
-  MomentumCost: 1
+    MinStrength: 3
+    MinAgility: 2
+  MomentumCost: 0
   TimingTurns: 0
-  DurationTurns: 5
-  CooldownTurns: 3
+  DurationTurns: 1
+  CooldownTurns: 2
   ActivationMode: 0
+  MinChargesRequired: 1
   PerkIds:
   - adrenaline_surge
   DrawbackIds: []

@@ -58,6 +58,9 @@ public enum PerkModifierTarget
     Agility,
     ActionDicesCount,
     TrickCharges,
+    MindDice,
+    HeartDice,
+    BodyDice,
 }
 
 public enum PerkConditionKey
@@ -97,4 +100,5 @@ public enum PerkOperation
     AddPer5Charges,
     AddPer10Charges,
     AddPerDamage,
+    Restrain,
 }

@@ -7,6 +7,7 @@ public class BattlerStateService
 
     public event Action<Battler, BattlerStateRuntimeInstance> OnBattlerStateApplied;
     public event Action<Battler, BattlerStateRuntimeInstance> OnBattlerStateRemoved;
+    public event Action<Battler, BattlerStateRuntimeInstance> OnBattlerStateExpired;
 
     public BattlerStateService(PerkService perkService)
     {
@@ -85,13 +86,19 @@ public class BattlerStateService
             }
 
             if (state.RemainingTurns < 0) continue;
+            
+            if (state.IsNew)
+            {
+                state.IsNew = false;
+                continue;
+            }
 
             state.DecreaseDuration();
             
             if (state.RemainingTurns == 0)
             {
                 RemoveBattlerStatePerks(battler, state);
-                OnBattlerStateRemoved?.Invoke(battler, state);
+                OnBattlerStateExpired?.Invoke(battler, state);
                 battler.ActiveStates.RemoveAt(i);
             }
         }
@@ -103,10 +110,14 @@ public class BattlerStateService
 
         for (int i = 0; i < stateInstance.Definition.PerkIds.Count; i++)
         {
-            PerkRuntimeInstance appliedPerk = perkService.ApplyPerk(target, stateInstance.Definition.PerkIds[i], source, durationTurns);
-            if (appliedPerk != null && !stateInstance.ActivePerks.Contains(appliedPerk)) 
+            PerkRuntimeInstance appliedPerk = perkService.ApplyPerk(target, stateInstance.Definition.PerkIds[i], source, -1);
+            if (appliedPerk != null)
             {
-                stateInstance.ActivePerks.Add(appliedPerk);
+                appliedPerk.SetSourceState(stateInstance);
+                if (!stateInstance.ActivePerks.Contains(appliedPerk)) 
+                {
+                    stateInstance.ActivePerks.Add(appliedPerk);
+                }
             }
         }
     }

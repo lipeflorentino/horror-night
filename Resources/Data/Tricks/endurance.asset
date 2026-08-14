@@ -17,26 +17,26 @@ MonoBehaviour:
   Description: "Cada ataque bloqueado adiciona +1 de Trick Charges (adequado at\xE9
     5). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Defense por charge
     na sua a\xE7\xE3o de Defesa."
-  Icon: {fileID: -985834562, guid: bb98d3e99fd5bae46a06657fc52156f4, type: 3}
-  Thumbnail: {fileID: 21300000, guid: 35a89177fb793044caca604d559f1a46, type: 3}
-  Level: 1
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
+  Level: 2
   Requirements:
-    MinLevel: 1
+    MinLevel: 2
     MinMind: 4
     MinHeart: 1
     MinBody: 3
     MinAttack: 0
-    MinDefense: 3
-    MinInitiative: 2
+    MinDefense: 4
+    MinInitiative: 0
     MinFocus: 0
-    MinStrength: 0
+    MinStrength: 2
     MinAgility: 0
-  MomentumCost: 3
+  MomentumCost: 0
   TimingTurns: 0
-  DurationTurns: 8
+  DurationTurns: 5
   CooldownTurns: 5
   ActivationMode: 2
-  MinChargesRequired: 3
+  MinChargesRequired: 1
   PerkIds:
   - endurance_charge
   - endurance_release

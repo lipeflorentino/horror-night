@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a425e133546695548841118226922a4e, type: 3}
-  m_Name: soreness
+  m_Name: bleeding
   m_EditorClassIdentifier: 
-  Id: soreness
-  DisplayName: Soreness
-  Description: "Voc\xEA sente um desconforto muscular que reduz sua for\xE7a mental,
-    emocional e fisica em 2."
+  Id: bleeding
+  DisplayName: Bleeding
+  Description: O combatente tem as stats (mind, heart, body) reduzidas em 2 e a cada
+    turno ele perde 2 de hp.
   Icon: {fileID: 0}
-  DurationTurns: 2
-  DurationMin: 2
-  DurationMax: 4
+  DurationTurns: 3
+  DurationMin: 3
+  DurationMax: 5
   PerkIds:
-  - soreness_strength
-  - soreness_body
-  - soreness_heart
-  - soreness_mind
-  FlavorText: "A dor \xE9 um lembrete de que voc\xEA est\xE1 vivo."
+  - bleeding_mind
+  - bleeding_heart
+  - bleeding_body
+  FlavorText: O sangue escorre quente lembrando a fragilidade da vida.

@@ -46,6 +46,8 @@ public class TurnManager
         Battler enemy, 
         PerkService perkService, 
         TrickService trickService, 
+        DrawbackService drawbackService,
+        BattlerStateService battlerStateService,
         ITrickInventory playerTrickInventory, 
         ITrickInventory enemyTrickInventory, 
         CombatTurnContext state)
@@ -64,6 +66,10 @@ public class TurnManager
         perkService.TickTurnEnd(enemy);
         trickService.TickTrickEnd(player, playerTrickInventory);
         trickService.TickTrickEnd(enemy, enemyTrickInventory);
+        drawbackService.TickTurnEnd(player);
+        drawbackService.TickTurnEnd(enemy);
+        battlerStateService.TickTurnEnd(player);
+        battlerStateService.TickTurnEnd(enemy);
         
         state.PlayerIsAttacker = !state.PlayerIsAttacker;
         state.CurrentTurn = state.PlayerIsAttacker ? new TurnActionContext(player, enemy) : new TurnActionContext(enemy, player);

@@ -18,8 +18,8 @@ MonoBehaviour:
   StackMode: 0
   Tags: 
   Rule:
-    Trigger: 5
-    ModifierTarget: 12
+    Trigger: 0
+    ModifierTarget: 18
     Operation: 0
     OwnerRole: 0
     ActionType: 0

@@ -12,6 +12,7 @@ public class DrawbackRuntimeInstance
     public Battler Owner { get; private set; }
     public Battler Source { get; private set; }
     public int RemainingTurns { get; set; }
+    public bool IsNew { get; set; } = true;
     public List<PerkRuntimeInstance> ActivePerks { get; private set; }
     
     public DrawbackRuntimeInstance(DrawbackSO definition, Battler owner, int durationTurns, Battler source = null, string instanceId = null)

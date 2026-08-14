@@ -16,8 +16,8 @@ MonoBehaviour:
   DisplayName: "Precis\xE3o Anal\xEDtica"
   Description: "Seus testes de Precis\xE3o usando dados de Mind nunca resultam em
     menos de 30%."
-  Icon: {fileID: 21300000, guid: 9b52a0d4dd0c1b346851ee7585205e99, type: 3}
-  Thumbnail: {fileID: 21300000, guid: b33f35a3829ae2d458f5b8a942d05303, type: 3}
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
   Level: 1
   Requirements:
     MinLevel: 1
@@ -35,6 +35,7 @@ MonoBehaviour:
   DurationTurns: -1
   CooldownTurns: 0
   ActivationMode: 0
+  MinChargesRequired: 1
   PerkIds:
   - analytic_precision
   DrawbackIds: []

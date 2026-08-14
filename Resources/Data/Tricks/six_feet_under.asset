@@ -16,11 +16,11 @@ MonoBehaviour:
   DisplayName: Six Feet Under
   Description: "Se um teste de Poder resultar em 6, a a\xE7\xE3o recebe um b\xF4nus
     de +30% de dano."
-  Icon: {fileID: 21300000, guid: b52cfc76eae547747acfefb6834d83bf, type: 3}
+  Icon: {fileID: 0}
   Thumbnail: {fileID: 21300000, guid: 95b10f90e8082934ba4677771c4cd9dc, type: 3}
-  Level: 1
+  Level: 2
   Requirements:
-    MinLevel: 1
+    MinLevel: 2
     MinMind: 2
     MinHeart: 0
     MinBody: 2
@@ -28,13 +28,14 @@ MonoBehaviour:
     MinDefense: 0
     MinInitiative: 0
     MinFocus: 0
-    MinStrength: 0
+    MinStrength: 2
     MinAgility: 0
-  MomentumCost: 4
+  MomentumCost: 0
   TimingTurns: 0
-  DurationTurns: 1
-  CooldownTurns: 2
+  DurationTurns: -1
+  CooldownTurns: 0
   ActivationMode: 0
+  MinChargesRequired: 1
   PerkIds:
   - six_feet_under
   DrawbackIds: []

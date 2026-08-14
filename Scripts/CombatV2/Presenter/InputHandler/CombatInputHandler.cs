@@ -95,7 +95,7 @@ public class CombatInputHandler : MonoBehaviour
 
     public void OnAddDice(DiceStatType diceStatType, DiceRollType diceRollType)
     {
-        if (IsWaitingTurnResolution || !CanAddDiceToRoll() || !CanUseDiceType(diceStatType)) return;
+        if (IsWaitingTurnResolution || !CanAddDiceToRoll() || !CanUseDiceType(diceStatType) || GetAllocatedStatCount(diceStatType) >= GetMaxAllowedDiceCount(diceStatType)) return;
 
         if (diceRollType == DiceRollType.Power)
         {
@@ -195,7 +195,7 @@ public class CombatInputHandler : MonoBehaviour
 
         foreach (DiceStatType stat in Enum.GetValues(typeof(DiceStatType)))
         {
-            bool canAdd = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll();
+            bool canAdd = canAllocate && CanUseDiceType(stat) && CanAddDiceToRoll() && GetAllocatedStatCount(stat) < GetMaxAllowedDiceCount(stat);
 
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(stat, DiceRollType.Power, canAdd);
             Combat.View.DiceAllocationView.SetAddDiceButtonInteractable(stat, DiceRollType.Accuracy, canAdd);
@@ -210,7 +210,7 @@ public class CombatInputHandler : MonoBehaviour
 
     private void RefreshSelectionPreview()
     {
-        if (Combat?.View?.DiceAllocationView == null) return;
+        if (Combat.View.DiceAllocationView == null) return;
 
         // 1. Base Stats Update
         Combat.View.DiceAllocationView.UpdateDiceAllocationStats(Combat.Player.Mind, Combat.Player.Heart, Combat.Player.Body);
@@ -237,12 +237,28 @@ public class CombatInputHandler : MonoBehaviour
         
         DiceAllocationContext previewData = DiceAllocationCalculator.CalculatePreview(
             baseActionPower: Combat.GetEffectivePlayerActionPower(),
-            powerDiceTypes: powerTypes, powerFaces: powerFaces,
-            accuracyDiceTypes: accuracyTypes, accuracyFaces: accuracyFaces,
-            powerTierBoundaries: powerBoundaries, accuracyTierBoundaries: accuracyBoundaries,
-            statBaseTargets: statTargets, powerPrimaryStat: powerPrimStat,
-            allocatedPowerDiceCount: PowerDiceTypes.Count
+            powerDiceTypes: powerTypes, 
+            powerFaces: powerFaces,
+            accuracyDiceTypes: accuracyTypes, 
+            accuracyFaces: accuracyFaces,
+            powerTierBoundaries: powerBoundaries, 
+            accuracyTierBoundaries: accuracyBoundaries,
+            statBaseTargets: statTargets, 
+            powerPrimaryStat: powerPrimStat,
+            allocatedPowerDiceCount: PowerDiceTypes.Count,
+            selectedAction: SelectedAction ?? AllowedAction,
+            seccondaryEffects: Combat.Player.ActionSecondaryEffects
         );
+
+        previewData.WarnWearStats = new List<DiceStatType>();
+        Dictionary<DiceStatType, int> rawDiceCounts = new();
+        
+        foreach (var t in PowerDiceTypes) { rawDiceCounts.TryAdd(t, 0); rawDiceCounts[t]++; }
+        foreach (var t in AccuracyDiceTypes) { rawDiceCounts.TryAdd(t, 0); rawDiceCounts[t]++; }
+        foreach (var kvp in rawDiceCounts)
+        {
+            if (kvp.Value >= 3) previewData.WarnWearStats.Add(kvp.Key);
+        }
         
         Combat.View.DiceAllocationView.UpdateSelectionPreview(previewData);
 
@@ -279,6 +295,28 @@ public class CombatInputHandler : MonoBehaviour
     private int GetRemainingDiceCount() => Mathf.Max(0, Combat.Player.CurrentActionDices - (PowerDiceTypes.Count + AccuracyDiceTypes.Count));
 
     private int GetAllocatedStatCount(DiceStatType stat) => PowerDiceTypes.FindAll(x => x == stat).Count + AccuracyDiceTypes.FindAll(x => x == stat).Count;
+
+    private int GetMaxAllowedDiceCount(DiceStatType stat)
+    {
+        int max = Combat.Player.MaxDices; // Valor padrão alto para não limitar, será ajustado pelos perks
+        PerkModifierTarget target = stat switch
+        {
+            DiceStatType.Mind => PerkModifierTarget.MindDice,
+            DiceStatType.Heart => PerkModifierTarget.HeartDice,
+            DiceStatType.Body => PerkModifierTarget.BodyDice,
+            _ => PerkModifierTarget.BodyDice
+        };
+
+        var perks = Combat.Player.GetEffectivePerks();
+        foreach (var perk in perks)
+        {
+            if (perk.Definition.Rule.ModifierTarget == target && perk.Definition.Rule.Operation == PerkOperation.Restrain)
+            {
+                max = Mathf.Min(max, (int)perk.Definition.Rule.Value);
+            }
+        }
+        return max;
+    }
 
     private DiceStatType GetFirstAvailableDiceType()
     {

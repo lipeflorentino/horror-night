@@ -16,8 +16,10 @@ MonoBehaviour:
   DisplayName: Exhaustion
   Description: "Voc\xEA se sente exausto e sua for\xE7a mental, emocional e fisica
     \xE9 reduzida em 4."
-  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
-  DurationTurns: -1
+  Icon: {fileID: 0}
+  DurationTurns: 4
+  DurationMin: 4
+  DurationMax: 6
   PerkIds:
   - exhaustion_strength
   - exhaustion_body

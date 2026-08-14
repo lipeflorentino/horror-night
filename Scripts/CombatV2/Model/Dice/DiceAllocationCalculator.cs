@@ -23,7 +23,9 @@ public static class DiceAllocationCalculator
         (int lowMax, int mediumMax, int highMin, int maxValue) accuracyTierBoundaries,
         IReadOnlyDictionary<DiceStatType, int> statBaseTargets,
         DiceStatType powerPrimaryStat,   
-        int allocatedPowerDiceCount)   
+        int allocatedPowerDiceCount,
+        ActionType selectedAction,
+        Dictionary<ActionResolutionVariation, List<ActionEffectPayload>> seccondaryEffects)   
     {
         var data = new DiceAllocationContext
         {
@@ -34,7 +36,8 @@ public static class DiceAllocationCalculator
             PowerTierBoundaries = powerTierBoundaries,
             AccuracyTierBoundaries = accuracyTierBoundaries,
             HasPower = powerDiceTypes != null && powerDiceTypes.Count > 0,
-            HasAccuracy = accuracyDiceTypes != null && accuracyDiceTypes.Count > 0
+            HasAccuracy = accuracyDiceTypes != null && accuracyDiceTypes.Count > 0,
+            SelectedAction = selectedAction,
         };
 
         if (!data.HasPower && !data.HasAccuracy)
@@ -66,6 +69,13 @@ public static class DiceAllocationCalculator
             data.MinDamage = CombatRules.CalculateBaseDamage(baseActionPower, powerPrimaryStat, data.MinPowerTier, allocatedPowerDiceCount);
             data.MaxDamage = CombatRules.CalculateBaseDamage(baseActionPower, powerPrimaryStat, data.MaxPowerTier, allocatedPowerDiceCount);
             data.DamageMultiplier = CombatRules.GetDamageMultiplier(powerPrimaryStat, data.MaxPowerTier, allocatedPowerDiceCount);
+
+            // Calcular o Bônus Potencial baseado no Max Roll
+            ActionResolutionVariation maxVariation = selectedAction == ActionType.Attack 
+                ? ActionResolutionVariation.Overpower 
+                : ActionResolutionVariation.IronWall;
+                
+            data.PotentialMaxBonus = CombatRules.GetDamageBonus(maxVariation);
         }
 
         if (data.HasPower && data.HasAccuracy)

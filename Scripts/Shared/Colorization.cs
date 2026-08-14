@@ -15,22 +15,25 @@ public static class Colorization
     public const string IdentityColorHex = "#0005FF";
     public const string ActiveColorHex = "#FF2100";
     public const string PassiveColorHex = "#F108EB";
-    public const string CommomColorHex = "#FFFFFF";
+    public const string CommonColorHex = "#FFFFFF";
     public const string UncommonColorHex = "#00FF00";
     public const string RareColorHex = "#0000FF";
     public const string EpicColorHex = "#800080";
     public const string LegendaryColorHex = "#FFA500";
+    public const string MindColorHex = "#a924ca";
+    public const string HeartColorHex = "#cb2228";
+    public const string BodyColorHex = "#8be958";
     
     public static string GetRarityColor(TrickRarity rarity)
     {
         return rarity switch
         {
-            TrickRarity.Common => CommomColorHex,
+            TrickRarity.Common => CommonColorHex,
             TrickRarity.Uncommon => UncommonColorHex,
             TrickRarity.Rare => RareColorHex,
             TrickRarity.Epic => EpicColorHex,
             TrickRarity.Legendary => LegendaryColorHex,
-            _ => CommomColorHex
+            _ => CommonColorHex
         };
     }
 
@@ -41,6 +44,17 @@ public static class Colorization
             TrickSlotType.CastedActive => ActiveColorHex,
             TrickSlotType.CastedPassive => PassiveColorHex,
             _ => IdentityColorHex
+        };
+    }
+
+    public static string GetStatColor(DiceStatType statType)
+    {
+        return statType switch
+        {
+            DiceStatType.Mind => MindColorHex,
+            DiceStatType.Heart => HeartColorHex,
+            DiceStatType.Body => BodyColorHex,
+            _ => DefaultTextColorHex
         };
     }
 

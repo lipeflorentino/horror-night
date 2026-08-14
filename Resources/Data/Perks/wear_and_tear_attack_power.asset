@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fcdf76252c6436392b4e2bab16c181a, type: 3}
-  m_Name: endurance_release
+  m_Name: wear_and_tear_attack_power
   m_EditorClassIdentifier: 
-  Id: endurance_release
+  Id: wear_and_tear_attack_power
   DefaultDurationTurns: -1
-  MaxStacks: 3
+  MaxStacks: 1
   StackMode: 0
   Tags: 
   Rule:
     Trigger: 0
-    ModifierTarget: 16
-    Operation: 3
+    ModifierTarget: 7
+    Operation: 1
     OwnerRole: 0
     ActionType: 0
     FilterByActionType: 0
@@ -32,4 +32,4 @@ MonoBehaviour:
     FilterByTier: 0
     ConditionKey: 0
     ConditionValue: 
-    Value: 1
+    Value: 0.7

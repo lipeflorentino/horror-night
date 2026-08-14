@@ -2,6 +2,7 @@ using System;
 
 public class DrawbackService
 {
+    private readonly DrawbackDatabase database;
     private readonly PerkService perkService;
 
     public event Action<Battler, DrawbackRuntimeInstance> OnDrawbackApplied;
@@ -10,6 +11,8 @@ public class DrawbackService
 
     public DrawbackService(PerkService perkService)
     {
+        database = DrawbackDatabase.GetOrCreateRuntimeDatabase();
+        database.EnsureLoaded();
         this.perkService = perkService;
     }
 
@@ -17,7 +20,7 @@ public class DrawbackService
     {
         if (target == null || string.IsNullOrWhiteSpace(drawbackId)) return null;
 
-        DrawbackSO definition = DrawbackDatabase.GetOrCreateRuntimeDatabase().GetById(drawbackId);
+        DrawbackSO definition = database.GetById(drawbackId);
         if (definition == null) return null;
 
         DrawbackRuntimeInstance existing = target.Drawbacks.Find(d => d != null && d.Definition != null &&
@@ -26,7 +29,7 @@ public class DrawbackService
         if (existing != null) return existing;
 
         int resolvedDuration = durationTurns >= 0 ? durationTurns : definition.DurationTurns;
-        DrawbackRuntimeInstance drawbackInstance = new DrawbackRuntimeInstance(definition, target, resolvedDuration, source);
+        DrawbackRuntimeInstance drawbackInstance = new(definition, target, resolvedDuration, source);
         target.Drawbacks.Add(drawbackInstance);
         
         ApplyDrawbackPerks(target, source, drawbackInstance, resolvedDuration);
@@ -65,6 +68,12 @@ public class DrawbackService
 
             if (drawback.RemainingTurns < 0) continue;
 
+            if (drawback.IsNew)
+            {
+                drawback.IsNew = false;
+                continue;
+            }
+
             drawback.DecreaseDuration();
             
             if (drawback.RemainingTurns == 0)
@@ -72,21 +81,24 @@ public class DrawbackService
                 RemoveDrawbackPerks(battler, drawback);
                 battler.Drawbacks.RemoveAt(i);
                 OnDrawbackExpired?.Invoke(battler, drawback);
-                OnDrawbackRemoved?.Invoke(battler, drawback);
             }
         }
     }
 
     private void ApplyDrawbackPerks(Battler target, Battler source, DrawbackRuntimeInstance drawbackInstance, int durationTurns)
     {
-        if (perkService == null || drawbackInstance?.Definition?.PerkIds == null) return;
+        if (perkService == null || drawbackInstance.Definition.PerkIds == null) return;
 
         for (int i = 0; i < drawbackInstance.Definition.PerkIds.Count; i++)
         {
-            PerkRuntimeInstance appliedPerk = perkService.ApplyPerk(target, drawbackInstance.Definition.PerkIds[i], source, durationTurns);
-            if (appliedPerk != null && !drawbackInstance.ActivePerks.Contains(appliedPerk))
+            PerkRuntimeInstance appliedPerk = perkService.ApplyPerk(target, drawbackInstance.Definition.PerkIds[i], source, -1);
+            if (appliedPerk != null)
             {
-                drawbackInstance.ActivePerks.Add(appliedPerk);
+                appliedPerk.SetSourceDrawback(drawbackInstance);
+                if (!drawbackInstance.ActivePerks.Contains(appliedPerk))
+                {
+                    drawbackInstance.ActivePerks.Add(appliedPerk);
+                }
             }
         }
     }

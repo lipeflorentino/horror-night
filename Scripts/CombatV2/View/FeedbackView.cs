@@ -37,13 +37,13 @@ public class FeedbackView : MonoBehaviour
         if (this.drawbackService != null)
         {
             this.drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
-            this.drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+            this.drawbackService.OnDrawbackExpired -= HandleDrawbackExpired;
         }
 
         if (this.battlerStateService != null)
         {
             this.battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
-            this.battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
+            this.battlerStateService.OnBattlerStateExpired -= HandleBattlerStateExpired;
         }
 
         ResolveFeedbackDependencies();
@@ -72,13 +72,13 @@ public class FeedbackView : MonoBehaviour
         if (this.drawbackService != null)
         {
             this.drawbackService.OnDrawbackApplied += HandleDrawbackApplied;
-            this.drawbackService.OnDrawbackRemoved += HandleDrawbackRemoved;
+            this.drawbackService.OnDrawbackExpired += HandleDrawbackExpired;
         }
 
         if (this.battlerStateService != null)
         {
             this.battlerStateService.OnBattlerStateApplied += HandleBattlerStateApplied;
-            this.battlerStateService.OnBattlerStateRemoved += HandleBattlerStateRemoved;
+            this.battlerStateService.OnBattlerStateExpired += HandleBattlerStateExpired;
         }
     }
     
@@ -123,12 +123,14 @@ public class FeedbackView : MonoBehaviour
 
     private void HandleDrawbackApplied(Battler battler, DrawbackRuntimeInstance drawback)
     {
+        Logger.Log($"[HandleDrawbackApplied] Handling drawback applied for {battler.Name}: {drawback.Definition.DisplayName}");
         if (combatLogView != null)
             combatLogView.ShowDrawbackFeedback(battler, drawback, "applied");
     }
 
-    private void HandleDrawbackRemoved(Battler battler, DrawbackRuntimeInstance drawback)
+    private void HandleDrawbackExpired(Battler battler, DrawbackRuntimeInstance drawback)
     {
+        Logger.Log($"[HandleDrawbackExpired] Handling drawback expired for {battler.Name}: {drawback.Definition.DisplayName}");
         if (combatLogView != null)
             combatLogView.ShowDrawbackFeedback(battler, drawback, "expired");
     }
@@ -139,7 +141,7 @@ public class FeedbackView : MonoBehaviour
             combatLogView.ShowBattlerStateFeedback(battler, state, "applied");
     }
 
-    private void HandleBattlerStateRemoved(Battler battler, BattlerStateRuntimeInstance state)
+    private void HandleBattlerStateExpired(Battler battler, BattlerStateRuntimeInstance state)
     {
         if (combatLogView != null)
             combatLogView.ShowBattlerStateFeedback(battler, state, "expired");

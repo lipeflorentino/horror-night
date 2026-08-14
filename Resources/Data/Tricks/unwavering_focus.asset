@@ -30,11 +30,12 @@ MonoBehaviour:
     MinFocus: 3
     MinStrength: 0
     MinAgility: 0
-  MomentumCost: 6
+  MomentumCost: 0
   TimingTurns: 1
-  DurationTurns: 2
+  DurationTurns: 1
   CooldownTurns: 4
   ActivationMode: 0
+  MinChargesRequired: 1
   PerkIds:
   - unwavering_focus
   DrawbackIds: []

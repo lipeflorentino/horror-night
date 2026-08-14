@@ -162,9 +162,6 @@ public class TrickService
         OnTrickCasted?.Invoke(target, trickInstance);
         OnTrickChanged?.Invoke(target, trickInstance);
 
-        Logger.Log($"[TrickService] Trick '{trickInstance.Definition.DisplayName}' castado em {target.Name}. " +
-                  $"Duração: {trickInstance.Definition.DurationTurns}, Cooldown: {trickInstance.CooldownTurnsRemaining}, TimingTurns: {trickInstance.Definition.TimingTurns}");
-
         return trickInstance;
     }
 
@@ -220,6 +217,18 @@ public class TrickService
             }
 
             bool changed = false;
+
+            if (trick.IsNew)
+            {
+                trick.IsNew = false;
+                if (trick.WasTriggeredThisTurn)
+                {
+                    trick.ClearTriggeredState();
+                    changed = true;
+                }
+                if (changed) OnTrickChanged?.Invoke(battler, trick);
+                continue;
+            }
 
             if (trick.WasTriggeredThisTurn)
             {

@@ -15,9 +15,11 @@ MonoBehaviour:
   Id: flutter
   DisplayName: Flutter
   Description: "Seu corpo est\xE1 quente de raiva, seu cora\xE7\xE3o est\xE1 palpitando,
-    sua respira\xE7\xE3o est\xE1 acelerada, isso te impede de pensar claramente e
-    agir de modo seguro"
-  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
-  DurationTurns: -1
+    sua respirac\xE3o est\xE1 acelerada, isso te impede de pensar claramente e agir
+    de modo seguro"
+  Icon: {fileID: 0}
+  DurationTurns: 3
+  DurationMin: 3
+  DurationMax: 5
   PerkIds: []
   FlavorText: 

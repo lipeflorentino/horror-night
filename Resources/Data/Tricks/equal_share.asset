@@ -17,7 +17,7 @@ MonoBehaviour:
   Description: "Se a soma dos seus dados for igual \xE0 soma dos dados do atacante,
     o dano total do confronto \xE9 dividido igualmente entre todos os combatentes
     envolvidos."
-  Icon: {fileID: 21300000, guid: b186a421c840be74da21940d73bcd7e5, type: 3}
+  Icon: {fileID: 0}
   Thumbnail: {fileID: 0}
   Level: 2
   Requirements:
@@ -31,11 +31,12 @@ MonoBehaviour:
     MinFocus: 0
     MinStrength: 0
     MinAgility: 0
-  MomentumCost: 2
+  MomentumCost: 0
   TimingTurns: 0
   DurationTurns: -1
   CooldownTurns: 0
   ActivationMode: 0
+  MinChargesRequired: 1
   PerkIds:
   - equal_share
   DrawbackIds: []

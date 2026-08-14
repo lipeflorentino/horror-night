@@ -117,10 +117,10 @@ public class CombatLogView : MonoBehaviour
                 Destroy(oldest.gameObject);
         }
 
-        StartCoroutine(AnimateEntryAndExpire(item, rect, canvasGroup));
+        StartCoroutine(AnimateEntryAndExpire(item));
     }
 
-    private IEnumerator AnimateEntryAndExpire(CombatLogItemUI item, RectTransform rect, CanvasGroup canvasGroup)
+    private IEnumerator AnimateEntryAndExpire(CombatLogItemUI item)
     {
         if (item == null)
             yield break;

@@ -126,3 +126,9 @@ TASKS
 
     - Icone do ActionLog está hardcoded
     - Mudar Result preview para ação de defesa, os textos não fazem sentido para defesa
+
+    - Damage popup no Hp do player 
+    - Icones de tricks / perks / drawbacks 
+    - Secondary Effects (UI)
+
+    - Extra dice não conta para o wearness (painel de result)

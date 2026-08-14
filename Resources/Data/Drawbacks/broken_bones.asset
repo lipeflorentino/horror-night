@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a425e133546695548841118226922a4e, type: 3}
-  m_Name: soreness
+  m_Name: broken_bones
   m_EditorClassIdentifier: 
-  Id: soreness
-  DisplayName: Soreness
-  Description: "Voc\xEA sente um desconforto muscular que reduz sua for\xE7a mental,
-    emocional e fisica em 2."
+  Id: broken_bones
+  DisplayName: Broken Bones
+  Description: O combatente reduz em 30% o parametro body e 50% do poder (seja ataque
+    ou defesa)
   Icon: {fileID: 0}
-  DurationTurns: 2
-  DurationMin: 2
-  DurationMax: 4
+  DurationTurns: 4
+  DurationMin: 4
+  DurationMax: 6
   PerkIds:
-  - soreness_strength
-  - soreness_body
-  - soreness_heart
-  - soreness_mind
-  FlavorText: "A dor \xE9 um lembrete de que voc\xEA est\xE1 vivo."
+  - broken_bones_body
+  - broken_bones_attack
+  - broken_bones_defense
+  FlavorText: "Ossos partidos trazem dor intensa e incapacidade f\xEDsica."

@@ -22,13 +22,13 @@ public class StatusEffectFeedbacks : MonoBehaviour
         if (battlerStateService != null)
         {
             battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
-            battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
+            battlerStateService.OnBattlerStateExpired -= HandleBattlerStateExpired;
         }
 
         if (drawbackService != null)
         {
             drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
-            drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+            drawbackService.OnDrawbackExpired -= HandleDrawbackExpired;
         }
 
         ownerBattler = owner;
@@ -38,13 +38,13 @@ public class StatusEffectFeedbacks : MonoBehaviour
         if (battlerStateService != null)
         {
             battlerStateService.OnBattlerStateApplied += HandleBattlerStateApplied;
-            battlerStateService.OnBattlerStateRemoved += HandleBattlerStateRemoved;
+            battlerStateService.OnBattlerStateExpired += HandleBattlerStateExpired;
         }
 
         if (drawbackService != null)
         {
             drawbackService.OnDrawbackApplied += HandleDrawbackApplied;
-            drawbackService.OnDrawbackRemoved += HandleDrawbackRemoved;
+            drawbackService.OnDrawbackExpired += HandleDrawbackExpired;
         }
     }
     private void HandleBattlerStateApplied(Battler battler, BattlerStateRuntimeInstance state)
@@ -63,7 +63,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
             feedbackKey: GetFeedbackKey(state.Definition.Id, state.Definition.Id));
     }
 
-    private void HandleBattlerStateRemoved(Battler battler, BattlerStateRuntimeInstance state)
+    private void HandleBattlerStateExpired(Battler battler, BattlerStateRuntimeInstance state)
     {
         if (!ShouldHandleEvent(battler))
             return;
@@ -71,7 +71,7 @@ public class StatusEffectFeedbacks : MonoBehaviour
         if (state == null)
             return;
 
-        RemovePopup(GetFeedbackKey(state.Definition?.Id, state.Definition?.Id));
+        RemovePopup(GetFeedbackKey(state.Definition.Id, state.Definition.Id));
     }
 
     private void HandleDrawbackApplied(Battler battler, DrawbackRuntimeInstance drawback)
@@ -90,15 +90,16 @@ public class StatusEffectFeedbacks : MonoBehaviour
             feedbackKey: GetFeedbackKey(drawback.InstanceId, drawback.Definition.Id));
     }
 
-    private void HandleDrawbackRemoved(Battler battler, DrawbackRuntimeInstance drawback)
+    private void HandleDrawbackExpired(Battler battler, DrawbackRuntimeInstance drawback)
     {
+        Logger.Log($"[HandleDrawbackExpired] Handling drawback expired for {battler.Name}: {drawback.Definition.DisplayName}");
         if (!ShouldHandleEvent(battler))
             return;
 
         if (drawback == null)
             return;
 
-        RemovePopup(GetFeedbackKey(drawback.InstanceId, drawback.Definition?.Id));
+        RemovePopup(GetFeedbackKey(drawback.InstanceId, drawback.Definition.Id));
     }
 
     private bool ShouldHandleEvent(Battler battler)
@@ -157,13 +158,13 @@ public class StatusEffectFeedbacks : MonoBehaviour
         if (battlerStateService != null)
         {
             battlerStateService.OnBattlerStateApplied -= HandleBattlerStateApplied;
-            battlerStateService.OnBattlerStateRemoved -= HandleBattlerStateRemoved;
+            battlerStateService.OnBattlerStateExpired -= HandleBattlerStateExpired;
         }
 
         if (drawbackService != null)
         {
             drawbackService.OnDrawbackApplied -= HandleDrawbackApplied;
-            drawbackService.OnDrawbackRemoved -= HandleDrawbackRemoved;
+            drawbackService.OnDrawbackExpired -= HandleDrawbackExpired;
         }
     }
 }

@@ -17,24 +17,24 @@ MonoBehaviour:
   Description: "Cada vez que voc\xEA sofre dano, voc\xEA ganha +1 de Trick Charges
     (at\xE9 3). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Attack
     por charge na sua a\xE7\xE3o de Ataque."
-  Icon: {fileID: 16180991, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
-  Thumbnail: {fileID: 21300000, guid: 6b2cfe6fb90212349bbffab673d5bf9f, type: 3}
-  Level: 1
+  Icon: {fileID: 0}
+  Thumbnail: {fileID: 0}
+  Level: 2
   Requirements:
-    MinLevel: 1
-    MinMind: 1
-    MinHeart: 1
-    MinBody: 1
-    MinAttack: 1
+    MinLevel: 2
+    MinMind: 3
+    MinHeart: 4
+    MinBody: 3
+    MinAttack: 4
     MinDefense: 0
     MinInitiative: 0
     MinFocus: 0
-    MinStrength: 0
+    MinStrength: 3
     MinAgility: 0
-  MomentumCost: 1
+  MomentumCost: 0
   TimingTurns: 0
-  DurationTurns: 3
-  CooldownTurns: 2
+  DurationTurns: 6
+  CooldownTurns: 8
   ActivationMode: 2
   MinChargesRequired: 3
   PerkIds:

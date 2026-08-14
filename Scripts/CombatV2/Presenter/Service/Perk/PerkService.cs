@@ -115,7 +115,7 @@ public class PerkService
                 continue;
             }
 
-            if (perk.SourceTrick != null) continue;
+            if (perk.SourceTrick != null || perk.SourceDrawback != null || perk.SourceState != null) continue;
             if (perk.RemainingTurns < 0) continue;
 
             perk.RemainingTurns--;

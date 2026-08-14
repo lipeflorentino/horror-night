@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ActionResolverService
@@ -74,7 +75,7 @@ public class ActionResolverService
 
         int attackPower = CalculatePower(attack, attacker, target, ActionType.Attack);
         int defensePower = !ignoreDefense ? CalculatePower(defense, target, attacker, ActionType.Defense) : 0;
-        int damage = attackPower - defensePower;
+        int damage = Math.Max(0, attackPower - defensePower);
 
         damage = perkService?.ApplyDamageModifiers(damage, attack, attacker, target, ActionType.Attack, defense) ?? damage;
         damage = perkService?.ApplyDamageModifiers(damage, defense, target, attacker, ActionType.Defense, attack) ?? damage;
@@ -226,42 +227,27 @@ public class ActionResolverService
     private void ApplyFeedback(ActionResolutionResult result)
     {
         bool showAttackFeedback = result.Outcome == ActionOutcome.Hit || result.Outcome == ActionOutcome.CriticalHit || result.Outcome == ActionOutcome.Missed;
-        
-        result.DamageBonusFeedbackText = result.DamageBonus > 0 
-            ? $"  <color=#FFFFFF>{"with"} </color> <color=#FFD700>{result.Damage} (+{result.DamageBonus}) DMG</color>" 
-            : (result.DamageBonus < 0 
-                ? $"  <color=#FFFFFF>{"with"}</color> <color=#FFD700>{result.Damage} ({result.DamageBonus}) DMG</color>" 
-                : string.Empty);
                 
         result.AttackFeedbackText = showAttackFeedback ? BuildAttackFeedback(result) : string.Empty;
         result.DefenseFeedbackText = BuildDefenseFeedback(result);
-
-        if (result.DamageBonus > 0 && showAttackFeedback)
-        {
-            result.AttackFeedbackText += result.DamageBonusFeedbackText;
-        }
-        else if (result.DamageBonus < 0)
-        {
-            result.DefenseFeedbackText += result.DamageBonusFeedbackText;
-        }
     }
 
     private string BuildAttackFeedback(ActionResolutionResult result)
     {
         return result.ResolutionVariation switch
         {
-            ActionResolutionVariation.LegendaryClash => "LEGENDARY CLASH",
-            ActionResolutionVariation.Deathstroke => "DEATHSTROKE",
-            ActionResolutionVariation.Overpower => "OVERPOWER",
-            ActionResolutionVariation.DevastatingStrike => "DEVASTATING STRIKE",
-            ActionResolutionVariation.ArmorShatter => "ARMOR SHATTER",
-            ActionResolutionVariation.PowerHit => "POWER HIT",
-            ActionResolutionVariation.PiercingHit => "PIERCING HIT",
-            ActionResolutionVariation.CriticalHit => "CRITICAL HIT!",
-            ActionResolutionVariation.Hit => "HIT",
-            ActionResolutionVariation.Missed => "MISSED",
-            ActionResolutionVariation.IronWall => "CRITICAL HIT!",
-            ActionResolutionVariation.Stronghold => "HIT",
+            ActionResolutionVariation.LegendaryClash => "Legendary Clash!",
+            ActionResolutionVariation.Deathstroke => "Deathstroke!",
+            ActionResolutionVariation.Overpower => "Overpower!",
+            ActionResolutionVariation.DevastatingStrike => "Devastating Strike!",
+            ActionResolutionVariation.ArmorShatter => "Armor Shatter",
+            ActionResolutionVariation.PowerHit => "Power Hit",
+            ActionResolutionVariation.PiercingHit => "Piercing Hit",
+            ActionResolutionVariation.CriticalHit => "Critical Hit!",
+            ActionResolutionVariation.Hit => "Hit",
+            ActionResolutionVariation.Missed => "Missed",
+            ActionResolutionVariation.IronWall => "Critical Hit!",
+            ActionResolutionVariation.Stronghold => "Hit",
             _ => string.Empty
         };
     }
@@ -269,25 +255,25 @@ public class ActionResolverService
     private string BuildDefenseFeedback(ActionResolutionResult result)
     {
         if (result.ResolutionVariation == ActionResolutionVariation.LegendaryClash)
-            return "LEGENDARY CLASH";
+            return "Legandary Clash!";
 
         if (result.ResolutionVariation == ActionResolutionVariation.FierceDefense)
-            return "FIERCE DEFENSE";
+            return "Fierce Defense!";
 
         if (result.ResolutionVariation == ActionResolutionVariation.IronWall)
-            return "IRON WALL";
+            return "Iron Wall";
 
         if (result.ResolutionVariation == ActionResolutionVariation.Stronghold)
-            return "STRONGHOLD";
+            return "Stronghold";
 
         if (result.IgnoreDefense)
-            return "GUARD BROKEN";
+            return "Guard Broken!";
 
         return result.DefenseOutcome switch
         {
-            DefenseOutcome.Evaded => "EVADED",
-            DefenseOutcome.Parried => "PARRIED",
-            DefenseOutcome.Blocked => "BLOCKED",
+            DefenseOutcome.Evaded => "Evaded",
+            DefenseOutcome.Parried => "Parried",
+            DefenseOutcome.Blocked => "Blocked",
             _ => string.Empty
         };
     }

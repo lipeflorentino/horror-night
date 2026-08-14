@@ -185,4 +185,46 @@ public static class CombatRules
             _ => 0
         };
     }
+
+    public static void VerifyWearness(IReadOnlyList<DiceStatType> powerDiceTypes, IReadOnlyList<DiceStatType> accuracyDiceTypes, Battler battler, DrawbackService drawbackService)
+    {
+        Dictionary<DiceStatType, int> diceCounts = new();
+        if (powerDiceTypes != null)
+        {
+            foreach (var stat in powerDiceTypes)
+            {
+                diceCounts.TryAdd(stat, 0);
+                diceCounts[stat]++;
+            }
+        }
+        if (accuracyDiceTypes != null)
+        {
+            foreach (var stat in accuracyDiceTypes)
+            {
+                diceCounts.TryAdd(stat, 0);
+                diceCounts[stat]++;
+            }
+        }
+
+        foreach (var kvp in diceCounts)
+        {
+            if (kvp.Value >= 3)
+            {
+                string drawbackId = kvp.Key switch
+                {
+                    DiceStatType.Mind => "wear_mind",
+                    DiceStatType.Heart => "wear_heart",
+                    DiceStatType.Body => "wear_body",
+                    _ => null
+                };
+
+                Logger.Log($"[CombatRules] Applying drawback '{drawbackId}' to battler '{battler.Name}' due to {kvp.Value} dice of type {kvp.Key}.");
+                
+                if (drawbackId != null)
+                {
+                    drawbackService.ApplyDrawback(battler, drawbackId);
+                }
+            }
+        }
+    }
 }

@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7fcdf76252c6436392b4e2bab16c181a, type: 3}
-  m_Name: endurance_release
+  m_Name: wear_heart_dice
   m_EditorClassIdentifier: 
-  Id: endurance_release
+  Id: wear_heart_dice
   DefaultDurationTurns: -1
-  MaxStacks: 3
+  MaxStacks: 1
   StackMode: 0
   Tags: 
   Rule:
     Trigger: 0
-    ModifierTarget: 16
-    Operation: 3
+    ModifierTarget: 26
+    Operation: 8
     OwnerRole: 0
     ActionType: 0
     FilterByActionType: 0

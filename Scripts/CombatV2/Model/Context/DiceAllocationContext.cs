@@ -34,4 +34,8 @@ public class DiceAllocationContext
     public int MissThreshold;
     public int HitThreshold;
     public int CriticalThreshold;
+    public ActionType SelectedAction;
+    public int PotentialMaxBonus;
+    public Dictionary<ActionResolutionVariation, List<ActionEffectPayload>> SeccondaryEffects;
+    public List<DiceStatType> WarnWearStats;
 }

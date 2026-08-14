@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: terrifying_presence
   DisplayName: "Presen\xE7a Aterrorizante"
-  Description: "Todos os inimigos ao seu redor sofrem -4 de Strength enquanto voc\xEA
+  Description: "Todos os inimigos ao seu redor sofrem -4 de Mind enquanto voc\xEA
     estiver presente."
   Icon: {fileID: 0}
   Thumbnail: {fileID: 0}
@@ -30,11 +30,12 @@ MonoBehaviour:
     MinFocus: 0
     MinStrength: 4
     MinAgility: 0
-  MomentumCost: 5
+  MomentumCost: 0
   TimingTurns: 0
-  DurationTurns: 2
-  CooldownTurns: 5
+  DurationTurns: 3
+  CooldownTurns: 6
   ActivationMode: 1
+  MinChargesRequired: 1
   PerkIds:
   - terrifying_presence
   DrawbackIds: []

@@ -6,6 +6,7 @@ public class BattlerStateRuntimeInstance
     public Battler Owner;
     public Battler Source;
     public int RemainingTurns;
+    public bool IsNew = true;
     public List<PerkRuntimeInstance> ActivePerks = new();
 
     public BattlerStateRuntimeInstance(BattlerStateSO definition, Battler owner, Battler source = null, int remainingTurns = -1)

@@ -291,40 +291,82 @@ public class DiceAllocationView : MonoBehaviour
         {
             accuracyResultPanelText.text = string.Empty;
             powerResultPanelText.text = string.Empty;
-            if (overallResultPanelText != null)
-                overallResultPanelText.text = string.Empty;
+            if (overallResultPanelText != null) overallResultPanelText.text = string.Empty;
             return;
         }
 
         StringBuilder accSb = new();
         StringBuilder powSb = new();
+        
+        bool isDefense = data.SelectedAction == ActionType.Defense;
 
+        // --------------------------------------------------------
+        // COLUNA 1: ACCURACY / GUARD
+        // --------------------------------------------------------
         if (data.HasAccuracy)
         {
-            string missThresholdText = data.MissThreshold > 0 ? $"1-{data.MissThreshold}" : "--";
+            string accTitle = isDefense ? "GUARD" : "ACCURACY";
+            string critLabel = isDefense ? "Perfect Guard (Crit)" : "Critical Hit";
+            string maxAccLabel = isDefense ? "Perfect Parry/Evade" : "Guard Break";
             
-            accSb.AppendLine($"<color={Colorization.AccuracyColorHex}><b><size=120%>ACCURACY</size></b></color>");
-            accSb.AppendLine();
-            accSb.AppendLine($"Miss Threshold: {ColorValue(missThresholdText, GetLowerThresholdColor(data.MissThreshold, data.AccuracyTierBoundaries.maxValue))}");
-            accSb.AppendLine($"Miss Chance:{ColorValue(data.AccuracyChances.Low.ToString("P0"), GetBadChanceColor(data.AccuracyChances.Low))}");
-            accSb.AppendLine($"Hit Threshold: {ColorValue($"{data.HitThreshold}+", GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))}");
-            accSb.AppendLine($"Hit Chance: {ColorValue((data.AccuracyChances.Medium + data.AccuracyChances.High).ToString("P0"), GetGoodChanceColor(data.AccuracyChances.Medium + data.AccuracyChances.High))}");
-            accSb.AppendLine($"Critical Threshold: {ColorValue(data.CriticalThreshold > 0 ? $"{data.CriticalThreshold}+" : "--", GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))}");
-            accSb.AppendLine($"Critical Chance: {ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))}");
-            accSb.AppendLine($"Max Accuracy Threshold: {ColorValue(data.AccuracyTierBoundaries.maxValue.ToString(), GetLowerThresholdColor(data.AccuracyTierBoundaries.maxValue, data.AccuracyTierBoundaries.maxValue))}");
-            accSb.AppendLine($"Max Accuracy Chance: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))}");
+            string hitRequirement = $"{data.HitThreshold}+";
+            float hitChance = data.AccuracyChances.Medium + data.AccuracyChances.High;
+            string critRequirement = data.CriticalThreshold > 0 ? $"{data.CriticalThreshold}+" : "--";
+            
+            accSb.AppendLine($"<color={Colorization.AccuracyColorHex}><b><size=120%>{accTitle}</size></b></color>\n");
+            // Linha 1: Hit Requirement + Chance 
+            accSb.AppendLine($"Hit Threshold: {ColorValue(hitRequirement, GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))} ({ColorValue(hitChance.ToString("P0"), GetGoodChanceColor(hitChance))})");
+            // Linha 2: Critical Requirement + Chance
+            accSb.AppendLine($"{critLabel}: {ColorValue(critRequirement, GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))} ({ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))})");
+            // Linha 3: Variação de Rolagem Máxima (Ex: Guard Break 15%)
+            accSb.AppendLine($"{maxAccLabel}: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))}");
         }
         
+        // --------------------------------------------------------
+        // COLUNA 2: POWER / MITIGATION
+        // --------------------------------------------------------
         if (data.HasPower)
         {
-            powSb.AppendLine($"<color={Colorization.PowerColorHex}><b><size=120%>POWER</size></b></color>");
-            powSb.AppendLine();
-            powSb.AppendLine($"Damage (Min/Max): {ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier))}-{ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier))}");
-            powSb.AppendLine($"Damage Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x");
-            powSb.AppendLine($"Max Power Threshold: {ColorValue(data.PowerTierBoundaries.maxValue.ToString(), GetLowerThresholdColor(data.PowerTierBoundaries.maxValue, data.PowerTierBoundaries.maxValue))}");
-            powSb.AppendLine($"Max Power Chance: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))}");
+            string powTitle = isDefense ? "MITIGATION" : "POWER";
+            string dmgLabel = isDefense ? "Block Range" : "Damage Range";
+            string maxPowLabel = isDefense ? "Iron Wall Chance" : "Overpower Chance";
+            
+            string minDmg = ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier));
+            string maxDmg = ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier));
+            string bonusText = data.PotentialMaxBonus > 0 
+                ? $" <color=#FFD700>(+{data.PotentialMaxBonus})</color>" 
+                : string.Empty;
+
+            powSb.AppendLine($"<color={Colorization.PowerColorHex}><b><size=120%>{powTitle}</size></b></color>\n");
+            // Linha 1: Range de Dano + Bônus Dourado
+            powSb.AppendLine($"{dmgLabel}: {minDmg}-{maxDmg}{bonusText}");
+            // Linha 2: Multiplicador
+            powSb.AppendLine($"Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x");
+            // Linha 3: Variação de Rolagem Máxima (Ex: Overpower Chance 10%)
+            powSb.AppendLine($"{maxPowLabel}: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))}");
         }
 
+        if (data.SeccondaryEffects != null && data.SeccondaryEffects.Count > 0)
+        {
+            foreach (var effect in data.SeccondaryEffects)
+            {
+                string effectName = effect.Key.ToString();
+                string effectChance = $"{effect.Value.Count} possible effects";
+                accSb.AppendLine($"\n<i><sprite name=\"icon_secondary_effect\"> <size=90%>{effectName}: {effectChance}</size></i>");
+            }
+        }
+
+        if (data.WarnWearStats != null && data.WarnWearStats.Count > 0)
+        {
+            foreach (var stat in data.WarnWearStats)
+            {
+                accSb.AppendLine($"\n<i><sprite name=\"wear_and_tear\"> <color={Colorization.GetStatColor(stat)}>{stat}</color> <color={Colorization.BadColorHex}>Wearness</color></i>");
+            }
+        }
+
+        // --------------------------------------------------------
+        // OVERALL CONSISTENCY
+        // --------------------------------------------------------
         if (data.HasPower && data.HasAccuracy)
         {
             string consistencyColorHex = GetConsistencyColor(data.Consistency);
