@@ -12,7 +12,6 @@ public class PerkSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void Bind(PerkRuntimeInstance instance)
     {
-        Logger.Log($"[PerkSlotUI] Binding perk to slot: {instance.Definition.Id ?? "null"}");
         if (perkIconImage != null)
         {
             if (instance.SourceTrick != null && instance.SourceTrick.Definition != null)
