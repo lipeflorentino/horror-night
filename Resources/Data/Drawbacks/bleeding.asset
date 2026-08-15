@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Bleeding
   Description: O combatente tem as stats (mind, heart, body) reduzidas em 2 e a cada
     turno ele perde 2 de hp.
-  Icon: {fileID: 0}
+  Icon: {fileID: -1381891710, guid: 1ac2741ed224a1c4788572be0179e647, type: 3}
   DurationTurns: 3
   DurationMin: 3
   DurationMax: 5

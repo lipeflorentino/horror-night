@@ -17,8 +17,8 @@ MonoBehaviour:
   Description: "Cada ataque bloqueado adiciona +1 de Trick Charges (adequado at\xE9
     5). Voc\xEA pode gastar at\xE9 3 charges para adicionar +1 de Defense por charge
     na sua a\xE7\xE3o de Defesa."
-  Icon: {fileID: 0}
-  Thumbnail: {fileID: 0}
+  Icon: {fileID: 21300000, guid: b3d9803ff6299304ba5b4717d4fb72df, type: 3}
+  Thumbnail: {fileID: 21300000, guid: 6b2cfe6fb90212349bbffab673d5bf9f, type: 3}
   Level: 2
   Requirements:
     MinLevel: 2

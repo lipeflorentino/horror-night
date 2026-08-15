@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Broken Bones
   Description: O combatente reduz em 30% o parametro body e 50% do poder (seja ataque
     ou defesa)
-  Icon: {fileID: 0}
+  Icon: {fileID: 1358806517, guid: dc9e329a0ddeb184aa1be098affb4148, type: 3}
   DurationTurns: 4
   DurationMin: 4
   DurationMax: 6

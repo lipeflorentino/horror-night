@@ -16,7 +16,7 @@ MonoBehaviour:
   DisplayName: Six Feet Under
   Description: "Se um teste de Poder resultar em 6, a a\xE7\xE3o recebe um b\xF4nus
     de +30% de dano."
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300000, guid: b52cfc76eae547747acfefb6834d83bf, type: 3}
   Thumbnail: {fileID: 21300000, guid: 95b10f90e8082934ba4677771c4cd9dc, type: 3}
   Level: 2
   Requirements:

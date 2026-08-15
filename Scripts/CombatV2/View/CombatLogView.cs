@@ -55,7 +55,7 @@ public class CombatLogView : MonoBehaviour
 
         if (actionType == "applied")
         {
-            textColor = Color.red;
+            textColor = Color.yellow;
         }
         else if (actionType == "expired")
         {
@@ -102,11 +102,6 @@ public class CombatLogView : MonoBehaviour
 
         CombatLogItemUI item = Instantiate(logItemPrefab, contentRoot);
         item.Bind(icon, logText, textColor ?? defaultColor);
-
-        RectTransform rect = item.GetComponent<RectTransform>();
-        CanvasGroup canvasGroup = item.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = item.gameObject.AddComponent<CanvasGroup>();
 
         activeLogs.Enqueue(item);
 

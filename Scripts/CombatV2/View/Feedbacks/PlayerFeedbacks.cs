@@ -8,6 +8,7 @@ public class PlayerFeedbacks : MonoBehaviour
     public Canvas screenFlashCanvas;
     public Image playerFlashImage;
     [SerializeField] private GameObject actionLogPanel;
+    [SerializeField] private Image actionIcon;
     [SerializeField] private TextMeshProUGUI playerStatusText;
     [SerializeField] private float PlayerStatusDuration = 2f;
     
@@ -31,13 +32,21 @@ public class PlayerFeedbacks : MonoBehaviour
         if (screenFlashCanvas == null || playerFlashImage == null)
         {
             Logger.Log("[PlayerFeedbacks] Screen flash canvas or image reference is missing.");
-            return;
         }
 
         if (actionLogPanel == null)
         {
             Logger.Log("[PlayerFeedbacks] Action log panel reference is missing.");
             return;
+        }
+
+        if (actionIcon == null)
+            actionIcon = actionLogPanel.GetComponentInChildren<Image>(true);
+
+        if (actionIcon != null)
+        {
+            actionIcon.enabled = false;
+            actionIcon.gameObject.SetActive(false);
         }
 
         actionLogPanel.SetActive(false);
@@ -64,6 +73,7 @@ public class PlayerFeedbacks : MonoBehaviour
             return;
         }
 
+        UpdateActionIcon(isAttackFeedback);
         AnimateActionLog(text, isAttackFeedback);
     }
 
@@ -159,6 +169,32 @@ public class PlayerFeedbacks : MonoBehaviour
                 playerFlashImage.enabled = false;
                 playerFlashImage.gameObject.SetActive(false);
             });
+    }
+
+    private void UpdateActionIcon(bool isAttackFeedback)
+    {
+        if (actionLogPanel == null)
+            return;
+
+        if (actionIcon == null)
+            actionIcon = actionLogPanel.GetComponentInChildren<Image>(true);
+
+        if (actionIcon == null)
+            return;
+
+        string actionName = isAttackFeedback ? "attack" : "defense";
+        Texture2D actionTexture = Resources.Load<Texture2D>($"UI/Actions/{actionName}");
+
+        if (actionTexture == null)
+        {
+            actionIcon.enabled = false;
+            actionIcon.gameObject.SetActive(false);
+            return;
+        }
+
+        actionIcon.sprite = Sprite.Create(actionTexture, new Rect(0f, 0f, actionTexture.width, actionTexture.height), new Vector2(0.5f, 0.5f));
+        actionIcon.enabled = true;
+        actionIcon.gameObject.SetActive(true);
     }
 
     private void AnimateActionLog(string text, bool isAttackFeedback)

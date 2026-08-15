@@ -16,8 +16,8 @@ MonoBehaviour:
   DisplayName: "Foco Inabal\xE1vel"
   Description: "Na sua a\xE7\xE3o de Defesa, cada ataque bloqueado adiciona +3 de
     Focus no pr\xF3ximo turno."
-  Icon: {fileID: 0}
-  Thumbnail: {fileID: 0}
+  Icon: {fileID: 21300000, guid: 560bc95186a83234ca4ab0fcddd1e5d9, type: 3}
+  Thumbnail: {fileID: 21300000, guid: b33f35a3829ae2d458f5b8a942d05303, type: 3}
   Level: 2
   Requirements:
     MinLevel: 2

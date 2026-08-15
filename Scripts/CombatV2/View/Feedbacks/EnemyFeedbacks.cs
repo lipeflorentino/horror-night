@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyFeedbacks : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class EnemyFeedbacks : MonoBehaviour
     private TextMeshProUGUI popupText;
     private SpriteRenderer enemySpriteRenderer;
     [SerializeField] private GameObject actionLogPanel;
+    [SerializeField] private Image actionIcon;
     [SerializeField] private TMP_Text enemyStatusText;
 
     [Header("Feedback Text Colors")]
@@ -60,6 +62,21 @@ public class EnemyFeedbacks : MonoBehaviour
         if (enemySpriteRenderer == null)
             Debug.LogError("[EnemyFeedbacks] Enemy visual reference or SpriteRenderer is missing.");
 
+        if (actionLogPanel == null)
+        {
+            Debug.LogError("[EnemyFeedbacks] Action log panel reference is missing.");
+            return;
+        }
+
+        if (actionIcon == null)
+            actionIcon = actionLogPanel.GetComponentInChildren<Image>(true);
+
+        if (actionIcon != null)
+        {
+            actionIcon.enabled = false;
+            actionIcon.gameObject.SetActive(false);
+        }
+
         popupObject.SetActive(false);
         actionLogPanel.SetActive(false);
     }
@@ -72,7 +89,14 @@ public class EnemyFeedbacks : MonoBehaviour
 
     public void ShowStatusPopup(string text, bool isAttackFeedback)
     {
+        if (actionLogPanel == null)
+        {
+            Debug.LogError("[EnemyFeedbacks] Action log panel reference is missing.");
+            return;
+        }
+
         actionLogPanel.SetActive(true);
+        UpdateActionIcon(isAttackFeedback);
         AnimateActionLog(text, isAttackFeedback);
     }
 
@@ -134,6 +158,32 @@ public class EnemyFeedbacks : MonoBehaviour
             .DOFade(1f, EnemyFlashDuration)
             .SetEase(Ease.Linear)
             .OnComplete(() => enemySpriteRenderer.color = initialColor);
+    }
+
+    private void UpdateActionIcon(bool isAttackFeedback)
+    {
+        if (actionLogPanel == null)
+            return;
+
+        if (actionIcon == null)
+            actionIcon = actionLogPanel.GetComponentInChildren<Image>(true);
+
+        if (actionIcon == null)
+            return;
+
+        string actionName = isAttackFeedback ? "attack" : "defense";
+        Texture2D actionTexture = Resources.Load<Texture2D>($"UI/Actions/{actionName}");
+
+        if (actionTexture == null)
+        {
+            actionIcon.enabled = false;
+            actionIcon.gameObject.SetActive(false);
+            return;
+        }
+
+        actionIcon.sprite = Sprite.Create(actionTexture, new Rect(0f, 0f, actionTexture.width, actionTexture.height), new Vector2(0.5f, 0.5f));
+        actionIcon.enabled = true;
+        actionIcon.gameObject.SetActive(true);
     }
 
     private void AnimateActionLog(string text, bool isAttackFeedback)

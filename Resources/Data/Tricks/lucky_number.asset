@@ -16,8 +16,8 @@ MonoBehaviour:
   DisplayName: "N\xFAmero da Sorte"
   Description: "Se a soma total dos seus dados for exatamente 7, voc\xEA ganha 1
     ponto de Momentum."
-  Icon: {fileID: 0}
-  Thumbnail: {fileID: 0}
+  Icon: {fileID: 21300000, guid: e894a34faf7dac9479e6382214ef968e, type: 3}
+  Thumbnail: {fileID: 21300000, guid: 95b10f90e8082934ba4677771c4cd9dc, type: 3}
   Level: 3
   Requirements:
     MinLevel: 3

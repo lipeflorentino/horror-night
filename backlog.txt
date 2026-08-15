@@ -126,6 +126,4 @@ TASKS
         - nos icones e texts de stats (quando gasta, quando está baixo, etc)   
     - Verificar Sistema/UI de Drawback / BattlerState
 
-    - Icone do ActionLog está hardcoded
-    - Icones de tricks / perks / drawbacks 
     - Secondary Effects (UI)
