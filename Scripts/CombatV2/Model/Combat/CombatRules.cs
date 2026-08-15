@@ -217,8 +217,6 @@ public static class CombatRules
                     DiceStatType.Body => "wear_body",
                     _ => null
                 };
-
-                Logger.Log($"[CombatRules] Applying drawback '{drawbackId}' to battler '{battler.Name}' due to {kvp.Value} dice of type {kvp.Key}.");
                 
                 if (drawbackId != null)
                 {

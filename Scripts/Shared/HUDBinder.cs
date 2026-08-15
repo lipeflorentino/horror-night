@@ -58,6 +58,7 @@ public class CombatHudBinding
     public StatHudBinding mind;
     public StatHudBinding heart;
     public StatHudBinding body;
+    public StatHudBinding hp;
 
     public void SetValues(int heartValue, int heartMax, int bodyValue, int bodyMax, int mindValue, int mindMax)
     {

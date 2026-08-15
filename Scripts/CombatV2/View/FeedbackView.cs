@@ -162,18 +162,18 @@ public class FeedbackView : MonoBehaviour
             if (view == null)
                 continue;
 
-            if (playerStatusEffectFeedbacks == null && view.OwnerBattler != null && view.OwnerBattler.IsPlayer)
-                playerStatusEffectFeedbacks = view;
-
             if (enemyStatusEffectFeedbacks == null && view.OwnerBattler != null && !view.OwnerBattler.IsPlayer)
                 enemyStatusEffectFeedbacks = view;
+
+            if (playerStatusEffectFeedbacks == null && view.OwnerBattler != null && view.OwnerBattler.IsPlayer)
+                playerStatusEffectFeedbacks = view;
         }
 
-        if (playerStatusEffectFeedbacks == null && feedbackViews.Length > 0)
-            playerStatusEffectFeedbacks = feedbackViews[0];
-
         if (enemyStatusEffectFeedbacks == null && feedbackViews.Length > 1)
-            enemyStatusEffectFeedbacks = feedbackViews[1];
+            enemyStatusEffectFeedbacks = feedbackViews[0];
+
+        if (playerStatusEffectFeedbacks == null && feedbackViews.Length > 0)
+            playerStatusEffectFeedbacks = feedbackViews[1];
     }
 
     public void ShowResolveFeedback(ActionResolutionResult result, bool attackerIsPlayer)
@@ -202,6 +202,7 @@ public class FeedbackView : MonoBehaviour
             }
 
             playerFeedbacks.ShowPlayerDamageFlash();
+            playerFeedbacks.ShowDamagePopup(result.Damage);
             return;
         }
 

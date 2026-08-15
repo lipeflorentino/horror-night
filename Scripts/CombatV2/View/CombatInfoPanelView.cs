@@ -121,7 +121,6 @@ public class CombatInfoPanelView : MonoBehaviour
         }
 
         IReadOnlyList<PerkRuntimeInstance> perks = player.GetEffectivePerks();
-        Logger.Log($"[CombatInfoPanelView] Building perk slots for player '{player.Name}' with {perks.Count} perks.");
         for (int i = 0; i < perks.Count; i++)
         {
             PerkRuntimeInstance perkInstance = perks[i];

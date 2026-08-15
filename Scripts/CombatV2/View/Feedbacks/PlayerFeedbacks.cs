@@ -67,6 +67,25 @@ public class PlayerFeedbacks : MonoBehaviour
         AnimateActionLog(text, isAttackFeedback);
     }
 
+    public void ShowDamagePopup(int damage)
+    {
+        if (damage <= 0)
+            return;
+
+        RectTransform anchor = GetHpAnchor();
+
+        if (screenFlashCanvas == null || anchor == null || resourceCostPopupPrefab == null)
+        {
+            Logger.Log("[PlayerFeedbacks] Screen flash canvas or image reference is missing.");
+            return;
+        }
+
+        var popup = Instantiate(resourceCostPopupPrefab, screenFlashCanvas.transform);
+        popup.transform.position = anchor.position;
+        Color color = ColorUtility.TryParseHtmlString(Colorization.BadColorHex, out Color c) ? c : Color.white;
+        popup.Show($"-{damage}", color);
+    }
+
     public void ShowResourceCostPopup(DiceStatType statType, int amount)
     {
         RectTransform anchor = GetStatIconAnchor(statType);
@@ -83,6 +102,8 @@ public class PlayerFeedbacks : MonoBehaviour
         Image hightlightImage = GetStatHightlightImage(statType);
         AnimateHighlight(hightlightImage);
     }
+
+    private RectTransform GetHpAnchor() => hudBinding?.hp?.valueText?.rectTransform;
 
     private RectTransform GetStatIconAnchor(DiceStatType statType) => statType switch
     {

@@ -127,7 +127,5 @@ TASKS
     - Verificar Sistema/UI de Drawback / BattlerState
 
     - Icone do ActionLog está hardcoded
-
-    - Damage popup no Hp do player 
     - Icones de tricks / perks / drawbacks 
     - Secondary Effects (UI)
