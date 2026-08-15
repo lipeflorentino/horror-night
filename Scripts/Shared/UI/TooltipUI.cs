@@ -74,11 +74,14 @@ public class TooltipUI : MonoBehaviour
             tooltipText.text = text;
             tooltipText.color = GetColor(color);
         }
-
+        
         ResizeToText(text);
 
         if (rectTransform != null)
-            rectTransform.position = position + new Vector3(0, 50, 0);
+        {
+            Vector3 targetPosition = position + new Vector3(0, 50, 0);
+            rectTransform.position = GetScreenClampedPosition(targetPosition);
+        }
 
         if (tooltipPanel == null)
             return;
@@ -167,6 +170,33 @@ public class TooltipUI : MonoBehaviour
     {
         ColorUtility.TryParseHtmlString(hex, out Color color);
         return color;
+    }
+
+    private Vector3 GetScreenClampedPosition(Vector3 desiredPosition)
+    {
+        // Usa o tamanho do painel (calculado no ResizeToText)
+        Vector2 size = panelRectTransform != null ? panelRectTransform.sizeDelta : rectTransform.sizeDelta;
+        Vector2 pivot = rectTransform.pivot;
+
+        // Calcula os limites virtuais do tooltip na tela
+        float minX = desiredPosition.x - (size.x * pivot.x);
+        float maxX = desiredPosition.x + (size.x * (1 - pivot.x));
+        float minY = desiredPosition.y - (size.y * pivot.y);
+        float maxY = desiredPosition.y + (size.y * (1 - pivot.y));
+
+        // Ajusta a posição no eixo X se estiver saindo pelas laterais
+        if (minX < 0) 
+            desiredPosition.x += -minX;
+        else if (maxX > Screen.width) 
+            desiredPosition.x -= (maxX - Screen.width);
+
+        // Ajusta a posição no eixo Y se estiver saindo por cima ou por baixo
+        if (minY < 0) 
+            desiredPosition.y += -minY;
+        else if (maxY > Screen.height) 
+            desiredPosition.y -= (maxY - Screen.height);
+
+        return desiredPosition;
     }
 
     public object Owner => currentOwner;

@@ -58,6 +58,17 @@ public static class Colorization
         };
     }
 
+    public static string GetStatColor(string statType)
+    {
+        return statType switch
+        {
+            "Mind" => MindColorHex,
+            "Heart" => HeartColorHex,
+            "Body" => BodyColorHex,
+            _ => DefaultTextColorHex
+        };
+    }
+
     public static Color HexToColor(string hex)
     {
         if (ColorUtility.TryParseHtmlString(hex, out Color color))

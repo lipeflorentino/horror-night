@@ -300,13 +300,27 @@ public class DiceAllocationView : MonoBehaviour
         
         bool isDefense = data.SelectedAction == ActionType.Defense;
 
+        // ==========================================
+        // 1. Definição das mensagens organizadas
+        // ==========================================
+        string hitThreshMsg = isDefense ? "O valor mínimo necessário nos dados para não ficar Vulnerável." : "O valor mínimo necessário nos dados para não Errar.";
+        string hitChanceMsg = "A probabilidade matemática de alcançar o Threshold.";
+        string critThreshMsg = isDefense ? "O valor para um bloqueio perfeito." : "O valor necessário para um acerto Crítico.";
+        string critChanceMsg = "Probabilidade de alcançar o valor Crítico.";
+        string maxAccMsg = isDefense ? "Chance de ignorar completamente o ataque inimigo." : "Chance de quebrar a defesa e ignorar mitigação.";
+
+        string dmgMsg = isDefense ? "Quantidade de dano que será absorvida." : "A estimativa de dano base que será causado.";
+        string maxBonusMsg = "Dano ou mitigação extra adicionado caso alcance o Max Roll.";
+        string multMsg = "Multiplicador baseado na quantidade de dados investidos.";
+        string maxPowMsg = isDefense ? "Chance de alcançar o status de Iron Wall." : "Chance de alcançar o status de Overpower.";
+
         // --------------------------------------------------------
         // COLUNA 1: ACCURACY / GUARD
         // --------------------------------------------------------
         if (data.HasAccuracy)
         {
             string accTitle = isDefense ? "GUARD" : "ACCURACY";
-            string critLabel = isDefense ? "Perfect Guard (Crit)" : "Critical Hit";
+            string critLabel = isDefense ? "Perfect Guard" : "Critical Hit";
             string maxAccLabel = isDefense ? "Perfect Parry/Evade" : "Guard Break";
             
             string hitRequirement = $"{data.HitThreshold}+";
@@ -315,11 +329,15 @@ public class DiceAllocationView : MonoBehaviour
             
             accSb.AppendLine($"<color={Colorization.AccuracyColorHex}><b><size=120%>{accTitle}</size></b></color>\n");
             // Linha 1: Hit Requirement + Chance 
-            accSb.AppendLine($"Hit Threshold: {ColorValue(hitRequirement, GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))} ({ColorValue(hitChance.ToString("P0"), GetGoodChanceColor(hitChance))})");
+            accSb.AppendLine(FormatTooltip($"Hit Threshold: {ColorValue(hitRequirement, GetLowerThresholdColor(data.HitThreshold, data.AccuracyTierBoundaries.maxValue))}", hitThreshMsg));
+            accSb.AppendLine(FormatTooltip($"Hit Chance: {ColorValue(hitChance.ToString("P0"), GetGoodChanceColor(hitChance))}", hitChanceMsg));
+
             // Linha 2: Critical Requirement + Chance
-            accSb.AppendLine($"{critLabel}: {ColorValue(critRequirement, GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))} ({ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))})");
-            // Linha 3: Variação de Rolagem Máxima (Ex: Guard Break 15%)
-            accSb.AppendLine($"{maxAccLabel}: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))}");
+            accSb.AppendLine(FormatTooltip($"{critLabel} Threshold: {ColorValue(critRequirement, GetLowerThresholdColor(data.CriticalThreshold, data.AccuracyTierBoundaries.maxValue))}", critThreshMsg));
+            accSb.AppendLine(FormatTooltip($"{critLabel} Chance: {ColorValue(data.AccuracyChances.High.ToString("P0"), GetGoodChanceColor(data.AccuracyChances.High))}", critChanceMsg));
+
+            // Linha 3: Variação de Rolagem Máxima
+            accSb.AppendLine(FormatTooltip($"{maxAccLabel}: {ColorValue(data.AccuracyMaxRollChance.ToString("P0"), GetGoodChanceColor(data.AccuracyMaxRollChance))}", maxAccMsg));
         }
         
         // --------------------------------------------------------
@@ -334,16 +352,19 @@ public class DiceAllocationView : MonoBehaviour
             string minDmg = ColorValue(data.MinDamage.ToString("F0"), GetTierColor(data.MinPowerTier));
             string maxDmg = ColorValue(data.MaxDamage.ToString("F0"), GetTierColor(data.MaxPowerTier));
             string bonusText = data.PotentialMaxBonus > 0 
-                ? $" <color=#FFD700>(+{data.PotentialMaxBonus})</color>" 
+                ? $" <color=yellow>(+{data.PotentialMaxBonus})</color>" 
                 : string.Empty;
 
             powSb.AppendLine($"<color={Colorization.PowerColorHex}><b><size=120%>{powTitle}</size></b></color>\n");
             // Linha 1: Range de Dano + Bônus Dourado
-            powSb.AppendLine($"{dmgLabel}: {minDmg}-{maxDmg}{bonusText}");
+            powSb.AppendLine(FormatTooltip($"{dmgLabel}: {minDmg}-{maxDmg}", dmgMsg));
+            powSb.AppendLine(FormatTooltip($"Potencial Max Bonus: {bonusText}", maxBonusMsg));
+
             // Linha 2: Multiplicador
-            powSb.AppendLine($"Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x");
-            // Linha 3: Variação de Rolagem Máxima (Ex: Overpower Chance 10%)
-            powSb.AppendLine($"{maxPowLabel}: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))}");
+            powSb.AppendLine(FormatTooltip($"Multiplier: {ColorValue(data.DamageMultiplier.ToString(), GetGoodChanceColor(data.DamageMultiplier))}x", multMsg));
+
+            // Linha 3: Variação de Rolagem Máxima
+            powSb.AppendLine(FormatTooltip($"{maxPowLabel}: {ColorValue(data.PowerMaxRollChance.ToString("P0"), GetGoodChanceColor(data.PowerMaxRollChance))}", maxPowMsg));
         }
 
         if (data.SeccondaryEffects != null && data.SeccondaryEffects.Count > 0)
@@ -352,7 +373,7 @@ public class DiceAllocationView : MonoBehaviour
             {
                 string effectName = effect.Key.ToString();
                 string effectChance = $"{effect.Value.Count} possible effects";
-                accSb.AppendLine($"\n<i><sprite name=\"icon_secondary_effect\"> <size=90%>{effectName}: {effectChance}</size></i>");
+                accSb.AppendLine($"\n<i><sprite name=\"icon_hint\"> <size=90%>{effectName}: {effectChance}</size></i>");
             }
         }
 
@@ -360,7 +381,9 @@ public class DiceAllocationView : MonoBehaviour
         {
             foreach (var stat in data.WarnWearStats)
             {
-                accSb.AppendLine($"\n<i><sprite name=\"wear_and_tear\"> <color={Colorization.GetStatColor(stat)}>{stat}</color> <color={Colorization.BadColorHex}>Wearness</color></i>");
+                string tooltipMensagem = $"Allocating [color=yellow]3+[/color] [color={Colorization.GetStatColor(stat)}]{stat}[/color] dices triggers [color={Colorization.BadColorHex}]{stat} Wearness[/color].";
+
+                accSb.AppendLine($"\n<i><size=90%><link=\"{tooltipMensagem}\"><color={Colorization.BadColorHex}>{stat} Wearness</color> <sprite name=\"icon_hint\"></link></size></i>");
             }
         }
 
@@ -558,5 +581,13 @@ public class DiceAllocationView : MonoBehaviour
 
         Debug.LogWarning($"[DiceAllocationView] Alocador não encontrado para {stat} + {rollType}.");
         return null;
+    }
+
+    // Helper para embrulhar qualquer texto em um link interativo e proteger tags de cor
+    private string FormatTooltip(string visibleText, string tooltipMessage)
+    {
+        string safeTooltip = tooltipMessage.Replace("<", "[").Replace(">", "]");
+    
+        return $"<link=\"{safeTooltip}\">{visibleText}</link>";
     }
 }

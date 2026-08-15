@@ -3395,6 +3395,7 @@ GameObject:
   - component: {fileID: 210545635}
   - component: {fileID: 210545637}
   - component: {fileID: 210545636}
+  - component: {fileID: 210545638}
   m_Layer: 0
   m_Name: PowResultText
   m_TagString: Untagged
@@ -3460,7 +3461,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
+  m_spriteAsset: {fileID: 11400000, guid: 3196c77fd5225574aaa0a28c230c4dd4, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -3518,6 +3519,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 210545634}
   m_CullTransparentMesh: 1
+--- !u!114 &210545638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 210545634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0d06e704b3c0d54bbdcc9ae3fd0871e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltipUI: {fileID: 7364249184114269096}
 --- !u!1 &219529095
 GameObject:
   m_ObjectHideFlags: 0
@@ -4612,6 +4626,7 @@ GameObject:
   - component: {fileID: 298998525}
   - component: {fileID: 298998527}
   - component: {fileID: 298998526}
+  - component: {fileID: 298998528}
   m_Layer: 0
   m_Name: AccResultText
   m_TagString: Untagged
@@ -4677,7 +4692,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
+  m_spriteAsset: {fileID: 11400000, guid: 3196c77fd5225574aaa0a28c230c4dd4, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -4735,6 +4750,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 298998524}
   m_CullTransparentMesh: 1
+--- !u!114 &298998528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 298998524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0d06e704b3c0d54bbdcc9ae3fd0871e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tooltipUI: {fileID: 7364249184114269096}
 --- !u!1 &299212191
 GameObject:
   m_ObjectHideFlags: 0
@@ -12601,7 +12629,7 @@ GameObject:
   - component: {fileID: 861307277}
   - component: {fileID: 861307276}
   m_Layer: 0
-  m_Name: Image
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37551,7 +37579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.7882353}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

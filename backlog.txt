@@ -73,6 +73,8 @@ Correções / Melhorias (Baixa prioridade / pouco valor)
 
 Componentes de UI
     - Adicionar informações no painel do player (XP e Gold)
+    - Trabalhar com Sprites para icones de Logs e outros feedbacks 
+    - Atualizar fonte do projeto (gotica serifada)
 
 Sistema de Lore 
     - Objetivo primario "escapar do limbo salvando o reino da Sombra"
@@ -125,10 +127,7 @@ TASKS
     - Verificar Sistema/UI de Drawback / BattlerState
 
     - Icone do ActionLog está hardcoded
-    - Mudar Result preview para ação de defesa, os textos não fazem sentido para defesa
 
     - Damage popup no Hp do player 
     - Icones de tricks / perks / drawbacks 
     - Secondary Effects (UI)
-
-    - Extra dice não conta para o wearness (painel de result)
